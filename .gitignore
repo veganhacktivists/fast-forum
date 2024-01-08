@@ -96,3 +96,5 @@ schema/schema_to_accept.sql
 .branchdbcache
 
 ml
+
+.env

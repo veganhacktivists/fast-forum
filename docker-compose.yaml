@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  db:
+    image: "ankane/pgvector:v0.5.1"
+    environment:
+      PG_MAJOR: 15
+      PGPASSWORD: "${DB_PASSWORD:-secret}"
+      POSTGRES_DB: "${DB_DATABASE}"
+      POSTGRES_USER: "${DB_USERNAME}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-secret}"
+    volumes:
+      - "forum_magnum_db:/var/lib/postgresql/data"
+      - "./schema/accepted_schema.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql"
+volumes:
+  forum_magnum_db:
+    driver: local
