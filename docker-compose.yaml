@@ -4,10 +4,10 @@ services:
     image: "ankane/pgvector:v0.5.1"
     environment:
       PG_MAJOR: 15
-      PGPASSWORD: "${DB_PASSWORD:-secret}"
-      POSTGRES_DB: "${DB_DATABASE}"
-      POSTGRES_USER: "${DB_USERNAME}"
-      POSTGRES_PASSWORD: "${DB_PASSWORD:-secret}"
+      PGPASSWORD: "${PG_PASSWORD:-secret}"
+      POSTGRES_DB: "${PG_DATABASE}"
+      POSTGRES_USER: "${PG_USERNAME}"
+      POSTGRES_PASSWORD: "${PG_PASSWORD:-secret}"
     ports:
       - "${FORWARD_DB_PORT:-5432}:5432"
     volumes:
