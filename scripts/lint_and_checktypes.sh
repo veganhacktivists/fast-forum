@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Run eslint and typescript typechecker in parallel. To keep the outputs from
 # awkwardly intermingling, the linter runs redirected to a file, which is then
 # printed after the type-checker has finished.

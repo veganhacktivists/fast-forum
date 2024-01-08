@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euxo pipefail
 # ---
 # In order to have different application names for LW and the EA Forum, we need
