@@ -8,6 +8,8 @@ services:
       POSTGRES_DB: "${DB_DATABASE}"
       POSTGRES_USER: "${DB_USERNAME}"
       POSTGRES_PASSWORD: "${DB_PASSWORD:-secret}"
+    ports:
+      - "${FORWARD_DB_PORT:-5432}:5432"
     volumes:
       - "forum_magnum_db:/var/lib/postgresql/data"
       - "./schema/accepted_schema.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql"
