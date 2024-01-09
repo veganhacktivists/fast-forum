@@ -18,7 +18,7 @@ const initGlobals = (args, isProd) => {
 
   const { getInstanceSettings } = require("./packages/lesswrong/lib/executionEnvironment");
   getInstanceSettings(args); // These args will be cached for later
-}
+};
 
 const fetchImports = (args, isProd) => {
   initGlobals(args, isProd);
@@ -26,7 +26,7 @@ const fetchImports = (args, isProd) => {
   const { getSqlClientOrThrow, setSqlClient } = require("./packages/lesswrong/lib/sql/sqlClient");
   const { createSqlConnection } = require("./packages/lesswrong/server/sqlConnection");
   return { getSqlClientOrThrow, setSqlClient, createSqlConnection };
-}
+};
 
 const credentialsPath = (forumType) => {
   const memorizedBases = {
@@ -35,19 +35,19 @@ const credentialsPath = (forumType) => {
   };
   const base = process.env.GITHUB_WORKSPACE ?? memorizedBases[forumType] ?? ".";
   const memorizedRepoNames = {
-    lw: 'LessWrong-Credentials',
-    ea: 'ForumCredentials',
+    lw: "LessWrong-Credentials",
+    ea: "ForumCredentials",
   };
   const repoName = memorizedRepoNames[forumType];
   if (!repoName) {
     return base;
   }
   return `${base}/${repoName}`;
-}
+};
 
 const settingsFilePath = (fileName, forumType) => {
   return `${credentialsPath(forumType)}/${fileName}`;
-}
+};
 
 const databaseConfig = (mode, forumType) => {
   if (!mode) {
@@ -71,13 +71,13 @@ const settingsFileName = (mode, forumType) => {
   if (!mode) {
     // With the state of the code when this comment was written, this indicates
     // an error condition, but it will be handled later, around L60
-    return '';
+    return "";
   }
-  if (forumType === 'lw') {
-    if (mode === 'prod') {
-      return 'settings-production-lesswrong.json';
+  if (forumType === "lw") {
+    if (mode === "prod") {
+      return "settings-production-lesswrong.json";
     }
-    return 'settings-local-dev-devdb.json'
+    return "settings-local-dev-devdb.json";
   }
   return `settings-${mode}.json`;
 };
@@ -100,22 +100,20 @@ const settingsFileName = (mode, forumType) => {
   }
 
   const forumType = process.argv[4];
-  const forumTypeIsSpecified = ['lw', 'ea'].includes(forumType)
+  const forumTypeIsSpecified = ["lw", "ea"].includes(forumType);
 
-  const dbConf = databaseConfig(mode, forumType);
-  if (dbConf.postgresUrl) {
-    process.env.PG_URL = dbConf.postgresUrl;
-  }
+  process.env.PG_URL ??= databaseConfig(mode, forumType).postgresUrl;
+
   const args = {
     postgresUrl: process.env.PG_URL,
     settingsFileName: process.env.SETTINGS_FILE || settingsFileName(mode, forumType),
     shellMode: false,
   };
-  
+
   await startSshTunnel(databaseConfig(mode, forumType).sshTunnelCommand);
 
   if (["dev", "staging", "prod", "xpost"].includes(mode)) {
-    console.log('Running migrations in mode', mode);
+    console.log("Running migrations in mode", mode);
     args.settingsFileName = settingsFilePath(settingsFileName(mode, forumType), forumType);
     if (command !== "create") {
       process.argv = process.argv.slice(0, 3).concat(process.argv.slice(forumTypeIsSpecified ? 5 : 4));
@@ -123,28 +121,26 @@ const settingsFileName = (mode, forumType) => {
       process.argv.pop();
     }
   } else if (args.postgresUrl && args.settingsFileName) {
-    console.log('Using PG_URL and SETTINGS_FILE from environment');
+    console.log("Using PG_URL and SETTINGS_FILE from environment");
   } else {
-    throw new Error('Unable to run migration without a mode or environment (PG_URL and SETTINGS_FILE)');
+    throw new Error("Unable to run migration without a mode or environment (PG_URL and SETTINGS_FILE)");
   }
 
   const { getSqlClientOrThrow, setSqlClient, createSqlConnection } = fetchImports(args, mode === "prod");
 
   if (isRunCommand) {
-    const {initServer} = require("./packages/lesswrong/server/serverStartup");
+    const { initServer } = require("./packages/lesswrong/server/serverStartup");
     await initServer(args);
   }
 
   let exitCode = 0;
 
-  const db = isRunCommand
-    ? getSqlClientOrThrow()
-    : await createSqlConnection(args.postgresUrl);
+  const db = isRunCommand ? getSqlClientOrThrow() : await createSqlConnection(args.postgresUrl);
 
   try {
     await db.tx(async (transaction) => {
       setSqlClient(transaction);
-      const { createMigrator }  = require("./packages/lesswrong/server/migrations/meta/umzug");
+      const { createMigrator } = require("./packages/lesswrong/server/migrations/meta/umzug");
       const migrator = await createMigrator(transaction);
       const result = await migrator.runAsCLI();
       if (!result) {
