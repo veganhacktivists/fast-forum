@@ -1,10 +1,18 @@
 #!/usr/bin/env node
 const { build, cliopts } = require("estrella");
-const fs = require('fs');
-const process = require('process');
+const fs = require("fs");
+const process = require("process");
 const { zlib } = require("mz");
-const { getDatabaseConfig, startSshTunnel, getOutputDir, setOutputDir } = require("./scripts/startup/buildUtil");
-const { setClientRebuildInProgress, setServerRebuildInProgress, generateBuildId, startAutoRefreshServer, initiateRefresh, startLint } = require("./scripts/startup/autoRefreshServer");
+const { getOutputDir, setOutputDir } = require("./scripts/startup/buildUtil");
+const {
+  setClientRebuildInProgress,
+  setServerRebuildInProgress,
+  generateBuildId,
+  startAutoRefreshServer,
+  initiateRefresh,
+  startLint,
+} = require("./scripts/startup/autoRefreshServer");
+
 /**
  * This is used for clean exiting in Github workflows by the dev
  * only route /api/quit
@@ -30,7 +38,7 @@ const getServerPort = () => {
   }
   const port = parseInt(process.env.PORT ?? "");
   return Number.isNaN(port) ? defaultServerPort : port;
-}
+};
 
 let latestCompletedBuildId = generateBuildId();
 let inProgressBuildId = null;
@@ -39,24 +47,9 @@ const websocketPort = serverPort + 1;
 
 setOutputDir(`./build${serverPort === defaultServerPort ? "" : serverPort}`);
 
-// Two things this script should do, that it currently doesn't:
-//  * Provide a websocket server for signaling autorefresh
+const isProduction = "production" in opts ? opts.production : process.env.NODE_ENV === "production";
 
-const isProduction = !!opts.production;
-const settingsFile = opts.settings || "settings.json"
-
-const databaseConfig = getDatabaseConfig(opts);
-process.env.PG_URL = databaseConfig.postgresUrl;
-
-if (databaseConfig.sshTunnelCommand) {
-  startSshTunnel(databaseConfig.sshTunnelCommand);
-}
-
-if (isProduction) {
-  process.env.NODE_ENV="production";
-} else {
-  process.env.NODE_ENV="development";
-}
+const settingsFile = opts.settings ?? process.env.SETTINGS_FILE ?? "settings.json";
 
 const clientBundleBanner = `/*
  * LessWrong 2.0 (client JS bundle)
@@ -66,32 +59,31 @@ const clientBundleBanner = `/*
  * Includes CkEditor.
  * Copyright (c) 2003-2022, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see https://github.com/ckeditor/ckeditor5/blob/master/LICENSE.md
- */`
+ */`;
 
 const bundleDefinitions = {
-  "process.env.NODE_ENV": isProduction ? "\"production\"" : "\"development\"",
-  "bundleIsProduction": isProduction,
-  "bundleIsTest": false,
-  "bundleIsMigrations": false,
-  "defaultSiteAbsoluteUrl": `\"${process.env.ROOT_URL || ""}\"`,
-  "buildId": `"${latestCompletedBuildId}"`,
-  "serverPort": getServerPort(),
-  "ddEnv": `\"${process.env.DD_ENV || "local"}\"`,
+  bundleIsProduction: isProduction,
+  bundleIsTest: false,
+  bundleIsMigrations: false,
+  defaultSiteAbsoluteUrl: `\"${process.env.ROOT_URL || ""}\"`,
+  buildId: `"${latestCompletedBuildId}"`,
+  serverPort: getServerPort(),
+  ddEnv: `\"${process.env.DD_ENV || "local"}\"`,
 };
 
 const clientBundleDefinitions = {
-  "bundleIsServer": false,
-  "global": "window",
-}
+  bundleIsServer: false,
+  global: "window",
+};
 
 const serverBundleDefinitions = {
-  "bundleIsServer": true,
-  "estrellaPid": process.pid,
-}
+  bundleIsServer: true,
+  estrellaPid: process.pid,
+};
 
 const clientOutfilePath = `${getOutputDir()}/client/js/bundle.js`;
 build({
-  entryPoints: ['./packages/lesswrong/client/clientStartup.ts'],
+  entryPoints: ["./packages/lesswrong/client/clientStartup.ts"],
   bundle: true,
   target: "es6",
   sourcemap: true,
@@ -123,12 +115,12 @@ build({
         fs.unlinkSync(brotliOutfilePath);
       }
       if (isProduction) {
-        fs.writeFileSync(brotliOutfilePath, zlib.brotliCompressSync(fs.readFileSync(clientOutfilePath, 'utf8')));
+        fs.writeFileSync(brotliOutfilePath, zlib.brotliCompressSync(fs.readFileSync(clientOutfilePath, "utf8")));
       }
 
       latestCompletedBuildId = inProgressBuildId;
       if (cliopts.watch) {
-        initiateRefresh({serverPort});
+        initiateRefresh({ serverPort });
       }
     }
     inProgressBuildId = null;
@@ -139,18 +131,26 @@ build({
   },
 });
 
-let serverCli = ["node", "-r", "source-map-support/register", "--", `${getOutputDir()}/server/js/serverBundle.js`, "--settings", settingsFile]
-if (opts.shell)
-  serverCli.push("--shell");
+let serverCli = [
+  "node",
+  "-r",
+  "source-map-support/register",
+  "--",
+  `${getOutputDir()}/server/js/serverBundle.js`,
+  "--settings",
+  settingsFile,
+];
+if (opts.shell) serverCli.push("--shell");
 if (opts.command) {
   serverCli.push("--command");
   serverCli.push(opts.command);
 }
-if (!isProduction)
+if (!isProduction) {
   serverCli.splice(1, 0, "--inspect");
+}
 
 build({
-  entryPoints: ['./packages/lesswrong/server/runServer.ts'],
+  entryPoints: ["./packages/lesswrong/server/runServer.ts"],
   bundle: true,
   outfile: `${getOutputDir()}/server/js/serverBundle.js`,
   platform: "node",
@@ -167,7 +167,7 @@ build({
   onEnd: () => {
     setServerRebuildInProgress(false);
     if (cliopts.watch) {
-      initiateRefresh({serverPort});
+      initiateRefresh({ serverPort });
     }
   },
   define: {
@@ -175,15 +175,42 @@ build({
     ...serverBundleDefinitions,
   },
   external: [
-    "akismet-api", "canvas", "express", "mz", "pg", "pg-promise", "mathjax", "mathjax-node",
-    "mathjax-node-page", "jsdom", "@sentry/node", "node-fetch", "later", "turndown",
-    "apollo-server", "apollo-server-express", "graphql", "csso", "io-ts", "fp-ts",
-    "bcrypt", "node-pre-gyp", "intercom-client", "node:*",
-    "fsevents", "chokidar", "auth0", "dd-trace", "pg-formatter",
-    "gpt-3-encoder", "@elastic/elasticsearch", "zod", "node-abort-controller",
+    "akismet-api",
+    "canvas",
+    "express",
+    "mz",
+    "pg",
+    "pg-promise",
+    "mathjax",
+    "mathjax-node",
+    "mathjax-node-page",
+    "jsdom",
+    "@sentry/node",
+    "node-fetch",
+    "later",
+    "turndown",
+    "apollo-server",
+    "apollo-server-express",
+    "graphql",
+    "csso",
+    "io-ts",
+    "fp-ts",
+    "bcrypt",
+    "node-pre-gyp",
+    "intercom-client",
+    "node:*",
+    "fsevents",
+    "chokidar",
+    "auth0",
+    "dd-trace",
+    "pg-formatter",
+    "gpt-3-encoder",
+    "@elastic/elasticsearch",
+    "zod",
+    "node-abort-controller",
   ],
-})
+});
 
 if (cliopts.watch && cliopts.run && !isProduction) {
-  startAutoRefreshServer({serverPort, websocketPort});
+  startAutoRefreshServer({ serverPort, websocketPort });
 }

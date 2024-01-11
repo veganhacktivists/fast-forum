@@ -1,7 +1,7 @@
-const fs = require('fs');
-const { spawnSync } = require('child_process');
+const fs = require("fs");
+const { spawnSync } = require("child_process");
 
-const fragmentsFilePath = 'packages/lesswrong/lib/generated/fragmentTypes.d.ts';
+const fragmentsFilePath = "packages/lesswrong/lib/generated/fragmentTypes.d.ts";
 
 /*
  * Experimentally determine which fields in our graphql fragments are unused,
@@ -17,26 +17,26 @@ const fragmentsFilePath = 'packages/lesswrong/lib/generated/fragmentTypes.d.ts';
  */
 
 function main() {
-  const fragmentsFile = fs.readFileSync(fragmentsFilePath, 'utf8');
-  const fragmentsFileLines = fragmentsFile.split('\n');
-  
-  if(hasAnyTypeErrors()) {
+  const fragmentsFile = fs.readFileSync(fragmentsFilePath, "utf8");
+  const fragmentsFileLines = fragmentsFile.split("\n");
+
+  if (hasAnyTypeErrors()) {
     console.error("Can't run unused fragment-field detection: There are already type errors.");
     return;
   }
-  
-  for(let i=0; i<fragmentsFileLines.length; i++) {
+
+  for (let i = 0; i < fragmentsFileLines.length; i++) {
     const line = fragmentsFileLines[i];
-    if(!lineIsTestableFragmentField(line)) {
+    if (!lineIsTestableFragmentField(line)) {
       console.log(line);
       continue;
     }
     let linesWithOneCommented = [...fragmentsFileLines];
-    linesWithOneCommented [i] = `//${line} //Commented out my markUnusedFragmentFields.js for test`;
+    linesWithOneCommented[i] = `//${line} //Commented out my markUnusedFragmentFields.js for test`;
     const fileWithLineCommented = linesWithOneCommented.join("\n");
-    fs.writeFileSync(fragmentsFilePath, fileWithLineCommented, 'utf8');
-    
-    if(hasAnyTypeErrors()) {
+    fs.writeFileSync(fragmentsFilePath, fileWithLineCommented, "utf8");
+
+    if (hasAnyTypeErrors()) {
       console.log(line);
     } else {
       console.log(`${line} //UNUSED`);
@@ -47,31 +47,31 @@ function main() {
 function lineIsTestableFragmentField(line) {
   let numOpenCurlies = countStrsInStr(line, "{");
   let numCloseCurlies = countStrsInStr(line, "}");
-  if(numOpenCurlies !== numCloseCurlies) {
+  if (numOpenCurlies !== numCloseCurlies) {
     return false;
   }
-  if(line.trim().length == 0) {
+  if (line.trim().length == 0) {
     return false;
   }
-  if(line.trim().startsWith("//")) {
+  if (line.trim().startsWith("//")) {
     return false;
   }
-  
+
   return true;
 }
 
 function countStrsInStr(haystack, needle) {
-  if(needle.length === 0 || haystack.length === 0) {
+  if (needle.length === 0 || haystack.length === 0) {
     return 0;
   }
-  return (haystack.split(needle).length - 1);
+  return haystack.split(needle).length - 1;
 }
 
 function hasAnyTypeErrors() {
-  const result = spawnSync('yarn', ['run', '--silent', 'tsc']);
+  const result = spawnSync("pnpm", ["run", "--silent", "tsc"]);
   const exitStatus = result.status;
-  
-  return exitStatus!==0;
+
+  return exitStatus !== 0;
 }
 
 main();

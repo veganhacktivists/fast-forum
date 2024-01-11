@@ -1,10 +1,10 @@
 // @ts-check
-const WebSocket = require('ws');
-const crypto = require('crypto');
-const fs = require('fs');
-const { getOutputDir } = require('./buildUtil');
-const childProcess = require('child_process');
-const { promisify } = require('util');
+const WebSocket = require("ws");
+const crypto = require("crypto");
+const fs = require("fs");
+const { getOutputDir } = require("./buildUtil");
+const childProcess = require("child_process");
+const { promisify } = require("util");
 
 const openWebsocketConnections = [];
 let clientRebuildInProgress = false;
@@ -22,7 +22,7 @@ async function isServerReady(serverPort) {
   try {
     const response = await fetch(readyApiUrl);
     return response.ok;
-  } catch(e) {
+  } catch (e) {
     return false;
   }
 }
@@ -54,30 +54,28 @@ function getServerBundleTimestamp() {
 function getEitherBundleTimestamp() {
   let clientBundleTimestamp = getClientBundleTimestamp();
   let serverBundleTimestamp = getServerBundleTimestamp();
-  if (clientBundleTimestamp > serverBundleTimestamp)
-    return clientBundleTimestamp;
-  else
-    return serverBundleTimestamp;
+  if (clientBundleTimestamp > serverBundleTimestamp) return clientBundleTimestamp;
+  else return serverBundleTimestamp;
 }
 
 function generateBuildId() {
-  return crypto.randomBytes(12).toString('base64');
+  return crypto.randomBytes(12).toString("base64");
 }
 
 let refreshIsPending = false;
-async function initiateRefresh({serverPort}) {
+async function initiateRefresh({ serverPort }) {
   if (refreshIsPending || clientRebuildInProgress || serverRebuildInProgress) {
     return;
   }
-  
+
   // Wait just long enough to make sure estrella has killed the old server
   // process so that when we check for server-readiness, we don't accidentally
   // check the process that's being replaced.
   await asyncSleep(100);
-  
+
   refreshIsPending = true;
   await waitForServerReady(serverPort);
-  
+
   if (openWebsocketConnections.length > 0) {
     console.log(`Notifying ${openWebsocketConnections.length} connected browser windows to refresh`);
     for (let connection of openWebsocketConnections) {
@@ -86,26 +84,25 @@ async function initiateRefresh({serverPort}) {
   } else {
     console.log("Not sending auto-refresh notifications (no connected browsers to notify)");
   }
-  
+
   refreshIsPending = false;
 }
 
-function startAutoRefreshServer({serverPort, websocketPort}) {
+function startAutoRefreshServer({ serverPort, websocketPort }) {
   const server = new WebSocket.Server({
     port: websocketPort,
   });
-  server.on('connection', async (ws) => {
+  server.on("connection", async (ws) => {
     openWebsocketConnections.push(ws);
-    
-    ws.on('message', (data) => {
-    });
-    ws.on('close', function close() {
+
+    ws.on("message", (data) => {});
+    ws.on("close", function close() {
       const connectionIndex = openWebsocketConnections.indexOf(ws);
       if (connectionIndex >= 0) {
         openWebsocketConnections.splice(connectionIndex, 1);
       }
     });
-    
+
     await waitForServerReady(serverPort);
     ws.send(`{"latestBuildTimestamp": "${getEitherBundleTimestamp()}"}`);
   });
@@ -122,13 +119,20 @@ async function startLint() {
   eslintIsRunning = true;
 
   try {
-    const eslintProcess = childProcess.spawn('yarn', ['--silent', 'eslint'], { stdio: 'inherit' });
-    eslintProcess.on('close', () => {
+    const eslintProcess = childProcess.spawn("pnpm", ["--silent", "eslint"], { stdio: "inherit" });
+    eslintProcess.on("close", () => {
       eslintIsRunning = false;
     });
-  } catch(err) {
-    console.error('Lint failed: ', err);
+  } catch (err) {
+    console.error("Lint failed: ", err);
   }
 }
 
-module.exports = { setClientRebuildInProgress, setServerRebuildInProgress, generateBuildId, startAutoRefreshServer, initiateRefresh, startLint };
+module.exports = {
+  setClientRebuildInProgress,
+  setServerRebuildInProgress,
+  generateBuildId,
+  startAutoRefreshServer,
+  initiateRefresh,
+  startLint,
+};

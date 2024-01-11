@@ -1,24 +1,22 @@
-import { CommandLineArguments, isAnyTest, isMigrations } from '../lib/executionEnvironment';
-import process from 'process';
-import fs from 'fs';
-
+import { CommandLineArguments, isAnyTest, isMigrations } from "../lib/executionEnvironment";
+import process from "process";
+import fs from "fs";
 
 const parseCommandLine = (argv: Array<string>): CommandLineArguments => {
   const commandLine: CommandLineArguments = {
     postgresUrl: process.env.PG_URL || "",
     postgresReadUrl: process.env.PG_READ_URL || "",
-    settingsFileName: "settings.json",
+    settingsFileName: process.env.SETTINGS_FILE || "settings.json",
     shellMode: false,
-  }
-  
+  };
+
   // Don't parse command-line arguments during unit testing (because jest passes
   // its command line arguments through).
-  if (isAnyTest)
-    return commandLine;
-  
-  for (let i=2; i<argv.length; i++) {
+  if (isAnyTest) return commandLine;
+
+  for (let i = 2; i < argv.length; i++) {
     const arg = argv[i];
-    switch(arg) {
+    switch (arg) {
       case "--settings":
         commandLine.settingsFileName = argv[++i];
         break;
@@ -34,30 +32,29 @@ const parseCommandLine = (argv: Array<string>): CommandLineArguments => {
         }
     }
   }
-  
+
   return commandLine;
-}
+};
 
 export const getCommandLineArguments = () => {
   return parseCommandLine(process.argv);
-}
+};
 
 export const loadInstanceSettings = (args?: CommandLineArguments) => {
   const commandLineArguments = args ?? parseCommandLine(process.argv);
   const instanceSettings = loadSettingsFile(commandLineArguments.settingsFileName);
   return instanceSettings;
-}
+};
 
 function loadSettingsFile(filename: string) {
   if (isAnyTest) {
     filename = "./settings-test.json";
   }
   const settingsFileText = readTextFile(filename);
-  if (!settingsFileText)
-    throw new Error(`Settings file ${filename} not found.`);
+  if (!settingsFileText) throw new Error(`Settings file ${filename} not found.`);
   return JSON.parse(settingsFileText);
 }
 
-const readTextFile = (filename: string): string|null => {
-  return fs.readFileSync(filename, 'utf8');
-}
+const readTextFile = (filename: string): string | null => {
+  return fs.readFileSync(filename, "utf8");
+};

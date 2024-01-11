@@ -4,15 +4,25 @@ services:
     image: "ankane/pgvector:v0.5.1"
     environment:
       PG_MAJOR: 15
-      PGPASSWORD: "${PG_PASSWORD:-secret}"
+      PGPASSWORD: "${PG_PASSWORD}"
       POSTGRES_DB: "${PG_DATABASE}"
       POSTGRES_USER: "${PG_USERNAME}"
-      POSTGRES_PASSWORD: "${PG_PASSWORD:-secret}"
+      POSTGRES_PASSWORD: "${PG_PASSWORD}"
     ports:
       - "${FORWARD_DB_PORT:-5432}:5432"
     volumes:
       - "forum_magnum_db:/var/lib/postgresql/data"
       - "./schema/accepted_schema.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql"
+  web:
+    build: .
+    depends_on:
+      - "db"
+    environment:
+      SETTINGS_FILE: "settings-dev.json"
+      PG_HOST: "db"
+      PG_URL: "postgresql://${PG_USERNAME}:${PG_PASSWORD}@db:${FORWARD_DB_PORT}/${PG_DATABASE}"
+    ports:
+      - "${PORT:-3000}:3000"
 volumes:
   forum_magnum_db:
     driver: local

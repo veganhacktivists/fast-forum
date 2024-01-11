@@ -5,7 +5,7 @@
  * and SETTINGS_FILE
  */
 require("ts-node/register");
-const { getDatabaseConfig, startSshTunnel } = require("./scripts/startup/buildUtil");
+const { getDatabaseConfig } = require("./scripts/startup/buildUtil");
 
 const initGlobals = (args, isProd) => {
   global.bundleIsServer = true;
@@ -45,39 +45,15 @@ const credentialsPath = (forumType) => {
   return `${base}/${repoName}`;
 };
 
-const settingsFilePath = (fileName, forumType) => {
-  return `${credentialsPath(forumType)}/${fileName}`;
-};
-
-const databaseConfig = (mode, forumType) => {
-  if (!mode) {
-    return {};
+const settingsFileName = (mode) => {
+  if (process.env.SETTINGS_FILE) {
+    return process.env.SETTINGS_FILE;
   }
-  const memorizedConfigPaths = {
-    lw: {
-      db: `${credentialsPath(forumType)}/connectionConfigs/${mode}.json`,
-    },
-    ea: {
-      postgresUrlFile: `${credentialsPath(forumType)}/${mode}-pg-conn.txt`,
-    },
-  };
-  const configPath = memorizedConfigPaths[forumType] || {
-    postgresUrlFile: `${credentialsPath(forumType)}/${mode}-pg-conn.txt`,
-  };
-  return getDatabaseConfig(configPath);
-};
-
-const settingsFileName = (mode, forumType) => {
   if (!mode) {
     // With the state of the code when this comment was written, this indicates
     // an error condition, but it will be handled later, around L60
+    throw new Error("No SETTINGS_FILE variable specified");
     return "";
-  }
-  if (forumType === "lw") {
-    if (mode === "prod") {
-      return "settings-production-lesswrong.json";
-    }
-    return "settings-local-dev-devdb.json";
   }
   return `settings-${mode}.json`;
 };
@@ -100,29 +76,16 @@ const settingsFileName = (mode, forumType) => {
   }
 
   const forumType = process.argv[4];
-  const forumTypeIsSpecified = ["lw", "ea"].includes(forumType);
 
-  process.env.PG_URL ??= databaseConfig(mode, forumType).postgresUrl;
+  const { postgresUrl } = getDatabaseConfig();
 
   const args = {
-    postgresUrl: process.env.PG_URL,
-    settingsFileName: process.env.SETTINGS_FILE || settingsFileName(mode, forumType),
+    postgresUrl,
+    settingsFileName: settingsFileName(mode, forumType),
     shellMode: false,
   };
 
-  await startSshTunnel(databaseConfig(mode, forumType).sshTunnelCommand);
-
-  if (["dev", "staging", "prod", "xpost"].includes(mode)) {
-    console.log("Running migrations in mode", mode);
-    args.settingsFileName = settingsFilePath(settingsFileName(mode, forumType), forumType);
-    if (command !== "create") {
-      process.argv = process.argv.slice(0, 3).concat(process.argv.slice(forumTypeIsSpecified ? 5 : 4));
-    } else if (forumTypeIsSpecified) {
-      process.argv.pop();
-    }
-  } else if (args.postgresUrl && args.settingsFileName) {
-    console.log("Using PG_URL and SETTINGS_FILE from environment");
-  } else {
+  if (!args.postgresUrl || !args.settingsFileName) {
     throw new Error("Unable to run migration without a mode or environment (PG_URL and SETTINGS_FILE)");
   }
 

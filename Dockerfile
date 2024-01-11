@@ -1,20 +1,27 @@
 # Node 18.x is LTS
-FROM node:18.15.0
+FROM node:18 AS base
 ENV IS_DOCKER=true
-# Transcrypt dependency
-RUN apt-get update && apt-get install -y bsdmainutils
-# Install transcrypt for EA Forum
-RUN curl -sSLo /usr/local/bin/transcrypt https://raw.githubusercontent.com/elasticdog/transcrypt/2f905dce485114fec10fb747443027c0f9119caa/transcrypt && chmod +x /usr/local/bin/transcrypt
-WORKDIR /usr/src/app
-# Copy only files necessary for yarn install, to avoid spurious changes
-# triggering re-install
-COPY package.json package.json
-COPY yarn.lock yarn.lock
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+COPY . /app
+WORKDIR /app
+
+FROM base
+ARG NODE_ENV="production"
+ENV NODE_ENV="${NODE_ENV}"
+ENV NODE_OPTIONS="--max_old_space_size=2560 --heapsnapshot-signal=SIGUSR2"
+
+COPY pnpm-lock.yaml package.json ./
+RUN pnpm install --frozen-lockfile --shamefully-hoist
+
+# COPY yarn.lock yarn.lock
+# RUN yarn install && yarn cache clean
+
 COPY public/lesswrong-editor public/lesswrong-editor
-COPY scripts/postinstall.sh scripts/postinstall.sh
-# clear the cache -- it's not useful and it adds to the time docker takes to
-# save the layer diff
-RUN yarn install && yarn cache clean
+
 COPY . .
-EXPOSE 8080
-CMD [ "yarn", "run", "production" ]
+
+EXPOSE 3000
+
+CMD [ "pnpm", "run", "start" ]
