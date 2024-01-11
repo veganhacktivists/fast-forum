@@ -22,4 +22,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD [ "pnpm", "run", "start" ]
+CMD [ "pnpm", "run", "production" ]
