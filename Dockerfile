@@ -11,10 +11,6 @@ ARG NODE_ENV="production"
 ENV NODE_ENV="${NODE_ENV}"
 ENV NODE_OPTIONS="--max_old_space_size=2560 --heapsnapshot-signal=SIGUSR2"
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends perl=5.36.0-7+deb12u1 \
-  && rm -rf /var/lib/apt/lists/*
-
 COPY pnpm-lock.yaml package.json ./
 RUN pnpm install --frozen-lockfile --shamefully-hoist
 
