@@ -4,13 +4,16 @@ ENV IS_DOCKER=true
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-COPY . /app
-WORKDIR /app
+WORKDIR /usr/src/app
 
 FROM base
 ARG NODE_ENV="production"
 ENV NODE_ENV="${NODE_ENV}"
 ENV NODE_OPTIONS="--max_old_space_size=2560 --heapsnapshot-signal=SIGUSR2"
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends perl=5.36.0-7+deb12u1 \
+  && rm -rf /var/lib/apt/lists/*
 
 COPY pnpm-lock.yaml package.json ./
 RUN pnpm install --frozen-lockfile --shamefully-hoist
@@ -19,7 +22,6 @@ RUN pnpm install --frozen-lockfile --shamefully-hoist
 # RUN yarn install && yarn cache clean
 
 COPY public/lesswrong-editor public/lesswrong-editor
-
 COPY . .
 
 EXPOSE 3000

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 const { build, cliopts } = require("estrella");
 const fs = require("fs");
 const process = require("process");
@@ -45,7 +46,7 @@ let inProgressBuildId = null;
 const serverPort = getServerPort();
 const websocketPort = serverPort + 1;
 
-setOutputDir(`./build${serverPort === defaultServerPort ? "" : serverPort}`);
+setOutputDir(`./build`);
 
 const isProduction = "production" in opts ? opts.production : process.env.NODE_ENV === "production";
 
@@ -132,7 +133,7 @@ build({
 });
 
 let serverCli = [
-  "node",
+  process.argv[0],
   "-r",
   "source-map-support/register",
   "--",
