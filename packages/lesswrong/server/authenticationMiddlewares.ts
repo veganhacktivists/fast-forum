@@ -55,16 +55,20 @@ class Auth0StrategyFixed extends Auth0Strategy {
 const googleClientIdSetting = new DatabaseServerSetting<string | null>("oAuth.google.clientId", null);
 const googleOAuthSecretSetting = new DatabaseServerSetting<string | null>("oAuth.google.secret", null);
 
-const auth0ClientIdSetting = new DatabaseServerSetting<string | null>("oAuth.auth0.appId", null);
-const auth0OAuthSecretSetting = new DatabaseServerSetting<string | null>("oAuth.auth0.secret", null);
-const auth0DomainSetting = new DatabaseServerSetting<string | null>("oAuth.auth0.domain", null);
+const auth0ClientId =
+  process.env.AUTH0_CLIENT_ID || new DatabaseServerSetting<string | null>("oAuth.auth0.appId", null).get();
+const auth0OAuthSecret =
+  process.env.AUTH0_SECRET || new DatabaseServerSetting<string | null>("oAuth.auth0.secret", null).get();
+const auth0Domain =
+  process.env.AUTH0_DOMAIN || new DatabaseServerSetting<string | null>("oAuth.auth0.domain", null).get();
 
 const facebookClientIdSetting = new DatabaseServerSetting<string | null>("oAuth.facebook.appId", null);
 const facebookOAuthSecretSetting = new DatabaseServerSetting<string | null>("oAuth.facebook.secret", null);
 
 const githubClientIdSetting = new DatabaseServerSetting<string | null>("oAuth.github.clientId", null);
 const githubOAuthSecretSetting = new DatabaseServerSetting<string | null>("oAuth.github.secret", null);
-export const expressSessionSecretSetting = new DatabaseServerSetting<string | null>("expressSessionSecret", null);
+export const expressSessionSecret =
+  process.env.SECRET || new DatabaseServerSetting<string | null>("expressSessionSecret", null).get();
 
 type IdFromProfile<P extends Profile> = (profile: P) => string | number;
 type UserDataFromProfile<P extends Profile> = (profile: P) => Promise<Partial<DbUser>>;
@@ -209,7 +213,9 @@ async function syncOAuthUser(user: DbUser, profile: Profile): Promise<DbUser> {
  * non-returnTo logins to erroneously redirect
  */
 function saveReturnTo(req: any): void {
-  if (!(process.env.SESSION_SECRET || expressSessionSecretSetting.get())) return;
+  if (!expressSessionSecret) {
+    return;
+  }
   let { returnTo } = req.query;
   if (!returnTo || !req.session) return;
 
@@ -228,7 +234,7 @@ function saveReturnTo(req: any): void {
  * Assumes that the initial request was made with a returnTo query parameter
  */
 function getReturnTo(req: any): string {
-  if (!expressSessionSecretSetting.get() || !req.session?.loginReturnTo) return "/";
+  if (!expressSessionSecret || !req.session?.loginReturnTo) return "/";
   if (moment(req.session.loginReturnTo.expiration) < moment()) return "/";
   return req.session.loginReturnTo.path;
 }
@@ -318,14 +324,11 @@ export const addAuthMiddlewares = (addConnectHandler: AddMiddlewareType) => {
       // Need to log the user out of their Auth0 account. Otherwise when they
       // next try to login they won't be given a choice, just auto-resumed to
       // the same Auth0 account.
-      if (auth0DomainSetting.get() && auth0ClientIdSetting.get() && isEAForum) {
+      if (auth0Domain && auth0ClientId && isEAForum) {
         // Will redirect to our homepage, and is a noop if they're not logged in
         // to an Auth0 account, so this is very non-disruptive
         const returnUrl = encodeURIComponent(siteUrlSetting.get());
-        res.setHeader(
-          "Location",
-          `https://${auth0DomainSetting.get()}/v2/logout?client_id=${auth0ClientIdSetting.get()}&returnTo=${returnUrl}`,
-        );
+        res.setHeader("Location", `https://${auth0Domain}/v2/logout?client_id=${auth0ClientId}&returnTo=${returnUrl}`);
       } else {
         res.setHeader("Location", "/");
       }
@@ -466,9 +469,9 @@ export const addAuthMiddlewares = (addConnectHandler: AddMiddlewareType) => {
 
   // NB: You must also set the expressSessionSecret setting in your database
   // settings - auth0 passport strategy relies on express-session to store state
-  const auth0ClientId = process.env.AUTH0_CLIENT_ID || auth0ClientIdSetting.get();
-  const auth0OAuthSecret = process.env.AUTH0_SECRET || auth0OAuthSecretSetting.get();
-  const auth0Domain = process.env.AUTH0_DOMAIN || auth0DomainSetting.get();
+  // const auth0ClientId = process.env.AUTH0_CLIENT_ID || auth0ClientIdSetting.get();
+  // const auth0OAuthSecret = process.env.AUTH0_SECRET || auth0OAuthSecretSetting.get();
+  // const auth0Domain = process.env.AUTH0_DOMAIN || auth0DomainSetting.get();
 
   if (auth0ClientId && auth0OAuthSecret && auth0Domain) {
     const auth0Strategy = new Auth0StrategyFixed(
