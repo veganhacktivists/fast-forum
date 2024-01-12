@@ -15,13 +15,13 @@ RUN pnpm install --frozen-lockfile --shamefully-hoist
 COPY public/lesswrong-editor public/lesswrong-editor
 COPY . .
 
-EXPOSE 3000
-
 ENV SETTINGS_FILE="settings.json"
 
 ARG NODE_ENV="production"
 ENV NODE_ENV="${NODE_ENV}"
 ENV NODE_OPTIONS="--max_old_space_size=2560 --heapsnapshot-signal=SIGUSR2"
 
+EXPOSE $PORT
+
 # migrate up runs migrations and starts the service
-CMD [ "pnpm", "run", "migrate", "up" ]
+CMD pnpm migrate up && pnpm production
