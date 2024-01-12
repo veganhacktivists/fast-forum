@@ -1,28 +1,28 @@
 /* eslint-disable no-console */
-import './datadog/tracer';
-import { createSqlConnection } from './sqlConnection';
-import { getSqlClientOrThrow, replaceDbNameInPgConnectionString, setSqlClient } from '../lib/sql/sqlClient';
-import PgCollection, { DbTarget } from '../lib/sql/PgCollection';
-import { Collections } from '../lib/vulcan-lib/getCollection';
-import { runStartupFunctions, isAnyTest, isMigrations, CommandLineArguments } from '../lib/executionEnvironment';
+// import './datadog/tracer';
+import { createSqlConnection } from "./sqlConnection";
+import { getSqlClientOrThrow, replaceDbNameInPgConnectionString, setSqlClient } from "../lib/sql/sqlClient";
+import PgCollection, { DbTarget } from "../lib/sql/PgCollection";
+import { Collections } from "../lib/vulcan-lib/getCollection";
+import { runStartupFunctions, isAnyTest, isMigrations, CommandLineArguments } from "../lib/executionEnvironment";
 import { PublicInstanceSetting } from "../lib/instanceSettings";
-import { refreshSettingsCaches } from './loadDatabaseSettings';
-import { getCommandLineArguments } from './commandLine';
-import { startWebserver } from './apolloServer';
-import { initGraphQL } from './vulcan-lib/apollo-server/initGraphQL';
-import { createVoteableUnionType } from './votingGraphQL';
-import { Globals, Vulcan } from '../lib/vulcan-lib/config';
+import { refreshSettingsCaches } from "./loadDatabaseSettings";
+import { getCommandLineArguments } from "./commandLine";
+import { startWebserver } from "./apolloServer";
+import { initGraphQL } from "./vulcan-lib/apollo-server/initGraphQL";
+import { createVoteableUnionType } from "./votingGraphQL";
+import { Globals, Vulcan } from "../lib/vulcan-lib/config";
 import { getBranchDbName } from "./branchDb";
-import { dropAndCreatePg } from './testingSqlClient';
-import process from 'process';
-import chokidar from 'chokidar';
-import fs from 'fs';
-import { basename, join } from 'path';
-import { filterConsoleLogSpam, wrapConsoleLogFunctions } from '../lib/consoleFilters';
-import { ensurePostgresViewsExist } from './postgresView';
-import cluster from 'node:cluster';
-import { cpus } from 'node:os';
-import { panic } from './utils/errorUtil';
+import { dropAndCreatePg } from "./testingSqlClient";
+import process from "process";
+import chokidar from "chokidar";
+import fs from "fs";
+import { basename, join } from "path";
+import { filterConsoleLogSpam, wrapConsoleLogFunctions } from "../lib/consoleFilters";
+import { ensurePostgresViewsExist } from "./postgresView";
+import cluster from "node:cluster";
+import { cpus } from "node:os";
+import { panic } from "./utils/errorUtil";
 
 const numCPUs = cpus().length;
 
@@ -30,8 +30,8 @@ const numCPUs = cpus().length;
  * Whether to run multiple node processes in a cluster.
  * The main reason this is a PublicInstanceSetting because it would be annoying and disruptive for other devs to change this while you're running the server.
  */
-export const clusterSetting = new PublicInstanceSetting<boolean>('cluster.enabled', false, 'optional')
-export const numWorkersSetting = new PublicInstanceSetting<number>('cluster.numWorkers', numCPUs, 'optional')
+export const clusterSetting = new PublicInstanceSetting<boolean>("cluster.enabled", false, "optional");
+export const numWorkersSetting = new PublicInstanceSetting<number>("cluster.numWorkers", numCPUs, "optional");
 
 // Do this here to avoid a dependency cycle
 Globals.dropAndCreatePg = dropAndCreatePg;
@@ -53,7 +53,7 @@ const initConsole = () => {
     //var stack = new Error().stack
     //log(stack)
   });
-}
+};
 
 const connectToPostgres = async (connectionString: string, target: DbTarget = "write") => {
   try {
@@ -68,28 +68,25 @@ const connectToPostgres = async (connectionString: string, target: DbTarget = "w
       const sql = await createSqlConnection(connectionString, false);
       setSqlClient(sql, target);
     }
-  } catch(err) {
+  } catch (err) {
     // eslint-disable-next-line no-console
     console.error("Failed to connect to postgres: ", err.message);
     process.exit(1);
   }
-}
+};
 
-const initDatabases = ({postgresUrl, postgresReadUrl}: CommandLineArguments) =>
-  Promise.all([
-    connectToPostgres(postgresUrl),
-    connectToPostgres(postgresReadUrl, "read"),
-  ]);
+const initDatabases = ({ postgresUrl, postgresReadUrl }: CommandLineArguments) =>
+  Promise.all([connectToPostgres(postgresUrl), connectToPostgres(postgresReadUrl, "read")]);
 
 const initSettings = () => {
   if (!isAnyTest) {
-    setInterval(refreshSettingsCaches, 1000 * 60 * 5) // We refresh the cache every 5 minutes on all servers
+    setInterval(refreshSettingsCaches, 1000 * 60 * 5); // We refresh the cache every 5 minutes on all servers
   }
   return refreshSettingsCaches();
-}
+};
 
 const initPostgres = async () => {
-  if (Collections.some(collection => collection instanceof PgCollection)) {
+  if (Collections.some((collection) => collection instanceof PgCollection)) {
     for (const collection of Collections) {
       if (collection instanceof PgCollection) {
         collection.buildPostgresTable();
@@ -99,8 +96,8 @@ const initPostgres = async () => {
 
   // If we're migrating up, we might be migrating from the start on a fresh database, so skip the check
   // for whether postgres views exist
-  const migrating = process.argv.some(arg => arg.indexOf('migrate') > -1)
-  const migratingUp = process.argv.some(arg => arg === 'up')
+  const migrating = process.argv.some((arg) => arg.indexOf("migrate") > -1);
+  const migratingUp = process.argv.some((arg) => arg === "up");
   if (migrating && migratingUp) return;
 
   try {
@@ -109,9 +106,9 @@ const initPostgres = async () => {
     // eslint-disable-next-line no-console
     console.error("Failed to ensure Postgres views exist:", e);
   }
-}
+};
 
-const executeServerWithArgs = async ({shellMode, command}: CommandLineArguments) => {
+const executeServerWithArgs = async ({ shellMode, command }: CommandLineArguments) => {
   await runStartupFunctions();
 
   // define executableSchema
@@ -125,12 +122,12 @@ const executeServerWithArgs = async ({shellMode, command}: CommandLineArguments)
     const result = await func();
     // eslint-disable-next-line no-console
     console.log("Finished. Result: ", result);
-    process.kill(estrellaPid, 'SIGQUIT');
+    process.kill(estrellaPid, "SIGQUIT");
   } else if (!isAnyTest && !isMigrations) {
     watchForShellCommands();
     startWebserver();
   }
-}
+};
 
 export const initServer = async (commandLineArguments?: CommandLineArguments) => {
   initConsole();
@@ -140,10 +137,10 @@ export const initServer = async (commandLineArguments?: CommandLineArguments) =>
   }
   await initDatabases(args);
   await initSettings();
-  require('../server.ts');
+  require("../server.ts");
   await initPostgres();
   return args;
-}
+};
 
 export const serverStartup = async () => {
   // Run server directly if not in cluster mode
@@ -154,7 +151,7 @@ export const serverStartup = async () => {
 
   // Use OS load balancing (as opposed to round-robin)
   // In principle, this should give better performance because it is aware of resource (cpu) usage
-  cluster.schedulingPolicy = cluster.SCHED_NONE
+  cluster.schedulingPolicy = cluster.SCHED_NONE;
   if (cluster.isPrimary) {
     // Initialize db connection and a few other things such as settings, but don't start a webserver.
     console.log("Initializing primary process");
@@ -170,7 +167,7 @@ export const serverStartup = async () => {
       cluster.fork();
     }
 
-    cluster.on('exit', (worker, code, signal) => {
+    cluster.on("exit", (worker, code, signal) => {
       console.log(`Worker ${worker.process.pid} died`);
     });
   } else {
@@ -178,15 +175,15 @@ export const serverStartup = async () => {
     await serverStartupWorker();
     console.log(`Worker ${process.pid} started`);
   }
-}
+};
 
 export const serverStartupWorker = async () => {
   const commandLineArguments = await initServer();
   await executeServerWithArgs(commandLineArguments);
-}
+};
 
 function initShell() {
-  const repl = require('repl');
+  const repl = require("repl");
   /*const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -213,28 +210,35 @@ const compileWithGlobals = (code: string) => {
   // This is basically just eval() but done in a way that:
   //   1) Allows us to define our own global scope
   //   2) Doesn't upset esbuild
-  const callable = (async function () {}).constructor(`with(this) { await ${code} }`);
-  const scope = {Globals, Vulcan};
+  const callable = async function () {}.constructor(`with(this) { await ${code} }`);
+  const scope = { Globals, Vulcan };
   return () => {
-    return callable.call(new Proxy({}, {
-      has () { return true; },
-      get (_target, key) {
-        if (typeof key !== "symbol") {
-          return global[key as keyof Global] ?? scope[key as "Globals"|"Vulcan"];
-        }
-      }
-    }));
-  }
-}
+    return callable.call(
+      new Proxy(
+        {},
+        {
+          has() {
+            return true;
+          },
+          get(_target, key) {
+            if (typeof key !== "symbol") {
+              return global[key as keyof Global] ?? scope[key as "Globals" | "Vulcan"];
+            }
+          },
+        },
+      ),
+    );
+  };
+};
 
 // Monitor ./tmp/pendingShellCommands for shell commands. If a JS file is
 // written there, run it then delete it. Security-wise this is okay because
 // write-access inside the repo directory is already equivalent to script
 // execution.
 const watchForShellCommands = () => {
-  const watcher = chokidar.watch('./tmp/pendingShellCommands');
-  watcher.on('add', async (path) => {
-    const fileContents = fs.readFileSync(path, 'utf8');
+  const watcher = chokidar.watch("./tmp/pendingShellCommands");
+  watcher.on("add", async (path) => {
+    const fileContents = fs.readFileSync(path, "utf8");
     // eslint-disable-next-line no-console
     console.log(`Running shell command: ${fileContents}`);
     const newPath = join("tmp/runningShellCommands", basename(path));
@@ -244,7 +248,7 @@ const watchForShellCommands = () => {
       const result = await func();
       // eslint-disable-next-line no-console
       console.log("Finished. Result: ", result);
-    } catch(e) {
+    } catch (e) {
       // eslint-disable-next-line no-console
       console.log("Failed.");
       // eslint-disable-next-line no-console
@@ -253,4 +257,4 @@ const watchForShellCommands = () => {
       fs.unlinkSync(newPath);
     }
   });
-}
+};
