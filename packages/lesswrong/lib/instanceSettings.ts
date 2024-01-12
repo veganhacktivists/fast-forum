@@ -157,11 +157,7 @@ export const hasRejectedContentSectionSetting = new PublicInstanceSetting<boolea
 export const sentryUrlSetting = new PublicInstanceSetting<string | null>("sentry.url", null, "warning"); // DSN URL
 export const sentryEnvironmentSetting = new PublicInstanceSetting<string | null>("sentry.environment", null, "warning"); // Environment, i.e. "development"
 export const sentryReleaseSetting = new PublicInstanceSetting<string | null>("sentry.release", null, "warning"); // Current release, i.e. hash of lattest commit
-export const siteUrlSetting = new PublicInstanceSetting<string>(
-  "siteUrl",
-  process.env.APP_URL || "localhost",
-  "optional",
-);
+export const siteUrlSetting = new PublicInstanceSetting<string>("siteUrl", getAbsoluteUrl(), "optional");
 
 // FM Crossposting
 export const fmCrosspostSiteNameSetting = new PublicInstanceSetting<string | null>(
