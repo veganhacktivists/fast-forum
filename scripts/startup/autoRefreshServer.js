@@ -108,7 +108,6 @@ function startAutoRefreshServer({ serverPort, websocketPort }) {
   });
 }
 
-const asyncExec = promisify(childProcess.exec);
 let eslintIsRunning = false;
 
 async function startLint() {
