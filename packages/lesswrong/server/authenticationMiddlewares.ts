@@ -55,20 +55,16 @@ class Auth0StrategyFixed extends Auth0Strategy {
 const googleClientIdSetting = new DatabaseServerSetting<string | null>("oAuth.google.clientId", null);
 const googleOAuthSecretSetting = new DatabaseServerSetting<string | null>("oAuth.google.secret", null);
 
-const auth0ClientId =
-  process.env.AUTH0_CLIENT_ID || new DatabaseServerSetting<string | null>("oAuth.auth0.appId", null).get();
-const auth0OAuthSecret =
-  process.env.AUTH0_SECRET || new DatabaseServerSetting<string | null>("oAuth.auth0.secret", null).get();
-const auth0Domain =
-  process.env.AUTH0_DOMAIN || new DatabaseServerSetting<string | null>("oAuth.auth0.domain", null).get();
+const auth0ClientId = process.env.AUTH0_CLIENT_ID;
+const auth0OAuthSecret = process.env.AUTH0_SECRET;
+const auth0Domain = process.env.AUTH0_DOMAIN;
 
 const facebookClientIdSetting = new DatabaseServerSetting<string | null>("oAuth.facebook.appId", null);
 const facebookOAuthSecretSetting = new DatabaseServerSetting<string | null>("oAuth.facebook.secret", null);
 
 const githubClientIdSetting = new DatabaseServerSetting<string | null>("oAuth.github.clientId", null);
 const githubOAuthSecretSetting = new DatabaseServerSetting<string | null>("oAuth.github.secret", null);
-export const expressSessionSecret =
-  process.env.SECRET || new DatabaseServerSetting<string | null>("expressSessionSecret", null).get();
+export const expressSessionSecret = process.env.SECRET;
 
 type IdFromProfile<P extends Profile> = (profile: P) => string | number;
 type UserDataFromProfile<P extends Profile> = (profile: P) => Promise<Partial<DbUser>>;
