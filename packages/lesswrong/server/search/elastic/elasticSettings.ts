@@ -1,19 +1,19 @@
 import { isAnyTest } from "../../../lib/executionEnvironment";
 import { PublicInstanceSetting } from "../../../lib/instanceSettings";
 
-export const elasticCloudIdSetting = new PublicInstanceSetting<string|null>(
+export const elasticCloudIdSetting = new PublicInstanceSetting<string | null>(
   "elasticsearch.cloudId",
   null,
   "optional",
 );
 
-export const elasticUsernameSetting = new PublicInstanceSetting<string|null>(
+export const elasticUsernameSetting = new PublicInstanceSetting<string | null>(
   "elasticsearch.username",
   null,
   "optional",
 );
 
-export const elasticPasswordSetting = new PublicInstanceSetting<string|null>(
+export const elasticPasswordSetting = new PublicInstanceSetting<string | null>(
   "elasticsearch.password",
   null,
   "optional",
@@ -25,10 +25,6 @@ export const searchOriginDate = new PublicInstanceSetting<string>(
   "optional",
 );
 
-const disableElastic = new PublicInstanceSetting<boolean>(
-  "disableElastic",
-  false,
-  "optional",
-);
+const disableElastic = new PublicInstanceSetting<boolean>("disableElastic", true, "optional");
 
 export const isElasticEnabled = !isAnyTest && !disableElastic.get();
