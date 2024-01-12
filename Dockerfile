@@ -21,7 +21,10 @@ ARG NODE_ENV="production"
 ENV NODE_ENV="${NODE_ENV}"
 ENV NODE_OPTIONS="--max_old_space_size=2560 --heapsnapshot-signal=SIGUSR2"
 
+ARG SESSION_SECRET
+ENV SESSION_SECRET="${SESSION_SECRET}"
+
 EXPOSE $PORT
 
 # migrate up runs migrations and starts the service
-CMD pnpm migrate up && pnpm production
+CMD ["sh", "-c", "pnpm migrate up && pnpm production"]
