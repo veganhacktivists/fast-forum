@@ -21,4 +21,5 @@ COPY . .
 
 EXPOSE 3000
 
-CMD [ "pnpm", "run", "production" ]
+# migrate up runs migrations and starts the service
+CMD [ "pnpm", "run", "migrate", "up" ]
