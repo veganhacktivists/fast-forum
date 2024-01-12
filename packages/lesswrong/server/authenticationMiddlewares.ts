@@ -64,7 +64,7 @@ const facebookOAuthSecretSetting = new DatabaseServerSetting<string | null>("oAu
 
 const githubClientIdSetting = new DatabaseServerSetting<string | null>("oAuth.github.clientId", null);
 const githubOAuthSecretSetting = new DatabaseServerSetting<string | null>("oAuth.github.secret", null);
-export const expressSessionSecret = process.env.SECRET;
+export const expressSessionSecret = process.env.SESSION_SECRET;
 
 type IdFromProfile<P extends Profile> = (profile: P) => string | number;
 type UserDataFromProfile<P extends Profile> = (profile: P) => Promise<Partial<DbUser>>;
