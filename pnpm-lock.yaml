@@ -22,9 +22,6 @@ dependencies:
   '@centreforeffectivealtruism/umzug':
     specifier: ^3.2.1
     version: 3.2.1
-  '@datadog/browser-rum':
-    specifier: ^4.26.0
-    version: 4.26.0
   '@dqbd/tiktoken':
     specifier: ^1.0.7
     version: 1.0.7
@@ -3038,28 +3035,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
-
-  /@datadog/browser-core@4.26.0:
-    resolution: {integrity: sha512-Zm5P+MA6B/LpKvH6Xw1CMUOSrOLodLJ3UG/SDwndVW/0ALx9l70vpH4+/MaW3BiBDLKPriTZ6rQIovyv0k19fw==}
-    dev: false
-
-  /@datadog/browser-rum-core@4.26.0:
-    resolution: {integrity: sha512-STn/DsQaSCAebfBk1ce5lGAmnM/0ZtQp+1hTEEpkcDQkNXJvMWNYMVAYCCKcqkWR/DD32hnOKKv+SmHWXwVMeg==}
-    dependencies:
-      '@datadog/browser-core': 4.26.0
-    dev: false
-
-  /@datadog/browser-rum@4.26.0:
-    resolution: {integrity: sha512-mcQwuL86h9hu5hyxnzyI91e/yfrtG1vDiIZL8APYw4foMMugDY5KMiJwEYu55FH5s6jA7l9D5ky7LY2oaZ7lbg==}
-    peerDependencies:
-      '@datadog/browser-logs': 4.26.0
-    peerDependenciesMeta:
-      '@datadog/browser-logs':
-        optional: true
-    dependencies:
-      '@datadog/browser-core': 4.26.0
-      '@datadog/browser-rum-core': 4.26.0
-    dev: false
 
   /@datadog/native-appsec@1.2.1:
     resolution: {integrity: sha512-jF+k7xhBmJIYYLtjvhCey08RBbItTG7O2zcSCDGFffhvCvo3ZOoou+IKtAm9z+U7hOoeOmD+Xg+h29xj/BB9MA==}
