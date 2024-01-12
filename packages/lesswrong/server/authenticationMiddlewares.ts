@@ -472,7 +472,6 @@ export const addAuthMiddlewares = (addConnectHandler: AddMiddlewareType) => {
   if (auth0ClientId && auth0OAuthSecret && auth0Domain) {
     const auth0Strategy = new Auth0StrategyFixed(
       {
-        state: true,
         clientID: auth0ClientId,
         clientSecret: auth0OAuthSecret,
         domain: auth0Domain,
