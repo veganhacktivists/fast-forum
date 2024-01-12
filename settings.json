@@ -1,0 +1,23 @@
+{
+  "public": {
+    "forumType": "EAForum",
+    "title": "FAST Community",
+    "tagline": "Gotta go FAST!",
+    "logoUrl": "https://res.cloudinary.com/lesswrong-2-0/image/upload/f_png/LessWrong_Logo_skglnw.svg",
+    "siteNameWithArticle": "ForumMagnum",
+    "siteUrl": "http://localhost:3000",
+    "aboutPostId": "dummyId",
+    "faviconUrl": "https://res.cloudinary.com/lesswrong-2-0/image/upload/v1497915096/favicon_lncumn.ico",
+    "taggingName": "topic",
+    "hasEvents": false,
+    "forumSettings": {
+      "headerTitle": "FAST Community",
+      "shortForumTitle": "FAST",
+      "tabTitle": "FAST Community"
+    },
+    "analytics": {
+      "environment": "localhost"
+    },
+    "testServer": true
+  }
+}
