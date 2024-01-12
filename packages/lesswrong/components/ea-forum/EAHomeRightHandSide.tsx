@@ -675,30 +675,8 @@ export const EAHomeRightHandSide = ({classes}: {
           })}
         </div>
       </AnalyticsContext>}
-      
-      <AnalyticsContext pageSubSectionContext="podcasts">
-        <div className={classNames(classes.section, classes.podcastsSection)}>
-          <SectionTitle
-            title="Listen to posts anywhere"
-            href={podcastPost}
-            className={classes.sectionTitle}
-            noTopMargin
-            noBottomPadding
-          />
-          <div className={classes.podcastApps}>
-            {podcasts.map(podcast => <Link key={podcast.name} to={podcast.url} target="_blank" rel="noopener noreferrer" className={classes.podcastApp}>
-                <div className={classes.podcastAppIcon}>{podcast.icon}</div>
-                <div>
-                  <div className={classes.listenOn}>Listen on</div>
-                  <div className={classes.podcastAppName}>{podcast.name}</div>
-                </div>
-              </Link>
-            )}
-          </div>
-        </div>
-      </AnalyticsContext>
 
-      <a href="mailto:forum@effectivealtruism.org" className={classes.feedbackLink}>
+      <a href="mailto:david@fastcommunity.org" className={classes.feedbackLink}>
         Send feedback
       </a>
     </div>
