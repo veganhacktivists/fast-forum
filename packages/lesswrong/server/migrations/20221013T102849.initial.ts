@@ -8,4 +8,4 @@ export const up = async ({db}: MigrationContext) => {
 
   await installExtensions(db);
   await updateFunctions(db);
-}
+};
