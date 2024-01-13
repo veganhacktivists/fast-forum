@@ -438,8 +438,8 @@ const Header = ({
                 {/* Existing Logo */}
                 {hasProminentLogoSetting.get() && <div className={classes.siteLogo}><SiteLogo eaWhite={!!backgroundColor}/></div>}
 
-                {/* Replace the following line with an image */}
-                <img src="https://i.imgur.com/KyvQUBY.png" />
+                <img src="https://i.imgur.com/KyvQUBY.png" style={{ width: '250px' }} alt="Header Logo" />
+
               </Link>
             </Typography>
               {!isEAForum &&<ActiveDialogues />}
