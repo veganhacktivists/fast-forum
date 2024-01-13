@@ -485,10 +485,8 @@ export const EAHomeRightHandSide = ({classes}: {
   
   // NoSSR sections that could affect the logged out user cache
   let digestAdNode = <DigestAd classes={classes} />
-  let upcomingEventsNode = <UpcomingEventsSection classes={classes} />
   if (!currentUser) {
     digestAdNode = <NoSSR>{digestAdNode}</NoSSR>
-    upcomingEventsNode = <NoSSR>{upcomingEventsNode}</NoSSR>
   }
 
   // data for podcasts section
