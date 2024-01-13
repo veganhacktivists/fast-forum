@@ -414,11 +414,11 @@ const DigestAd = ({classes}: {
     <div className={classNames(classes.section, classes.digestAdSection)}>
       <div className={classes.digestAd}>
         <div className={classes.digestAdHeadingRow}>
-          <h2 className={classes.digestAdHeading}>Get the best posts in your email</h2>
+          <h2 className={classes.digestAdHeading}>Get the best posts emailed</h2>
           <ForumIcon icon="Close" className={classes.digestAdClose} onClick={handleClose} />
         </div>
         <div className={classes.digestAdBody}>
-          Sign up for the EA Forum Digest to get curated recommendations every week
+          Sign up for the FAST Forum Digest to get curated recommendations every week
         </div>
         {formNode}
       </div>

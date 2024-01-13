@@ -143,7 +143,7 @@ export const menuTabs: ForumOptions<Array<MenuTab>> = {
       showOnCompressed: true
     }, {
       id: 'bestOf',
-      title: 'Website',
+      title: 'Our Website',
       link: 'https://fastcommunity.org',
       iconComponent: BestOfIcon,
       selectedIconComponent: BestOfSelectedIcon,
