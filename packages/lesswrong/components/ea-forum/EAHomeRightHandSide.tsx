@@ -263,6 +263,20 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
+const WrappedAd = ({classes}: {
+  classes: ClassesType<typeof styles>,
+}) => {
+  const currentUser = useCurrentUser()
+  
+  if (!currentUser) return null
+  
+  const { CloudinaryImage2 } = Components
+  
+  return <AnalyticsContext pageSubSectionContext="wrappedAd">
+
+  </AnalyticsContext>
+}
+
 /**
  * This is the Forum Digest ad that appears at the top of the EA Forum home page right hand side.
  * It has some overlap with the Forum Digest ad that appears in "Recent discussion".
