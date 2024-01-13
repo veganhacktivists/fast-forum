@@ -1,8 +1,8 @@
 {
   "public": {
     "forumType": "EAForum",
-    "title": "FAST Community",
-    "tagline": "Gotta go FAST!",
+    "title": "FAST Forum",
+    "tagline": "Animal Advocacy Forum",
     "logoUrl": "https://res.cloudinary.com/lesswrong-2-0/image/upload/f_png/LessWrong_Logo_skglnw.svg",
     "siteNameWithArticle": "ForumMagnum",
     "aboutPostId": "dummyId",
@@ -10,9 +10,9 @@
     "taggingName": "topic",
     "hasEvents": false,
     "forumSettings": {
-      "headerTitle": "FAST Community",
+      "headerTitle": "FAST Forum",
       "shortForumTitle": "FAST",
-      "tabTitle": "FAST Community"
+      "tabTitle": "FAST Forum"
     },
     "analytics": {
       "environment": "localhost"
