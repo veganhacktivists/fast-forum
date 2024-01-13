@@ -434,22 +434,14 @@ const Header = ({
             <Toolbar disableGutters={isFriendlyUI}>
               <NavigationMenuButton />
               <Typography className={classes.title} variant="title">
-                <div className={classes.hideSmDown}>
-                  <div className={classes.titleSubtitleContainer}>
-                    <Link to="/" className={classes.titleLink}>
-                      {hasProminentLogoSetting.get() && <div className={classes.siteLogo}><SiteLogo eaWhite={!!backgroundColor}/></div>}
-                      {forumHeaderTitleSetting.get()}
-                    </Link>
-                    <HeaderSubtitle />
-                  </div>
-                </div>
-                <div className={classes.hideMdUp}>
-                  <Link to="/" className={classes.titleLink}>
-                    {hasProminentLogoSetting.get() && <div className={classes.siteLogo}><SiteLogo eaWhite={!!backgroundColor}/></div>}
-                    {forumShortTitleSetting.get()}
-                  </Link>
-                </div>
-              </Typography>
+              <Link to="/" className={classes.titleLink}>
+                {/* Existing Logo */}
+                {hasProminentLogoSetting.get() && <div className={classes.siteLogo}><SiteLogo eaWhite={!!backgroundColor}/></div>}
+
+                {/* Replace the following line with an image */}
+                <img src="https://i.imgur.com/KyvQUBY.png" />
+              </Link>
+            </Typography>
               {!isEAForum &&<ActiveDialogues />}
               {rightHeaderItemsNode}
             </Toolbar>
