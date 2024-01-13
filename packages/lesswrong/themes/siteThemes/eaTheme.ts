@@ -37,7 +37,7 @@ export const eaForumTheme: SiteThemeSpecification = {
       dark: '#085d6c' 
     },
     secondary: {
-      main: '#0c869b',
+      main: '#1C563E',
       light: '#3c9eaf',
       dark: '#085d6c'
     },
@@ -74,7 +74,7 @@ export const eaForumTheme: SiteThemeSpecification = {
     },
     header: {
       text: shadePalette.type === 'light' ? "rgba(0,0,0,.87)" : shadePalette.greyAlpha(.87),
-      background: shadePalette.type === 'light' ? '#ffffff' : shadePalette.grey[30],
+      background: shadePalette.type === 'light' ? '#1C563E' : shadePalette.grey[30],
     },
     event: '#0C869B',
     group: '#538747',
