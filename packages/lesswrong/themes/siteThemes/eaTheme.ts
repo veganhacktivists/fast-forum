@@ -42,8 +42,8 @@ export const eaForumTheme: SiteThemeSpecification = {
       dark: '#085d6c'
     },
     lwTertiary: {
-      main: "#137283",
-      dark: "#137283",
+      main: "#1C563E",
+      dark: "#1C563E",
     },
     error: {
       main: "#bf360c",
@@ -52,7 +52,7 @@ export const eaForumTheme: SiteThemeSpecification = {
       main: "#ffad08"
     },
     text: {
-      primaryAlert: "#137283",
+      primaryAlert: "#1C563E",
       contentHeader: shadePalette.grey[1000],
       debateComment: {
         [1]: "#66C9F3",
