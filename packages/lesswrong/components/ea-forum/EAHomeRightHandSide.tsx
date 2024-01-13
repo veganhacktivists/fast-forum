@@ -570,8 +570,6 @@ export const EAHomeRightHandSide = ({classes}: {
         </div>
       </AnalyticsContext>}
       
-      {upcomingEventsNode}
-      
       {!!sortedSavedPosts?.length && <AnalyticsContext pageSubSectionContext="savedPosts">
         <div className={classes.section}>
           <SectionTitle
