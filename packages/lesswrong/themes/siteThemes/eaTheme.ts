@@ -73,7 +73,7 @@ export const eaForumTheme: SiteThemeSpecification = {
       warningTranslucent: "rgba(255, 173, 8, 0.1)",
     },
     header: {
-      text: shadePalette.type === 'light' ? "rgba(0,0,0,.87)" : shadePalette.greyAlpha(.87),
+      text: shadePalette.type === 'light' ? "#fff" : shadePalette.greyAlpha(.87),
       background: shadePalette.type === 'light' ? '#1C563E' : shadePalette.grey[30],
     },
     event: '#0C869B',
@@ -359,7 +359,7 @@ export const eaForumTheme: SiteThemeSpecification = {
         },
         MuiListItemIcon: {
           root: {
-            color: palette.grey[700],
+            color: '#fff',
             marginRight: 12,
           }
         },
