@@ -32,7 +32,7 @@ export const eaForumTheme: SiteThemeSpecification = {
   },
   componentPalette: (shadePalette: ThemeShadePalette) => ({
     primary: {
-      main: '#0c869b',
+      main: '#1C563E',
       light: '#00b2be',
       dark: '#085d6c' 
     },
@@ -76,7 +76,7 @@ export const eaForumTheme: SiteThemeSpecification = {
       text: shadePalette.type === 'light' ? "#fff" : shadePalette.greyAlpha(.87),
       background: shadePalette.type === 'light' ? '#1C563E' : shadePalette.grey[30],
     },
-    event: '#0C869B',
+    event: '#1C563E',
     group: '#538747',
     individual: '#BF577D',
     icon: {
@@ -95,7 +95,7 @@ export const eaForumTheme: SiteThemeSpecification = {
       addedBlockquoteHighlightStyles: `padding-top: 4px; padding-bottom: 6px;`
     },
     buttons: {
-      alwaysPrimary: '#0c869b',
+      alwaysPrimary: '#1C563E',
     },
     tag: {
       text: shadePalette.grey[1000],
