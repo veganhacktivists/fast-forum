@@ -105,15 +105,6 @@ export const menuTabs: ForumOptions<Array<MenuTab>> = {
       showOnMobileStandalone: true,
       showOnCompressed: true,
     }, {
-      id: 'bestOf',
-      title: 'Best of the Forum',
-      link: '/best-of',
-      iconComponent: BestOfIcon,
-      selectedIconComponent: BestOfSelectedIcon,
-      tooltip: 'Curated by the Forum team',
-      showOnMobileStandalone: true,
-      showOnCompressed: true,
-    }, {
       id: 'allPosts',
       title: 'All posts',
       link: '/allPosts',
@@ -150,6 +141,15 @@ export const menuTabs: ForumOptions<Array<MenuTab>> = {
       tooltip: 'Visit our Resources Hub for valuable links, documents, services, and tools to enhance your animal advocacy work',
       showOnMobileStandalone: false,
       showOnCompressed: true
+    }, {
+      id: 'bestOf',
+      title: 'Website',
+      link: 'https://fastcommunity.org',
+      iconComponent: BestOfIcon,
+      selectedIconComponent: BestOfSelectedIcon,
+      tooltip: 'The main FAST Community website',
+      showOnMobileStandalone: true,
+      showOnCompressed: true,
     }, {
       id: 'divider',
       divider: true,
