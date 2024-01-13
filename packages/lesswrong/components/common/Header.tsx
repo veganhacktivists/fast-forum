@@ -436,7 +436,7 @@ const Header = ({
               <Typography className={classes.title} variant="title">
               <Link to="/" className={classes.titleLink}>
                 {hasProminentLogoSetting.get() && <div className={classes.siteLogo}><SiteLogo eaWhite={!!backgroundColor}/></div>}
-                <img src="https://i.imgur.com/KyvQUBY.png" style="width: 250px;">
+                <img src="https://i.imgur.com/KyvQUBY.png" style="width: 250px;" />
               </Link>
             </Typography>
               {!isEAForum &&<ActiveDialogues />}
