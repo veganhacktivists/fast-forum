@@ -435,8 +435,11 @@ const Header = ({
               <NavigationMenuButton />
               <Typography className={classes.title} variant="title">
               <Link to="/" className={classes.titleLink}>
+                {/* Existing Logo */}
                 {hasProminentLogoSetting.get() && <div className={classes.siteLogo}><SiteLogo eaWhite={!!backgroundColor}/></div>}
-                <img src="https://i.imgur.com/KyvQUBY.png" style="width: 250px;" />
+
+                {/* Replace the following line with an image */}
+                <img src="https://i.imgur.com/KyvQUBY.png" />
               </Link>
             </Typography>
               {!isEAForum &&<ActiveDialogues />}
