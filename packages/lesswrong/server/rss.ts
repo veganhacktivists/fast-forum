@@ -26,7 +26,7 @@ export const getMeta = (url: string) => {
     description: taglineSetting.get(),
     feed_url: url,
     site_url: siteUrl,
-    image_url: "https://i.imgur.com/IpfciY0.png"
+    image_url: "https://i.imgur.com/EsjRMTB.png"
   };
 };
 

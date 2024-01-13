@@ -1034,7 +1034,7 @@ const NextStepsDialog = ({ onClose, userId, targetUserId, targetUserDisplayName,
             <p>Once they fill out the form, you'll get to see each other's answers and chat about whether a dialogue makes sense.</p>
           </DialogTitle>
           <div style={{textAlign: "center"}}>
-            <img style={{maxHeight: "50px"}} src="https://i.imgur.com/IpfciY0.png"></img>
+            <img style={{maxHeight: "50px"}} src="https://i.imgur.com/EsjRMTB.png"></img>
           </div>
           <DialogActions>
             <Button onClick={onCloseWrapper} color="default">
