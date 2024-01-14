@@ -67,11 +67,11 @@ const CoreTagCard = ({tag, classes}: {
   return (
     <div className={classes.root}>
       <div className={classes.imageContainer}>
-        {if (tagId == 'ffijFsJaLxQiAwqEW') {
+        {tagId === 'ffijFsJaLxQiAwqEW' ? (
           <img src="https://i.imgur.com/0ECNJA8.png" className={classes.fallbackImage} />
-        } else {
+        ) : (
           <img src={siteImageSetting.get()} className={classes.fallbackImage} />
-        }}
+        )}
       </div>
       <div className={classes.tagInfo}>
         <Link to={tagGetUrl(tag)} className={classes.title}>
