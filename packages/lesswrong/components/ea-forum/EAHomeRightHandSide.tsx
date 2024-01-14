@@ -604,6 +604,9 @@ export const EAHomeRightHandSide = ({classes}: {
       <a href="mailto:david@fastcommunity.org" className={classes.feedbackLink}>
         Send feedback
       </a>
+      <p>FAST Animal Advocacy Forum © 2024</p>
+      <p>Maintained by <a href="https://veganhacktivists.org">Vegan Hacktivists</a> and designed by <a href="https://violetstudios.org">Violet Studios</a>.</p>
+
     </div>
   </AnalyticsContext>
 }
