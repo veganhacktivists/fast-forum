@@ -67,7 +67,7 @@ const CoreTagCard = ({tag, classes}: {
   return (
     <div className={classes.root}>
       <div className={classes.imageContainer}>
-        {tagId === 'ffijFsJaLxQiAwqEW' ? (
+        {tag.name === 'Grassroots & Direct Action' ? (
           <img src="https://i.imgur.com/0ECNJA8.png" className={classes.fallbackImage} />
         ) : (
           <img src={siteImageSetting.get()} className={classes.fallbackImage} />
