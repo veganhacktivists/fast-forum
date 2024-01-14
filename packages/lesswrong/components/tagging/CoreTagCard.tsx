@@ -4,6 +4,7 @@ import { Link } from '../../lib/reactRouterWrapper';
 import { tagGetUrl } from '../../lib/collections/tags/helpers';
 import { siteImageSetting } from '../vulcan-core/App';
 import { isFriendlyUI } from '../../themes/forumTheme';
+import { Tags } from '../../lib/collections/tags/collection';
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -66,11 +67,11 @@ const CoreTagCard = ({tag, classes}: {
   return (
     <div className={classes.root}>
       <div className={classes.imageContainer}>
-        {imageId ? (
-          <CloudinaryImage2 publicId={imageId} height={85} width={85} className={classes.image} />
-        ) : (
+        if (tagId == 'ffijFsJaLxQiAwqEW') {
+          <img src="https://i.imgur.com/0ECNJA8.png" className={classes.fallbackImage} />
+        } else {
           <img src={siteImageSetting.get()} className={classes.fallbackImage} />
-        )}
+        }
       </div>
       <div className={classes.tagInfo}>
         <Link to={tagGetUrl(tag)} className={classes.title}>
