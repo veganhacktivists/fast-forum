@@ -140,17 +140,22 @@ const frontpageTab = {_id: '0', name: 'Frontpage'}
 const topicTabsOrder = [
   'ffijFsJaLxQiAwqEW', // Grassroots & Direct Action
   '7BkfuMYSNmiS4qwmZ', // Legal & Policy Advocacy
+  '6Jomoktz9WvartAbT', // AI, Technology & Innovation
+  'KzdiSGpBpEkXDa8Ti', // Careers & Volunteering
+  'EEkBpJqjvSRPmNKQi', // Farmed Animal Advocacy
+  'rerSxJsibwdYTCvjS', // FAST Community
+  'qBnZaqbzRg2GDEBb4', // Cage Free Campaigns
+  'oxBe47pzDA4gF7FGh', // Fish & Aquatic Advocacy
+  'oBwQMugikyfs5RTZD', // Capacity Building
+  'b3vxJTnnas53FPu6b', // Institutional Campaigns
+  'm7PnwaCfsRwNDnTD7', // Education & Advocacy
+  '5EHCAQD2HJgRC9HZJ', // Invertebrate & Insect Advocacy
   'HzWqFhs4KqgndeESm', // Diet & Nutrition
-  'ZCihBFp5P64JCvQY6', // Community
-  'H43gvLzBCacxxamPe', // Biosecurity & pandemics
-  'ee66CtAMYurQreWBH', // Existential risk
-  '4eyeLKC64Yvznzt6Z', // Philosophy
-  'EHLmbEmJ2Qd5WfwTb', // Building effective altruism
-  'of9xBvR3wpbp6qsZC', // Policy
-  'psBzwdY8ipfCeExJ7', // Cause prioritization
-  'L6NqHZkLc4xZ7YtDr', // Effective giving
-  '4CH9vsvzyk4mSKwyZ', // Career choice
-  'aJnrnnobcBNWRsfAw', // Forecasting & estimation
+  'aBHg2tywssv3EjZ3E', // Wild Animal Suffering
+  'czpKnLMrKmmyYTW7P', // Fundraising & Reports
+  'xB9FAdfk3MiE323Zq', // Alternative Proteins
+  'Kdkmfd8KEbDJ3iwAX', // Climate & Environment
+  'gGKYpdehFGSdxX2sw', // Animal Rescue & Sanctuaries
 ]
 
 /**

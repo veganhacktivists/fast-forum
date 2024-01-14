@@ -65,8 +65,23 @@ const CoreTagCard = ({tag, classes}: {
   const imageMap = {
     'ffijFsJaLxQiAwqEW': 'https://i.imgur.com/GfhfhnW.png', // Grassroots & Direct Action
     '7BkfuMYSNmiS4qwmZ': 'https://i.imgur.com/MZlwrn2.png', // Legal & Policy Advocacy
-    // Add more tag IDs and their corresponding image URLs here
-    // ...
+    '6Jomoktz9WvartAbT': 'https://i.imgur.com/CkJQVfX.png', // AI, Technology & Innovation
+    'xB9FAdfk3MiE323Zq': 'https://i.imgur.com/Upb2ggV.png', // Alternative Proteins
+    'gGKYpdehFGSdxX2sw': 'https://i.imgur.com/oe1fYx6.png', // Animal Rescue & Sanctuaries
+    'oBwQMugikyfs5RTZD': 'https://i.imgur.com/VD9h8ES.png', // Capacity Building
+    'KzdiSGpBpEkXDa8Ti': 'https://i.imgur.com/zVZdk0u.png', // Careers & Volunteering
+    'Kdkmfd8KEbDJ3iwAX': 'https://i.imgur.com/PU6khp5.png', // Climate & Environment
+    'HzWqFhs4KqgndeESm': 'https://i.imgur.com/x9hD8Pa.png', // Diet & Nutrition
+    'm7PnwaCfsRwNDnTD7': 'https://i.imgur.com/vD53Gdb.png', // Education & Advocacy
+    'EEkBpJqjvSRPmNKQi': 'https://i.imgur.com/uQm4kyI.png', // Farmed Animal Advocacy
+    'rerSxJsibwdYTCvjS': 'https://i.imgur.com/sk0CnLq.png', // FAST Community
+    'oxBe47pzDA4gF7FGh': 'https://i.imgur.com/5PBfSWN.png', // Fish & Aquatic Advocacy
+    'czpKnLMrKmmyYTW7P': 'https://i.imgur.com/ZMR373J.png', // Fundraising & Reports
+    'b3vxJTnnas53FPu6b': 'https://i.imgur.com/ys0nJhr.png', // Institutional Campaigns
+    '5EHCAQD2HJgRC9HZJ': 'https://i.imgur.com/8n6Fv8m.png', // Invertebrate & Insect Advocacy
+    'aBHg2tywssv3EjZ3E': 'https://i.imgur.com/dzLve2i.png', // Wild Animal Suffering
+    'qBnZaqbzRg2GDEBb4': 'https://i.imgur.com/6fjTBC1.png', // Cage Free Campaigns
+    
   };
 
   const imageUrl = imageMap[tag._id] || siteImageSetting.get();
