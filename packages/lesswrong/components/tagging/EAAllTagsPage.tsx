@@ -66,7 +66,7 @@ const EAAllTagsPage = ({classes}: {
   const htmlWithAnchors = tag?.tableOfContents?.html || tag?.description?.html || "";
 
   return (
-    <AnalyticsContext pageContext="allTagsPage">
+    /*<AnalyticsContext pageContext="allTagsPage">
       <SingleColumnSection>
         <SectionTitle title={`Core ${taggingNamePluralSetting.get()}`} noTopMargin className={classes.coreTagsTitle} />
         <CoreTagsSection />
@@ -111,6 +111,7 @@ const EAAllTagsPage = ({classes}: {
         </div>
       </SingleColumnSection>
     </AnalyticsContext>
+      */
   );
 }
 
