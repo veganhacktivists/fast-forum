@@ -72,7 +72,7 @@ const UserCommentMarkers = ({
       {showNewUserIcon &&
         <LWTooltip
           placement="bottom-start"
-          title={`${user.displayName} is either new on ${siteNameWithArticleSetting.get()} or doesn't have much karma yet.`}
+          title={`${user.displayName} is either new on FAST Forum or doesn't have much karma yet.`}
           className={classes.iconWrapper}
         >
           <ForumIcon icon="Sprout" className={classes.sproutIcon} />
