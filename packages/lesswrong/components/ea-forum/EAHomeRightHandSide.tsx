@@ -520,21 +520,21 @@ export const EAHomeRightHandSide = ({classes}: {
         <div className={classes.section}>
           <SectionTitle title="Resources" className={classes.sectionTitle} noTopMargin noBottomPadding />
           <div>
-            <Link to="/handbook" className={classes.resourceLink}>
+            <Link to="https://forum.fastcommunity.org/posts/gTBQ9APGmxcizgorA/our-community-guidelines" className={classes.resourceLink}>
               <ForumIcon icon="BookOpen" className={classes.resourceIcon} />
-              The EA Handbook
+              Community Guidelines
             </Link>
           </div>
           <div>
-            <Link to="https://www.effectivealtruism.org/virtual-programs/introductory-program" className={classes.resourceLink}>
+            <Link to="https://forum.fastcommunity.org/posts/GF3apJE62QPaodWzb/how-to-use-this-forum" className={classes.resourceLink}>
               <ForumIcon icon="ComputerDesktop" className={classes.resourceIcon} />
-              The Introductory EA Program
+              How to use this forum
             </Link>
           </div>
           <div>
-            <Link to="/groups" className={classes.resourceLink}>
+            <Link to="https://fastcommunity.org/resources" className={classes.resourceLink}>
               <ForumIcon icon="UsersOutline" className={classes.resourceIcon} />
-              Discover EA groups
+              Discover our Resource Hub
             </Link>
           </div>
         </div>
