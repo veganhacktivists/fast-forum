@@ -65,54 +65,7 @@ const EAAllTagsPage = ({classes}: {
   
   const htmlWithAnchors = tag?.tableOfContents?.html || tag?.description?.html || "";
 
-  return (
-    /*<AnalyticsContext pageContext="allTagsPage">
-      <SingleColumnSection>
-        <SectionTitle title={`Core ${taggingNamePluralSetting.get()}`} noTopMargin className={classes.coreTagsTitle} />
-        <CoreTagsSection />
-        <div className={classes.portalSection}>
-          <SectionTitle title={portalTitle}>
-            <SectionButton>
-              {currentUser && tagUserHasSufficientKarma(currentUser, "new") && <Link
-                to={tagCreateUrl}
-              >
-                <AddBoxIcon className={classes.addTagButton}/>
-                New {taggingNameCapitalSetting.get()}
-              </Link>}
-              {!currentUser && <a onClick={(ev) => {
-                openDialog({
-                  componentName: "LoginPopup",
-                  componentProps: {}
-                });
-                ev.preventDefault();
-              }}>
-                <AddBoxIcon className={classes.addTagButton}/>
-                New {taggingNameCapitalSetting.get()}
-              </a>}
-            </SectionButton>
-          </SectionTitle>
-          <ContentStyles contentType="comment" className={classes.portal}>
-            {!tag && <Loading/>}
-            {userCanEditTagPortal(currentUser) && <a onClick={() => setEditing(true)} className={classes.edit}>
-              Edit
-            </a>}
-            {editing && tag ?
-              <EditTagForm tag={tag} successCallback={()=>setEditing(false)}/>
-              :
-              <ContentItemBody
-                dangerouslySetInnerHTML={{__html: htmlWithAnchors}}
-                description={`tag ${tag?.name}`} noHoverPreviewPrefetch
-              />
-            }
-          </ContentStyles>
-          <AnalyticsContext pageSectionContext="allTagsAlphabetical">
-            <AllTagsAlphabetical />
-          </AnalyticsContext>
-        </div>
-      </SingleColumnSection>
-    </AnalyticsContext>
-      */
-  );
+  return <></>;
 }
 
 const EAAllTagsPageComponent = registerComponent("EAAllTagsPage", EAAllTagsPage, {styles});
