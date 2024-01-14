@@ -600,11 +600,14 @@ export const EAHomeRightHandSide = ({classes}: {
           })}
         </div>
       </AnalyticsContext>}
-      <div class="TabNavigationMenu-divider" style="margin-left: 0px;"></div>
-      <p class="EAHomeRightHandSide-feedbackLink">FAST Animal Advocacy Forum © 2024</p>
-      <p class="EAHomeRightHandSide-feedbackLink" style="line-height: 20px;">Maintained by <a href="https://veganhacktivists.org" style="color: #1c563e;" target="_blank">Vegan Hacktivists</a>, designed by <a href="https://violetstudios.org" style="color: #1c563e;" target="_blank">Violet Studios</a>, built <a href="https://github.com/ForumMagnum/ForumMagnum" style="color: #1c563e;" target="_blank">and based</a> on <a href="https://forum.effectivealtruism.org/" style="color: #1c563e;" target="_blank">EAForum</a>.</p>
-
-
+      <div className="TabNavigationMenu-divider" style={{ marginLeft: '0px' }}></div>
+      <p className="EAHomeRightHandSide-feedbackLink">FAST Animal Advocacy Forum © 2024</p>
+      <p className="EAHomeRightHandSide-feedbackLink" style={{ lineHeight: '20px' }}>
+          Maintained by <a href="https://veganhacktivists.org" style={{ color: '#1c563e' }} target="_blank">Vegan Hacktivists</a>, 
+          designed by <a href="https://violetstudios.org" style={{ color: '#1c563e' }} target="_blank">Violet Studios</a>, 
+          built <a href="https://github.com/ForumMagnum/ForumMagnum" style={{ color: '#1c563e' }} target="_blank">and based</a> 
+          on <a href="https://forum.effectivealtruism.org/" style={{ color: '#1c563e' }} target="_blank">EAForum</a>.
+      </p>
     </div>
   </AnalyticsContext>
 }
