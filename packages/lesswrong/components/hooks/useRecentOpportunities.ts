@@ -3,16 +3,16 @@ import { useTimezone } from "../common/withTimezone";
 import { UseMultiResult, useMulti } from "../../lib/crud/withMulti";
 
 const requiredTags: string[] = [
-  "z8qFsGt5iXyZiLbjN", // Opportunities to take action
+  "KzdiSGpBpEkXDa8Ti", // Opportunities to take action
 ];
 
 const subscribedTags: string[] = [
-  "fCcrMpyRbozMfwYPF", // Application announcements
-  "be4pBryMKxLhkmgvE", // Funding opportunities
-  "2BvgFyR85zX25osTT", // Fellowships and internships
-  "54Ls7K7N53kYws9ja", // Job listing (open)
-  "vgT4Fiybt4qjHLoBv", // Bounty (open)
-  "ihpwNfh2ZxR4ZHaAK", // Prizes and contests
+  "KzdiSGpBpEkXDa8Ti", // Application announcements
+  "KzdiSGpBpEkXDa8Ti", // Funding opportunities
+  "KzdiSGpBpEkXDa8Ti", // Fellowships and internships
+  "KzdiSGpBpEkXDa8Ti", // Job listing (open)
+  "KzdiSGpBpEkXDa8Ti", // Bounty (open)
+  "KzdiSGpBpEkXDa8Ti", // Prizes and contests
 ];
 
 export const useRecentOpportunities =<
