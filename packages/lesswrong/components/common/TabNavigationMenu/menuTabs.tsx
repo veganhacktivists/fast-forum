@@ -138,7 +138,7 @@ export const menuTabs: ForumOptions<Array<MenuTab>> = {
       link: 'https://fastcommunity.org/resources',
       iconComponent: GroupsIcon,
       selectedIconComponent: GroupsSelectedIcon,
-      tooltip: 'Visit our Resources Hub for valuable links, documents, services, and tools to enhance your animal advocacy work',
+      tooltip: 'Visit our Resource Hub for valuable links, documents, services, and tools to enhance your animal advocacy work',
       showOnMobileStandalone: false,
       showOnCompressed: true
     }, {
@@ -147,7 +147,7 @@ export const menuTabs: ForumOptions<Array<MenuTab>> = {
       link: 'https://fastcommunity.org',
       iconComponent: BestOfIcon,
       selectedIconComponent: BestOfSelectedIcon,
-      tooltip: 'The main FAST Community website',
+      tooltip: 'Visit the main website that includes more information on our forum, list and resources',
       showOnMobileStandalone: true,
       showOnCompressed: true,
     }, {
