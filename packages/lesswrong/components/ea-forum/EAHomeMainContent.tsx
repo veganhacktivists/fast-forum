@@ -140,7 +140,7 @@ const frontpageTab = {_id: '0', name: 'Frontpage'}
 const topicTabsOrder = [
   'ffijFsJaLxQiAwqEW', // Grassroots & Direct Action
   '7BkfuMYSNmiS4qwmZ', // Legal & Policy Advocacy
-  'oNiQsBHA3i837sySD', // AI safety
+  'HzWqFhs4KqgndeESm', // Diet & Nutrition
   'ZCihBFp5P64JCvQY6', // Community
   'H43gvLzBCacxxamPe', // Biosecurity & pandemics
   'ee66CtAMYurQreWBH', // Existential risk
