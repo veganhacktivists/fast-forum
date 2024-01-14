@@ -548,8 +548,8 @@ export const EAHomeRightHandSide = ({classes}: {
             popperClassName={classes.tooltip}
           >
             <SectionTitle
-              title="Opportunities"
-              href="/topics/opportunities-to-take-action?sortedBy=magic"
+              title="Careers & Volunteering"
+              href="/topics/careers-and-volunteering"
               className={classes.sectionTitle}
               noTopMargin
               noBottomPadding
