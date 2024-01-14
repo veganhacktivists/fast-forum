@@ -74,7 +74,7 @@ const CoreTagCard = ({tag, classes}: {
       </div>
       <div className={classes.tagInfo}>
         <Link to={tagGetUrl(tag)} className={classes.title}>
-          {tag.shortName || tag.name}
+          {tag.name}
         </Link>
         <div className={classes.postCount}>{tag.postCount} posts</div>
         <div className={classes.subscribeButton}>
