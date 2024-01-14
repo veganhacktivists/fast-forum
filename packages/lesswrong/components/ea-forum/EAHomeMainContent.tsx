@@ -138,7 +138,7 @@ const frontpageTab = {_id: '0', name: 'Frontpage'}
 
 // The order in which the topics are displayed is slightly different from their default ordering
 const topicTabsOrder = [
-  'sWcuTyTB5dP3nas2t', // Global health
+  'ffijFsJaLxQiAwqEW', // Global health
   'QdH9f8TC6G8oGYdgt', // Animal welfare
   'oNiQsBHA3i837sySD', // AI safety
   'ZCihBFp5P64JCvQY6', // Community
