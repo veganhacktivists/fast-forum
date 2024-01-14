@@ -601,11 +601,9 @@ export const EAHomeRightHandSide = ({classes}: {
         </div>
       </AnalyticsContext>}
 
-      <a href="mailto:david@fastcommunity.org" className={classes.feedbackLink}>
-        Send feedback
-      </a>
-      <p>FAST Animal Advocacy Forum © 2024</p>
-      <p>Maintained by <a href="https://veganhacktivists.org">Vegan Hacktivists</a> and designed by <a href="https://violetstudios.org">Violet Studios</a>.</p>
+      <p class="EAHomeRightHandSide-feedbackLink">FAST Animal Advocacy Forum © 2024</p>
+      <p class="EAHomeRightHandSide-feedbackLink" style="line-height: 20px;">Maintained by <a href="https://veganhacktivists.org">Vegan Hacktivists</a>, designed by <a href="https://violetstudios.org">Violet Studios</a>, built <a href="https://github.com/ForumMagnum/ForumMagnum">and based</a> on <a href="https://forum.effectivealtruism.org/">EAForum</a>.</p>
+
 
     </div>
   </AnalyticsContext>
