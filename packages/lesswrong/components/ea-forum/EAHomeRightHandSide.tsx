@@ -605,7 +605,7 @@ export const EAHomeRightHandSide = ({classes}: {
       <p className="EAHomeRightHandSide-feedbackLink" style={{ lineHeight: '20px' }}>
           Maintained by <a href="https://veganhacktivists.org" style={{ color: '#1c563e' }} target="_blank">Vegan Hacktivists</a>, 
           designed by <a href="https://violetstudios.org" style={{ color: '#1c563e' }} target="_blank">Violet Studios</a>, 
-          built <a href="https://github.com/ForumMagnum/ForumMagnum" style={{ color: '#1c563e' }} target="_blank">and based</a>&nbsp;
+          built <a href="https://github.com/ForumMagnum/ForumMagnum" style={{ color: '#1c563e' }} target="_blank">and based</a> 
           on <a href="https://forum.effectivealtruism.org/" style={{ color: '#1c563e' }} target="_blank">EAForum</a>.
       </p>
     </div>
