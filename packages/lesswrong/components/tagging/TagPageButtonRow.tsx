@@ -142,7 +142,7 @@ const TagPageButtonRow = ({ tag, editing, setEditing, className, classes }: {
     />
   </>
 
-  return <div className={classNames(classes.buttonsRow, className)} style={{ padding-top: '10px' }}>
+  return <div className={classNames(classes.buttonsRow, className)} style={{ paddingTop: '10px' }}>
     {!editing && <LWTooltip
       className={classes.buttonTooltip}
       title={editTooltip}
