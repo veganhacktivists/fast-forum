@@ -9,7 +9,6 @@ import { Tags } from '../../lib/collections/tags/collection';
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     width: "100%",
-    // white background
     background: theme.palette.background.pageActiveAreaBackground,
     borderRadius: 6,
     display: "flex",
@@ -34,7 +33,7 @@ const styles = (theme: ThemeType): JssStyles => ({
   tagInfo: {
     display: "flex",
     flexDirection: "column",
-    minWidth: 0, // required for text-overflow to work
+    minWidth: 0,
   },
   title: {
     ...theme.typography[isFriendlyUI ? "headerStyle" : "headline"],
@@ -62,16 +61,20 @@ const CoreTagCard = ({tag, classes}: {
 }) => {
   const { CloudinaryImage2, SubscribeButton } = Components;
 
-  const imageId = tag.squareImageId || tag.bannerImageId
+  // Image mapping for different tags
+  const imageMap = {
+    'ffijFsJaLxQiAwqEW': 'https://i.imgur.com/GfhfhnW.png', // Grassroots & Direct Action
+    '7BkfuMYSNmiS4qwmZ': 'https://i.imgur.com/MZlwrn2.png', // Legal & Policy Advocacy
+    // Add more tag IDs and their corresponding image URLs here
+    // ...
+  };
+
+  const imageUrl = imageMap[tag._id] || siteImageSetting.get();
 
   return (
     <div className={classes.root}>
       <div className={classes.imageContainer}>
-        {tag.name === 'Grassroots & Direct Action' ? (
-          <img src="https://i.imgur.com/0ECNJA8.png" className={classes.fallbackImage} />
-        ) : (
-          <img src={siteImageSetting.get()} className={classes.fallbackImage} />
-        )}
+        <img src={imageUrl} className={classes.fallbackImage} />
       </div>
       <div className={classes.tagInfo}>
         <Link to={tagGetUrl(tag)} className={classes.title}>
@@ -97,3 +100,5 @@ declare global {
     CoreTagCard: typeof CoreTagCardComponent
   }
 }
+
+export default CoreTagCardComponent;
