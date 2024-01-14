@@ -138,8 +138,8 @@ const frontpageTab = {_id: '0', name: 'Frontpage'}
 
 // The order in which the topics are displayed is slightly different from their default ordering
 const topicTabsOrder = [
-  'ffijFsJaLxQiAwqEW', // Global health
-  'QdH9f8TC6G8oGYdgt', // Animal welfare
+  'ffijFsJaLxQiAwqEW', // Grassroots & Direct Action
+  '7BkfuMYSNmiS4qwmZ', // Legal & Policy Advocacy
   'oNiQsBHA3i837sySD', // AI safety
   'ZCihBFp5P64JCvQY6', // Community
   'H43gvLzBCacxxamPe', // Biosecurity & pandemics
