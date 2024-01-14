@@ -51,7 +51,7 @@ const PostBottomRecommendations = ({post, hasTableOfContents, classes}: {
       postId: post._id,
       context: "post-footer",
     },
-    count: 3,
+    count: 6,
     disableFallbacks: true,
   });
 
@@ -61,7 +61,7 @@ const PostBottomRecommendations = ({post, hasTableOfContents, classes}: {
   } = usePaginatedResolver({
     fragmentName: "PostsPage",
     resolverName: "CuratedAndPopularThisWeek",
-    limit: 3,
+    limit: 6,
   });
 
   const {
