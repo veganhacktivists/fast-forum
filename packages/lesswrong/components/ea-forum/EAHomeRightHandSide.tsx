@@ -602,7 +602,7 @@ export const EAHomeRightHandSide = ({classes}: {
       </AnalyticsContext>}
       <div class="TabNavigationMenu-divider" style="margin-left: 0px;"></div>
       <p class="EAHomeRightHandSide-feedbackLink">FAST Animal Advocacy Forum © 2024</p>
-      <p class="EAHomeRightHandSide-feedbackLink" style="line-height: 20px;">Maintained by <a href="https://veganhacktivists.org">Vegan Hacktivists</a>, designed by <a href="https://violetstudios.org">Violet Studios</a>, built <a href="https://github.com/ForumMagnum/ForumMagnum">and based</a> on <a href="https://forum.effectivealtruism.org/">EAForum</a>.</p>
+      <p class="EAHomeRightHandSide-feedbackLink" style="line-height: 20px;">Maintained by <a href="https://veganhacktivists.org" style="color: #1c563e;" target="_blank">Vegan Hacktivists</a>, designed by <a href="https://violetstudios.org" style="color: #1c563e;" target="_blank">Violet Studios</a>, built <a href="https://github.com/ForumMagnum/ForumMagnum" style="color: #1c563e;" target="_blank">and based</a> on <a href="https://forum.effectivealtruism.org/" style="color: #1c563e;" target="_blank">EAForum</a>.</p>
 
 
     </div>
