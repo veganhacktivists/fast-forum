@@ -411,7 +411,7 @@ const DigestAd = ({classes}: {
           <ForumIcon icon="Close" className={classes.digestAdClose} onClick={handleClose} />
         </div>
         <div className={classes.digestAdBody}>
-          Sign up for the FAST Forum Digest to get curated recommendations every week
+          Sign up for the FAST Forum Digest to get curated weekly recommendations
         </div>
         {formNode}
       </div>
