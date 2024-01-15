@@ -71,20 +71,6 @@ const EAAllTagsPage = ({classes}: {
         <SectionTitle title={`Core ${taggingNamePluralSetting.get()}`} noTopMargin className={classes.coreTagsTitle} />
         <CoreTagsSection />
         <div className={classes.portalSection}>
-          <ContentStyles contentType="comment" className={classes.portal}>
-            {!tag && <Loading/>}
-            {userCanEditTagPortal(currentUser) && <a onClick={() => setEditing(true)} className={classes.edit}>
-              Edit
-            </a>}
-            {editing && tag ?
-              <EditTagForm tag={tag} successCallback={()=>setEditing(false)}/>
-              :
-              <ContentItemBody
-                dangerouslySetInnerHTML={{__html: htmlWithAnchors}}
-                description={`tag ${tag?.name}`} noHoverPreviewPrefetch
-              />
-            }
-          </ContentStyles>
           <AnalyticsContext pageSectionContext="allTagsAlphabetical">
             <AllTagsAlphabetical />
           </AnalyticsContext>
