@@ -1,12 +1,7 @@
 import { Client } from "@elastic/elasticsearch";
 import type { SearchHit, SearchResponse } from "@elastic/elasticsearch/lib/api/types";
 import ElasticQuery, { QueryData } from "./ElasticQuery";
-import {
-  elasticCloudIdSetting,
-  elasticPasswordSetting,
-  elasticUsernameSetting,
-  isElasticEnabled,
-} from "./elasticSettings";
+import { elasticPasswordSetting, elasticUsernameSetting, isElasticEnabled } from "./elasticSettings";
 
 export type ElasticDocument = Exclude<SearchDocument, "_id">;
 export type ElasticSearchHit = SearchHit<ElasticDocument>;
@@ -22,11 +17,13 @@ class ElasticClient {
       throw new Error("Elasticsearch is not enabled");
     }
 
-    const cloudId = elasticCloudIdSetting.get();
+    const host = `${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}`;
     const username = elasticUsernameSetting.get();
     const password = elasticPasswordSetting.get();
 
-    if (!cloudId || !username || !password) {
+    const caFingerprint = process.env.ELASTIC_CERT_FINGERPRINT;
+
+    if (!host || !username || !password) {
       // eslint-disable-next-line no-console
       console.warn("Elastic is enabled, but credentials are missing");
       return;
@@ -34,11 +31,15 @@ class ElasticClient {
 
     if (!globalClient) {
       globalClient = new Client({
+        node: host,
         requestTimeout: 600000,
-        cloud: {id: cloudId},
         auth: {
           username,
           password,
+        },
+        caFingerprint,
+        tls: {
+          rejectUnauthorized: false,
         },
       });
       if (!globalClient) {
@@ -55,6 +56,7 @@ class ElasticClient {
 
   search(queryData: QueryData): Promise<ElasticSearchResponse> {
     const query = new ElasticQuery(queryData);
+
     const request = query.compile();
     return this.client.search(request);
   }

@@ -39,6 +39,8 @@
     "rebuild-ckeditor": "cd ./public/lesswrong-editor && pnpm install && pnpm run build",
     "production": "./build.js -run --production",
     "deploy": "scripts/deploy.sh",
+    "command": "./build.js -run --command",
+    "elasticsearch-export": "pnpm command 'Globals.elasticConfigureIndexes()'; pnpm command 'Globals.elasticExportAll()'",
     "ea-command-dev": "./build.js -run --settings ../ForumCredentials/settings-dev.json --postgresUrlFile ../ForumCredentials/dev-pg-conn.txt --command",
     "ea-command-staging-db": "./build.js -run --settings ../ForumCredentials/settings-dev.json --postgresUrlFile ../ForumCredentials/dev-pg-conn.txt --command",
     "ea-command-prod-db": "./build.js -run --settings ../ForumCredentials/settings-dev.json --postgresUrlFile ../ForumCredentials/dev-pg-conn.txt --command",

@@ -9,13 +9,13 @@ export const elasticCloudIdSetting = new PublicInstanceSetting<string | null>(
 
 export const elasticUsernameSetting = new PublicInstanceSetting<string | null>(
   "elasticsearch.username",
-  null,
+  process.env.ELASTIC_USER ?? null,
   "optional",
 );
 
 export const elasticPasswordSetting = new PublicInstanceSetting<string | null>(
   "elasticsearch.password",
-  null,
+  process.env.ELASTIC_PASSWORD ?? null,
   "optional",
 );
 
@@ -25,6 +25,6 @@ export const searchOriginDate = new PublicInstanceSetting<string>(
   "optional",
 );
 
-const disableElastic = new PublicInstanceSetting<boolean>("disableElastic", true, "optional");
+const disableElastic = new PublicInstanceSetting<boolean>("disableElastic", false, "optional");
 
 export const isElasticEnabled = !isAnyTest && !disableElastic.get();
