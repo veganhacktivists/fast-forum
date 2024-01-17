@@ -67,6 +67,7 @@ const CoreTagCard = ({tag, classes}: {
     '7BkfuMYSNmiS4qwmZ': 'https://i.imgur.com/MZlwrn2.png', // Legal & Policy Advocacy
     '6Jomoktz9WvartAbT': 'https://i.imgur.com/CkJQVfX.png', // AI, Technology & Innovation
     'xB9FAdfk3MiE323Zq': 'https://i.imgur.com/Upb2ggV.png', // Alternative Proteins
+    'nKADby7AQpQfmzL4J': 'https://i.imgur.com/ATjV14M.png', // Research & Data
     'gGKYpdehFGSdxX2sw': 'https://i.imgur.com/oe1fYx6.png', // Animal Rescue & Sanctuaries
     'oBwQMugikyfs5RTZD': 'https://i.imgur.com/VD9h8ES.png', // Capacity Building
     'KzdiSGpBpEkXDa8Ti': 'https://i.imgur.com/zVZdk0u.png', // Careers & Volunteering
