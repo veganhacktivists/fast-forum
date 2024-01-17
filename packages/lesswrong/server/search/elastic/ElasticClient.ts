@@ -17,7 +17,7 @@ class ElasticClient {
       throw new Error("Elasticsearch is not enabled");
     }
 
-    const host = `${process.env.ELASTIC_HOST}:${process.env.ELASTIC_PORT}`;
+    const host = process.env.ELASTIC_URL;
     const username = elasticUsernameSetting.get();
     const password = elasticPasswordSetting.get();
 
