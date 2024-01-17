@@ -25,6 +25,10 @@ export const searchOriginDate = new PublicInstanceSetting<string>(
   "optional",
 );
 
-const disableElastic = new PublicInstanceSetting<boolean>("disableElastic", false, "optional");
+const disableElastic = new PublicInstanceSetting<boolean>(
+  "disableElastic",
+  ["true", "1"].includes(process.env.DISABLE_ELASTIC ?? "false"),
+  "optional",
+);
 
 export const isElasticEnabled = !isAnyTest && !disableElastic.get();
