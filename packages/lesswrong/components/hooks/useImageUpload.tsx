@@ -1,67 +1,72 @@
 import React, { useCallback } from "react";
 import Helmet from "react-helmet";
 import { requireCssVar } from "../../themes/cssVars";
-import {
-  cloudinaryCloudNameSetting,
-  DatabasePublicSetting,
-} from "../../lib/publicSettings";
+import { cloudinaryCloudNameSetting, DatabasePublicSetting } from "../../lib/publicSettings";
 import { useTheme } from "../themes/useTheme";
 
-const cloudinaryUploadPresetGridImageSetting = new DatabasePublicSetting<string>(
+const cloudinaryUploadPresetGridImageSetting = new DatabasePublicSetting<string | null>(
   "cloudinary.uploadPresetGridImage",
-  "tz0mgw2s",
+  "grid_image",
+  // process.env.CLOUDINARY_PRESET_GRID_IMAGE ?? null,
 );
-const cloudinaryUploadPresetBannerSetting = new DatabasePublicSetting<string>(
+const cloudinaryUploadPresetBannerSetting = new DatabasePublicSetting<string | null>(
   "cloudinary.uploadPresetBanner",
-  "navcjwf7",
+  "banner",
+  // process.env.CLOUDINARY_PRESET_BANNER ?? null,
 );
 const cloudinaryUploadPresetProfileSetting = new DatabasePublicSetting<string | null>(
   "cloudinary.uploadPresetProfile",
-  null,
+  "profile",
+  // process.env.CLOUDINARY_PRESET_PROFILE ?? null,
 );
 const cloudinaryUploadPresetSocialPreviewSetting = new DatabasePublicSetting<string | null>(
   "cloudinary.uploadPresetSocialPreview",
-  null,
+  "social_preview",
+  // process.env.CLOUDINARY_PRESET_SOCIAL_PREVIEW ?? null,
 );
 const cloudinaryUploadPresetEventImageSetting = new DatabasePublicSetting<string | null>(
   "cloudinary.uploadPresetEventImage",
-  null,
+  "event_image",
+  // process.env.CLOUDINARY_PRESET_EVENT_IMAGE ?? null,
 );
 const cloudinaryUploadPresetSpotlightSetting = new DatabasePublicSetting<string | null>(
   "cloudinary.uploadPresetSpotlight",
-  "yjgxmsio",
+  "spotlight",
+  // process.env.CLOUDINARY_PRESET_SPOTLIGHT ?? null,
 );
 
 type CloudinaryImageUploadError = {
-  statusText: string,
-}
-
-type CloundinaryImageUploadResult = {
-  event: "success",
-  info?: {
-    public_id?: string,
-  },
-} | {
-  event:string,
-  info: Record<string, unknown>,
+  statusText: string;
 };
 
+type CloundinaryImageUploadResult =
+  | {
+      event: "success";
+      info?: {
+        public_id?: string;
+      };
+    }
+  | {
+      event: string;
+      info: Record<string, unknown>;
+    };
+
 type CloudinaryImageUploadCallback = (
-  error: CloudinaryImageUploadError|null,
-  result: CloundinaryImageUploadResult|null,
+  error: CloudinaryImageUploadError | null,
+  result: CloundinaryImageUploadResult | null,
 ) => void;
 
 type CloudinaryImageUploadFont = {
-  url: string,
-  active: boolean,
-}
+  url: string;
+  active: boolean;
+};
 
-type CloudinaryImageUploadFontConfig = Record<string, CloudinaryImageUploadFont|null>;
+type CloudinaryImageUploadFontConfig = Record<string, CloudinaryImageUploadFont | null>;
 
 type CloudinaryImageUploadStyles = {
-  palette?: Record<string, string>,
-  fonts?: CloudinaryImageUploadFontConfig,
-}
+  palette?: Record<string, string>;
+  fonts?: CloudinaryImageUploadFontConfig;
+};
 
 declare global {
   interface Window {
@@ -71,55 +76,55 @@ declare global {
     cloudinary?: {
       openUploadWidget: (
         options: {
-          cloudName: string,
-          uploadPreset: string,
-          multiple?: boolean,
-          secure?: boolean,
-          encryption?: {key: string, iv: string},
-          sources?: string[],
-          defaultSource?: string,
-          maxFiles?: number,
-          cropping?: boolean,
-          croppingAspectRatio?: number,
-          croppingDefaultSelectionRatio?: number,
-          croppingValidateDimensions?: boolean,
-          croppingShowDimensions?: boolean,
-          croppingShowBackButton?: boolean,
-          croppingCoordinatesMode?: "custom" | "face",
-          showSkipCropButton?: boolean,
-          publicId?: string,
-          folder?: string,
-          tags?: string[],
-          resourceType?: string,
-          context?: Record<string, string>,
-          uploadSignature?: string | (() => string),
-          uploadSignatureTimestamp?: number,
-          clientAllowedFormats?: string[],
-          maxFileSize?: number,
-          maxImageFileSize?: number,
-          maxVideoFileSize?: number,
-          maxRawFileSize?: number,
-          minImageWidth?: number,
-          maxImageWidth?: number,
-          minImageHeight?: number,
-          maxImageHeight?: number,
-          validateMaxWidthHeight?: boolean,
-          maxChunkSize?: number,
-          form?: string,
-          fieldName?: string,
-          thumbnails?: string,
-          thumbnailTransformation?: string | Record<string, string | number>[],
-          buttonClass?: string,
-          buttonCaption?: string,
-          theme?: string,
-          text?: Record<string, string>,
-          styles?: CloudinaryImageUploadStyles,
-          showPoweredBy?: boolean,
-          autoMinimize?: boolean,
+          cloudName: string;
+          uploadPreset: string;
+          multiple?: boolean;
+          secure?: boolean;
+          encryption?: { key: string; iv: string };
+          sources?: string[];
+          defaultSource?: string;
+          maxFiles?: number;
+          cropping?: boolean;
+          croppingAspectRatio?: number;
+          croppingDefaultSelectionRatio?: number;
+          croppingValidateDimensions?: boolean;
+          croppingShowDimensions?: boolean;
+          croppingShowBackButton?: boolean;
+          croppingCoordinatesMode?: "custom" | "face";
+          showSkipCropButton?: boolean;
+          publicId?: string;
+          folder?: string;
+          tags?: string[];
+          resourceType?: string;
+          context?: Record<string, string>;
+          uploadSignature?: string | (() => string);
+          uploadSignatureTimestamp?: number;
+          clientAllowedFormats?: string[];
+          maxFileSize?: number;
+          maxImageFileSize?: number;
+          maxVideoFileSize?: number;
+          maxRawFileSize?: number;
+          minImageWidth?: number;
+          maxImageWidth?: number;
+          minImageHeight?: number;
+          maxImageHeight?: number;
+          validateMaxWidthHeight?: boolean;
+          maxChunkSize?: number;
+          form?: string;
+          fieldName?: string;
+          thumbnails?: string;
+          thumbnailTransformation?: string | Record<string, string | number>[];
+          buttonClass?: string;
+          buttonCaption?: string;
+          theme?: string;
+          text?: Record<string, string>;
+          styles?: CloudinaryImageUploadStyles;
+          showPoweredBy?: boolean;
+          autoMinimize?: boolean;
         },
         resultCallback: CloudinaryImageUploadCallback,
-      ) => void,
-    },
+      ) => void;
+    };
   }
 }
 
@@ -165,19 +170,19 @@ const cloudinaryArgsByImageType = {
     minImageWidth: 500,
     croppingAspectRatio: 1.91,
     croppingDefaultSelectionRatio: 1.91,
-    uploadPreset: cloudinaryUploadPresetEventImageSetting.get()
+    uploadPreset: cloudinaryUploadPresetEventImageSetting.get(),
   },
   spotlightImageId: {
     minImageHeight: 232,
     minImageWidth: 345,
     cropping: false,
-    uploadPreset: cloudinaryUploadPresetSpotlightSetting.get()
+    uploadPreset: cloudinaryUploadPresetSpotlightSetting.get(),
   },
   spotlightDarkImageId: {
     minImageHeight: 232,
     minImageWidth: 345,
     cropping: false,
-    uploadPreset: cloudinaryUploadPresetSpotlightSetting.get()
+    uploadPreset: cloudinaryUploadPresetSpotlightSetting.get(),
   },
 } as const;
 
@@ -197,16 +202,16 @@ const getCssVarValue = (varRef: string): string => {
   }
   const style = getComputedStyle(document.body);
   return style.getPropertyValue(varName);
-}
+};
 
 export type ImageType = keyof typeof cloudinaryArgsByImageType;
 
 export type UseImageUploadProps = {
-  imageType: ImageType,
-  onUploadSuccess?: (publicImageId: string) => void | Promise<void>,
-  onUploadError?: (error: Error) => void | Promise<void>,
-  croppingAspectRatio?: number,
-}
+  imageType: ImageType;
+  onUploadSuccess?: (publicImageId: string) => void | Promise<void>;
+  onUploadError?: (error: Error) => void | Promise<void>;
+  croppingAspectRatio?: number;
+};
 
 export const useImageUpload = ({
   imageType,
@@ -223,63 +228,66 @@ export const useImageUpload = ({
 
     const cloudinaryArgs = cloudinaryArgsByImageType[imageType];
     if (!cloudinaryArgs) {
-      throw new Error("Unsupported image upload type")
+      throw new Error("Unsupported image upload type");
     }
 
     const uploadPreset = cloudinaryArgs.uploadPreset;
     if (!uploadPreset) {
-      throw new Error(`Cloudinary upload preset not configured for ${imageType}`)
+      throw new Error(`Cloudinary upload preset not configured for ${imageType}`);
     }
 
     const color = getCssVarValue(primaryMain);
 
-    window.cloudinary.openUploadWidget({
-      multiple: false,
-      sources: ["local", "url", "camera", "facebook", "instagram", "google_drive"],
-      cropping: true,
-      cloudName: cloudinaryCloudNameSetting.get(),
-      theme: "minimal",
-      croppingValidateDimensions: true,
-      croppingShowDimensions: true,
-      styles: {
-        palette: {
-          tabIcon: color,
-          link: color,
-          action: color,
-          textDark: "#212121",
-        },
-        fonts: {
-          default: null,
-          [theme.typography.cloudinaryFont.stack]: {
-            url: theme.typography.cloudinaryFont.url,
-            active: true,
+    window.cloudinary.openUploadWidget(
+      {
+        multiple: false,
+        sources: ["local", "url", "camera", "facebook", "instagram", "google_drive"],
+        cropping: true,
+        cloudName: cloudinaryCloudNameSetting.get(),
+        theme: "minimal",
+        croppingValidateDimensions: true,
+        croppingShowDimensions: true,
+        styles: {
+          palette: {
+            tabIcon: color,
+            link: color,
+            action: color,
+            textDark: "#212121",
+          },
+          fonts: {
+            default: null,
+            [theme.typography.cloudinaryFont.stack]: {
+              url: theme.typography.cloudinaryFont.url,
+              active: true,
+            },
           },
         },
+        ...cloudinaryArgs,
+        uploadPreset,
+        croppingAspectRatio,
       },
-      ...cloudinaryArgs,
-      uploadPreset,
-      croppingAspectRatio,
-    }, (error, result) => {
-      if (error) {
-        void onUploadError?.(new Error(error?.statusText ?? "Failed to upload image"));
-        return;
-      }
+      (error, result) => {
+        if (error) {
+          void onUploadError?.(new Error(error?.statusText ?? "Failed to upload image"));
+          return;
+        }
 
-      /**
-       * Currently we ignore all events other than a successful upload - See
-       * https://cloudinary.com/documentation/upload_widget_reference#events
-       */
-      if (result && result.event !== "success") {
-        return;
-      }
+        /**
+         * Currently we ignore all events other than a successful upload - See
+         * https://cloudinary.com/documentation/upload_widget_reference#events
+         */
+        if (result && result.event !== "success") {
+          return;
+        }
 
-      const publicId = result?.info?.public_id;
-      if (publicId) {
-        void onUploadSuccess?.(publicId as string);
-      } else {
-        void onUploadError?.(new Error("Failed to upload image"));
-      }
-    });
+        const publicId = result?.info?.public_id;
+        if (publicId) {
+          void onUploadSuccess?.(publicId as string);
+        } else {
+          void onUploadError?.(new Error("Failed to upload image"));
+        }
+      },
+    );
   }, [
     croppingAspectRatio,
     imageType,
@@ -293,11 +301,8 @@ export const useImageUpload = ({
     uploadImage,
     ImageUploadScript: () => (
       <Helmet>
-        <script
-          src="https://upload-widget.cloudinary.com/global/all.js"
-          type="text/javascript"
-        />
+        <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript" />
       </Helmet>
     ),
   };
-}
+};
