@@ -515,6 +515,34 @@ export const EAHomeRightHandSide = ({classes}: {
       <WrappedAd classes={classes} />
 
       {digestAdNode}
+
+      <AnalyticsContext pageSubSectionContext="resources">
+        <div className={classes.section}>
+          <SectionTitle title="Quick Links" className={classes.sectionTitle} noTopMargin noBottomPadding />
+          <div>
+            <Link to="https://forum.fastcommunity.org/newPost" className={classes.resourceLink}>
+              <ForumIcon icon="BookOpen" className={classes.resourceIcon} />
+              Create a new post
+            </Link>
+          </div>
+          <div>
+          <div className={classes.resourceLink} 
+              onClick={() => openDialog({componentName:"NewShortformDialog"})}>
+
+              <ForumIcon icon="AddBoxIcon" className={classes.resourceIcon} />
+              Comment a quick take
+          </div>
+          </div>
+          <div>
+            <Link to="https://forum.fastcommunity.org/newPost?question=true" className={classes.resourceLink}>
+              <ForumIcon icon="UsersOutline" className={classes.resourceIcon} />
+              Ask a question
+            </Link>
+          </div>
+        </div>
+      </AnalyticsContext>
+
+      <div className="TabNavigationMenu-divider" style={{ marginLeft: '0px' }}></div>
       
       <AnalyticsContext pageSubSectionContext="resources">
         <div className={classes.section}>
