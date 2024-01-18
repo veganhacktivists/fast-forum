@@ -11,15 +11,15 @@ import { isEAForum } from "../lib/instanceSettings";
 import { addCronJob } from "./cronUtil";
 import { TiktokenModel, encoding_for_model } from "@dqbd/tiktoken";
 
-export const HAS_EMBEDDINGS_FOR_RECOMMENDATIONS = isEAForum;
+export const HAS_EMBEDDINGS_FOR_RECOMMENDATIONS = false; // isEAForum;
 
 export const DEFAULT_EMBEDDINGS_MODEL: TiktokenModel = "text-embedding-ada-002";
 const DEFAULT_EMBEDDINGS_MODEL_MAX_TOKENS = 8191;
 
 type EmbeddingsResult = {
-  embeddings: number[],
-  model: string,
-}
+  embeddings: number[];
+  model: string;
+};
 
 /**
  * OpenAI models have a maximum number of "tokens" that the input can consist of.
@@ -33,25 +33,17 @@ type EmbeddingsResult = {
  * actually encoding length. In the vast majority of cases, no more than 2
  * iterations of the loop should be necessary.
  */
-const trimText = (
-  text: string,
-  model: TiktokenModel,
-  maxTokens: number,
-): string => {
+const trimText = (text: string, model: TiktokenModel, maxTokens: number): string => {
   const encoding = encoding_for_model(model);
 
-  for (
-    let encoded = encoding.encode(text);
-    encoded.length > maxTokens;
-    encoded = encoding.encode(text)
-  ) {
-    const charsToRemove = 1 + ((encoded.length - maxTokens) * 4);
+  for (let encoded = encoding.encode(text); encoded.length > maxTokens; encoded = encoding.encode(text)) {
+    const charsToRemove = 1 + (encoded.length - maxTokens) * 4;
     text = text.slice(0, text.length - charsToRemove);
   }
 
   encoding.free();
   return text;
-}
+};
 
 const getEmbeddingsFromApi = async (text: string): Promise<EmbeddingsResult> => {
   if (isAnyTest) {
@@ -72,38 +64,31 @@ const getEmbeddingsFromApi = async (text: string): Promise<EmbeddingsResult> => 
     model,
   });
   const embeddings = result?.data?.[0].embedding;
-  if (
-    !embeddings ||
-    !Array.isArray(embeddings) ||
-    !embeddings.length ||
-    typeof embeddings[0] !== "number"
-  ) {
-    throw new Error(`Invalid API response: ${inspect(result, {depth: null})}`);
+  if (!embeddings || !Array.isArray(embeddings) || !embeddings.length || typeof embeddings[0] !== "number") {
+    throw new Error(`Invalid API response: ${inspect(result, { depth: null })}`);
   }
   return {
     embeddings,
     model,
   };
-}
+};
 
-const getEmbeddingsForPost = async (
-  postId: string,
-): Promise<EmbeddingsResult & {hash: string}> => {
-  const post = await Posts.findOne({_id: postId});
+const getEmbeddingsForPost = async (postId: string): Promise<EmbeddingsResult & { hash: string }> => {
+  const post = await Posts.findOne({ _id: postId });
   if (!post) {
     throw new Error(`Can't find post with id ${postId}`);
   }
   const text = htmlToTextDefault(post.contents?.html ?? "");
   const embeddings = await getEmbeddingsFromApi(text);
   const hash = md5(text);
-  return {hash, ...embeddings};
-}
+  return { hash, ...embeddings };
+};
 
 export const updatePostEmbeddings = async (postId: string) => {
-  const {hash, embeddings, model} = await getEmbeddingsForPost(postId);
+  const { hash, embeddings, model } = await getEmbeddingsForPost(postId);
   const repo = new PostEmbeddingsRepo();
   await repo.setPostEmbeddings(postId, hash, model, embeddings);
-}
+};
 
 const updateAllPostEmbeddings = async () => {
   await forEachDocumentBatchInCollection({
@@ -111,14 +96,14 @@ const updateAllPostEmbeddings = async () => {
     batchSize: 100,
     callback: async (posts: DbPost[]) => {
       try {
-        await Promise.all(posts.map(({_id}) => updatePostEmbeddings(_id)));
+        await Promise.all(posts.map(({ _id }) => updatePostEmbeddings(_id)));
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error("Error", e);
       }
     },
   });
-}
+};
 
 export const updateMissingPostEmbeddings = async () => {
   const ids = await new PostsRepo().getPostIdsWithoutEmbeddings();
@@ -131,7 +116,7 @@ export const updateMissingPostEmbeddings = async () => {
       console.error((e as AnyBecauseIsInput).response ?? e);
     }
   }
-}
+};
 
 Globals.updatePostEmbeddings = updatePostEmbeddings;
 Globals.updateAllPostEmbeddings = updateAllPostEmbeddings;
