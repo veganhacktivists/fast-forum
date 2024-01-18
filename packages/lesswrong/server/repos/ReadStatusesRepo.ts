@@ -9,7 +9,8 @@ class ReadStatusesRepo extends AbstractRepo<"ReadStatuses"> {
   }
 
   upsertReadStatus(userId: string, postId: string, isRead: boolean): Promise<null> {
-    return this.none(`
+    return this.none(
+      `
       INSERT INTO "ReadStatuses" (
         "_id",
         "postId",
@@ -19,22 +20,26 @@ class ReadStatusesRepo extends AbstractRepo<"ReadStatuses"> {
         "lastUpdated"
       ) VALUES (
         $(_id), $(postId), $(tagId), $(userId), $(isRead), $(lastUpdated)
-      ) ON CONFLICT (
-        COALESCE("postId", ''),
-        COALESCE("userId", ''),
-        COALESCE("tagId", '')
       )
-      DO UPDATE SET
-        "isRead" = $(isRead),
-        "lastUpdated" = $(lastUpdated)
-      `, {
-      _id: randomId(),
-      userId,
-      postId,
-      isRead,
-      tagId: null,
-      lastUpdated: new Date(),
-    });
+      `,
+      // Removed this to avoid a crash
+      //  ON CONFLICT (
+      //         COALESCE("postId", ''),
+      //         COALESCE("userId", ''),
+      //         COALESCE("tagId", '')
+      //        )
+      //       DO UPDATE SET
+      //         "isRead" = $(isRead),
+      //         "lastUpdated" = $(lastUpdated)
+      {
+        _id: randomId(),
+        userId,
+        postId,
+        isRead,
+        tagId: null,
+        lastUpdated: new Date(),
+      },
+    );
   }
 }
 
