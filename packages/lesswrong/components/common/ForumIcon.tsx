@@ -62,6 +62,7 @@ import ArrowCircleIcon from "@heroicons/react/20/solid/ArrowPathRoundedSquareIco
 import FunnelIcon from "@heroicons/react/24/outline/FunnelIcon";
 import BarsArrowDown from "@heroicons/react/24/outline/BarsArrowDownIcon";
 import InformationCircleIcon from '@heroicons/react/24/solid/InformationCircleIcon';
+import AddBox from "@material-ui/icons/AddBox";
 import MuiVolumeUpIcon from "@material-ui/icons/VolumeUp";
 import MuiBookmarkIcon from "@material-ui/icons/Bookmark";
 import MuiBookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
@@ -116,6 +117,7 @@ import { QIcon } from "../icons/qIcon";
 import { FilterAlt } from "../icons/filteralt";
 import { VotedIcon } from "../icons/votedIcon";
 import { LightbulbChatIcon } from "../icons/lightbulbChatIcon";
+import { DiscussIcon } from "../icons/givingSeasonIcons";
 
 /**
  * This exists to allow us to easily use different icon sets on different
@@ -204,92 +206,11 @@ export type ForumIconName =
   "Voted" |
   "InfoCircle" |
   "BarsArrowDown" |
-  "LightbulbChat";
+  "LightbulbChat" |
+  "AddBoxIcon" |
+  "DiscussIcon";
 
 const ICONS: ForumOptions<Record<ForumIconName, IconComponent>> = {
-  LWAF: {
-    VolumeUp: MuiVolumeUpIcon,
-    BookOpen: BookOpenIcon,
-    Bookmark: MuiBookmarkIcon,
-    BookmarkBorder: MuiBookmarkBorderIcon,
-    Bookmarks: MuiBookmarksIcon,
-    Karma: MuiStarIcon,
-    KarmaOutline: MuiStarBorderIcon,
-    Star: MuiStarIcon,
-    User: MuiPersonIcon,
-    Users: MuiPeopleIcon,
-    UsersOutline: UsersOutlineIcon,
-    Bell: MuiNotificationsIcon,
-    BellAlert: BellAlertIcon,
-    BellBorder: MuiBellBorderIcon,
-    AddEmoji: AddEmojiIcon,
-    Link: MuiLinkIcon,
-    BoldLink: BoldLinkIcon,
-    Pin: StickyIcon,
-    Author: AuthorIcon,
-    Sprout: SproutIcon,
-    GivingHand: GivingHand,
-    Close: CloseIcon,
-    Calendar: CalendarIcon,
-    CalendarDays: CalendarDaysIcon,
-    Work: BriefcaseIcon,
-    School: AcademicCapIcon,
-    MapPin: MuiLocationIcon,
-    Pencil: PencilIcon,
-    PencilSquare: PencilSquareIcon,
-    Comment: CommentIcon,
-    CommentFilled: CommentFilledIcon,
-    ChatBubbleLeftRight: ChatBubbleLeftRightIcon,
-    ChatBubbleLeftRightFilled: MuiForumIcon,
-    Shortform: MuiNotesIcon,
-    Warning: MuiWarningIcon,
-    ListBullet: ListBulletIcon,
-    Report: MuiReportIcon,
-    Tag: MuiTagIcon,
-    TagFilled: TagFilledIcon,
-    Eye: MuiVisibility,
-    EyeOutline: MuiVisibilityOff,
-    Edit: MuiEditIcon,
-    Analytics: MuiShowChartIcon,
-    ThickChevronLeft: ThickChevronLeftIcon,
-    ThickChevronRight: ThickChevronRightIcon,
-    ThickChevronDown: ThickChevronDownIcon,
-    NarrowArrowDown: ArrowLongDown,
-    Plus: PlusIcon,
-    PlusSmall: PlusSmallIcon,
-    MinusSmall: MinusSmallIcon,
-    Heart: HeartIcon,
-    HeartOutline: HeartOutlineIcon,
-    Settings: MuiSettingsIcon,
-    Email: MuiEmailIcon,
-    Image: PhotoIcon,
-    Document: DocumentTextIcon,
-    DocumentFilled: DocumentIcon,
-    Puzzle: MuiPuzzleIcon,
-    Check: MuiCheckIcon,
-    CheckCircle: CheckCircleIcon,
-    Card: CardIcon,
-    List: ListIcon,
-    SoftUpArrow: SoftUpArrowIcon,
-    ArrowRight: ArrowRightIcon,
-    ArrowCircle: ArrowCircleIcon,
-    EllipsisVertical: MuiEllipsisVerticalIcon,
-    Share: MuiShareIcon,
-    ClipboardDocumentList: ClipboardDocumentListIcon,
-    ClipboardDocument: ClipboardDocumentIcon,
-    QuestionMarkCircle: QuestionMarkCircleIcon,
-    Search: MuiSearchIcon,
-    ComputerDesktop: ComputerDesktopIcon,
-    Menu: MuiMenuIcon,
-    CloseMenu: CloseMenuIcon,
-    Q: QIcon,
-    BarChart: ChartBarIcon,
-    Funnel: FilterAlt,
-    Voted: VotedIcon,
-    InfoCircle: InformationCircleIcon,
-    BarsArrowDown: BarsArrowDown,
-    LightbulbChat: LightbulbChatIcon,
-  },
   default: {
     VolumeUp: SpeakerWaveIcon,
     BookOpen: BookOpenIcon,
@@ -372,6 +293,8 @@ const ICONS: ForumOptions<Record<ForumIconName, IconComponent>> = {
     InfoCircle: InformationCircleIcon,
     BarsArrowDown: BarsArrowDown,
     LightbulbChat: LightbulbChatIcon,
+    AddBoxIcon: AddBox,
+    DiscussIcon: DiscussIcon
   },
 };
 

@@ -85,7 +85,7 @@ const CoreTagCard = ({tag, classes}: {
     
   };
 
-  const imageUrl = imageMap[tag._id] || siteImageSetting.get();
+  const imageUrl = imageMap[tag._id as keyof typeof imageMap] || siteImageSetting.get();
 
   return (
     <div className={classes.root}>
