@@ -526,11 +526,9 @@ export const EAHomeRightHandSide = ({classes}: {
             </Link>
           </div>
           <div>
-          <div className={classes.resourceLink} 
-              onClick={() => openDialog({componentName:"NewShortformDialog"})}>
-
-              <ForumIcon icon="AddBoxIcon" className={classes.resourceIcon} />
-              Comment a quick take
+          <div className={classes.resourceLink} onClick={() => openDialog({componentName:"NewShortformDialog"})}>
+            <ForumIcon icon="AddBoxIcon" className={classes.resourceIcon} />
+            Comment a quick take
           </div>
           </div>
           <div>
