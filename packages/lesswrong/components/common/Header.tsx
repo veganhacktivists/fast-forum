@@ -71,7 +71,7 @@ export const styles = (theme: ThemeType) => ({
       color: theme.palette.text.alwaysWhite,
     },
     "& .KarmaChangeNotifier-starIcon": {
-      color: "#fff",
+      color: theme.palette.text.alwaysWhite,
     },
     "& .KarmaChangeNotifier-gainedPoints": {
       color: theme.palette.text.alwaysWhite,
@@ -80,10 +80,10 @@ export const styles = (theme: ThemeType) => ({
       color: theme.palette.text.alwaysWhite,
     },
     "& .NotificationsMenuButton-buttonClosed": {
-      color: "#fff",
+      color: theme.palette.text.alwaysWhite,
     },
     "& .UsersMenu-arrowIcon": {
-      color: "#fff",
+      color: theme.palette.text.alwaysWhite,
     },
     "& .EAButton-variantContained": {
       backgroundColor: theme.palette.text.alwaysWhite,
