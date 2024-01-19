@@ -83,7 +83,7 @@ export const styles = (theme: ThemeType) => ({
       color: "#fff",
     },
     "& .UsersMenu-arrowIcon": {
-      color: theme.palette.text.alwaysWhite,
+      color: "#fff",
     },
     "& .EAButton-variantContained": {
       backgroundColor: theme.palette.text.alwaysWhite,
