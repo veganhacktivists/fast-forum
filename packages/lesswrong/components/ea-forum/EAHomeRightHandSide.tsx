@@ -27,6 +27,7 @@ import { useRecentOpportunities } from '../hooks/useRecentOpportunities';
 import { podcastAddictLogoIcon } from '../icons/PodcastAddictLogoIcon';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import DiscussIcon from '@material-ui/icons/Discuss';
+import MapsUgcIcon from '@mui/icons-material/MapsUgc';
 
 const styles = (theme: ThemeType) => ({
   root: {
@@ -523,7 +524,7 @@ export const EAHomeRightHandSide = ({classes}: {
           <SectionTitle title="Quick Links" className={classes.sectionTitle} noTopMargin noBottomPadding />
           <div>
             <Link to="https://forum.fastcommunity.org/newPost" className={classes.resourceLink}>
-              <ForumIcon icon="BookOpen" className={classes.resourceIcon} />
+              <ForumIcon icon="MapsUgcIcon" className={classes.resourceIcon} />
               Create a new post
             </Link>
           </div>
