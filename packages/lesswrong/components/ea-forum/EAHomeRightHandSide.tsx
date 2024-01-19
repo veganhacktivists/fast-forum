@@ -25,6 +25,8 @@ import { applePodcastsLogoIcon } from '../icons/ApplePodcastsLogoIcon';
 import { getBrowserLocalStorage } from '../editor/localStorageHandlers';
 import { useRecentOpportunities } from '../hooks/useRecentOpportunities';
 import { podcastAddictLogoIcon } from '../icons/PodcastAddictLogoIcon';
+import AddBoxIcon from '@material-ui/icons/AddBox';
+import DiscussIcon from '@material-ui/icons/Discuss';
 
 const styles = (theme: ThemeType) => ({
   root: {
@@ -533,7 +535,7 @@ export const EAHomeRightHandSide = ({classes}: {
           </div>
           <div>
             <Link to="https://forum.fastcommunity.org/newPost?question=true" className={classes.resourceLink}>
-              <ForumIcon icon="UsersOutline" className={classes.resourceIcon} />
+              <ForumIcon icon="DiscussIcon" className={classes.resourceIcon} />
               Ask a question
             </Link>
           </div>
