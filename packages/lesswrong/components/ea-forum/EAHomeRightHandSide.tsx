@@ -521,19 +521,16 @@ export const EAHomeRightHandSide = ({classes}: {
           <SectionTitle title="Quick Links" className={classes.sectionTitle} noTopMargin noBottomPadding />
           <div>
             <Link to="https://forum.fastcommunity.org/newPost" className={classes.resourceLink}>
-              {/* <ForumIcon icon="MapsUgcIcon" className={classes.resourceIcon} /> */}
               Create a new post
             </Link>
           </div>
           <div>
-          <Link to="https://forum.fastcommunity.org/quicktakes" className={classes.resourceLink}>
-            <ForumIcon icon="AddBoxIcon" className={classes.resourceIcon} />
-            Comment a quick take
-          </Link>
+            <Link to="https://forum.fastcommunity.org/quicktakes" className={classes.resourceLink}>
+              Post a quick take
+            </Link>
           </div>
           <div>
             <Link to="https://forum.fastcommunity.org/newPost?question=true" className={classes.resourceLink}>
-              <ForumIcon icon="DiscussIcon" className={classes.resourceIcon} />
               Ask a question
             </Link>
           </div>
