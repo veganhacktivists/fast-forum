@@ -1,44 +1,56 @@
-import React, { useRef, useState, useEffect, useContext } from 'react'
-import { registerComponent, Components } from '../../lib/vulcan-lib/components';
-import CKEditor from '../editor/ReactCKEditor';
-import { getCkEditor, ckEditorBundleVersion } from '../../lib/wrapCkEditor';
-import { getCKEditorDocumentId, generateTokenRequest} from '../../lib/ckEditorUtils'
-import { CollaborativeEditingAccessLevel, accessLevelCan, SharingSettings } from '../../lib/collections/posts/collabEditingPermissions';
-import { ckEditorUploadUrlSetting, ckEditorWebsocketUrlSetting } from '../../lib/publicSettings'
-import { ckEditorUploadUrlOverrideSetting, ckEditorWebsocketUrlOverrideSetting } from '../../lib/instanceSettings';
-import { CollaborationMode } from './EditorTopBar';
-import { useSubscribedLocation } from '../../lib/routeUtil';
-import { defaultEditorPlaceholder } from '../../lib/editor/make_editable';
+import React, { useRef, useState, useEffect, useContext } from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib/components";
+import CKEditor from "../editor/ReactCKEditor";
+import { getCkEditor, ckEditorBundleVersion } from "../../lib/wrapCkEditor";
+import { getCKEditorDocumentId, generateTokenRequest } from "../../lib/ckEditorUtils";
+import {
+  CollaborativeEditingAccessLevel,
+  accessLevelCan,
+  SharingSettings,
+} from "../../lib/collections/posts/collabEditingPermissions";
+import { ckEditorUploadUrlSetting, ckEditorWebsocketUrlSetting } from "../../lib/publicSettings";
+import { ckEditorUploadUrlOverrideSetting, ckEditorWebsocketUrlOverrideSetting } from "../../lib/instanceSettings";
+import { CollaborationMode } from "./EditorTopBar";
+import { useSubscribedLocation } from "../../lib/routeUtil";
+import { defaultEditorPlaceholder } from "../../lib/editor/make_editable";
 import { mentionPluginConfiguration } from "../../lib/editor/mentionsConfig";
-import { useCurrentUser } from '../common/withUser';
-import { useMessages } from '../common/withMessages';
-import { getConfirmedCoauthorIds } from '../../lib/collections/posts/helpers';
-import sortBy from 'lodash/sortBy'
-import uniqBy from 'lodash/uniqBy';
-import { filterNonnull } from '../../lib/utils/typeGuardUtils';
+import { useCurrentUser } from "../common/withUser";
+import { useMessages } from "../common/withMessages";
+import { getConfirmedCoauthorIds } from "../../lib/collections/posts/helpers";
+import sortBy from "lodash/sortBy";
+import uniqBy from "lodash/uniqBy";
+import { filterNonnull } from "../../lib/utils/typeGuardUtils";
 import { gql, useMutation } from "@apollo/client";
-import type { Editor } from '@ckeditor/ckeditor5-core';
-import type { Node, RootElement, Writer, Element as CKElement, Selection, DocumentFragment } from '@ckeditor/ckeditor5-engine';
-import { EditorContext } from '../posts/PostsEditForm';
-import { isFriendlyUI } from '../../themes/forumTheme';
-import { useMulti } from '../../lib/crud/withMulti';
+import type { Editor } from "@ckeditor/ckeditor5-core";
+import type {
+  Node,
+  RootElement,
+  Writer,
+  Element as CKElement,
+  Selection,
+  DocumentFragment,
+} from "@ckeditor/ckeditor5-engine";
+import { EditorContext } from "../posts/PostsEditForm";
+import { isFriendlyUI } from "../../themes/forumTheme";
+import { useMulti } from "../../lib/crud/withMulti";
+import { getAbsoluteUrl } from "../../lib/executionEnvironment";
 
 // Uncomment this line and the reference below to activate the CKEditor debugger
 // import CKEditorInspector from '@ckeditor/ckeditor5-inspector';
 
 const styles = (theme: ThemeType): JssStyles => ({
   sidebar: {
-    position: 'absolute',
+    position: "absolute",
     right: -350,
     width: 300,
-    [theme.breakpoints.down('md')]: {
-      position: 'absolute',
+    [theme.breakpoints.down("md")]: {
+      position: "absolute",
       right: -100,
-      width: 50
+      width: 50,
     },
-    [theme.breakpoints.down('sm')]: {
-      right: 0
-    }
+    [theme.breakpoints.down("sm")]: {
+      right: 0,
+    },
   },
   addMessageButton: {
     marginBottom: 30,
@@ -46,44 +58,47 @@ const styles = (theme: ThemeType): JssStyles => ({
   hidden: {
     display: "none",
   },
-})
+});
 
-const DIALOGUE_MESSAGE_INPUT_WRAPPER = 'dialogueMessageInputWrapper';
-const DIALOGUE_MESSAGE_INPUT = 'dialogueMessageInput';
-const DIALOGUE_MESSAGE = 'dialogueMessage';
+const DIALOGUE_MESSAGE_INPUT_WRAPPER = "dialogueMessageInputWrapper";
+const DIALOGUE_MESSAGE_INPUT = "dialogueMessageInput";
+const DIALOGUE_MESSAGE = "dialogueMessage";
 
 type ElementOfType<T extends string> = (RootElement | CKElement) & { name: T };
 type InputWrapper = ElementOfType<typeof DIALOGUE_MESSAGE_INPUT_WRAPPER>;
 type Input = ElementOfType<typeof DIALOGUE_MESSAGE_INPUT>;
 
 function isElementOfType<T extends string>(type: T) {
-  return function(node: Node | DocumentFragment | undefined): node is ElementOfType<T> {
-    return !!(node?.is('element', type));
-  }
+  return function (node: Node | DocumentFragment | undefined): node is ElementOfType<T> {
+    return !!node?.is("element", type);
+  };
 }
 
 const isInput = isElementOfType(DIALOGUE_MESSAGE_INPUT);
 const isInputWrapper = isElementOfType(DIALOGUE_MESSAGE_INPUT_WRAPPER);
 
 function areInputsInCorrectOrder(dialogueMessageInputs: Node[], sortedCoauthors: UsersMinimumInfo[]) {
-  if (dialogueMessageInputs.length > sortedCoauthors.length) return true //handles case when postfixer doesn't have up to date list of coauthors, up-to-date post fixer for another user can fix the sorting
+  if (dialogueMessageInputs.length > sortedCoauthors.length) return true; //handles case when postfixer doesn't have up to date list of coauthors, up-to-date post fixer for another user can fix the sorting
   return dialogueMessageInputs.every((input, idx) => {
-    const inputUserId = input.getAttribute('user-id');
+    const inputUserId = input.getAttribute("user-id");
     return inputUserId === sortedCoauthors[idx]._id;
   });
 }
 
 function createMissingInputs(authorsWithoutInputs: UsersMinimumInfo[], writer: Writer, parent: InputWrapper) {
-  authorsWithoutInputs.forEach(author => {
-    const newUserMessageInput = writer.createElement(DIALOGUE_MESSAGE_INPUT, { 'user-id': author._id, 'display-name': author.displayName });
+  authorsWithoutInputs.forEach((author) => {
+    const newUserMessageInput = writer.createElement(DIALOGUE_MESSAGE_INPUT, {
+      "user-id": author._id,
+      "display-name": author.displayName,
+    });
     writer.append(newUserMessageInput, parent);
   });
 }
 
 function getAuthorsWithoutInputs(sortedCoauthors: UsersMinimumInfo[], dialogueMessageInputs: Node[]) {
-  return sortedCoauthors.filter(coauthor => {
-    return !dialogueMessageInputs.some(input => {
-      const inputUserId = input.getAttribute('user-id') as string | undefined;
+  return sortedCoauthors.filter((coauthor) => {
+    return !dialogueMessageInputs.some((input) => {
+      const inputUserId = input.getAttribute("user-id") as string | undefined;
       return coauthor._id === inputUserId;
     });
   });
@@ -91,8 +106,8 @@ function getAuthorsWithoutInputs(sortedCoauthors: UsersMinimumInfo[], dialogueMe
 
 function removeDuplicateInputs(dialogueMessageInputs: Node[], writer: Writer) {
   const inputsForAuthor = new Map<string, Node>();
-  return dialogueMessageInputs.some(input => {
-    const inputUserId = input.getAttribute('user-id') as string | undefined;
+  return dialogueMessageInputs.some((input) => {
+    const inputUserId = input.getAttribute("user-id") as string | undefined;
     if (!inputUserId) {
       writer.remove(input);
       return true;
@@ -109,76 +124,86 @@ function removeDuplicateInputs(dialogueMessageInputs: Node[], writer: Writer) {
 }
 
 function removeDuplicateInputWrappers(dialogueMessageInputWrappers: Node[], writer: Writer) {
-  dialogueMessageInputWrappers.slice(-1).forEach(inputWrapper => {
+  dialogueMessageInputWrappers.slice(-1).forEach((inputWrapper) => {
     writer.remove(inputWrapper);
   });
 }
 
 function getElementUserOrder(element: RootElement | CKElement) {
   // Explicitly || rather than ?? to survive things like NaN
-  return Number.parseInt((element.getAttribute('user-order') || '0') as string);
+  return Number.parseInt((element.getAttribute("user-order") || "0") as string);
 }
 
 function getMaxUserOrder(dialogueElements: (RootElement | CKElement)[]) {
-  return Math.max(...dialogueElements.map(element => getElementUserOrder(element)))
+  return Math.max(...dialogueElements.map((element) => getElementUserOrder(element)));
 }
 
-function assignUserOrders(messagesOrInputs: (RootElement | CKElement)[], sortedCoauthors: UsersMinimumInfo[], writer: Writer) {
-  return messagesOrInputs.map(element => {
-    const elementUserId = element.getAttribute('user-id');
-    const elementUserOrder = getElementUserOrder(element);
-    let userOrder = sortedCoauthors.findIndex((author) => author._id === elementUserId) + 1;
+function assignUserOrders(
+  messagesOrInputs: (RootElement | CKElement)[],
+  sortedCoauthors: UsersMinimumInfo[],
+  writer: Writer,
+) {
+  return messagesOrInputs
+    .map((element) => {
+      const elementUserId = element.getAttribute("user-id");
+      const elementUserOrder = getElementUserOrder(element);
+      let userOrder = sortedCoauthors.findIndex((author) => author._id === elementUserId) + 1;
 
-    if (userOrder < 1) {
-      if (elementUserOrder) {
-        userOrder = elementUserOrder;
-      } else {
-        userOrder = getMaxUserOrder(messagesOrInputs) + 1;
+      if (userOrder < 1) {
+        if (elementUserOrder) {
+          userOrder = elementUserOrder;
+        } else {
+          userOrder = getMaxUserOrder(messagesOrInputs) + 1;
+        }
       }
-    }
 
-    if (userOrder !== elementUserOrder) {
-      writer.setAttribute('user-order', userOrder, element);
-      return true;
-    }
+      if (userOrder !== elementUserOrder) {
+        writer.setAttribute("user-order", userOrder, element);
+        return true;
+      }
 
-    return false;
-  }).some(e => e);
+      return false;
+    })
+    .some((e) => e);
 }
 
 function assignUserIds(inputs: Input[], sortedCoauthors: UsersMinimumInfo[], writer: Writer) {
-  return inputs.map((element) => {
-    const elementUserId = element.getAttribute('user-id');
-    if (elementUserId) return false;
+  return inputs
+    .map((element) => {
+      const elementUserId = element.getAttribute("user-id");
+      if (elementUserId) return false;
 
-    // Explicitly coalesce on 0, which only happens if there is no user-order on the element
-    const elementUserOrder = getElementUserOrder(element) || (getMaxUserOrder(inputs) + 1);
+      // Explicitly coalesce on 0, which only happens if there is no user-order on the element
+      const elementUserOrder = getElementUserOrder(element) || getMaxUserOrder(inputs) + 1;
 
-    // user-order is 1-indexed
-    const userId = sortedCoauthors[elementUserOrder - 1]._id
-    writer.setAttribute('user-id', userId, element);
+      // user-order is 1-indexed
+      const userId = sortedCoauthors[elementUserOrder - 1]._id;
+      writer.setAttribute("user-id", userId, element);
 
-    return true;
-  }).some(e => e);
+      return true;
+    })
+    .some((e) => e);
 }
 
 function assignDisplayNames(inputs: Input[], sortedCoauthors: UsersMinimumInfo[], writer: Writer) {
-  return inputs.map((input) => {
-    const inputUserId = input.getAttribute('user-id')
-    const inputDisplayName = input.getAttribute('display-name');
-    if (!inputUserId || inputDisplayName) return false;
+  return inputs
+    .map((input) => {
+      const inputUserId = input.getAttribute("user-id");
+      const inputDisplayName = input.getAttribute("display-name");
+      if (!inputUserId || inputDisplayName) return false;
 
-    const inputUser = sortedCoauthors.find((author) => author._id === inputUserId);
-    if (!inputUser) return false;
+      const inputUser = sortedCoauthors.find((author) => author._id === inputUserId);
+      if (!inputUser) return false;
 
-    const displayName = inputUser.displayName;
-    writer.setAttribute('display-name', displayName, input);
-    return true;
-  }).some(e => e);
+      const displayName = inputUser.displayName;
+      writer.setAttribute("display-name", displayName, input);
+      return true;
+    })
+    .some((e) => e);
 }
 
 function getBlockUserId(modelElement: CKElement) {
-  return (modelElement.getAttribute('user-id') || '').toString();
+  return (modelElement.getAttribute("user-id") || "").toString();
 }
 
 function createDialoguePostFixer(editor: Editor, sortedCoauthors: UsersMinimumInfo[]) {
@@ -188,7 +213,7 @@ function createDialoguePostFixer(editor: Editor, sortedCoauthors: UsersMinimumIn
     const dialogueMessages = children.filter(isElementOfType(DIALOGUE_MESSAGE));
 
     const inputWrappers = children.filter(isElementOfType(DIALOGUE_MESSAGE_INPUT_WRAPPER));
-    
+
     // We check that we have a wrapper div for the inputs
     if (inputWrappers.length === 0) {
       writer.appendElement(DIALOGUE_MESSAGE_INPUT_WRAPPER, root);
@@ -211,7 +236,9 @@ function createDialoguePostFixer(editor: Editor, sortedCoauthors: UsersMinimumIn
     }
 
     const inputWrapperChildren = Array.from(inputWrapper.getChildren());
-    const dialogueMessageInputs = [...children, ...inputWrapperChildren].filter(isElementOfType(DIALOGUE_MESSAGE_INPUT));
+    const dialogueMessageInputs = [...children, ...inputWrapperChildren].filter(
+      isElementOfType(DIALOGUE_MESSAGE_INPUT),
+    );
 
     const anyIncorrectInputUserOrders = assignUserOrders(dialogueMessageInputs, sortedCoauthors, writer);
     if (anyIncorrectInputUserOrders) {
@@ -249,8 +276,8 @@ function createDialoguePostFixer(editor: Editor, sortedCoauthors: UsersMinimumIn
     // We check that the inputs are in lexical order by author userId
     const incorrectOrder = !areInputsInCorrectOrder(dialogueMessageInputs, sortedCoauthors);
     if (incorrectOrder) {
-      const sortedInputs = sortBy(dialogueMessageInputs, (i) => getElementUserOrder(i))
-      sortedInputs.forEach(sortedInput => {
+      const sortedInputs = sortBy(dialogueMessageInputs, (i) => getElementUserOrder(i));
+      sortedInputs.forEach((sortedInput) => {
         writer.append(sortedInput, inputWrapper);
       });
       return true;
@@ -260,15 +287,16 @@ function createDialoguePostFixer(editor: Editor, sortedCoauthors: UsersMinimumIn
     for (const input of dialogueMessageInputs) {
       const inputIsEmpty = Array.from(input.getChildren()).length === 0;
       if (inputIsEmpty) {
-        writer.appendElement('paragraph', input);
+        writer.appendElement("paragraph", input);
         return true;
       }
     }
 
     // We don't actually want a leading paragraph that'll let users do whatever they want with no friction
-    const hasSpuriousLeadingParagraph = children.length === 2
-      && children[0].is('element', 'paragraph')
-      && Array.from(children[0].getChildren()).length === 0;
+    const hasSpuriousLeadingParagraph =
+      children.length === 2 &&
+      children[0].is("element", "paragraph") &&
+      Array.from(children[0].getChildren()).length === 0;
 
     if (hasSpuriousLeadingParagraph) {
       writer.remove(children[0]);
@@ -279,24 +307,23 @@ function createDialoguePostFixer(editor: Editor, sortedCoauthors: UsersMinimumIn
   };
 }
 
-const refreshDisplayMode = ( editor: any, sidebarElement: HTMLDivElement | null ) => {
-  if (!sidebarElement) return null
-  const annotationsUIs = editor.plugins.get( 'AnnotationsUIs' );
-  
-  if ( window.innerWidth < 1400 ) {
-    sidebarElement.classList.remove( 'hidden' );
-    sidebarElement.classList.add( 'narrow' );
-    
+const refreshDisplayMode = (editor: any, sidebarElement: HTMLDivElement | null) => {
+  if (!sidebarElement) return null;
+  const annotationsUIs = editor.plugins.get("AnnotationsUIs");
+
+  if (window.innerWidth < 1400) {
+    sidebarElement.classList.remove("hidden");
+    sidebarElement.classList.add("narrow");
+
     annotationsUIs.deactivateAll();
-    annotationsUIs.activate('narrowSidebar');
-  }
-  else {
-    sidebarElement.classList.remove( 'hidden', 'narrow' );
-    
+    annotationsUIs.activate("narrowSidebar");
+  } else {
+    sidebarElement.classList.remove("hidden", "narrow");
+
     annotationsUIs.deactivateAll();
-    annotationsUIs.activate('wideSidebar');
+    annotationsUIs.activate("wideSidebar");
   }
-}
+};
 
 function handleSubmitWithoutNewline(editor: Editor, currentUser: UsersCurrent | null, event: KeyboardEvent) {
   const selectedBlocks = Array.from(editor.model.document.selection.getSelectedBlocks());
@@ -310,16 +337,16 @@ function handleSubmitWithoutNewline(editor: Editor, currentUser: UsersCurrent | 
       if ((event.ctrlKey || event.metaKey) && event.keyCode === 13 && parentInputElement) {
         event.stopPropagation();
         event.preventDefault();
-        editor.execute('submitDialogueMessage');
+        editor.execute("submitDialogueMessage");
       }
     }
   }
 }
 
 export type ConnectedUserInfo = {
-  _id: string
-  name: string
-}
+  _id: string;
+  name: string;
+};
 
 const CKPostEditor = ({
   data,
@@ -336,64 +363,63 @@ const CKPostEditor = ({
   accessLevel,
   placeholder,
   document,
-  classes
+  classes,
 }: {
-  data?: any,
-  collectionName: CollectionNameString,
-  fieldName: string,
-  onSave?: any,
-  onChange?: any,
-  onFocus?: (event: AnyBecauseTodo, editor: AnyBecauseTodo) => void,
-  documentId?: string,
-  userId?: string,
-  formType?: "new"|"edit",
-  onInit?: any,
+  data?: any;
+  collectionName: CollectionNameString;
+  fieldName: string;
+  onSave?: any;
+  onChange?: any;
+  onFocus?: (event: AnyBecauseTodo, editor: AnyBecauseTodo) => void;
+  documentId?: string;
+  userId?: string;
+  formType?: "new" | "edit";
+  onInit?: any;
   // Whether this is the contents field of a collaboratively-edited post
-  isCollaborative?: boolean,
+  isCollaborative?: boolean;
   // If this is the contents field of a collaboratively-edited post, the access level the
   // logged in user has. Otherwise undefined.
-  accessLevel?: CollaborativeEditingAccessLevel,
-  placeholder?: string,
-  document?: any,
-  classes: ClassesType,
+  accessLevel?: CollaborativeEditingAccessLevel;
+  placeholder?: string;
+  document?: any;
+  classes: ClassesType;
 }) => {
   const currentUser = useCurrentUser();
   const { flash } = useMessages();
-  const post = (document as PostsEdit);
+  const post = document as PostsEdit;
   const isBlockOwnershipMode = isCollaborative && post.collabEditorDialogue;
-  
+
   const { EditorTopBar, DialogueEditorGuidelines, DialogueEditorFeedback } = Components;
   const { PostEditor, PostEditorCollaboration } = getCkEditor();
   const getInitialCollaborationMode = () => {
     if (!isCollaborative || !accessLevel) return "Editing";
-    if (accessLevelCan(accessLevel, "edit"))
-      return "Editing";
-    else if (accessLevelCan(accessLevel, "comment"))
-      return "Commenting";
-    else
-      return "Viewing";
-  }
-  const initialCollaborationMode = getInitialCollaborationMode()
-  const [collaborationMode,setCollaborationMode] = useState<CollaborationMode>(initialCollaborationMode);
-  const collaborationModeRef = useRef(collaborationMode)
-  const [connectedUsers,setConnectedUsers] = useState<ConnectedUserInfo[]>([]);
+    if (accessLevelCan(accessLevel, "edit")) return "Editing";
+    else if (accessLevelCan(accessLevel, "comment")) return "Commenting";
+    else return "Viewing";
+  };
+  const initialCollaborationMode = getInitialCollaborationMode();
+  const [collaborationMode, setCollaborationMode] = useState<CollaborationMode>(initialCollaborationMode);
+  const collaborationModeRef = useRef(collaborationMode);
+  const [connectedUsers, setConnectedUsers] = useState<ConnectedUserInfo[]>([]);
 
   // Get the linkSharingKey, if it exists
-  const { query : { key } } = useSubscribedLocation();
-  
-    // To make sure that the refs are populated we have to do two rendering passes
-  const [layoutReady, setLayoutReady] = useState(false)
-  useEffect(() => {
-    setLayoutReady(true)
-  }, [])
+  const {
+    query: { key },
+  } = useSubscribedLocation();
 
-  const editorRef = useRef<CKEditor>(null)
-  const sidebarRef = useRef<HTMLDivElement>(null)
-  const hiddenPresenceListRef = useRef<HTMLDivElement>(null)
+  // To make sure that the refs are populated we have to do two rendering passes
+  const [layoutReady, setLayoutReady] = useState(false);
+  useEffect(() => {
+    setLayoutReady(true);
+  }, []);
+
+  const editorRef = useRef<CKEditor>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const hiddenPresenceListRef = useRef<HTMLDivElement>(null);
 
   const webSocketUrl = ckEditorWebsocketUrlOverrideSetting.get() || ckEditorWebsocketUrlSetting.get();
   const ckEditorCloudConfigured = !!webSocketUrl;
-  const initData = typeof(data) === "string" ? data : ""
+  const initData = typeof data === "string" ? data : "";
 
   const [sendNewDialogueMessageNotification] = useMutation(gql`
     mutation sendNewDialogueMessageNotification($postId: String!, $dialogueHtml: String!) {
@@ -402,19 +428,19 @@ const CKPostEditor = ({
   `);
 
   const dialogueParticipantNotificationCallback = async () => {
-  const editorContents =  editorRef?.current?.editor.getData()
+    const editorContents = editorRef?.current?.editor.getData();
 
     await sendNewDialogueMessageNotification({
       variables: {
         postId: post._id,
-        dialogueHtml: editorContents
-      }
+        dialogueHtml: editorContents,
+      },
     });
-  }
-  
-  const dialogueConfiguration = { dialogueParticipantNotificationCallback }
+  };
 
-  const {results: anyDialogue} = useMulti({
+  const dialogueConfiguration = { dialogueParticipantNotificationCallback };
+
+  const { results: anyDialogue } = useMulti({
     collectionName: "Posts",
     terms: {
       view: "hasEverDialogued",
@@ -424,15 +450,15 @@ const CKPostEditor = ({
     fragmentName: "PostsMinimumInfo",
     fetchPolicy: "cache-and-network",
     skip: !currentUser?._id,
-  })
+  });
 
   const hasEverDialoguedBefore = !!anyDialogue && anyDialogue.length > 1;
 
   const [_, setEditor] = useContext(EditorContext);
-  
+
   const applyCollabModeToCkEditor = (editor: Editor, mode: CollaborationMode) => {
-    const trackChanges = editor.commands.get('trackChanges')!;
-    switch(mode) {
+    const trackChanges = editor.commands.get("trackChanges")!;
+    switch (mode) {
       case "Viewing":
         editor.isReadOnly = true;
         trackChanges.value = false;
@@ -447,7 +473,7 @@ const CKPostEditor = ({
         trackChanges.value = false;
         break;
     }
-  }
+  };
   const changeCollaborationMode = (mode: CollaborationMode) => {
     const editor = editorRef.current?.editor;
     if (editor) {
@@ -455,205 +481,255 @@ const CKPostEditor = ({
     }
     setCollaborationMode(mode);
     collaborationModeRef.current = mode;
-  }
+  };
 
-  return <div>
-    {isBlockOwnershipMode && <>
-     {!hasEverDialoguedBefore && <DialogueEditorGuidelines />}
-     <style>
-      {
-      `.dialogue-message-input button {
+  return (
+    <div>
+      {isBlockOwnershipMode && (
+        <>
+          {!hasEverDialoguedBefore && <DialogueEditorGuidelines />}
+          <style>
+            {`.dialogue-message-input button {
         display: none;
       }
 
-      ${currentUser ? `.dialogue-message-input[user-id="${currentUser!._id}"] {
+      ${
+        currentUser
+          ? `.dialogue-message-input[user-id="${currentUser!._id}"] {
         order: 1;
-      }` : ``}
+      }`
+          : ``
+      }
       
-      ${currentUser ? `.dialogue-message-input[user-id="${currentUser!._id}"] button {
+      ${
+        currentUser
+          ? `.dialogue-message-input[user-id="${currentUser!._id}"] button {
         display: block;
-      }` : ``}
+      }`
+          : ``
+      }
       `}
-     </style>
-    </>}
-    
-    {isCollaborative && <EditorTopBar
-      accessLevel={accessLevel||"none"}
-      collaborationMode={collaborationMode}
-      setCollaborationMode={changeCollaborationMode}
-      post={post}
-      connectedUsers={connectedUsers}
-    />}
-    
-    <div className={classes.hidden} ref={hiddenPresenceListRef}/>
-    <div ref={sidebarRef} className={classes.sidebar}/>
+          </style>
+        </>
+      )}
 
-    {layoutReady && <CKEditor
-      ref={editorRef}
-      onChange={onChange}
-      onFocus={onFocus}
-      editor={isCollaborative ? PostEditorCollaboration : PostEditor}
-      data={data}
-      onInit={(editor: Editor) => {
-        if (isCollaborative) {
-          // Uncomment this line and the import above to activate the CKEditor debugger
-          // CKEditorInspector.attach(editor)
+      {isCollaborative && (
+        <EditorTopBar
+          accessLevel={accessLevel || "none"}
+          collaborationMode={collaborationMode}
+          setCollaborationMode={changeCollaborationMode}
+          post={post}
+          connectedUsers={connectedUsers}
+        />
+      )}
 
-          // We listen to the current window size to determine how to show comments
-          window.addEventListener( 'resize', () => refreshDisplayMode(editor, sidebarRef.current) );
-          // We then call the method once to determine the current window size
-          refreshDisplayMode(editor, sidebarRef.current);
-          
-          applyCollabModeToCkEditor(editor, collaborationMode);
-          
-          editor.keystrokes.set('CTRL+ALT+M', 'addCommentThread')
+      <div className={classes.hidden} ref={hiddenPresenceListRef} />
+      <div ref={sidebarRef} className={classes.sidebar} />
 
-          editorRef.current?.domContainer?.current?.addEventListener('keydown', (event: KeyboardEvent) => {
-            handleSubmitWithoutNewline(editor, currentUser, event);
-          }, { capture: true });
-          
-          // We need this context for Dialogues, which should always be collaborative.
-          setEditor(editor);
-        }
+      {layoutReady && (
+        <CKEditor
+          ref={editorRef}
+          onChange={onChange}
+          onFocus={onFocus}
+          editor={isCollaborative ? PostEditorCollaboration : PostEditor}
+          data={data}
+          onInit={(editor: Editor) => {
+            if (isCollaborative) {
+              // Uncomment this line and the import above to activate the CKEditor debugger
+              // CKEditorInspector.attach(editor)
 
-        const userIds = formType === 'new' ? [userId] : [post.userId, ...getConfirmedCoauthorIds(post)];
-        if (post.collabEditorDialogue && accessLevel && accessLevelCan(accessLevel, 'edit')) {
-          const rawAuthors = formType === 'new' ? [currentUser!] : filterNonnull([post.user, ...(post.coauthors ?? [])])
-          const coauthors = uniqBy(
-            rawAuthors.filter(coauthor => userIds.includes(coauthor._id)),
-            (user) => user._id,
-          );
-          editor.model.document.registerPostFixer( createDialoguePostFixer(editor, coauthors) );
+              // We listen to the current window size to determine how to show comments
+              window.addEventListener("resize", () => refreshDisplayMode(editor, sidebarRef.current));
+              // We then call the method once to determine the current window size
+              refreshDisplayMode(editor, sidebarRef.current);
 
-          // This is just to trigger the postFixer when the editor is initialized
-          editor.model.change(writer => {
-            const dummyParagraph = writer.createElement('paragraph');
-            writer.append(dummyParagraph, editor.model.document.getRoot()!);
-            writer.remove(dummyParagraph);
-          });
-        }
+              applyCollabModeToCkEditor(editor, collaborationMode);
 
-        // Not checking for the plugin's existence causes an error which causes integration tests to fail
-        if (editor.plugins.has('Sessions')) {
-          const sessionsPlugin = editor.plugins.get('Sessions') as AnyBecauseHard;
-          if (sessionsPlugin) {
-            const connectedUsers = sessionsPlugin.allConnectedUsers
-            const updateConnectedUsers = (usersCollection: AnyBecauseHard) => {
-              const newUsersArr = [...usersCollection];
-              setConnectedUsers(newUsersArr.map(u => ({
-                _id: u.id,
-                name: u.name,
-              })));
+              editor.keystrokes.set("CTRL+ALT+M", "addCommentThread");
+
+              editorRef.current?.domContainer?.current?.addEventListener(
+                "keydown",
+                (event: KeyboardEvent) => {
+                  handleSubmitWithoutNewline(editor, currentUser, event);
+                },
+                { capture: true },
+              );
+
+              // We need this context for Dialogues, which should always be collaborative.
+              setEditor(editor);
             }
-            connectedUsers.on('add', (change: AnyBecauseHard) => {
-              if (change.source) {
-                updateConnectedUsers(change.source);
-              }
-            });
-            connectedUsers.on('remove', (change: AnyBecauseHard) => {
-              if (change.source) {
-                updateConnectedUsers(change.source);
-              }
-            });
-          }
-        }
 
-        if (isBlockOwnershipMode) {
-          editor.model.on('_afterChanges', (change) => {
-            const currentSelection: Selection = (change?.source as AnyBecauseHard)?.document?.selection;
-            const blocks = currentSelection?.getSelectedBlocks?.();
-            const blockOwners: string[] = [];
-            if (blocks) {
-              for (let block of blocks) {
-                const ancestors = block.getAncestors({ includeSelf: true });
-                const parentDialogueElement = ancestors.find((ancestor): ancestor is CKElement => {
-                  return ancestor.is('element', DIALOGUE_MESSAGE) || ancestor.is('element', DIALOGUE_MESSAGE_INPUT);
-                })
-                if (parentDialogueElement) {
-                  const owner = getBlockUserId(parentDialogueElement);
-                  if (owner && userIds.includes(owner)) {
-                    blockOwners.push(owner);
+            const userIds = formType === "new" ? [userId] : [post.userId, ...getConfirmedCoauthorIds(post)];
+            if (post.collabEditorDialogue && accessLevel && accessLevelCan(accessLevel, "edit")) {
+              const rawAuthors =
+                formType === "new" ? [currentUser!] : filterNonnull([post.user, ...(post.coauthors ?? [])]);
+              const coauthors = uniqBy(
+                rawAuthors.filter((coauthor) => userIds.includes(coauthor._id)),
+                (user) => user._id,
+              );
+              editor.model.document.registerPostFixer(createDialoguePostFixer(editor, coauthors));
+
+              // This is just to trigger the postFixer when the editor is initialized
+              editor.model.change((writer) => {
+                const dummyParagraph = writer.createElement("paragraph");
+                writer.append(dummyParagraph, editor.model.document.getRoot()!);
+                writer.remove(dummyParagraph);
+              });
+            }
+
+            // Not checking for the plugin's existence causes an error which causes integration tests to fail
+            if (editor.plugins.has("Sessions")) {
+              const sessionsPlugin = editor.plugins.get("Sessions") as AnyBecauseHard;
+              if (sessionsPlugin) {
+                const connectedUsers = sessionsPlugin.allConnectedUsers;
+                const updateConnectedUsers = (usersCollection: AnyBecauseHard) => {
+                  const newUsersArr = [...usersCollection];
+                  setConnectedUsers(
+                    newUsersArr.map((u) => ({
+                      _id: u.id,
+                      name: u.name,
+                    })),
+                  );
+                };
+                connectedUsers.on("add", (change: AnyBecauseHard) => {
+                  if (change.source) {
+                    updateConnectedUsers(change.source);
                   }
-                }
-              }
-            }
-            
-            if (collaborationModeRef.current !== "Editing (override)") {
-              if (blockOwners.some(blockOwner => blockOwner !== currentUser?._id)) {
-                changeCollaborationMode("Commenting");
-              } else {
-                changeCollaborationMode("Editing");
+                });
+                connectedUsers.on("remove", (change: AnyBecauseHard) => {
+                  if (change.source) {
+                    updateConnectedUsers(change.source);
+                  }
+                });
               }
             }
 
-            const acceptCommand = editor.commands.get('acceptSuggestion');
-            if (acceptCommand) {
-              // TODO: maybe restrict accepting suggestions to only the user who owns the block, not just any user other than the one that made the suggestion
-              // Don't let users accept changes in blocks they don't own
-              acceptCommand.on("execute", (command: any, suggestionIds: string[]) => {
-                const trackChangesPlugin = editor.plugins.get( 'TrackChanges' );
-                if (trackChangesPlugin) {
-                  for (let suggestionId of suggestionIds) {
-                    const suggestion = (trackChangesPlugin as any).getSuggestion(suggestionId);
-                    const suggesterUserId = suggestion.author.id;
-                    if ((!currentUser || (suggesterUserId === currentUser?._id)) && collaborationModeRef.current !== "Editing (override)") {
-                      flash("You cannot accept your own changes");
-                      command.stop();
+            if (isBlockOwnershipMode) {
+              editor.model.on("_afterChanges", (change) => {
+                const currentSelection: Selection = (change?.source as AnyBecauseHard)?.document?.selection;
+                const blocks = currentSelection?.getSelectedBlocks?.();
+                const blockOwners: string[] = [];
+                if (blocks) {
+                  for (let block of blocks) {
+                    const ancestors = block.getAncestors({ includeSelf: true });
+                    const parentDialogueElement = ancestors.find((ancestor): ancestor is CKElement => {
+                      return ancestor.is("element", DIALOGUE_MESSAGE) || ancestor.is("element", DIALOGUE_MESSAGE_INPUT);
+                    });
+                    if (parentDialogueElement) {
+                      const owner = getBlockUserId(parentDialogueElement);
+                      if (owner && userIds.includes(owner)) {
+                        blockOwners.push(owner);
+                      }
                     }
                   }
                 }
-              }, {
-                priority: "high",
+
+                if (collaborationModeRef.current !== "Editing (override)") {
+                  if (blockOwners.some((blockOwner) => blockOwner !== currentUser?._id)) {
+                    changeCollaborationMode("Commenting");
+                  } else {
+                    changeCollaborationMode("Editing");
+                  }
+                }
+
+                const acceptCommand = editor.commands.get("acceptSuggestion");
+                if (acceptCommand) {
+                  // TODO: maybe restrict accepting suggestions to only the user who owns the block, not just any user other than the one that made the suggestion
+                  // Don't let users accept changes in blocks they don't own
+                  acceptCommand.on(
+                    "execute",
+                    (command: any, suggestionIds: string[]) => {
+                      const trackChangesPlugin = editor.plugins.get("TrackChanges");
+                      if (trackChangesPlugin) {
+                        for (let suggestionId of suggestionIds) {
+                          const suggestion = (trackChangesPlugin as any).getSuggestion(suggestionId);
+                          const suggesterUserId = suggestion.author.id;
+                          if (
+                            (!currentUser || suggesterUserId === currentUser?._id) &&
+                            collaborationModeRef.current !== "Editing (override)"
+                          ) {
+                            flash("You cannot accept your own changes");
+                            command.stop();
+                          }
+                        }
+                      }
+                    },
+                    {
+                      priority: "high",
+                    },
+                  );
+                }
               });
             }
-          });
-        }
 
-        if (onInit) onInit(editor)
-      }}
-      config={{
-        ...(post.collabEditorDialogue ? {blockToolbar: [
-          'imageUpload',
-          'insertTable',
-          'horizontalLine',
-          'mathDisplay',
-          'mediaEmbed',
-          'footnote',
-        ]} : {}),
-        autosave: {
-          save (editor: any) {
-            return onSave && onSave(editor.getData())
-          }
-        },
-        cloudServices: ckEditorCloudConfigured ? {
-          tokenUrl: generateTokenRequest(collectionName, fieldName, documentId, userId, formType, key),
-          uploadUrl: ckEditorUploadUrlOverrideSetting.get() || ckEditorUploadUrlSetting.get(),
-          webSocketUrl: webSocketUrl,
-          documentId: getCKEditorDocumentId(documentId, userId, formType),
-          bundleVersion: ckEditorBundleVersion,
-        } : undefined,
-        collaboration: ckEditorCloudConfigured ? {
-          channelId: getCKEditorDocumentId(documentId, userId, formType)
-        } : undefined,
-        sidebar: {
-          container: sidebarRef.current
-        },
-        presenceList: {
-          container: hiddenPresenceListRef.current
-        },
-        initialData: initData,
-        placeholder: placeholder ?? defaultEditorPlaceholder,
-        mention: mentionPluginConfiguration,
-        dialogues: dialogueConfiguration
-      }}
-    />}
-    {post.collabEditorDialogue && !isFriendlyUI ? <DialogueEditorFeedback post={post} /> : null}
-  </div>
-}
+            if (onInit) onInit(editor);
+          }}
+          config={{
+            ...(post.collabEditorDialogue
+              ? {
+                  blockToolbar: [
+                    "imageUpload",
+                    "insertTable",
+                    "horizontalLine",
+                    "mathDisplay",
+                    "mediaEmbed",
+                    "footnote",
+                  ],
+                }
+              : {}),
+            autosave: {
+              save(editor: any) {
+                return onSave && onSave(editor.getData());
+              },
+            },
+            cloudServices: ckEditorCloudConfigured
+              ? {
+                  tokenUrl: generateTokenRequest(collectionName, fieldName, documentId, userId, formType, key),
+                  uploadUrl: ckEditorUploadUrlOverrideSetting.get() || ckEditorUploadUrlSetting.get(),
+                  webSocketUrl: webSocketUrl,
+                  documentId: getCKEditorDocumentId(documentId, userId, formType),
+                  bundleVersion: ckEditorBundleVersion,
+                }
+              : undefined,
+            collaboration: ckEditorCloudConfigured
+              ? {
+                  channelId: getCKEditorDocumentId(documentId, userId, formType),
+                }
+              : undefined,
+            sidebar: {
+              container: sidebarRef.current,
+            },
+            presenceList: {
+              container: hiddenPresenceListRef.current,
+            },
+            initialData: initData,
+            placeholder: placeholder ?? defaultEditorPlaceholder,
+            mention: mentionPluginConfiguration,
+            dialogues: dialogueConfiguration,
+            simpleUpload: {
+              // The URL that the images are uploaded to.
+              uploadUrl: `${getAbsoluteUrl()}/api/upload`,
 
-const CKPostEditorComponent = registerComponent("CKPostEditor", CKPostEditor, {styles});
+              // Enable the XMLHttpRequest.withCredentials property.
+              withCredentials: true,
+
+              // Headers sent along with the XMLHttpRequest to the upload server.
+              // headers: {
+              //   "X-CSRF-TOKEN": "CSRF-Token",
+              //   Authorization: "Bearer <JSON Web Token>",
+              // },
+            },
+          }}
+        />
+      )}
+      {post.collabEditorDialogue && !isFriendlyUI ? <DialogueEditorFeedback post={post} /> : null}
+    </div>
+  );
+};
+
+const CKPostEditorComponent = registerComponent("CKPostEditor", CKPostEditor, { styles });
 declare global {
   interface ComponentTypes {
-    CKPostEditor: typeof CKPostEditorComponent
+    CKPostEditor: typeof CKPostEditorComponent;
   }
 }
