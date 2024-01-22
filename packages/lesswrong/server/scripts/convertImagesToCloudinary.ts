@@ -15,7 +15,9 @@ import uniq from "lodash/uniq";
 import { loggerConstructor } from "../../lib/utils/logging";
 import { Posts } from "../../lib/collections/posts";
 import { getAtPath, setAtPath } from "../../lib/helpers";
-import { Readable, Stream } from "stream";
+import { Stream } from "stream";
+
+import type { UploadApiResponse } from "cloudinary";
 
 const cloudinaryApiKey = new DatabaseServerSetting<string>("cloudinaryApiKey", process.env.CLOUDINARY_API_KEY ?? "");
 const cloudinaryApiSecret = new DatabaseServerSetting<string>(
@@ -24,8 +26,6 @@ const cloudinaryApiSecret = new DatabaseServerSetting<string>(
 );
 
 export async function uploadStreamToCloudinary(stream: Stream) {
-  const logger = loggerConstructor("image-conversion");
-
   const cloudName = cloudinaryCloudNameSetting.get();
   const apiKey = cloudinaryApiKey.get();
   const apiSecret = cloudinaryApiSecret.get();
@@ -40,7 +40,6 @@ export async function uploadStreamToCloudinary(stream: Stream) {
     new Promise((resolve, reject) => {
       const uploadStream = cloudinary.v2.uploader.upload_stream(
         {
-          // folder: `mirroredImages/${originDocumentId}`,
           cloud_name: cloudName,
           api_key: apiKey,
           api_secret: apiSecret,
@@ -57,36 +56,19 @@ export async function uploadStreamToCloudinary(stream: Stream) {
       stream.pipe(uploadStream);
     });
 
-  const result = await upload();
+  const result = (await upload()) as UploadApiResponse;
 
-  console.log({ result });
+  // Serve all images with automatic quality and format transformations to save on bandwidth
+  const autoQualityFormatUrl = cloudinary.v2.url(result.public_id, {
+    cloud_name: cloudName,
+    api_key: apiKey,
+    api_secret: apiSecret,
+    quality: "auto",
+    fetch_format: "auto",
+    secure: true,
+  });
 
-  return result;
-
-  // const result = await cloudinary.v2.uploader.upload_stream(buf, {
-  //   folder: `mirroredImages/${originDocumentId}`,
-  //   cloud_name: cloudName,
-  //   api_key: apiKey,
-  //   api_secret: apiSecret,
-  // });
-  // logger(`Result of moving image: ${result.secure_url}`);
-
-  // // Serve all images with automatic quality and format transformations to save on bandwidth
-  // const autoQualityFormatUrl = cloudinary.v2.url(result.public_id, {
-  //   cloud_name: cloudName,
-  //   api_key: apiKey,
-  //   api_secret: apiSecret,
-  //   quality: "auto",
-  //   fetch_format: "auto",
-  //   secure: true,
-  // });
-  //
-  // await Images.rawInsert({
-  //   originalUrl: oldUrl,
-  //   cdnHostedUrl: autoQualityFormatUrl,
-  // });
-  //
-  // return autoQualityFormatUrl;
+  return autoQualityFormatUrl;
 }
 
 // Given a URL which (probably) points to an image, download that image,

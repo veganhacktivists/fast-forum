@@ -21,8 +21,6 @@ import { formatError } from "apollo-errors";
 import * as Sentry from "@sentry/node";
 import express from "express";
 import multer from "multer";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
-import cloudinary from "cloudinary";
 import { app } from "./expressServer";
 import path from "path";
 import { getPublicSettingsLoaded } from "../lib/settingsCache";
@@ -63,6 +61,7 @@ import {
   setAsyncStoreValue,
 } from "./perfMetrics";
 import { performanceMetricLoggingEnabled } from "../lib/publicSettings";
+import { Readable } from "stream";
 
 class ApolloServerLogging implements ApolloServerPlugin<ResolverContext> {
   requestDidStart({
@@ -190,7 +189,6 @@ export function startWebserver() {
     plugins: [new ApolloServerLogging()],
   });
 
-  // const storage = new CloudinaryStorage({ cloudinary: cloudinary.v2, params: {} });
   const storage = multer.memoryStorage();
 
   app.post("/api/upload", multer({ storage }).single("upload"), async (req, res) => {
@@ -205,11 +203,13 @@ export function startWebserver() {
       return;
     }
 
-    console.log("stream", req.file.stream);
-
-    const x = await uploadStreamToCloudinary(req.file.stream);
-    console.log("file", x);
-    res.json({ message: "Successfully uploaded files" });
+    const stream = Readable.from(req.file.buffer);
+    try {
+      const url = await uploadStreamToCloudinary(stream);
+      res.json({ url });
+    } catch (e) {
+      res.json({ error: "Error uploading file" }).status(500);
+    }
   });
 
   app.use("/graphql", express.json({ limit: "50mb" }));
