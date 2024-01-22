@@ -17,6 +17,6 @@
     "analytics": {
       "environment": "localhost"
     },
-    "testServer": true
+    "testServer": false
   }
 }
