@@ -9,6 +9,8 @@ import voyagerMiddleware from "graphql-voyager/middleware/express";
 import { graphiqlMiddleware } from "./vulcan-lib/apollo-server/graphiql";
 import getPlaygroundConfig from "./vulcan-lib/apollo-server/playground";
 
+import { uploadStreamToCloudinary } from "./scripts/convertImagesToCloudinary";
+
 import { getExecutableSchema } from "./vulcan-lib/apollo-server/initGraphQL";
 import { getUserFromReq, configureSentryScope, getContextFromReqAndRes } from "./vulcan-lib/apollo-server/context";
 
@@ -18,6 +20,9 @@ import { formatError } from "apollo-errors";
 
 import * as Sentry from "@sentry/node";
 import express from "express";
+import multer from "multer";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "cloudinary";
 import { app } from "./expressServer";
 import path from "path";
 import { getPublicSettingsLoaded } from "../lib/settingsCache";
@@ -183,6 +188,28 @@ export function startWebserver() {
       return context;
     },
     plugins: [new ApolloServerLogging()],
+  });
+
+  // const storage = new CloudinaryStorage({ cloudinary: cloudinary.v2, params: {} });
+  const storage = multer.memoryStorage();
+
+  app.post("/api/upload", multer({ storage }).single("upload"), async (req, res) => {
+    const currentUser = await getUserFromReq(req);
+    if (!currentUser) {
+      res.status(403).send("Not logged in");
+      return;
+    }
+
+    if (!req.file) {
+      res.status(400).send("Not a valid file");
+      return;
+    }
+
+    console.log("stream", req.file.stream);
+
+    const x = await uploadStreamToCloudinary(req.file.stream);
+    console.log("file", x);
+    res.json({ message: "Successfully uploaded files" });
   });
 
   app.use("/graphql", express.json({ limit: "50mb" }));
