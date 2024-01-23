@@ -24,4 +24,4 @@ ARG PORT=3000
 EXPOSE $PORT
 
 # migrate up runs migrations and starts the service
-CMD ["sh", "-c", "pnpm migrate up && pnpm elasticsearch-export && pnpm production"]
+CMD ["sh", "-c", "pnpm migrate up && pnpm production"]
