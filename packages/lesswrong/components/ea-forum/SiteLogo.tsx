@@ -33,6 +33,7 @@ const SiteLogo = ({ eaWhite, classes }: { eaWhite?: boolean; classes: ClassesTyp
       src={logoUrl}
       title={forumTitleSetting.get()}
       alt={`${forumTitleSetting.get()} Logo`}
+      style={{ width: '250px', height: '45px' }}
     />
   );
 };
