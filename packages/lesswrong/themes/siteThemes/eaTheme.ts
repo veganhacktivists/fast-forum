@@ -64,7 +64,7 @@ export const eaForumTheme: SiteThemeSpecification = {
       },
     },
     link: {
-      visited: "#7130a6",
+      visited: "#458E2E",
     },
     background: {
       default: shadePalette.type === 'light' ? '#f6f8f9' : shadePalette.grey[60],
