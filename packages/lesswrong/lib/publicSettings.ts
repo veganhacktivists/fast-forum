@@ -136,7 +136,7 @@ export const ddRumSampleRate = new DatabasePublicSetting<number>("datadog.rumSam
 export const ddSessionReplaySampleRate = new DatabasePublicSetting<number>("datadog.sessionReplaySampleRate", 100); // Sample rate for backend traces, between 0 and 100
 
 /** Will we show our logo prominently, such as in the header */
-export const hasProminentLogoSetting = new DatabasePublicSetting<boolean>("hasProminentLogo", false);
+export const hasProminentLogoSetting = new DatabasePublicSetting<boolean>("hasProminentLogo", true);
 
 export const hasCookieConsentSetting = new DatabasePublicSetting<boolean>("hasCookieConsent", false);
 
