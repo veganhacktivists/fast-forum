@@ -47,6 +47,7 @@ const SiteLogoSmall = ({ eaWhite, classes }: { eaWhite?: boolean; classes: Class
       src={smallUrl}
       title={forumTitleSetting.get()}
       alt={`${forumTitleSetting.get()} Logo`}
+      style={{ width: '150px', height: '45px' }}
     />
   );
 };
