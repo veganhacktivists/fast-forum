@@ -33,13 +33,13 @@ export const eaForumTheme: SiteThemeSpecification = {
   componentPalette: (shadePalette: ThemeShadePalette) => ({
     primary: {
       main: '#1C563E',
-      light: '#00b2be',
-      dark: '#085d6c' 
+      light: '#AAB138',
+      dark: '#1C563E' 
     },
     secondary: {
       main: '#1C563E',
-      light: '#3c9eaf',
-      dark: '#085d6c'
+      light: '#67A453',
+      dark: '#1C563E'
     },
     lwTertiary: {
       main: "#1C563E",
