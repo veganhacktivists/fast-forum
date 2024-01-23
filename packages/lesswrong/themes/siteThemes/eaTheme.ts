@@ -1,45 +1,39 @@
 const titleStack = [
-  'GreekFallback', // Ensures that greek letters render consistently
-  'Inter',
-  'Helvetica Neue',
-  'Helvetica',
-  'Arial',
-  'sans-serif'
-].join(',')
+  "GreekFallback", // Ensures that greek letters render consistently
+  "Inter",
+  "Helvetica Neue",
+  "Helvetica",
+  "Arial",
+  "sans-serif",
+].join(",");
 
-const serifStack = [
-  'Merriweather',
-  'Baskerville',
-  'Libre Baskerville',
-  'Georgia',
-  'serif'
-].join(',')
+const serifStack = ["Merriweather", "Baskerville", "Libre Baskerville", "Georgia", "serif"].join(",");
 
 // TODO why is SanSerifStack different from titleStack?
 const sansSerifStack = [
-  'GreekFallback', // Ensures that greek letters render consistently
-  'Inter',
-  'Helvetica Neue',
-  'Helvetica',
-  'Arial',
-  'sans-serif'
-].join(',')
+  "GreekFallback", // Ensures that greek letters render consistently
+  "Inter",
+  "Helvetica Neue",
+  "Helvetica",
+  "Arial",
+  "sans-serif",
+].join(",");
 
 export const eaForumTheme: SiteThemeSpecification = {
   shadePalette: {
     primaryAlpha: (alpha: number) => `rgba(12, 134, 155,${alpha})`,
-    fonts: {sansSerifStack, serifStack},
+    fonts: { sansSerifStack, serifStack },
   },
   componentPalette: (shadePalette: ThemeShadePalette) => ({
     primary: {
-      main: '#1C563E',
-      light: '#AAB138',
-      dark: '#1C563E' 
+      main: "#1C563E",
+      light: "#AAB138",
+      dark: "#1C563E",
     },
     secondary: {
-      main: '#1C563E',
-      light: '#67A453',
-      dark: '#1C563E'
+      main: "#1C563E",
+      light: "#67A453",
+      dark: "#1C563E",
     },
     lwTertiary: {
       main: "#1C563E",
@@ -49,7 +43,7 @@ export const eaForumTheme: SiteThemeSpecification = {
       main: "#bf360c",
     },
     warning: {
-      main: "#ffad08"
+      main: "#ffad08",
     },
     text: {
       primaryAlert: "#1C563E",
@@ -67,64 +61,64 @@ export const eaForumTheme: SiteThemeSpecification = {
       visited: "#458E2E",
     },
     background: {
-      default: shadePalette.type === 'light' ? '#f6f8f9' : shadePalette.grey[60],
-      primaryDim: '#e2f1f4',
+      default: shadePalette.type === "light" ? "#f6f8f9" : shadePalette.grey[60],
+      primaryDim: "#e2f1f4",
       primaryTranslucent: "rgba(12, 134, 155, 0.05)",
       warningTranslucent: "rgba(255, 173, 8, 0.1)",
     },
     header: {
-      text: shadePalette.type === 'light' ? "#fff" : shadePalette.greyAlpha(.87),
-      background: shadePalette.type === 'light' ? '#1C563E' : shadePalette.grey[30],
+      text: shadePalette.type === "light" ? "#fff" : shadePalette.greyAlpha(0.87),
+      background: shadePalette.type === "light" ? "#1C563E" : shadePalette.grey[30],
     },
-    event: '#1C563E',
-    group: '#538747',
-    individual: '#BF577D',
+    event: "#1C563E",
+    group: "#538747",
+    individual: "#BF577D",
     icon: {
       navigationSidebarIcon: shadePalette.greyAlpha(0.5),
-      sprout: '#5EB25C'
+      sprout: "#5EB25C",
     },
     border: {
-      primaryHighlight: '#88c9d4',
-      primaryHighlight2: '#bae2e8',
-      secondaryHighlight: '#aedba3',
-      secondaryHighlight2: '#d8edd3',
+      primaryHighlight: "#88c9d4",
+      primaryHighlight2: "#bae2e8",
+      secondaryHighlight: "#aedba3",
+      secondaryHighlight2: "#d8edd3",
     },
     blockquoteHighlight: {
-      commentHovered: shadePalette.type === 'light' ? "#b5e5ed" : "#144952",
-      individualQuoteHovered: shadePalette.type === 'light' ? "#b5e5ed" : "#144952",
-      addedBlockquoteHighlightStyles: `padding-top: 4px; padding-bottom: 6px;`
+      commentHovered: shadePalette.type === "light" ? "#b5e5ed" : "#144952",
+      individualQuoteHovered: shadePalette.type === "light" ? "#b5e5ed" : "#144952",
+      addedBlockquoteHighlightStyles: `padding-top: 4px; padding-bottom: 6px;`,
     },
     buttons: {
-      alwaysPrimary: '#1C563E',
+      alwaysPrimary: "#1C563E",
     },
     tag: {
       text: shadePalette.grey[1000],
       background: shadePalette.grey[0],
       backgroundHover: shadePalette.greyAlpha(0.03),
-      border: shadePalette.greyBorder("1px", .15),
+      border: shadePalette.greyBorder("1px", 0.15),
       coreTagText: shadePalette.grey[1000],
       coreTagBackground: shadePalette.grey[250],
       coreTagBackgroundHover: shadePalette.grey[340],
       coreTagBorder: `1px solid ${shadePalette.grey[250]}`,
-      hollowTagBorder: shadePalette.greyBorder("1px", .15),
+      hollowTagBorder: shadePalette.greyBorder("1px", 0.15),
       hollowTagBackground: shadePalette.grey[0],
       hollowTagBackgroundHover: shadePalette.greyAlpha(0.03),
-      boxShadow: `1px 2px 5px ${shadePalette.boxShadowColor(.2)}`,
+      boxShadow: `1px 2px 5px ${shadePalette.boxShadowColor(0.2)}`,
       addTagButtonBackground: shadePalette.grey[300],
     },
   }),
   make: (palette: ThemePalette) => {
-    const defaultBorderRadius = 6
+    const defaultBorderRadius = 6;
     const basicText = {
       color: palette.grey[900],
       // use ems (not rems) to preserve relative height even if font-size is changed
-      lineHeight: '1.75em',
+      lineHeight: "1.75em",
       fontWeight: 450,
-      fontFamily: serifStack
-    }
+      fontFamily: serifStack,
+    };
     return {
       spacing: {
-        mainLayoutPaddingTop: 20
+        mainLayoutPaddingTop: 20,
       },
       borderRadius: {
         default: defaultBorderRadius,
@@ -156,32 +150,32 @@ export const eaForumTheme: SiteThemeSpecification = {
           fontFamily: palette.fonts.sansSerifStack,
           fontWeight: 450,
           fontSize: "1rem",
-          lineHeight: '1.4rem'
+          lineHeight: "1.4rem",
         },
         tinyText: {
           fontWeight: 450,
           fontSize: ".75rem",
-          lineHeight: '1.4rem'
+          lineHeight: "1.4rem",
         },
         postStyle: {
           ...basicText,
         },
         headerStyle: {
-          fontFamily: titleStack
+          fontFamily: titleStack,
         },
         commentStyle: {
           fontFamily: sansSerifStack,
-          fontWeight: 450
+          fontWeight: 450,
         },
         errorStyle: {
           color: palette.error.main,
-          fontFamily: sansSerifStack
+          fontFamily: sansSerifStack,
         },
         headline: {
           fontFamily: serifStack,
         },
         subheading: {
-          fontFamily: titleStack
+          fontFamily: titleStack,
         },
         title: {
           color: palette.grey[800],
@@ -194,34 +188,34 @@ export const eaForumTheme: SiteThemeSpecification = {
           color: palette.grey[800],
           fontFamily: titleStack,
           fontWeight: 600,
-          fontSize: '1.6rem',
-          lineHeight: '1.25em',
+          fontSize: "1.6rem",
+          lineHeight: "1.25em",
         },
         // used by h2
         display1: {
           color: palette.grey[800],
           fontFamily: titleStack,
           fontWeight: 650,
-          fontSize: '2rem',
-          lineHeight: '1.25em',
+          fontSize: "2rem",
+          lineHeight: "1.25em",
         },
         // used by h1
         display2: {
           color: palette.grey[800],
           fontFamily: titleStack,
           fontWeight: 600,
-          fontSize: '2.4rem',
-          lineHeight: '1.25em',
+          fontSize: "2.4rem",
+          lineHeight: "1.25em",
         },
         // used by page title
         display3: {
           color: palette.grey[800],
           fontFamily: titleStack,
           fontWeight: 500,
-          lineHeight: '1.25em'
+          lineHeight: "1.25em",
         },
         uiSecondary: {
-          sansSerifStack
+          sansSerifStack,
         },
         chapterTitle: {
           fontStyle: "unset",
@@ -231,7 +225,7 @@ export const eaForumTheme: SiteThemeSpecification = {
           fontWeight: 500,
         },
         largeChapterTitle: {
-          fontSize: "2.2rem"
+          fontSize: "2.2rem",
         },
         italic: {
           fontStyle: "normal",
@@ -245,20 +239,20 @@ export const eaForumTheme: SiteThemeSpecification = {
           tooltip: {
             fontSize: "1rem",
             padding: ".7rem",
-          }
+          },
         },
         MetaInfo: {
           root: {
-            fontFamily: sansSerifStack
-          }
+            fontFamily: sansSerifStack,
+          },
         },
         PostsVoteDefault: {
           voteScore: {
-            paddingTop:4,
-            paddingBottom:2,
-            paddingLeft:1,
-            paddingRight:0,
-            fontSize: '50%',
+            paddingTop: 4,
+            paddingBottom: 2,
+            paddingLeft: 1,
+            paddingRight: 0,
+            fontSize: "50%",
             fontFamily: sansSerifStack,
           },
         },
@@ -267,16 +261,16 @@ export const eaForumTheme: SiteThemeSpecification = {
             marginBottom: -8,
           },
           title: {
-            textTransform: 'uppercase',
+            textTransform: "uppercase",
             fontSize: 18,
-            color: 'rgba(0,0,0,.7)',
+            color: "rgba(0,0,0,.7)",
             fontWeight: 500,
-          }
+          },
         },
         FilterMode: {
           selected: {
-            color: palette.primary.main
-          }
+            color: palette.primary.main,
+          },
         },
         NavigationStandalone: {
           sidebar: {
@@ -284,7 +278,7 @@ export const eaForumTheme: SiteThemeSpecification = {
           },
           footerBar: {
             backgroundColor: palette.grey[200],
-          }
+          },
         },
         TabNavigationItem: {
           navButton: {
@@ -297,57 +291,57 @@ export const eaForumTheme: SiteThemeSpecification = {
         },
         TabNavigationFooterItem: {
           selected: {
-            backgroundColor: palette.secondary.main
-          }
+            backgroundColor: palette.secondary.main,
+          },
         },
         TabNavigationCompressedItem: {
           icon: {
-            opacity: 1
-          }
+            opacity: 1,
+          },
         },
         PostsPageTitle: {
           root: {
             lineHeight: 1.25,
-            fontWeight: 700
-          }
+            fontWeight: 700,
+          },
         },
         PostsTimeBlock: {
           divider: {
-            display: 'none'
-          }
+            display: "none",
+          },
         },
         EAAllTagsPage: {
           portal: {
             background: palette.grey[0],
-            marginTop: 'unset',
-            marginBottom: 'unset',
-            padding: '20px',
+            marginTop: "unset",
+            marginBottom: "unset",
+            padding: "20px",
             boxShadow: "0 1px 5px rgba(0,0,0,.025)",
-          }
+          },
         },
         TagSmallPostLink: {
           wrap: {
-            lineHeight: '1.2em'
-          }
+            lineHeight: "1.2em",
+          },
         },
         TagsDetailsItem: {
           description: {
             maxWidth: 490,
-          }
+          },
         },
         ContentType: {
           root: {
             color: palette.grey[800],
-            fontWeight: 600
+            fontWeight: 600,
           },
           icon: {
-            color: palette.grey[800]
-          }
+            color: palette.grey[800],
+          },
         },
         MuiSnackbarContent: {
           root: {
-            backgroundColor: palette.lwTertiary.main
-          }
+            backgroundColor: palette.lwTertiary.main,
+          },
         },
         MuiMenuItem: {
           root: {
@@ -355,21 +349,21 @@ export const eaForumTheme: SiteThemeSpecification = {
             fontWeight: 500,
             fontSize: "1.1rem",
             color: palette.grey[900],
-          }
+          },
         },
         MuiListItemIcon: {
           root: {
-            color: '#fff',
+            color: "#fff",
             marginRight: 12,
-          }
+          },
         },
         MuiIconButton: {
           root: {
-            color: '#fff',
-            borderRadius: defaultBorderRadius
-          }
-        }
-      }
-    }
-  }
+            color: "#fff",
+            borderRadius: defaultBorderRadius,
+          },
+        },
+      },
+    };
+  },
 };
