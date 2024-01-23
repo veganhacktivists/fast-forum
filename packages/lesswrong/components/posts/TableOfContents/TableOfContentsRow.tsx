@@ -61,6 +61,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     marginRight: theme.spacing.unit,
     '& $link': {
       whiteSpace: "normal",
+      lineHeight: "20px",
     },
     // Don't show location dot for level0
     '& $link:after': {
