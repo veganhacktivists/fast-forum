@@ -549,9 +549,9 @@ export const EAHomeRightHandSide = ({classes}: {
             </Link>
           </div>
           <div>
-            <Link to="https://forum.fastcommunity.org/posts/GF3apJE62QPaodWzb/how-to-use-this-forum" className={classes.resourceLink}>
+            <Link to="https://forum.fastcommunity.org/topics" className={classes.resourceLink}>
               <ForumIcon icon="ComputerDesktop" className={classes.resourceIcon} />
-              How to use this forum
+              Explore & Subscribe to Topics
             </Link>
           </div>
           <div>
