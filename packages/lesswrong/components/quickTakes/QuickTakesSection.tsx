@@ -70,16 +70,6 @@ const QuickTakesSection = ({classes}: {
       title="Quick takes"
       afterTitleTo="/quicktakes"
       AfterTitleComponent={() => (
-        <LWTooltip
-          title='Show quick takes tagged "Community"'
-          placement="left"
-          hideOnTouchScreens
-        >
-          <div className={classes.communityToggle}>
-            <Checkbox checked={showCommunity} onChange={toggleShowCommunity} />
-            <span onClick={toggleShowCommunity}>Show community</span>
-          </div>
-        </LWTooltip>
       )}
       Content={() => (
         <>
