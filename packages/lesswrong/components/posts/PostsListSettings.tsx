@@ -226,21 +226,6 @@ const PostsListSettings = ({persistentSettings, hidden, currentTimeframe, curren
               </MetaInfo>
             </QueryLink>
           </Tooltip>
-
-          {isEAForum && <Tooltip title={<div><div>By default, Community posts are shown.</div><div>Toggle to hide them.</div></div>} placement="left-start">
-            <QueryLink
-              className={classes.checkboxGroup}
-              onClick={() => setSetting('hideCommunity', !currentHideCommunity)}
-              query={{hideCommunity: !currentHideCommunity}}
-              merge
-              rel="nofollow"
-            >
-              <Checkbox classes={{root: classes.checkbox, checked: classes.checkboxChecked}} checked={!currentHideCommunity}/>
-              <MetaInfo className={classes.checkboxLabel}>
-                Show community
-              </MetaInfo>
-            </QueryLink>
-          </Tooltip>}
         </div>
       </div>
   );
