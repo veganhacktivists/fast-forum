@@ -79,7 +79,7 @@ const CoreTagCard = ({tag, classes}: {
     'oxBe47pzDA4gF7FGh': 'https://i.imgur.com/5PBfSWN.png', // Fish & Aquatic Advocacy
     'czpKnLMrKmmyYTW7P': 'https://i.imgur.com/ZMR373J.png', // Fundraising & Reports
     'b3vxJTnnas53FPu6b': 'https://i.imgur.com/ys0nJhr.png', // Institutional Campaigns
-    '5EHCAQD2HJgRC9HZJ': 'https://i.imgur.com/8n6Fv8m.png', // Invertebrate & Insect Advocacy
+    '5EHCAQD2HJgRC9HZJ': 'https://i.imgur.com/8n6Fv8m.png', // Insect Advocacy
     'aBHg2tywssv3EjZ3E': 'https://i.imgur.com/dzLve2i.png', // Wild Animal Suffering
     'qBnZaqbzRg2GDEBb4': 'https://i.imgur.com/6fjTBC1.png', // Cage Free Campaigns
     

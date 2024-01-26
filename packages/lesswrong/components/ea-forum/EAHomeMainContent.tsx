@@ -150,7 +150,7 @@ const topicTabsOrder = [
   'oBwQMugikyfs5RTZD', // Capacity Building
   'b3vxJTnnas53FPu6b', // Institutional Campaigns
   'm7PnwaCfsRwNDnTD7', // Education & Advocacy
-  '5EHCAQD2HJgRC9HZJ', // Invertebrate & Insect Advocacy
+  '5EHCAQD2HJgRC9HZJ', // Insect Advocacy
   'HzWqFhs4KqgndeESm', // Diet & Nutrition
   'aBHg2tywssv3EjZ3E', // Wild Animal Suffering
   'czpKnLMrKmmyYTW7P', // Fundraising & Reports
