@@ -566,7 +566,7 @@ export const WrappedNotification = registerNotificationType({
   userSettingField: "notificationPrivateMessage",
   allowedChannels: ["onsite", "email", "both"],
   async getMessage() {
-    return "Check out your EA Forum 2023 Wrapped"
+    return "Check out your FAST Forum 2023 Wrapped"
   },
   getIcon() {
     return <GiftIcon style={flatIconStyles}/>

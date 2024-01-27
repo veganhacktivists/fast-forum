@@ -453,7 +453,7 @@ export const NewMessageNotification = serverRegisterNotificationType({
 export const WrappedNotification = serverRegisterNotificationType({
   name: "wrapped",
   emailSubject: async function() {
-    return 'Your EA Forum 2023 Wrapped';
+    return 'Your FAST Forum 2023 Wrapped';
   },
   emailBody: async function({ user }: {user: DbUser}) {
     return <div>
@@ -463,7 +463,7 @@ export const WrappedNotification = serverRegisterNotificationType({
       <p>
         Thanks for being part of our community this year!{' '}
         <a href={`${combineUrls(getSiteUrl(), 'wrapped')}?utm_medium=email`}>
-          Check out your EA Forum 2023 Wrapped.
+          Check out your FAST Forum 2023 Wrapped.
         </a>{' '}
         🎁
       </p>

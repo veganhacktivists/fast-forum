@@ -193,7 +193,7 @@ export function ReviewOverviewTooltip() {
   
   if (isEAForum) {
     return <div>
-      <div>The EA Forum is reflecting on the best EA writing, in three phases</div>
+      <div>The FAST Forum is reflecting on the best EA writing, in three phases</div>
       <ul>
         <li><em>Nomination</em> ({nominationPhaseDateRange})</li>
         <li><em>Review</em> ({reviewPhaseDateRange})</li>

@@ -15,7 +15,7 @@ import LRU from "lru-cache";
 const fmCrosspostTimeoutMsSetting = new DatabaseServerSetting<number>('fmCrosspostTimeoutMs', 15000)
 
 export const TOS_NOT_ACCEPTED_ERROR = 'You must accept the terms of use before you can publish this post';
-const TOS_NOT_ACCEPTED_REMOTE_ERROR = 'You must read and accept the Terms of Use on the EA Forum in order to crosspost.  To do so, go to https://forum.effectivealtruism.org/newPost and accept the Terms of Use presented above the draft post.';
+const TOS_NOT_ACCEPTED_REMOTE_ERROR = 'You must read and accept the Terms of Use on the FAST Forum in order to crosspost.  To do so, go to https://forum.fastcommunity.org/newPost and accept the Terms of Use presented above the draft post.';
 
 const getUserId = (req?: Request) => {
   const userId = req?.user?._id;

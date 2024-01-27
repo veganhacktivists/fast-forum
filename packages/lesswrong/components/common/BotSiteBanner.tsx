@@ -27,8 +27,8 @@ const BotSiteBanner = ({ classes }: { classes: ClassesType }) => {
   return (
     <SingleColumnSection className={classes.root}>
       <div>
-        Welcome to the EA Forum bot site. If you are trying to access the Forum programmatically (either by scraping or
-        via the api) please use this site rather than <Link to={"https://forum.effectivealtruism.org"}>forum.effectivealtruism.org</Link>.
+        Welcome to the FAST Forum bot site. If you are trying to access the Forum programmatically (either by scraping or
+        via the api) please use this site rather than <Link to={"https://forum.fastcommunity.org"}>forum.effectivealtruism.org</Link>.
         <br />
         <br />
         This site has the same content as the main site, but is run in a separate environment to avoid bots overloading the main site

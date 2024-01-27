@@ -61,7 +61,7 @@ const EAAllTagsPage = ({classes}: {
 
   const { AllTagsAlphabetical, SectionButton, SectionTitle, ContentItemBody, ContentStyles, Loading, CoreTagsSection, SingleColumnSection } = Components;
 
-  const portalTitle = `EA Forum ${`${taggingNamePluralCapitalSetting.get()} `}Wiki`
+  const portalTitle = `FAST Forum ${`${taggingNamePluralCapitalSetting.get()} `}Wiki`
   
   const htmlWithAnchors = tag?.tableOfContents?.html || tag?.description?.html || "";
 

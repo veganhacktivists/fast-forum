@@ -283,7 +283,7 @@ const getEmojiReactionPower = (value?: boolean) =>
 
 registerVotingSystem({
   name: "eaEmojis",
-  description: "Approval voting, plus EA Forum emoji reactions",
+  description: "Approval voting, plus FAST Forum emoji reactions",
   getCommentVotingComponent: () => Components.EAEmojisVoteOnComment,
   getPostBottomVotingComponent: () => Components.EAEmojisVoteOnPost,
   getPostBottomSecondaryVotingComponent: () => Components.EAEmojisVoteOnPostSecondary,
@@ -341,7 +341,7 @@ registerVotingSystem({
 
 registerVotingSystem<{preVote: boolean}, {preVoteCount: number}>({
   name: "eaDonationElection",
-  description: "Donation election voting for the EA Forum",
+  description: "Donation election voting for the FAST Forum",
   userCanActivate: false,
   isAllowedExtendedVote: (user) => {
     try {

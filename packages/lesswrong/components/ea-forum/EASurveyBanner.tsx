@@ -104,11 +104,11 @@ const EASurveyBanner = ({classes}: {classes: ClassesType}) => {
   return (
     <Wrapper>
       <div className={classes.root}>
-        Take the 4 minute EA Forum Survey to help inform our strategy and funding decisions
+        Take the 4 minute FAST Forum Survey to help inform our strategy and funding decisions
         <TypeformPopupEmbed
           widgetId="Z1wH4v8v"
           domain="cea-core.typeform.com"
-          title="EA Forum survey"
+          title="FAST Forum survey"
           label="Take the survey"
           onSubmit={onSubmitSurvey}
           className={classes.button}

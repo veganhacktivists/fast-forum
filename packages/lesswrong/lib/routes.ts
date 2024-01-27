@@ -537,7 +537,7 @@ addRoute(
     path: getAllTagsPath(),
     componentName: isEAForum ? 'EAAllTagsPage' : 'AllTagsPage',
     title: isEAForum ? `${taggingNamePluralCapitalSetting.get()} — Main Page` : "Concepts Portal",
-    description: isEAForum ? `Browse the core ${taggingNamePluralSetting.get()} discussed on the EA Forum and an organised wiki of key ${taggingNameSetting.get()} pages` : undefined,
+    description: isEAForum ? `Browse the core ${taggingNamePluralSetting.get()} discussed on the FAST Forum and an organised wiki of key ${taggingNameSetting.get()} pages` : undefined,
   },
   // And all the redirects to it
   ...getAllTagsRedirectPaths().map((path, idx) => ({
@@ -795,13 +795,13 @@ const eaLwAfForumSpecificRoutes = forumSelect<Route[]>({
       name: 'EAForumWrapped',
       path: '/wrapped2022',
       componentName: 'EAForumWrapped2022Page',
-      title: 'EA Forum Wrapped',
+      title: 'FAST Forum Wrapped',
     },
     {
       name: 'EAForumWrappedV2',
       path: '/wrapped',
       componentName: 'EAForumWrapped2023Page',
-      title: 'EA Forum Wrapped',
+      title: 'FAST Forum Wrapped',
       noFooter: true,
     },
     {

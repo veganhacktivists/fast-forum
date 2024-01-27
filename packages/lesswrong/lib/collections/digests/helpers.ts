@@ -14,7 +14,7 @@ export type StatusField = 'emailDigestStatus'|'onsiteDigestStatus'
  * Returns the digest name in our standard format
  */
 export const getDigestName = (digest: DigestsMinimumInfo) => {
-  return `EA Forum Digest #${digest.num}`
+  return `FAST Forum Digest #${digest.num}`
 }
 
 /**

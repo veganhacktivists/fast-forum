@@ -193,7 +193,7 @@ const NewUserCompleteProfile: React.FC<NewUserCompleteProfileProps> = ({ current
           Get weekly emails with selected posts
         </Typography>
         <Typography variant='body1' className={classes.sectionHelperText} gutterBottom>
-          The EA Forum Digest is curated by the Forum team, and features highlights from
+          The FAST Forum Digest is curated by the Forum team, and features highlights from
           every week, announcements, and more.{" "}
           <Link to={eaForumDigestLink} target="_blank" rel="noreferrer">
             See recent issues here
@@ -206,7 +206,7 @@ const NewUserCompleteProfile: React.FC<NewUserCompleteProfileProps> = ({ current
               onChange={event => setSubscribeToDigest(event.target.checked)}
             />
           }
-          label='Yes, subscribe me to EA Forum digest emails'
+          label='Yes, subscribe me to FAST Forum digest emails'
         />
       </div>}
       {/* TODO: Something about bio? */}

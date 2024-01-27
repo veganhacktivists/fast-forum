@@ -546,7 +546,7 @@ const GivingSeasonHeader = ({
       {isVotingPortal && (
         <HeadTags
           title="Voting portal"
-          description="Vote in the EA Forum Donation Election"
+          description="Vote in the FAST Forum Donation Election"
           image={makeCloudinaryImageUrl(heroImageId, votingPortalSocialImageProps)}
         />
       )}

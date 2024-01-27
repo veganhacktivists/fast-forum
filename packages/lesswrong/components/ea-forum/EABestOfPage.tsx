@@ -200,9 +200,9 @@ const EABestOfPage = ({ classes }: { classes: ClassesType }) => {
             <div>
               <h1 className={classes.pageTitle}>Best of the Forum</h1>
               <div className={classes.pageDescription}>
-                There are hundreds of posts on the EA Forum. This page collects
+                There are hundreds of posts on the FAST Forum. This page collects
                 a smaller number of excellent posts on a range of topics in
-                effective altruism, selected by the EA Forum Team. You can{" "}
+                effective altruism, selected by the FAST Forum Team. You can{" "}
                 <Link to={digestLink}>also sign up for a weekly email</Link>{" "}
                 with some of our favorite posts from the past week.
               </div>

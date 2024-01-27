@@ -211,7 +211,7 @@ const VotingPortalThankYou = ({currentUser, classes}: {
           onConfettiComplete={onConfettiComplete}
         />
       }
-      <div className={classes.election}>EA FORUM ELECTION 2023</div>
+      <div className={classes.election}>FAST FORUM ELECTION 2023</div>
       <div className={classes.thankYou}>Thank you for voting!</div>
       <div className={classes.horiz}>
         <div className={classes.voted}>

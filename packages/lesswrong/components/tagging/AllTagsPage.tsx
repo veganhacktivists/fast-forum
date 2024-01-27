@@ -59,12 +59,12 @@ const AllTagsPage = ({classes}: {
   const { AllTagsAlphabetical, SectionButton, SectionTitle, ContentItemBody, ContentStyles, ToCColumn, TagTableOfContents, Loading } = Components;
 
   let sectionTitle = forumSelect({
-    EAForum: 'EA Forum Wiki',
+    EAForum: 'FAST Forum Wiki',
     default: 'Concepts Portal'
   })
   if (taggingNameIsSet.get()) {
     sectionTitle = forumSelect({
-      EAForum: `EA Forum ${taggingNamePluralCapitalSetting.get()} Wiki`,
+      EAForum: `FAST Forum ${taggingNamePluralCapitalSetting.get()} Wiki`,
       default: `${taggingNamePluralCapitalSetting.get()} Portal`
     })
   }

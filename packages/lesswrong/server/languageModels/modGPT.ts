@@ -32,7 +32,7 @@ export const modGPTPrompt = `
   Suggestions for improvement: The comment could be improved by focusing on specific points of disagreement and addressing those points in a more respectful and constructive manner. The user should avoid personal attacks and strong language, and instead engage in a productive conversation about their concerns with the response they received. Offering alternative perspectives or suggestions for improvement would be more helpful in fostering a healthy discussion.
   
   Prompt:
-  You are an advisor to the moderation team for the EA Forum. Your job is to make recommendations to the moderation team about whether they should intervene and moderate a comment.
+  You are an advisor to the moderation team for the FAST Forum. Your job is to make recommendations to the moderation team about whether they should intervene and moderate a comment.
   Review each comment you're given by making an overall assessment of how well the comment meets the norms. Then flag if the comment breaks any Forum rules. Conclude by making a recommendation as to whether the moderation team should intervene. Your options are:
   Intervene
   Consider reviewing
@@ -71,13 +71,13 @@ const getModGPTAnalysis = async (api: OpenAI, text: string) => {
  * Constructs the PM sent to the commenter when ModGPT flags their comment as "Intervene".
  */
 const getMessageToCommenter = (user: DbUser, commentLink: string, flag?: string) => {
-  const normsLink = 'https://forum.effectivealtruism.org/posts/yND9aGJgobm5dEXqF/guide-to-norms-on-the-forum'
+  const normsLink = 'https://forum.fastcommunity.org/posts/gTBQ9APGmxcizgorA/our-community-guidelines'
   let intro = `
-    <p>Our moderation bot suspects that <a href="${commentLink}">your recent comment</a> violates the <a href="${normsLink}">EA Forum discussion norms</a>.</p>
+    <p>Our moderation bot suspects that <a href="${commentLink}">your recent comment</a> violates the <a href="${normsLink}">FAST Forum Community Guidelines</a>.</p>
   `
   if (flag) {
     intro = `
-      <p>Our moderation bot suspects that <a href="${commentLink}">your recent comment</a> violates the following <a href="${normsLink}">EA Forum discussion norm(s)</a>:</p>
+      <p>Our moderation bot suspects that <a href="${commentLink}">your recent comment</a> violates the following <a href="${normsLink}">FAST Forum Community Guidelines</a>:</p>
       <ul><li>${flag}</li></ul>
     `
   }
@@ -86,7 +86,7 @@ const getMessageToCommenter = (user: DbUser, commentLink: string, flag?: string)
   <p>Hi,</p>
   ${intro}
   <p>Your comment will be collapsed by default. We encourage you to improve the comment, after which the bot will re-evaluate it.</p>
-  <p>This system is new. If you believe the bot made a mistake, please report this to the EA Forum Team by replying to this message or contacting us <a href="https://forum.effectivealtruism.org/contact">here</a>. Please also reach out if you'd like any help editing your comment to better follow the Forum's norms.</p>
+  <p>This system is new. If you believe the bot made a mistake, please report this to the FAST Forum Team by replying to this message or contacting us <a href="https://fastcommunity.org/contact">here</a>. Please also reach out if you'd like any help editing your comment to better follow the Forum's norms.</p>
   `
 }
 

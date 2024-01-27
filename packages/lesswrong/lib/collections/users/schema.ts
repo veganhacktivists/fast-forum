@@ -1591,7 +1591,7 @@ const schema: SchemaType<"Users"> = {
     type: Boolean,
     optional: true,
     group: formGroups.emails,
-    label: "Subscribe to the EA Forum Digest emails",
+    label: "Subscribe to the FAST Forum Digest emails",
     canCreate: ['members'],
     canUpdate: [userOwns, 'sunshineRegiment', 'admins'],
     hidden: !isEAForum,
@@ -2621,7 +2621,7 @@ const schema: SchemaType<"Users"> = {
     control: "SelectLocalgroup",
     label: "Organizer of",
     placeholder: 'Select groups to display',
-    tooltip: "If you organize a group that is missing from this list, please contact the EA Forum team.",
+    tooltip: "If you organize a group that is missing from this list, please contact the FAST Forum team.",
     form: {
       useDocumentAsUser: true,
       separator: '\r\n',
