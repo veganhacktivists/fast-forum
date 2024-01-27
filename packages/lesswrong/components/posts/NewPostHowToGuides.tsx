@@ -99,12 +99,14 @@ export const NewPostHowToGuides = ({classes}: {
         >
           <ForumIcon icon="Close" />
         </div>
-        <p>
-          Please make sure to read our 
-          <a href="https://forum.fastcommunity.org/posts/gTBQ9APGmxcizgorA/our-community-guidelines" target="_blank" rel="noopener noreferrer">
+        <p style={{ lineHeight: '20px' }}>
+        Please read our 
+          <a href="https://forum.fastcommunity.org/posts/gTBQ9APGmxcizgorA/our-community-guidelines" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            style={{ textDecoration: 'underline' }}>
             Community Guidelines
-          </a>
-          before posting.
+          </a> thoroughly before contributing in our community— we appreciate it!
         </p>
       </div>
     </AnalyticsContext>
