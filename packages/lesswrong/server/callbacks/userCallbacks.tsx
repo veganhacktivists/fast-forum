@@ -345,7 +345,7 @@ getCollectionHooks("Users").newAsync.add(async function subscribeToEAForumAudien
     return;
   }
   if (!user.email) {
-    captureException(new Error(`Subscription to EA Forum audience failed: no email for user ${user.displayName}`))
+    captureException(new Error(`Subscription to FAST Forum audience failed: no email for user ${user.displayName}`))
     return;
   }
   const { lat: latitude, lng: longitude, known } = userGetLocation(user);

@@ -60,7 +60,7 @@ const useMoreFromTheForumRecommendations: RecommendationsGenerator = (
       </li>,
       () => <li>
         Get weekly highlights in your inbox: Sign up for the{" "}
-        <Link to={digest}>EA Forum Digest</Link>
+        <Link to={digest}>FAST Forum Digest</Link>
       </li>,
       () => <li>
         Browse <Link to={jobs}>job opportunities</Link>

@@ -497,7 +497,7 @@ const EAGApplicationImportForm = ({currentUser, classes}: {
           </Typography>
           <Typography variant="body2" className={classes.loggedOutMessage}>
             <a href={`/auth/auth0?returnTo=${pathname}`} className={classes.loggedOutLink}>Login</a> or <a href={`/auth/auth0?screen_hint=signup&returnTo=${pathname}`} className={classes.loggedOutLink}>Sign Up</a> to
-            import information from your EA Global application to your EA Forum profile.
+            import information from your EA Global application to your FAST Forum profile.
           </Typography>
         </div>
       </AnalyticsContext>
@@ -506,7 +506,7 @@ const EAGApplicationImportForm = ({currentUser, classes}: {
     
   const body = !importedData ? <>
     <Typography variant="body2" className={classes.noAppText}>
-      Sorry, we found no EA Global applications matching your EA Forum account's email address.
+      Sorry, we found no EA Global applications matching your FAST Forum account's email address.
     </Typography>
     <Typography variant="body2" className={classes.subheading}>
       If you feel that this is in error, please <Link to="/contact" className={classes.contactUs}>contact us</Link>.
@@ -519,7 +519,7 @@ const EAGApplicationImportForm = ({currentUser, classes}: {
     <AnalyticsContext pageSectionContext="overwriteCallout">
       <div className={classes.callout}>
         <Typography variant="body2" className={classes.overwriteText}>
-          Would you like to overwrite your EA Forum profile data?
+          Would you like to overwrite your FAST Forum profile data?
         </Typography>
         <div>
           <button type="submit"

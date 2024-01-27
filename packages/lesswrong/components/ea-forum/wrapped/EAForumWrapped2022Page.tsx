@@ -324,7 +324,7 @@ const EAForumWrapped2022Page = ({classes}: {classes: ClassesType}) => {
             
             <h2 className={classes.summarySectionTitleRow}>
               <div className={classes.summarySectionTitle}>
-                It's your {moment.localeData().ordinal(userAge)} year on the EA Forum
+                It's your {moment.localeData().ordinal(userAge)} year on the FAST Forum
               </div>
             </h2>
             <div className={classes.summarySection}>

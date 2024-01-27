@@ -351,10 +351,10 @@ const participateLink = "/posts/hAzhyikPnLnMXweXG/participate-in-the-donation-el
 const resultsLink = "/posts/7D83kwkyaHLQSo6JT/winners-in-the-forum-s-donation-election-2023";
 const candidatesLink = "/posts/bBm64htDSKn3ZKiQ5/meet-the-candidates-in-the-forum-s-donation-election-2023";
 
-const pageDescription = "Giving season 2023 on the EA Forum included a Donation Election (read about the winners!) and discussions related to weekly themes.";
+const pageDescription = "Giving season 2023 on the FAST Forum included a Donation Election (read about the winners!) and discussions related to weekly themes.";
 const PageDescription = () => (
   <>
-    Giving season 2023 on the EA Forum included a{" "}
+    Giving season 2023 on the FAST Forum included a{" "}
     <Link to={participateLink}>Donation Election</Link>{" "}
     (read about <Link to={resultsLink}>the winners</Link>!){" "}
     and discussions related to{" "}

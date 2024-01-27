@@ -331,7 +331,7 @@ const TargetedJobAd = ({ad, onDismiss, onExpand, onInterested, onUninterested, c
   // standard CTA, asking if the user is interested in this role
   let ctaSection = <>
     <div className={classes.prompt}>
-      If you're interested in this role, would you like us to pass along your email address and EA Forum profile to the hiring manager?
+      If you're interested in this role, would you like us to pass along your email address and FAST Forum profile to the hiring manager?
     </div>
     <div className={classes.btnRow}>
       <Button variant="contained" color="primary" onClick={() => handleInterested()} className={classes.btn}>

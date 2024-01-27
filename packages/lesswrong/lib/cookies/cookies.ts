@@ -31,13 +31,13 @@ export const HIDE_FEATURED_RESOURCE_COOKIE = registerCookie({
 export const SHOW_COMMUNITY_POSTS_SECTION_COOKIE = registerCookie({
   name: 'show_community_posts_section',
   type: "necessary",
-  description: "Whether to show the community posts section on the EA Forum home page",
+  description: "Whether to show the community posts section on the FAST Forum home page",
 })
 
 export const SHOW_QUICK_TAKES_SECTION_COOKIE = registerCookie({
   name: 'show_quick_takes_section',
   type: "necessary",
-  description: "Whether to show the quick takes section on the EA Forum home page",
+  description: "Whether to show the quick takes section on the FAST Forum home page",
 })
 
 export const SHOW_QUICK_TAKES_SECTION_COMMUNITY_COOKIE = registerCookie({
@@ -49,13 +49,13 @@ export const SHOW_QUICK_TAKES_SECTION_COMMUNITY_COOKIE = registerCookie({
 export const SHOW_POPULAR_COMMENTS_SECTION_COOKIE = registerCookie({
   name: 'show_popular_comments_section',
   type: "necessary",
-  description: "Whether to show the popular comments section on the EA Forum home page",
+  description: "Whether to show the popular comments section on the FAST Forum home page",
 })
 
 export const HIDE_HANDBOOK_COOKIE = registerCookie({
   name: "hide_home_handbook",
   type: "necessary",
-  description: "Whether to hide the EA Handbook on the EA Forum home page",
+  description: "Whether to hide the EA Handbook on the FAST Forum home page",
 });
 
 export const HIDE_JOB_AD_COOKIE = registerCookie({name: 'hide_job_ad', type: "necessary", description: 'Controls whether job ads are hidden'});

@@ -911,7 +911,7 @@ const EngagementHoursSection = ({engagementHours, classes}: {
   return <AnalyticsContext pageSectionContext="engagementHours">
     <section className={classes.section}>
       <h1 className={classes.heading3}>
-        You spent <span className={classes.highlight}>{engagementHours.toFixed(1)}</span> hours on the EA Forum in 2023
+        You spent <span className={classes.highlight}>{engagementHours.toFixed(1)}</span> hours on the FAST Forum in 2023
       </h1>
       <p className={classNames(classes.textRow, classes.text, classes.mt70)}>Which is about the same as...</p>
       <div className={classNames(classes.stats, classes.mt30)}>
@@ -943,7 +943,7 @@ const DaysVisitedSection = ({daysVisited, classes}: {
   return <AnalyticsContext pageSectionContext="daysVisited">
     <section className={classes.section}>
       <h1 className={classes.heading3}>
-        You visited the EA Forum on <span className={classes.highlight}>{daysVisited.length}</span> days in 2023
+        You visited the FAST Forum on <span className={classes.highlight}>{daysVisited.length}</span> days in 2023
       </h1>
       <p className={classNames(classes.textRow, classes.text, classes.mt16)}>
         (You may have visited more times while logged out)
@@ -1588,7 +1588,7 @@ const EAForumWrapped2023Page = ({classes}: {classes: ClassesType}) => {
   if (!currentUser) {
     return <AnalyticsContext pageContext="eaYearWrapped">
       <HeadTags
-        title="EA Forum 2023 Wrapped"
+        title="FAST Forum 2023 Wrapped"
         image={makeCloudinaryImageUrl('2023_wrapped_wide', socialImageProps)}
       />
       <main className={classes.root}>
