@@ -90,19 +90,22 @@ export const NewPostHowToGuides = ({classes}: {
   return (
     <AnalyticsContext pageElementContext="newPostHowToGuides">
       <div className={classes.root}>
-        <div className={classes.title}>Useful links</div>
+        <div className={classes.title}>Important</div>
         <div
           className={classes.dismissButton}
           onClick={dismiss}
           role="button"
+          aria-label="Close"
         >
           <ForumIcon icon="Close" />
         </div>
-        {guides.map(({icon, label, url}) =>
-          <Link to={url} className={classes.howToGuide} key={label}>
-            <ForumIcon icon={icon} /> {label}
-          </Link>
-        )}
+        <p>
+          Please make sure to read our 
+          <a href="https://forum.fastcommunity.org/posts/gTBQ9APGmxcizgorA/our-community-guidelines" target="_blank" rel="noopener noreferrer">
+            Community Guidelines
+          </a>
+          before posting.
+        </p>
       </div>
     </AnalyticsContext>
   );
