@@ -100,7 +100,7 @@ export const NewPostHowToGuides = ({classes}: {
           <ForumIcon icon="Close" />
         </div>
         <p style={{ lineHeight: '20px' }}>
-        Please read our 
+        Please read our&nbsp;
           <a href="https://forum.fastcommunity.org/posts/gTBQ9APGmxcizgorA/our-community-guidelines" 
             target="_blank" 
             rel="noopener noreferrer" 
@@ -109,7 +109,7 @@ export const NewPostHowToGuides = ({classes}: {
           </a> thoroughly before contributing in our community— we appreciate it!
         </p>
       </div>
-    </AnalyticsContext>
+    </AnalyticsContext> 
   );
 }
 
