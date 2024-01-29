@@ -39,7 +39,7 @@ const EAHomeCommunityPosts = ({classes}:{classes: ClassesType}) => {
   const recentPostsTerms = {
     view: "magic",
     filterSettings: {
-      // Include the user's personal blog filter setting but override the tags filter
+      // Include the user's personal blog filter setting but override the tags filter 
       ...userFilterSettings,
       tags: [
         {
