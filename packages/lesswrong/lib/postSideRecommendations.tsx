@@ -10,8 +10,9 @@ import type {
   StrategySpecification,
 } from "./collections/users/recommendationSettings";
 import { Components } from "./vulcan-lib";
+import { eaForumDigestSubscribeURL } from "../components/recentDiscussion/RecentDiscussionSubscribeReminder";
 
-type RecommendablePost = PostsWithNavigation|PostsWithNavigationAndRevision;
+type RecommendablePost = PostsWithNavigation | PostsWithNavigationAndRevision;
 
 /**
  * The content to be displayed as recommendations at the side of posts is
@@ -22,17 +23,17 @@ type RecommendablePost = PostsWithNavigation|PostsWithNavigationAndRevision;
  */
 export type PostSideRecommendations = {
   /** If recommendations are still loading */
-  loading: boolean,
+  loading: boolean;
   /** Title for the section (generally the algorithm name) */
-  title: string,
+  title: string;
   /** The container type to place the results in (defaults to "div") */
-  Container?: "div" | "ol" | "ul",
+  Container?: "div" | "ol" | "ul";
   /** List of recommendations to display - may be empty if loading */
-  items: ComponentType[],
+  items: ComponentType[];
   /** An optional cookie name to handle hiding the section - if undefined
    *  the section is not hideable */
-  hideCookieName?: string,
-}
+  hideCookieName?: string;
+};
 
 /**
  * Recommendations generators are used as hooks, so the name should begin
@@ -40,40 +41,42 @@ export type PostSideRecommendations = {
  */
 type RecommendationsGenerator = (post: RecommendablePost) => PostSideRecommendations;
 
-const useMoreFromTheForumRecommendations: RecommendationsGenerator = (
-  _post: RecommendablePost,
-) => {
+const useMoreFromTheForumRecommendations: RecommendationsGenerator = (_post: RecommendablePost) => {
   const usefulLinks = "/posts/BsnGqnLzrLdmsYTGt/new-start-here-useful-links-1";
   const podcast = "/posts/K5Snxo5EhgmwJJjR2/announcing-ea-forum-podcast-audio-narrations-of-ea-forum";
-  const digest = "https://effectivealtruism.us8.list-manage.com/subscribe?u=52b028e7f799cca137ef74763&id=7457c7ff3e";
   const jobs = "/topics/opportunities-to-take-action";
   return {
     loading: false,
     title: "More from the Forum",
     Container: "ul",
     items: [
-      () => <li>
-        New? <Link to={usefulLinks}>Expore useful links</Link>
-      </li>,
-      () => <li>
-        <Link to={podcast}>Listen</Link> to popular & recent posts
-      </li>,
-      () => <li>
-        Get weekly highlights in your inbox: Sign up for the{" "}
-        <Link to={digest}>FAST Forum Digest</Link>
-      </li>,
-      () => <li>
-        Browse <Link to={jobs}>job opportunities</Link>
-      </li>,
+      () => (
+        <li>
+          New? <Link to={usefulLinks}>Expore useful links</Link>
+        </li>
+      ),
+      () => (
+        <li>
+          <Link to={podcast}>Listen</Link> to popular & recent posts
+        </li>
+      ),
+      () => (
+        <li>
+          Get weekly highlights in your inbox: Sign up for the{" "}
+          <Link to={eaForumDigestSubscribeURL}>FAST Forum Digest</Link>
+        </li>
+      ),
+      () => (
+        <li>
+          Browse <Link to={jobs}>job opportunities</Link>
+        </li>
+      ),
     ],
     hideCookieName: HIDE_MORE_FROM_THE_FORUM_RECOMMENDATIONS_COOKIE,
   };
-}
+};
 
-const useGeneratorWithStrategy = (
-  title: string,
-  strategy: StrategySpecification,
-): PostSideRecommendations => {
+const useGeneratorWithStrategy = (title: string, strategy: StrategySpecification): PostSideRecommendations => {
   const algorithm: RecommendationsAlgorithmWithStrategy = {
     strategy: {
       context: "post-right",
@@ -82,28 +85,21 @@ const useGeneratorWithStrategy = (
     count: 3,
     disableFallbacks: true,
   };
-  const {
-    recommendations: posts = [],
-    recommendationsLoading: loading,
-  } = useRecommendations(algorithm);
+  const { recommendations: posts = [], recommendationsLoading: loading } = useRecommendations(algorithm);
   return {
     loading,
     title,
     items: posts.map((post) => () => <Components.SideRecommendation post={post} />),
   };
-}
+};
 
-const useMorePostsListThisRecommendations: RecommendationsGenerator = (
-  post: RecommendablePost,
-) =>
+const useMorePostsListThisRecommendations: RecommendationsGenerator = (post: RecommendablePost) =>
   useGeneratorWithStrategy("More posts like this", {
     name: "tagWeightedCollabFilter",
     postId: post._id,
   });
 
-const useNewAndUpvotedInTagRecommendations: RecommendationsGenerator = (
-  post: RecommendablePost,
-) => {
+const useNewAndUpvotedInTagRecommendations: RecommendationsGenerator = (post: RecommendablePost) => {
   const tag = postGetPrimaryTag(post, true);
   if (!tag) {
     throw new Error("Couldn't choose recommendation tag");
@@ -113,16 +109,14 @@ const useNewAndUpvotedInTagRecommendations: RecommendationsGenerator = (
     postId: post._id,
     tagId: tag._id,
   });
-}
+};
 
 const getAvailableGenerators = (
-  user: UsersCurrent|null,
+  user: UsersCurrent | null,
   post: RecommendablePost,
   cookies: Cookies,
 ): RecommendationsGenerator[] => {
-  const generators: RecommendationsGenerator[] = [
-    useMorePostsListThisRecommendations.bind(null, post),
-  ];
+  const generators: RecommendationsGenerator[] = [useMorePostsListThisRecommendations.bind(null, post)];
   if (post.tags.length) {
     generators.push(useNewAndUpvotedInTagRecommendations.bind(null, post));
   }
@@ -131,13 +125,9 @@ const getAvailableGenerators = (
     // generators.push(useMoreFromTheForumRecommendations);
   }
   return generators;
-}
+};
 
-const useGenerator = (
-  seed: number,
-  user: UsersCurrent|null,
-  post: RecommendablePost,
-): RecommendationsGenerator => {
+const useGenerator = (seed: number, user: UsersCurrent | null, post: RecommendablePost): RecommendationsGenerator => {
   const [cookies] = useCookiesWithConsent();
   const generator = useRef<RecommendationsGenerator>();
   if (!generator.current) {
@@ -146,13 +136,13 @@ const useGenerator = (
     generator.current = generators[index];
   }
   return generator.current;
-}
+};
 
 export const usePostSideRecommendations = (
-  user: UsersCurrent|null,
+  user: UsersCurrent | null,
   post: RecommendablePost,
 ): PostSideRecommendations => {
   const ssrRenderedAt = useSsrRenderedAt().getTime();
   const useRecommendations = useGenerator(ssrRenderedAt, user, post);
   return useRecommendations(post);
-}
+};

@@ -8,6 +8,7 @@ import { useMulti } from "../../lib/crud/withMulti";
 import keyBy from "lodash/keyBy";
 import moment from "moment";
 import classNames from "classnames";
+import { eaForumDigestSubscribeURL } from "../recentDiscussion/RecentDiscussionSubscribeReminder";
 
 const MAX_WIDTH = 1500;
 const MD_WIDTH = 1000;
@@ -136,34 +137,29 @@ const allSequenceIds = [...featuredCollectionsSequenceIds, ...introToCauseAreasS
 
 const allCollectionIds = [...featuredCollectionsCollectionIds];
 
-const digestLink = "https://effectivealtruism.us8.list-manage.com/subscribe?u=52b028e7f799cca137ef74763&id=7457c7ff3e";
-
 const EABestOfPage = ({ classes }: { classes: ClassesType }) => {
   const currentCuratedPostCount = useCurrentCuratedPostCount();
 
   const { results: posts, loading } = useMulti({
-    terms: {postIds: allPostIds, limit: allPostIds.length},
+    terms: { postIds: allPostIds, limit: allPostIds.length },
     collectionName: "Posts",
-    fragmentName: 'PostsBestOfList',
+    fragmentName: "PostsBestOfList",
   });
 
   const { results: sequences, loading: sequencesLoading } = useMulti({
-    terms: {sequenceIds: allSequenceIds, limit: allSequenceIds.length},
+    terms: { sequenceIds: allSequenceIds, limit: allSequenceIds.length },
     collectionName: "Sequences",
-    fragmentName: 'SequencesPageFragment',
+    fragmentName: "SequencesPageFragment",
   });
 
   const { results: collections, loading: collectionsLoading } = useMulti({
-    terms: {collectionIds: allCollectionIds, limit: allCollectionIds.length},
+    terms: { collectionIds: allCollectionIds, limit: allCollectionIds.length },
     collectionName: "Collections",
-    fragmentName: 'CollectionsBestOfFragment',
+    fragmentName: "CollectionsBestOfFragment",
   });
 
   const currentTime = useCurrentTime();
-  const {
-    results: monthlyHighlights,
-    loading: monthlyHighlightsLoading,
-  } = useMulti({
+  const { results: monthlyHighlights, loading: monthlyHighlightsLoading } = useMulti({
     collectionName: "Posts",
     fragmentName: "PostsListWithVotes",
     terms: {
@@ -172,9 +168,9 @@ const EABestOfPage = ({ classes }: { classes: ClassesType }) => {
     },
   });
 
-  const postsById = useMemo(() => keyBy(posts, '_id'), [posts]);
-  const sequencesById = useMemo(() => keyBy(sequences, '_id'), [sequences]);
-  const collectionsById = useMemo(() => keyBy(collections, '_id'), [collections]);
+  const postsById = useMemo(() => keyBy(posts, "_id"), [posts]);
+  const sequencesById = useMemo(() => keyBy(sequences, "_id"), [sequences]);
+  const collectionsById = useMemo(() => keyBy(collections, "_id"), [collections]);
 
   if (loading || sequencesLoading || collectionsLoading || monthlyHighlightsLoading) {
     return <Components.Loading />;
@@ -187,10 +183,7 @@ const EABestOfPage = ({ classes }: { classes: ClassesType }) => {
   const featuredCollectionSequences = featuredCollectionsSequenceIds.map((id) => sequencesById[id]);
   const introToCauseAreasSequences = introToCauseAreasSequenceIds.map((id) => sequencesById[id]);
 
-  const {
-    HeadTags, EASequenceCard, EACollectionCard, EAPostsItem, PostsAudioCard,
-    PostsVideoCard,
-  } = Components;
+  const { HeadTags, EASequenceCard, EACollectionCard, EAPostsItem, PostsAudioCard, PostsVideoCard } = Components;
   return (
     <>
       <HeadTags title="Best of the Forum" />
@@ -200,11 +193,10 @@ const EABestOfPage = ({ classes }: { classes: ClassesType }) => {
             <div>
               <h1 className={classes.pageTitle}>Best of the Forum</h1>
               <div className={classes.pageDescription}>
-                There are hundreds of posts on the FAST Forum. This page collects
-                a smaller number of excellent posts on a range of topics in
-                effective altruism, selected by the FAST Forum Team. You can{" "}
-                <Link to={digestLink}>also sign up for a weekly email</Link>{" "}
-                with some of our favorite posts from the past week.
+                There are hundreds of posts on the FAST Forum. This page collects a smaller number of excellent posts on
+                a range of topics in effective altruism, selected by the FAST Forum Team. You can{" "}
+                <Link to={eaForumDigestSubscribeURL}>also sign up for a weekly email</Link> with some of our favorite
+                posts from the past week.
               </div>
             </div>
             <AnalyticsContext pageSectionContext="featuredCollections">
@@ -228,11 +220,7 @@ const EABestOfPage = ({ classes }: { classes: ClassesType }) => {
                 <h2 className={classes.heading}>Highlights this year</h2>
                 <div className={classes.listSection}>
                   {bestOfYearPosts.map((post) => (
-                    <EAPostsItem
-                      key={post._id}
-                      post={post}
-                      className={classes.postsItem}
-                    />
+                    <EAPostsItem key={post._id} post={post} className={classes.postsItem} />
                   ))}
                 </div>
                 <div className={classes.viewMore}>
@@ -267,9 +255,7 @@ const EABestOfPage = ({ classes }: { classes: ClassesType }) => {
                   ))}
                 </div>
                 <div className={classes.viewMore}>
-                  <Link to="/allPosts?timeframe=monthly&hideCommunity=true&sortedBy=top">
-                    View more
-                  </Link>
+                  <Link to="/allPosts?timeframe=monthly&hideCommunity=true&sortedBy=top">View more</Link>
                 </div>
               </div>
             </AnalyticsContext>
@@ -303,11 +289,7 @@ const EABestOfPage = ({ classes }: { classes: ClassesType }) => {
   );
 };
 
-const EABestOfPageComponent = registerComponent(
-  "EABestOfPage",
-  EABestOfPage,
-  {styles, stylePriority: 2},
-);
+const EABestOfPageComponent = registerComponent("EABestOfPage", EABestOfPage, { styles, stylePriority: 2 });
 
 declare global {
   interface ComponentTypes {
