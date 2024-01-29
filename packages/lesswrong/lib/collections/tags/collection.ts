@@ -7,7 +7,7 @@ import schema from './schema';
 import { tagUserHasSufficientKarma, userIsSubforumModerator } from './helpers';
 import { formGroups } from './formGroups';
 
-export const EA_FORUM_COMMUNITY_TOPIC_ID = 'rerSxJsibwdYTCvjS';
+export const EA_FORUM_COMMUNITY_TOPIC_ID = 'KzdiSGpBpEkXDa8Ti';
 export const EA_FORUM_TRANSLATION_TOPIC_ID = 'f4d3KbWLszzsKqxej';
 export const EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID = '4saLTjJHsbduczFti';
 

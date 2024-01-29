@@ -58,8 +58,8 @@ const EAHomeCommunityPosts = ({classes}:{classes: ClassesType}) => {
       pageSectionContext="communityPosts"
       expanded={expanded}
       toggleExpanded={toggleExpanded}
-      title="Posts tagged community"
-      afterTitleTo="/topics/community"
+      title="Career, Job & Volunteering Opportunities"
+      afterTitleTo="/topics/careers-and-volunteering"
       Content={() => (
         <>
           <AnalyticsContext listContext={"communityPosts"}>
@@ -67,7 +67,7 @@ const EAHomeCommunityPosts = ({classes}:{classes: ClassesType}) => {
           </AnalyticsContext>
           <SectionFooter>
             <Link
-              to="/topics/community"
+              to="/topics/careers-and-volunteering"
               className={classes.readMoreLinkMobile}
             >
               View more
