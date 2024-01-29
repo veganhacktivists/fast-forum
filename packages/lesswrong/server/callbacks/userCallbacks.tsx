@@ -1,64 +1,83 @@
-import React from 'react';
+import React from "react";
 import md5 from "md5";
 import Users from "../../lib/collections/users/collection";
-import { isAdmin, userGetGroups } from '../../lib/vulcan-users/permissions';
-import { createMutator, updateMutator } from '../vulcan-lib/mutators';
-import { Posts } from '../../lib/collections/posts'
-import { Comments } from '../../lib/collections/comments'
-import { bellNotifyEmailVerificationRequired } from '../notificationCallbacks';
-import { isAnyTest } from '../../lib/executionEnvironment';
-import { getCollectionHooks, UpdateCallbackProperties } from '../mutationCallbacks';
-import { voteCallbacks, VoteDocTuple } from '../../lib/voting/vote';
-import { encodeIntlError } from '../../lib/vulcan-lib/utils';
+import { isAdmin, userGetGroups } from "../../lib/vulcan-users/permissions";
+import { createMutator, updateMutator } from "../vulcan-lib/mutators";
+import { Posts } from "../../lib/collections/posts";
+import { Comments } from "../../lib/collections/comments";
+import { bellNotifyEmailVerificationRequired } from "../notificationCallbacks";
+import { isAnyTest } from "../../lib/executionEnvironment";
+import { getCollectionHooks, UpdateCallbackProperties } from "../mutationCallbacks";
+import { voteCallbacks, VoteDocTuple } from "../../lib/voting/vote";
+import { encodeIntlError } from "../../lib/vulcan-lib/utils";
 import { sendVerificationEmail } from "../vulcan-lib/apollo-server/authentication";
 import { isEAForum, isLW, verifyEmailsSetting } from "../../lib/instanceSettings";
-import { mailchimpEAForumListIdSetting, mailchimpForumDigestListIdSetting } from "../../lib/publicSettings";
+import {
+  mailchimpEAForumListIdSetting,
+  mailchimpForumDigestListIdSetting,
+  mailchimpRegionSetting,
+} from "../../lib/publicSettings";
 import { mailchimpAPIKeySetting } from "../../server/serverSettings";
-import {userGetLocation, getUserEmail} from "../../lib/collections/users/helpers";
+import { userGetLocation, getUserEmail } from "../../lib/collections/users/helpers";
 import { captureException } from "@sentry/core";
-import { getAdminTeamAccount } from './commentCallbacks';
-import { wrapAndSendEmail } from '../emails/renderEmail';
+import { getAdminTeamAccount } from "./commentCallbacks";
+import { wrapAndSendEmail } from "../emails/renderEmail";
 import { DatabaseServerSetting } from "../databaseSettings";
-import { EventDebouncer } from '../debouncer';
-import { Components } from '../../lib/vulcan-lib/components';
-import { Conversations } from '../../lib/collections/conversations/collection';
-import { Messages } from '../../lib/collections/messages/collection';
-import { getAuth0Profile, updateAuth0Email } from '../authentication/auth0';
-import { triggerReviewIfNeeded } from './sunshineCallbackUtils';
-import { FilterSettings, FilterTag, getDefaultFilterSettings } from '../../lib/filterSettings';
-import Tags from '../../lib/collections/tags/collection';
-import keyBy from 'lodash/keyBy';
-import {userFindOneByEmail} from "../commonQueries";
-import { hasDigests } from '../../lib/betas';
-import ElectionVotes from '../../lib/collections/electionVotes/collection';
-import { eaGivingSeason23ElectionName } from '../../lib/eaGivingSeason';
+import { EventDebouncer } from "../debouncer";
+import { Components } from "../../lib/vulcan-lib/components";
+import { Conversations } from "../../lib/collections/conversations/collection";
+import { Messages } from "../../lib/collections/messages/collection";
+import { getAuth0Profile, updateAuth0Email } from "../authentication/auth0";
+import { triggerReviewIfNeeded } from "./sunshineCallbackUtils";
+import { FilterSettings, FilterTag, getDefaultFilterSettings } from "../../lib/filterSettings";
+import Tags from "../../lib/collections/tags/collection";
+import keyBy from "lodash/keyBy";
+import { userFindOneByEmail } from "../commonQueries";
+import { hasDigests } from "../../lib/betas";
+import ElectionVotes from "../../lib/collections/electionVotes/collection";
+import { eaGivingSeason23ElectionName } from "../../lib/eaGivingSeason";
 
-const MODERATE_OWN_PERSONAL_THRESHOLD = 50
-const TRUSTLEVEL1_THRESHOLD = 2000
+const MODERATE_OWN_PERSONAL_THRESHOLD = 50;
+const TRUSTLEVEL1_THRESHOLD = 2000;
 
-voteCallbacks.castVoteAsync.add(async function updateTrustedStatus ({newDocument, vote}: VoteDocTuple) {
-  const user = await Users.findOne(newDocument.userId)
-  if (user && (user?.karma) >= TRUSTLEVEL1_THRESHOLD && (!userGetGroups(user).includes('trustLevel1'))) {
-    await Users.rawUpdateOne(user._id, {$push: {groups: 'trustLevel1'}});
-    const updatedUser = await Users.findOne(newDocument.userId)
+voteCallbacks.castVoteAsync.add(async function updateTrustedStatus({ newDocument, vote }: VoteDocTuple) {
+  const user = await Users.findOne(newDocument.userId);
+  if (user && user?.karma >= TRUSTLEVEL1_THRESHOLD && !userGetGroups(user).includes("trustLevel1")) {
+    await Users.rawUpdateOne(user._id, { $push: { groups: "trustLevel1" } });
+    const updatedUser = await Users.findOne(newDocument.userId);
     //eslint-disable-next-line no-console
-    console.info("User gained trusted status", updatedUser?.username, updatedUser?._id, updatedUser?.karma, updatedUser?.groups)
+    console.info(
+      "User gained trusted status",
+      updatedUser?.username,
+      updatedUser?._id,
+      updatedUser?.karma,
+      updatedUser?.groups,
+    );
   }
 });
 
-voteCallbacks.castVoteAsync.add(async function updateModerateOwnPersonal({newDocument, vote}: VoteDocTuple) {
-  const user = await Users.findOne(newDocument.userId)
-  if (!user) throw Error("Couldn't find user")
-  if ((user.karma) >= MODERATE_OWN_PERSONAL_THRESHOLD && (!userGetGroups(user).includes('canModeratePersonal'))) {
-    await Users.rawUpdateOne(user._id, {$push: {groups: 'canModeratePersonal'}});
-    const updatedUser = await Users.findOne(newDocument.userId)
-    if (!updatedUser) throw Error("Couldn't find user to update")
+voteCallbacks.castVoteAsync.add(async function updateModerateOwnPersonal({ newDocument, vote }: VoteDocTuple) {
+  const user = await Users.findOne(newDocument.userId);
+  if (!user) throw Error("Couldn't find user");
+  if (user.karma >= MODERATE_OWN_PERSONAL_THRESHOLD && !userGetGroups(user).includes("canModeratePersonal")) {
+    await Users.rawUpdateOne(user._id, { $push: { groups: "canModeratePersonal" } });
+    const updatedUser = await Users.findOne(newDocument.userId);
+    if (!updatedUser) throw Error("Couldn't find user to update");
     //eslint-disable-next-line no-console
-    console.info("User gained trusted status", updatedUser.username, updatedUser._id, updatedUser.karma, updatedUser.groups)
+    console.info(
+      "User gained trusted status",
+      updatedUser.username,
+      updatedUser._id,
+      updatedUser.karma,
+      updatedUser.groups,
+    );
   }
 });
 
-getCollectionHooks("Users").editBefore.add(async function UpdateAuth0Email(modifier: MongoModifier<DbUser>, user: DbUser) {
+getCollectionHooks("Users").editBefore.add(async function UpdateAuth0Email(
+  modifier: MongoModifier<DbUser>,
+  user: DbUser,
+) {
   const newEmail = modifier.$set?.email;
   const oldEmail = user.email;
   if (newEmail && newEmail !== oldEmail && isEAForum) {
@@ -73,64 +92,62 @@ getCollectionHooks("Users").editBefore.add(async function UpdateAuth0Email(modif
   return modifier;
 });
 
-getCollectionHooks("Users").editSync.add(function maybeSendVerificationEmail (modifier, user: DbUser)
-{
-  if(modifier.$set.whenConfirmationEmailSent
-      && (!user.whenConfirmationEmailSent
-          || user.whenConfirmationEmailSent.getTime() !== modifier.$set.whenConfirmationEmailSent.getTime()))
-  {
+getCollectionHooks("Users").editSync.add(function maybeSendVerificationEmail(modifier, user: DbUser) {
+  if (
+    modifier.$set.whenConfirmationEmailSent &&
+    (!user.whenConfirmationEmailSent ||
+      user.whenConfirmationEmailSent.getTime() !== modifier.$set.whenConfirmationEmailSent.getTime())
+  ) {
     void sendVerificationEmail(user);
   }
 });
 
-getCollectionHooks("Users").updateBefore.add(async function updateProfileTagsSubscribesUser(data, {oldDocument, newDocument}: UpdateCallbackProperties<"Users">) {
+getCollectionHooks("Users").updateBefore.add(async function updateProfileTagsSubscribesUser(
+  data,
+  { oldDocument, newDocument }: UpdateCallbackProperties<"Users">,
+) {
   // check if the user added any tags to their profile
-  const tagIdsAdded = newDocument.profileTagIds?.filter(tagId => !oldDocument.profileTagIds?.includes(tagId)) || []
-  
+  const tagIdsAdded = newDocument.profileTagIds?.filter((tagId) => !oldDocument.profileTagIds?.includes(tagId)) || [];
+
   // if so, then we want to subscribe them to the newly added tags
   if (tagIdsAdded.length > 0) {
-    const tagsAdded = await Tags.find({_id: {$in: tagIdsAdded}}).fetch()
-    const tagsById = keyBy(tagsAdded, tag => tag._id)
-    
-    let newFrontpageFilterSettings: FilterSettings = newDocument.frontpageFilterSettings ?? getDefaultFilterSettings()
+    const tagsAdded = await Tags.find({ _id: { $in: tagIdsAdded } }).fetch();
+    const tagsById = keyBy(tagsAdded, (tag) => tag._id);
+
+    let newFrontpageFilterSettings: FilterSettings = newDocument.frontpageFilterSettings ?? getDefaultFilterSettings();
     for (let addedTag of tagIdsAdded) {
-      const newTagFilter: FilterTag = {tagId: addedTag, tagName: tagsById[addedTag].name, filterMode: 'Subscribed'}
-      const existingFilter = newFrontpageFilterSettings.tags.find(tag => tag.tagId === addedTag)
+      const newTagFilter: FilterTag = { tagId: addedTag, tagName: tagsById[addedTag].name, filterMode: "Subscribed" };
+      const existingFilter = newFrontpageFilterSettings.tags.find((tag) => tag.tagId === addedTag);
       // if the user already had a filter for this tag, see if we should update it or leave it alone
       if (existingFilter) {
-        if ([0, 'Default', 'TagDefault'].includes(existingFilter.filterMode)) {
+        if ([0, "Default", "TagDefault"].includes(existingFilter.filterMode)) {
           newFrontpageFilterSettings = {
             ...newFrontpageFilterSettings,
-            tags: [
-              ...newFrontpageFilterSettings.tags.filter(tag => tag.tagId !== addedTag),
-              newTagFilter
-            ]
-          }
+            tags: [...newFrontpageFilterSettings.tags.filter((tag) => tag.tagId !== addedTag), newTagFilter],
+          };
         }
       } else {
         // otherwise, subscribe them to this tag
         newFrontpageFilterSettings = {
           ...newFrontpageFilterSettings,
-          tags: [
-            ...newFrontpageFilterSettings.tags,
-            newTagFilter
-          ]
-        }
+          tags: [...newFrontpageFilterSettings.tags, newTagFilter],
+        };
       }
     }
-    return {...data, frontpageFilterSettings: newFrontpageFilterSettings}
+    return { ...data, frontpageFilterSettings: newFrontpageFilterSettings };
   }
-  return data
-})
+  return data;
+});
 
-getCollectionHooks("Users").editAsync.add(async function approveUnreviewedSubmissions (newUser: DbUser, oldUser: DbUser)
-{
-  if(newUser.reviewedByUserId && !oldUser.reviewedByUserId)
-  {
+getCollectionHooks("Users").editAsync.add(async function approveUnreviewedSubmissions(
+  newUser: DbUser,
+  oldUser: DbUser,
+) {
+  if (newUser.reviewedByUserId && !oldUser.reviewedByUserId) {
     // For each post by this author which has the authorIsUnreviewed flag set,
     // clear the authorIsUnreviewed flag so it's visible, and update postedAt
     // to now so that it goes to the right place int he latest posts list.
-    const unreviewedPosts = await Posts.find({userId: newUser._id, authorIsUnreviewed: true}).fetch();
+    const unreviewedPosts = await Posts.find({ userId: newUser._id, authorIsUnreviewed: true }).fetch();
     for (let post of unreviewedPosts) {
       await updateMutator<"Posts">({
         collection: Posts,
@@ -139,14 +156,14 @@ getCollectionHooks("Users").editAsync.add(async function approveUnreviewedSubmis
           authorIsUnreviewed: false,
           postedAt: new Date(),
         },
-        validate: false
+        validate: false,
       });
     }
-    
+
     // For each comment by this author which has the authorIsUnreviewed flag set, clear the authorIsUnreviewed flag.
     // This only matters if the hideUnreviewedAuthorComments setting is active -
     // in that case, we want to trigger the relevant comment notifications once the author is reviewed.
-    const unreviewedComments = await Comments.find({userId: newUser._id, authorIsUnreviewed: true}).fetch();
+    const unreviewedComments = await Comments.find({ userId: newUser._id, authorIsUnreviewed: true }).fetch();
     for (let comment of unreviewedComments) {
       await updateMutator<"Comments">({
         collection: Comments,
@@ -154,28 +171,38 @@ getCollectionHooks("Users").editAsync.add(async function approveUnreviewedSubmis
         set: {
           authorIsUnreviewed: false,
         },
-        validate: false
+        validate: false,
       });
     }
   }
 });
 
-getCollectionHooks("Users").updateAsync.add(function updateUserMayTriggerReview({document, data}: UpdateCallbackProperties<"Users">) {
-  const reviewTriggerFields: (keyof DbUser)[] = ['voteCount', 'mapLocation', 'postCount', 'commentCount', 'biography', 'profileImageId'];
-  if (reviewTriggerFields.some(field => field in data)) {
-    void triggerReviewIfNeeded(document._id)
+getCollectionHooks("Users").updateAsync.add(function updateUserMayTriggerReview({
+  document,
+  data,
+}: UpdateCallbackProperties<"Users">) {
+  const reviewTriggerFields: (keyof DbUser)[] = [
+    "voteCount",
+    "mapLocation",
+    "postCount",
+    "commentCount",
+    "biography",
+    "profileImageId",
+  ];
+  if (reviewTriggerFields.some((field) => field in data)) {
+    void triggerReviewIfNeeded(document._id);
   }
-})
+});
 
 // When the very first user account is being created, add them to Sunshine
 // Regiment. Patterned after a similar callback in
 // vulcan-users/lib/server/callbacks.js which makes the first user an admin.
-getCollectionHooks("Users").newSync.add(async function makeFirstUserAdminAndApproved (user: DbUser) {
+getCollectionHooks("Users").newSync.add(async function makeFirstUserAdminAndApproved(user: DbUser) {
   if (isAnyTest) return user;
   const realUsersCount = await Users.find({}).count();
   if (realUsersCount === 0) {
     user.reviewedByUserId = "firstAccount"; //HACK
-    
+
     // Add the first user to the Sunshine Regiment
     if (!user.groups) user.groups = [];
     user.groups.push("sunshineRegiment");
@@ -183,18 +210,19 @@ getCollectionHooks("Users").newSync.add(async function makeFirstUserAdminAndAppr
   return user;
 });
 
-getCollectionHooks("Users").editSync.add(function clearKarmaChangeBatchOnSettingsChange (modifier, user: DbUser)
-{
+getCollectionHooks("Users").editSync.add(function clearKarmaChangeBatchOnSettingsChange(modifier, user: DbUser) {
   if (modifier.$set && modifier.$set.karmaChangeNotifierSettings) {
-    if (!user.karmaChangeNotifierSettings.updateFrequency
-      || modifier.$set.karmaChangeNotifierSettings.updateFrequency !== user.karmaChangeNotifierSettings.updateFrequency) {
+    if (
+      !user.karmaChangeNotifierSettings.updateFrequency ||
+      modifier.$set.karmaChangeNotifierSettings.updateFrequency !== user.karmaChangeNotifierSettings.updateFrequency
+    ) {
       modifier.$set.karmaChangeLastOpened = null;
       modifier.$set.karmaChangeBatchStart = null;
     }
   }
 });
 
-getCollectionHooks("Users").newAsync.add(async function subscribeOnSignup (user: DbUser) {
+getCollectionHooks("Users").newAsync.add(async function subscribeOnSignup(user: DbUser) {
   // Regardless of the config setting, try to confirm the user's email address
   // (But not in unit-test contexts, where this function is unavailable and sending
   // emails doesn't make sense.)
@@ -204,27 +232,23 @@ getCollectionHooks("Users").newAsync.add(async function subscribeOnSignup (user:
   }
 });
 
-getCollectionHooks("Users").editAsync.add(async function handleSetShortformPost (newUser: DbUser, oldUser: DbUser) {
-  if (newUser.shortformFeedId !== oldUser.shortformFeedId)
-  {
-    const post = await Posts.findOne({_id: newUser.shortformFeedId});
-    if (!post)
-      throw new Error("Invalid post ID for shortform");
+getCollectionHooks("Users").editAsync.add(async function handleSetShortformPost(newUser: DbUser, oldUser: DbUser) {
+  if (newUser.shortformFeedId !== oldUser.shortformFeedId) {
+    const post = await Posts.findOne({ _id: newUser.shortformFeedId });
+    if (!post) throw new Error("Invalid post ID for shortform");
     if (post.userId !== newUser._id)
       throw new Error("Post can only be an author's short-form post if they are the post's author");
-    if (post.draft)
-      throw new Error("Draft post cannot be a user's short-form post");
+    if (post.draft) throw new Error("Draft post cannot be a user's short-form post");
     // @ts-ignore -- this should be something with post.status; post.deleted doesn't exist
-    if (post.deleted)
-      throw new Error("Deleted post cannot be a user's short-form post");
-    
+    if (post.deleted) throw new Error("Deleted post cannot be a user's short-form post");
+
     // In theory, we should check here whether the user already had a short-form
     // post which is getting un-set, and clear the short-form flag from it. But
     // in the long run we won't need to do this, because creation of short-form
     // posts will be automatic-only, and as admins we can just not click the
     // set-as-shortform button on posts for users that already have a shortform.
     // So, don't bother checking for an old post in the shortformFeedId field.
-    
+
     // Mark the post as shortform
     await updateMutator({
       collection: Posts,
@@ -236,34 +260,33 @@ getCollectionHooks("Users").editAsync.add(async function handleSetShortformPost 
   }
 });
 
-getCollectionHooks("Users").newSync.add(async function usersMakeAdmin (user: DbUser) {
+getCollectionHooks("Users").newSync.add(async function usersMakeAdmin(user: DbUser) {
   if (isAnyTest) return user;
   // if this is not a dummy account, and is the first user ever, make them an admin
-  // TODO: should use await Connectors.count() instead, but cannot await inside Accounts.onCreateUser. Fix later. 
-  if (typeof user.isAdmin === 'undefined') {
+  // TODO: should use await Connectors.count() instead, but cannot await inside Accounts.onCreateUser. Fix later.
+  if (typeof user.isAdmin === "undefined") {
     const realUsersCount = await Users.find({}).count();
-    user.isAdmin = (realUsersCount === 0);
+    user.isAdmin = realUsersCount === 0;
   }
   return user;
 });
 
-const sendVerificationEmailConditional = async  (user: DbUser) => {
+const sendVerificationEmailConditional = async (user: DbUser) => {
   if (!isAnyTest && verifyEmailsSetting.get()) {
     void sendVerificationEmail(user);
     await bellNotifyEmailVerificationRequired(user);
   }
-}
+};
 
-getCollectionHooks("Users").editSync.add(async function usersEditCheckEmail (modifier, user: DbUser) {
+getCollectionHooks("Users").editSync.add(async function usersEditCheckEmail(modifier, user: DbUser) {
   // if email is being modified, update user.emails too
   if (modifier.$set && modifier.$set.email) {
-
     const newEmail = modifier.$set.email;
 
     // check for existing emails and throw error if necessary
     const userWithSameEmail = await userFindOneByEmail(newEmail);
     if (userWithSameEmail && userWithSameEmail._id !== user._id) {
-      throw new Error(encodeIntlError({id:'users.email_already_taken', value: newEmail}));
+      throw new Error(encodeIntlError({ id: "users.email_already_taken", value: newEmail }));
     }
 
     // if user.emails exists, change it too
@@ -272,59 +295,61 @@ getCollectionHooks("Users").editSync.add(async function usersEditCheckEmail (mod
         user.emails[0].address = newEmail;
         user.emails[0].verified = false;
         modifier.$set.emails = user.emails;
-        await sendVerificationEmailConditional(user)
+        await sendVerificationEmailConditional(user);
       }
     } else {
-      modifier.$set.emails = [{address: newEmail, verified: false}];
-      await sendVerificationEmailConditional(user)
+      modifier.$set.emails = [{ address: newEmail, verified: false }];
+      await sendVerificationEmailConditional(user);
     }
   }
   return modifier;
 });
 
-getCollectionHooks("Users").editAsync.add(async function subscribeToForumDigest (newUser: DbUser, oldUser: DbUser) {
-  if (
-    isAnyTest ||
-    !hasDigests ||
-    newUser.subscribedToDigest === oldUser.subscribedToDigest
-  ) {
+getCollectionHooks("Users").editAsync.add(async function subscribeToForumDigest(newUser: DbUser, oldUser: DbUser) {
+  if (isAnyTest || !hasDigests || newUser.subscribedToDigest === oldUser.subscribedToDigest) {
     return;
   }
 
   const mailchimpAPIKey = mailchimpAPIKeySetting.get();
   const mailchimpForumDigestListId = mailchimpForumDigestListIdSetting.get();
+  const mailchimpRegion = mailchimpRegionSetting.get();
   if (!mailchimpAPIKey || !mailchimpForumDigestListId) {
     return;
   }
   if (!newUser.email) {
-    captureException(new Error(`Forum digest subscription failed: no email for user ${newUser.displayName}`))
+    captureException(new Error(`Forum digest subscription failed: no email for user ${newUser.displayName}`));
     return;
   }
   const { lat: latitude, lng: longitude, known } = userGetLocation(newUser);
-  const status = newUser.subscribedToDigest ? 'subscribed' : 'unsubscribed'; 
-  
-  const email = getUserEmail(newUser)
+  const status = newUser.subscribedToDigest ? "subscribed" : "unsubscribed";
+
+  const email = getUserEmail(newUser);
   const emailHash = md5(email!.toLowerCase());
 
-  void fetch(`https://us8.api.mailchimp.com/3.0/lists/${mailchimpForumDigestListId}/members/${emailHash}`, {
-    method: 'PUT',
-    body: JSON.stringify({
-      email_address: newUser.email,
-      email_type: 'html', 
-      ...(known && {location: {
-        latitude,
-        longitude,
-      }}),
-      merge_fields: {
-        FNAME: newUser.displayName,
+  void fetch(
+    `https://${mailchimpRegion}.api.mailchimp.com/3.0/lists/${mailchimpForumDigestListId}/members/${emailHash}`,
+    {
+      method: "PUT",
+      body: JSON.stringify({
+        email_address: newUser.email,
+        email_type: "html",
+        ...(known && {
+          location: {
+            latitude,
+            longitude,
+          },
+        }),
+        merge_fields: {
+          FNAME: newUser.displayName,
+        },
+        status,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `API_KEY ${mailchimpAPIKey}`,
       },
-      status,
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `API_KEY ${mailchimpAPIKey}`,
     },
-  }).catch(e => {
+  ).catch((e) => {
     captureException(e);
     // eslint-disable-next-line no-console
     console.log(e);
@@ -345,26 +370,29 @@ getCollectionHooks("Users").newAsync.add(async function subscribeToEAForumAudien
     return;
   }
   if (!user.email) {
-    captureException(new Error(`Subscription to FAST Forum audience failed: no email for user ${user.displayName}`))
+    captureException(new Error(`Subscription to FAST Forum audience failed: no email for user ${user.displayName}`));
     return;
   }
+  const mailchimpRegion = mailchimpRegionSetting.get();
   const { lat: latitude, lng: longitude, known } = userGetLocation(user);
-  void fetch(`https://us8.api.mailchimp.com/3.0/lists/${mailchimpEAForumListId}/members`, {
-    method: 'POST',
+  void fetch(`https://${mailchimpRegion}.api.mailchimp.com/3.0/lists/${mailchimpEAForumListId}/members`, {
+    method: "POST",
     body: JSON.stringify({
       email_address: user.email,
-      email_type: 'html', 
-      ...(known && {location: {
-        latitude,
-        longitude,
-      }}),
+      email_type: "html",
+      ...(known && {
+        location: {
+          latitude,
+          longitude,
+        },
+      }),
       status: "subscribed",
     }),
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `API_KEY ${mailchimpAPIKey}`,
     },
-  }).catch(e => {
+  }).catch((e) => {
     captureException(e);
     // eslint-disable-next-line no-console
     console.log(e);
@@ -373,15 +401,15 @@ getCollectionHooks("Users").newAsync.add(async function subscribeToEAForumAudien
 
 const welcomeMessageDelayer = new EventDebouncer({
   name: "welcomeMessageDelay",
-  
+
   // Delay is by default 60 minutes between when you create an account, and
   // when we send the welcome email. The theory is that users creating new
   // accounts are often doing so because they're about to write a comment or
   // something, and derailing them with a bunch of stuff to read at that
   // particular moment could be bad.
   // LW wants people to see site intro before posting
-  defaultTiming: isLW ? {type: "none"} : {type: "delayed", delayMinutes: 60},
-  
+  defaultTiming: isLW ? { type: "none" } : { type: "delayed", delayMinutes: 60 },
+
   callback: (userId: string) => {
     void sendWelcomeMessageTo(userId);
   },
@@ -393,8 +421,8 @@ getCollectionHooks("Users").newAsync.add(async function sendWelcomingPM(user: Db
   });
 });
 
-const welcomeEmailPostId = new DatabaseServerSetting<string|null>("welcomeEmailPostId", null);
-const forumTeamUserId = new DatabaseServerSetting<string|null>("forumTeamUserId", null);
+const welcomeEmailPostId = new DatabaseServerSetting<string | null>("welcomeEmailPostId", null);
+const forumTeamUserId = new DatabaseServerSetting<string | null>("forumTeamUserId", null);
 
 async function sendWelcomeMessageTo(userId: string) {
   const postId = welcomeEmailPostId.get();
@@ -403,76 +431,76 @@ async function sendWelcomeMessageTo(userId: string) {
     console.log("Not sending welcome email, welcomeEmailPostId setting is not configured");
     return;
   }
-  const welcomePost = await Posts.findOne({_id: postId});
+  const welcomePost = await Posts.findOne({ _id: postId });
   if (!welcomePost) {
     // eslint-disable-next-line no-console
     console.error(`Not sending welcome email, welcomeEmailPostId of ${postId} does not match any post`);
     return;
   }
-  
+
   const user = await Users.findOne(userId);
   if (!user) throw new Error(`Could not find ${userId}`);
-  
+
   // try to use forumTeamUserId as the sender,
   // and default to the admin account if not found
-  const adminUserId = forumTeamUserId.get()
-  let adminsAccount = adminUserId ? await Users.findOne({_id: adminUserId}) : null
+  const adminUserId = forumTeamUserId.get();
+  let adminsAccount = adminUserId ? await Users.findOne({ _id: adminUserId }) : null;
   if (!adminsAccount) {
-    adminsAccount = await getAdminTeamAccount()
+    adminsAccount = await getAdminTeamAccount();
     if (!adminsAccount) {
-      throw new Error("Could not find admin account")
+      throw new Error("Could not find admin account");
     }
   }
-  
+
   const subjectLine = welcomePost.title;
   const welcomeMessageBody = welcomePost.contents.html;
-  
+
   const conversationData = {
     participantIds: [user._id, adminsAccount._id],
     title: subjectLine,
-  }
+  };
   const conversation = await createMutator({
     collection: Conversations,
     document: conversationData,
     currentUser: adminsAccount,
-    validate: false
+    validate: false,
   });
-  
+
   const messageDocument = {
     userId: adminsAccount._id,
     contents: {
       originalContents: {
         type: "html",
         data: welcomeMessageBody,
-      }
+      },
     },
     conversationId: conversation.data._id,
     noEmail: true,
-  }
+  };
   await createMutator({
     collection: Messages,
     document: messageDocument,
     currentUser: adminsAccount,
-    validate: false
-  })
-  
+    validate: false,
+  });
+
   // the EA Forum has a separate "welcome email" series that is sent via mailchimp,
   // so we're not sending the email notification for this welcome PM
   if (!isEAForum) {
     await wrapAndSendEmail({
       user,
       subject: subjectLine,
-      body: <Components.EmailContentItemBody dangerouslySetInnerHTML={{ __html: welcomeMessageBody }}/>
-    })
+      body: <Components.EmailContentItemBody dangerouslySetInnerHTML={{ __html: welcomeMessageBody }} />,
+    });
   }
 }
 
-getCollectionHooks("Users").updateBefore.add(async function UpdateDisplayName(data: DbUser, {oldDocument}) {
+getCollectionHooks("Users").updateBefore.add(async function UpdateDisplayName(data: DbUser, { oldDocument }) {
   if (data.displayName !== undefined && data.displayName !== oldDocument.displayName) {
     if (!data.displayName) {
       throw new Error("You must enter a display name");
     }
-    if (await Users.findOne({displayName: data.displayName})) {
+    if (await Users.findOne({ displayName: data.displayName })) {
       throw new Error("This display name is already taken");
     }
   }
@@ -482,7 +510,10 @@ getCollectionHooks("Users").updateBefore.add(async function UpdateDisplayName(da
 /**
  * Only allow users to update givingSeason2023VotedFlair if they have voted in the 2023 donation election
  */
-getCollectionHooks("Users").updateBefore.add(async function UpdateGivingSeason2023VotedFlair(data: DbUser, {oldDocument}) {
+getCollectionHooks("Users").updateBefore.add(async function UpdateGivingSeason2023VotedFlair(
+  data: DbUser,
+  { oldDocument },
+) {
   if (isAdmin(oldDocument)) return data;
 
   if (data.givingSeason2023VotedFlair && data.givingSeason2023VotedFlair !== oldDocument.givingSeason2023VotedFlair) {
