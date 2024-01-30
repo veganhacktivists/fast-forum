@@ -132,8 +132,8 @@ const forumComponentPalette = (shadePalette: ThemeShadePalette) =>
         dark: '#3c9eaf'
       },
       lwTertiary: {
-        main: "#0e9bb4",
-        dark: "#0e9bb4",
+        main: "#67A453",
+        dark: "#67A453",
       },
       text: {
         primaryAlert: '#F3F9FA'
