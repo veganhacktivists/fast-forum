@@ -172,7 +172,7 @@ export const styles = (theme: ThemeType): JssStyles => ({
 
 const autosaveInterval = 3000; //milliseconds
 const validationInterval = 500; //milliseconds
-export const ckEditorName = forumTypeSetting.get() === 'EAForum' ? 'EA Forum Docs' : 'LessWrong Docs'
+export const ckEditorName = forumTypeSetting.get() === 'EAForum' ? 'FAST Forum Docs' : 'LessWrong Docs'
 
 export type EditorTypeString = "html"|"markdown"|"draftJS"|"ckEditorMarkup";
 
