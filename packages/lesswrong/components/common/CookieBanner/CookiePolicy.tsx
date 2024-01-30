@@ -107,12 +107,6 @@ const CookiePolicy = ({ classes }: { classes: ClassesType }) => {
         Last Updated: April 26, 2023
       </Typography>
       <Typography variant="body1">
-        The Centre for Effective Altruism ("CEA", "we" or "us") is a project of the Effective Ventures group — the
-        umbrella term for Effective Ventures Foundation and Effective Ventures Foundation USA, Inc., which are two
-        separate legal entities that work together. Under UK law, the Effective Ventures Foundation is the “data
-        controller” for the personal data that we collect and process.
-      </Typography>
-      <Typography variant="body1">
         {/* TODO possibly make this generic for all CEA websites once all the cookie banners are done */}
         We use cookies on the FAST Forum. This cookie notice applies only to the FAST Forum. You may access and change your
         cookie preferences at any time by clicking{" "}
@@ -122,11 +116,6 @@ const CookiePolicy = ({ classes }: { classes: ClassesType }) => {
         If you choose to reject cookies you are ultimately responsible for removing any that have already been set (such as if you
         previously accepted). See the instructions for doing so{" "}
         <ExternalLink href="https://support.google.com/chrome/answer/95647">here</ExternalLink>.
-      </Typography>
-      <Typography variant="body1">
-        This cookie notice is different to the cookie notice that covers other Effective Ventures Foundation websites.
-        You can see the Effective Ventures Foundation cookie notice{" "}
-        <ExternalLink href="https://ev.org/cookie-policy/">here</ExternalLink>.
       </Typography>
       <Typography variant="body1" className={classes.heading}>
         What are cookies?
