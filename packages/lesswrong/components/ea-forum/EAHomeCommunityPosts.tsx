@@ -58,7 +58,7 @@ const EAHomeCommunityPosts = ({classes}:{classes: ClassesType}) => {
       pageSectionContext="communityPosts"
       expanded={expanded}
       toggleExpanded={toggleExpanded}
-      title="Career, Job & Volunteering Opportunities"
+      title="Careers, Jobs & Volunteering"
       afterTitleTo="/topics/careers-and-volunteering"
       Content={() => (
         <>
