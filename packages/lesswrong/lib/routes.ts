@@ -577,7 +577,7 @@ const eaLwAfForumSpecificRoutes = forumSelect<Route[]>({
       name: 'home',
       path: '/',
       componentName: 'EAHome',
-      description: "Research, discussion, and updates on the world's most pressing problems. Including global health and development, animal welfare, AI safety, and biosecurity.",
+      description: "Animal Advocacy Forum is a space for advocates and organizations to engage, collaborate, and strategize on a wide range of topics surrounding factory farming, encouraging long-form and strategic discussions.",
       enableResourcePrefetch: true,
       sunshineSidebar: true
     },
