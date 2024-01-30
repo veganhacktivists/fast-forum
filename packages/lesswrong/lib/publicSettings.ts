@@ -58,14 +58,14 @@ export const algoliaPrefixSetting = new DatabasePublicSetting<string>("algolia.i
 export const ckEditorUploadUrlSetting = new DatabasePublicSetting<string | null>("ckEditor.uploadUrl", null); // Image Upload URL for CKEditor
 export const ckEditorWebsocketUrlSetting = new DatabasePublicSetting<string | null>("ckEditor.webSocketUrl", null); // Websocket URL for CKEditor (for collaboration)
 
+// Hide comments by unreviewed authors after date provided (prevents spam / flaming / makes moderation easier, but delays new user engagement)
 export const hideUnreviewedAuthorCommentsSettings = new DatabasePublicSetting<string | null>(
   "hideUnreviewedAuthorComments",
   null,
-); // Hide comments by unreviewed authors after date provided (prevents spam / flaming / makes moderation easier, but delays new user engagement)
-export const cloudinaryCloudNameSetting = new DatabasePublicSetting<string>(
-  "cloudinary.cloudName",
-  process.env.CLOUDINARY_CLOUD_NAME ?? "fast-forum",
-); // Cloud name for cloudinary hosting
+);
+
+// Cloud name for cloudinary hosting
+export const cloudinaryCloudNameSetting = new DatabasePublicSetting<string>("cloudinary.cloudName", "fast-forum");
 
 export const forumAllPostsNumDaysSetting = new DatabasePublicSetting<number>("forum.numberOfDays", 10); // Number of days to display in the timeframe view
 

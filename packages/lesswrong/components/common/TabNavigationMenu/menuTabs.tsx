@@ -1,24 +1,24 @@
-import React from 'react';
-import { communityPath, getAllTagsPath } from '../../../lib/routes';
-import { REVIEW_YEAR } from '../../../lib/reviewUtils';
-import { eaSequencesHomeDescription } from '../../ea-forum/EASequencesHome';
-import { preferredHeadingCase } from '../../../themes/forumTheme';
-import { ForumOptions } from '../../../lib/forumTypeUtils';
-import { taggingNamePluralCapitalSetting, taggingNamePluralSetting } from '../../../lib/instanceSettings';
+import React from "react";
+import { communityPath, getAllTagsPath } from "../../../lib/routes";
+import { REVIEW_YEAR } from "../../../lib/reviewUtils";
+import { eaSequencesHomeDescription } from "../../ea-forum/EASequencesHome";
+import { preferredHeadingCase } from "../../../themes/forumTheme";
+import { ForumOptions } from "../../../lib/forumTypeUtils";
+import { taggingNamePluralCapitalSetting, taggingNamePluralSetting } from "../../../lib/instanceSettings";
 
-import { compassIcon } from '../../icons/compassIcon';
-import { questionsGlobeIcon } from '../../icons/questionsGlobeIcon';
-import { conceptsIcon } from '../../icons/conceptsIcon';
-import { communityGlobeIcon } from '../../icons/communityGlobeIcon';
-import { BookIcon } from '../../icons/bookIcon'
-import { allPostsIcon } from '../../icons/allPostsIcon';
+import { compassIcon } from "../../icons/compassIcon";
+import { questionsGlobeIcon } from "../../icons/questionsGlobeIcon";
+import { conceptsIcon } from "../../icons/conceptsIcon";
+import { communityGlobeIcon } from "../../icons/communityGlobeIcon";
+import { BookIcon } from "../../icons/bookIcon";
+import { allPostsIcon } from "../../icons/allPostsIcon";
 
-import Home from '@material-ui/icons/Home'
-import LocalOffer from '@material-ui/icons/LocalOffer';
-import Sort from '@material-ui/icons/Sort'
-import Info from '@material-ui/icons/Info';
-import LocalLibrary from '@material-ui/icons/LocalLibrary';
-import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
+import Home from "@material-ui/icons/Home";
+import LocalOffer from "@material-ui/icons/LocalOffer";
+import Sort from "@material-ui/icons/Sort";
+import Info from "@material-ui/icons/Info";
+import LocalLibrary from "@material-ui/icons/LocalLibrary";
+import SupervisedUserCircleIcon from "@material-ui/icons/SupervisedUserCircle";
 
 // EA Forum menu icons
 import HomeIcon from "@heroicons/react/24/outline/HomeIcon";
@@ -63,189 +63,210 @@ import GroupsSelectedIcon from "@heroicons/react/24/solid/UsersIcon";
 // See TabNavigation[Footer|Compressed]?Item.jsx for how these are used by the code
 
 type MenuTabDivider = {
-  id: string
-  divider: true
-  showOnCompressed?: boolean
-}
+  id: string;
+  divider: true;
+  showOnCompressed?: boolean;
+};
 
 type MenuTabCustomComponent = {
-  id: string
-  customComponentName: string
-}
+  id: string;
+  customComponentName: string;
+};
 
-type MenuItemIcon = React.ComponentType | React.FC<{className?: string}>;
+type MenuItemIcon = React.ComponentType | React.FC<{ className?: string }>;
 
 export type MenuTabRegular = {
-  id: string
-  title: string
-  mobileTitle?: string
-  link: string
-  icon?: React.ReactNode
-  iconComponent?: MenuItemIcon
-  selectedIconComponent?: MenuItemIcon
-  compressedIconComponent?: MenuItemIcon
-  tooltip?: React.ReactNode
-  showOnMobileStandalone?: boolean
-  showOnCompressed?: boolean
-  subItem?: boolean,
-  loggedOutOnly?: boolean
-}
+  id: string;
+  title: string;
+  mobileTitle?: string;
+  link: string;
+  icon?: React.ReactNode;
+  iconComponent?: MenuItemIcon;
+  selectedIconComponent?: MenuItemIcon;
+  compressedIconComponent?: MenuItemIcon;
+  tooltip?: React.ReactNode;
+  showOnMobileStandalone?: boolean;
+  showOnCompressed?: boolean;
+  subItem?: boolean;
+  loggedOutOnly?: boolean;
+};
 
-type MenuTab = MenuTabDivider | MenuTabCustomComponent | MenuTabRegular
+type MenuTab = MenuTabDivider | MenuTabCustomComponent | MenuTabRegular;
 
 export const menuTabs: ForumOptions<Array<MenuTab>> = {
   EAForum: [
     {
-      id: 'home',
-      title: 'Home',
-      link: '/',
+      id: "home",
+      title: "Home",
+      link: "/",
       iconComponent: HomeIcon,
       selectedIconComponent: HomeSelectedIcon,
-      tooltip: 'See recent posts on strategies for animal advocacy, plus recent activity from all across the Forum.',
+      tooltip: "See recent posts on strategies for animal advocacy, plus recent activity from all across the Forum.",
       showOnMobileStandalone: true,
       showOnCompressed: true,
-    }, {
-      id: 'allPosts',
-      title: 'All posts',
-      link: '/allPosts',
+    },
+    {
+      id: "allPosts",
+      title: "All posts",
+      link: "/allPosts",
       iconComponent: AllPostsIcon,
       selectedIconComponent: AllPostsSelectedIcon,
-      tooltip: 'See all posts, filtered and sorted by date, karma, and more.',
+      tooltip: "See all posts, filtered and sorted by date, karma, and more.",
       showOnMobileStandalone: false,
       showOnCompressed: true,
-    }, {
+    },
+    {
       id: taggingNamePluralSetting.get(),
       title: taggingNamePluralCapitalSetting.get(),
       mobileTitle: taggingNamePluralCapitalSetting.get(),
       link: getAllTagsPath(),
       iconComponent: TopicsIcon,
       selectedIconComponent: TopicsSelectedIcon,
-      tooltip: `A sorted list of pages — “${taggingNamePluralCapitalSetting.get()}” — in the EA Forum Wiki, which explains 
-      ${taggingNamePluralSetting.get()} in EA and collects posts tagged with those ${taggingNamePluralSetting.get()}.`,
+      tooltip: `A sorted list of pages — “${taggingNamePluralCapitalSetting.get()}” — in the FAST Forum Wiki, which explains 
+      ${taggingNamePluralSetting.get()} in FAST and collects posts tagged with those ${taggingNamePluralSetting.get()}.`,
       showOnMobileStandalone: true,
       showOnCompressed: true,
-    }, {
-      id: 'takeAction',
-      title: 'Take action',
+    },
+    {
+      id: "takeAction",
+      title: "Take action",
       link: `/${taggingNamePluralSetting.get()}/careers-and-volunteering`,
       iconComponent: TakeActionIcon,
       selectedIconComponent: TakeActionSelectedIcon,
       tooltip: "Opportunities to get involved with impactful work",
-      loggedOutOnly: true
-    }, {
-      id: 'community',
-      title: 'Resource Hub',
-      link: 'https://fastcommunity.org/resources',
+      loggedOutOnly: true,
+    },
+    {
+      id: "community",
+      title: "Resource Hub",
+      link: "https://fastcommunity.org/resources",
       iconComponent: GroupsIcon,
       selectedIconComponent: GroupsSelectedIcon,
-      tooltip: 'Visit our Resource Hub for valuable links, documents, services, and tools to enhance your animal advocacy work',
+      tooltip:
+        "Visit our Resource Hub for valuable links, documents, services, and tools to enhance your animal advocacy work",
       showOnMobileStandalone: false,
-      showOnCompressed: true
-    }, {
-      id: 'bestOf',
-      title: 'Our Website',
-      link: 'https://fastcommunity.org',
+      showOnCompressed: true,
+    },
+    {
+      id: "bestOf",
+      title: "Our Website",
+      link: "https://fastcommunity.org",
       iconComponent: BestOfIcon,
       selectedIconComponent: BestOfSelectedIcon,
-      tooltip: 'Visit the main website that includes more information on our forum, list and resources',
+      tooltip: "Visit the main website that includes more information on our forum, list and resources",
       showOnMobileStandalone: true,
       showOnCompressed: true,
-    }, {
-      id: 'divider',
+    },
+    {
+      id: "divider",
       divider: true,
       showOnCompressed: true,
-    }, {
-      id: 'shortform',
-      title: 'Quick takes',
-      link: '/quicktakes',
+    },
+    {
+      id: "shortform",
+      title: "Quick takes",
+      link: "/quicktakes",
       subItem: true,
-    }, {
-      id: 'contact',
-      title: preferredHeadingCase('Contact Us'),
-      link: 'https://fastcommunity.org/contact',
+    },
+    {
+      id: "contact",
+      title: preferredHeadingCase("Contact Us"),
+      link: "https://fastcommunity.org/contact",
       subItem: true,
-    }, {
-      id: 'cookies',
-      title: preferredHeadingCase('Cookie Policy'),
-      link: '/cookiePolicy',
+    },
+    {
+      id: "cookies",
+      title: preferredHeadingCase("Cookie Policy"),
+      link: "/cookiePolicy",
       subItem: true,
-    }, {
-      id: 'subscribeWidget',
+    },
+    {
+      id: "subscribeWidget",
       customComponentName: "SubscribeWidget",
-    }
+    },
   ],
   default: [
     {
-      id: 'home',
-      title: 'Home',
-      link: '/',
+      id: "home",
+      title: "Home",
+      link: "/",
       iconComponent: Home,
-      tooltip: 'See recent posts on strategies for animal advocacy, plus recent activity from all across the Forum.',
+      tooltip: "See recent posts on strategies for animal advocacy, plus recent activity from all across the Forum.",
       showOnMobileStandalone: true,
       showOnCompressed: true,
-    }, {
-      id: 'allPosts',
-      title: 'All Posts',
-      link: '/allPosts',
+    },
+    {
+      id: "allPosts",
+      title: "All Posts",
+      link: "/allPosts",
       iconComponent: Sort,
-      tooltip: 'See all posts, filtered and sorted by date, karma, and more.',
+      tooltip: "See all posts, filtered and sorted by date, karma, and more.",
       showOnMobileStandalone: false,
       showOnCompressed: true,
-    }, {
-      id: 'wiki',
-      title: 'Wiki',
-      mobileTitle: 'Wiki',
+    },
+    {
+      id: "wiki",
+      title: "Wiki",
+      mobileTitle: "Wiki",
       link: getAllTagsPath(),
       iconComponent: LocalOffer,
-      tooltip: 'Collaboratively edited Tags and Wiki Articles',
+      tooltip: "Collaboratively edited Tags and Wiki Articles",
       showOnMobileStandalone: true,
       showOnCompressed: true,
-    }, {
-      id: 'library',
-      title: 'Library',
-      link: '/library',
+    },
+    {
+      id: "library",
+      title: "Library",
+      link: "/library",
       iconComponent: LocalLibrary,
       tooltip: eaSequencesHomeDescription,
       showOnMobileStandalone: true,
       showOnCompressed: true,
-    }, {
-      id: 'events',
-      title: 'Community and Events',
-      mobileTitle: 'Events',
+    },
+    {
+      id: "events",
+      title: "Community and Events",
+      mobileTitle: "Events",
       link: communityPath,
       iconComponent: SupervisedUserCircleIcon,
-      tooltip: 'See groups and events in your area',
+      tooltip: "See groups and events in your area",
       showOnMobileStandalone: true,
-      showOnCompressed: true
-    }, {
-      id: 'eventsList',
+      showOnCompressed: true,
+    },
+    {
+      id: "eventsList",
       customComponentName: "EventsList",
-    }, {
-      id: 'divider',
+    },
+    {
+      id: "divider",
       divider: true,
       showOnCompressed: true,
-    }, {
-      id: 'shortform',
-      title: 'Shortform',
-      link: '/shortform',
+    },
+    {
+      id: "shortform",
+      title: "Shortform",
+      link: "/shortform",
       subItem: true,
-    }, {
-      id: 'subscribeWidget',
+    },
+    {
+      id: "subscribeWidget",
       customComponentName: "SubscribeWidget",
-    }, {
-      id: 'about',
-      title: 'About the Forum',
-      link: '/about',
+    },
+    {
+      id: "about",
+      title: "About the Forum",
+      link: "/about",
       subItem: true,
       compressedIconComponent: Info,
       showOnCompressed: true,
-    }, {
-      id: 'contact',
-      title: preferredHeadingCase('Contact Us'),
-      link: '/contact',
+    },
+    {
+      id: "contact",
+      title: preferredHeadingCase("Contact Us"),
+      link: "/contact",
       subItem: true,
-    }
-  ]
-}
+    },
+  ],
+};
 
 export default menuTabs;
