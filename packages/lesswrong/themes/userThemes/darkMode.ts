@@ -122,9 +122,9 @@ const forumComponentPalette = (shadePalette: ThemeShadePalette) =>
   forumSelect({
     EAForum: {
       primary: {
-        main: '#009da8',
+        main: '#67A453',
         light: '#0c869b',
-        dark: '#009da8'
+        dark: '#67A453'
       },
       secondary: {
         main: '#3c9eaf',
