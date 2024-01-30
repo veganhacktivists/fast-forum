@@ -107,6 +107,9 @@ export const NewPostHowToGuides = ({classes}: {
             style={{ textDecoration: 'underline' }}>
             Community Guidelines
           </a> thoroughly before contributing in our community— we appreciate it!
+          <p style={{ lineHeight: '20px' }}>
+          <b>Note: This forum and your post is available to the public.</b>
+          </p>
         </p>
       </div>
     </AnalyticsContext> 
