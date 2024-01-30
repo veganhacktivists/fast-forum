@@ -75,7 +75,7 @@ const CoreTagCard = ({tag, classes}: {
     'HzWqFhs4KqgndeESm': 'https://i.imgur.com/x9hD8Pa.png', // Diet & Nutrition
     'm7PnwaCfsRwNDnTD7': 'https://i.imgur.com/vD53Gdb.png', // Education & Advocacy
     'EEkBpJqjvSRPmNKQi': 'https://i.imgur.com/uQm4kyI.png', // Farmed Animal Advocacy
-    'rerSxJsibwdYTCvjS': 'https://i.imgur.com/sk0CnLq.png', // FAST Community
+    'rerSxJsibwdYTCvjS': 'https://i.imgur.com/krfAWdi.png', // FAST Community
     'oxBe47pzDA4gF7FGh': 'https://i.imgur.com/5PBfSWN.png', // Fish & Aquatic Advocacy
     'czpKnLMrKmmyYTW7P': 'https://i.imgur.com/ZMR373J.png', // Fundraising & Reports
     'b3vxJTnnas53FPu6b': 'https://i.imgur.com/ys0nJhr.png', // Institutional Campaigns
