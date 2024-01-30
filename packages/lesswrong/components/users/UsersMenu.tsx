@@ -57,7 +57,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     columnGap: 4,
   },
   arrowIcon: {
-    color: theme.palette.grey[600],
+    color: theme.palette.text.alwaysWhite,
     fontSize: 18,
   },
   notAMember: {
