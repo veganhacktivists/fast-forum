@@ -192,10 +192,10 @@ const UsersMenu = ({classes}: {
       : null,
     newEvent: () => userCanPost(currentUser)
       ? (
-        <DropdownItem
+        /*<DropdownItem
           title={preferredHeadingCase("New Event")}
           to="/newPost?eventForm=true"
-        />
+        />*/
       )
       : null,
     newSequence: () =>
