@@ -140,7 +140,7 @@ const PostBottomRecommendations = ({post, hasTableOfContents, classes}: {
                   <EAPostsItem key={post._id} post={post} />
                 ))}
                 <div className={classes.viewMore}>
-                  <Link to="/topics/opportunities-to-take-action">
+                  <Link to="/topics/careers-and-volunteering">
                     View more
                   </Link>
                 </div>

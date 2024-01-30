@@ -44,7 +44,7 @@ type RecommendationsGenerator = (post: RecommendablePost) => PostSideRecommendat
 const useMoreFromTheForumRecommendations: RecommendationsGenerator = (_post: RecommendablePost) => {
   const usefulLinks = "/posts/BsnGqnLzrLdmsYTGt/new-start-here-useful-links-1";
   const podcast = "/posts/K5Snxo5EhgmwJJjR2/announcing-ea-forum-podcast-audio-narrations-of-ea-forum";
-  const jobs = "/topics/opportunities-to-take-action";
+  const jobs = "/topics/careers-and-volunteering";
   return {
     loading: false,
     title: "More from the Forum",
