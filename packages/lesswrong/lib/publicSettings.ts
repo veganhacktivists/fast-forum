@@ -123,7 +123,7 @@ export const annualReviewVotingResultsPostPath = new DatabasePublicSetting<strin
   "",
 );
 
-export const moderationEmail = new DatabasePublicSetting<string>("moderationEmail", "ERROR: NO MODERATION EMAIL SET");
+export const moderationEmail = new DatabasePublicSetting<string>("moderationEmail", "david@fastcommunity.org");
 type AccountInfo = {
   username: string;
   email: string;
