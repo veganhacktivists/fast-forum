@@ -160,7 +160,7 @@ const NewUserCompleteProfile: React.FC<NewUserCompleteProfileProps> = ({ current
     <SingleColumnSection>
       <div className={classes.root}>
         <Typography variant="display2" gutterBottom className={classes.title}>
-          Welcome to {siteNameWithArticleSetting.get()}!
+          Welcome to the FAST Community Forum!
         </Typography>
         <div className={classes.section}>
           <Typography variant="display1" className={classes.sectionHeadingText} gutterBottom>
