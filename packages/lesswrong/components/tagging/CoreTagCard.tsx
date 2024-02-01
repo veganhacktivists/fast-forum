@@ -82,7 +82,7 @@ const CoreTagCard = ({tag, classes}: {
     '5EHCAQD2HJgRC9HZJ': 'https://i.imgur.com/8n6Fv8m.png', // Insect Advocacy
     'aBHg2tywssv3EjZ3E': 'https://i.imgur.com/dzLve2i.png', // Wild Animal Suffering
     'qBnZaqbzRg2GDEBb4': 'https://i.imgur.com/6fjTBC1.png', // Cage Free Campaigns
-    
+    'rNpm9mywMNWnBxCXa': 'https://i.imgur.com/mCHd7fn.png', // Victories
   };
 
   const imageUrl = imageMap[tag._id as keyof typeof imageMap] || siteImageSetting.get();

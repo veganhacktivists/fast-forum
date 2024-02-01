@@ -156,6 +156,7 @@ const topicTabsOrder = [
   'czpKnLMrKmmyYTW7P', // Fundraising & Reports
   'xB9FAdfk3MiE323Zq', // Alternative Proteins
   'Kdkmfd8KEbDJ3iwAX', // Climate & Environment
+  'rNpm9mywMNWnBxCXa', // Victories
   'gGKYpdehFGSdxX2sw', // Animal Rescue & Sanctuaries
 ]
 
