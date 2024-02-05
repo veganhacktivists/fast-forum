@@ -242,32 +242,31 @@ const UsersMenu = ({ classes }: { classes: ClassesType }) => {
                   return <Component key={i} />;
                 })}
               </div>
-
-              <DropdownDivider />
-
-              {isAF && !isAfMember && (
-                <DropdownItem
-                  title={preferredHeadingCase("Apply for Membership")}
-                  onClick={() => openDialog({ componentName: "AFApplicationForm" })}
-                />
-              )}
-              {currentUser.noKibitz && (
-                <DropdownItem
-                  title={preferredHeadingCase(disableNoKibitz ? "Hide Names" : "Reveal Names")}
-                  onClick={() => setDisableNoKibitz(!disableNoKibitz)}
-                  icon={() =>
-                    disableNoKibitz ? <EyeIcon className={classes.icon} /> : <EyeIconCrossed className={classes.icon} />
-                  }
-                />
-              )}
-              {!isEAForum && (
-                <DropdownItem
-                  title={preferredHeadingCase("My Drafts")}
-                  to="/drafts"
-                  icon="Edit"
-                  iconClassName={classes.icon}
-                />
-              )}
+              {/* <DropdownDivider /> */}
+              {/**/}
+              {/* {isAF && !isAfMember && ( */}
+              {/*   <DropdownItem */}
+              {/*     title={preferredHeadingCase("Apply for Membership")} */}
+              {/*     onClick={() => openDialog({ componentName: "AFApplicationForm" })} */}
+              {/*   /> */}
+              {/* )} */}
+              {/* {currentUser.noKibitz && ( */}
+              {/*   <DropdownItem */}
+              {/*     title={preferredHeadingCase(disableNoKibitz ? "Hide Names" : "Reveal Names")} */}
+              {/*     onClick={() => setDisableNoKibitz(!disableNoKibitz)} */}
+              {/*     icon={() => */}
+              {/*       disableNoKibitz ? <EyeIcon className={classes.icon} /> : <EyeIconCrossed className={classes.icon} /> */}
+              {/*     } */}
+              {/*   /> */}
+              {/* )} */}
+              {/* {!isEAForum && ( */}
+              {/*   <DropdownItem */}
+              {/*     title={preferredHeadingCase("My Drafts")} */}
+              {/*     to="/drafts" */}
+              {/*     icon="Edit" */}
+              {/*     iconClassName={classes.icon} */}
+              {/*   /> */}
+              {/* )} */}
               {!currentUser.deleted && (
                 <DropdownItem
                   title={preferredHeadingCase("User Profile")}
