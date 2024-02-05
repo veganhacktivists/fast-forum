@@ -11,7 +11,7 @@
     "build": "./build.js",
     "migrate": "node migrate",
     "branchdb": "ts-node scripts/branchDb.ts",
-    "start": "pnpm run start-local-db",
+    "dev": "pnpm run start-local-db",
     "start-local-db": "./build.js --run --watch",
     "start-dev-db": "./build.js --no-clear -run --watch --lint --db ../LessWrong-Credentials/connectionConfigs/dev.json --settings ../LessWrong-Credentials/settings-local-dev-devdb.json",
     "start-prod-db": "./build.js --no-clear -run --watch --lint --db ../LessWrong-Credentials/connectionConfigs/prod.json --settings ../LessWrong-Credentials/settings-local-dev-proddb.json",
