@@ -65,7 +65,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     opacity: 0.9,
   },
   icon: {
-    color: isFriendlyUI ? undefined : theme.palette.grey[500],
+    color: theme.palette.grey[500], // isFriendlyUI ? undefined : theme.palette.grey[500],
   },
   deactivatedTooltip: {
     maxWidth: 230,
