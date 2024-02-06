@@ -359,7 +359,6 @@ export const eaForumTheme: SiteThemeSpecification = {
         },
         MuiIconButton: {
           root: {
-            color: "#fff",
             borderRadius: defaultBorderRadius,
           },
         },
