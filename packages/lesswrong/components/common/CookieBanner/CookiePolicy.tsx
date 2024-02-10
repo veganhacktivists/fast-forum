@@ -107,7 +107,6 @@ const CookiePolicy = ({ classes }: { classes: ClassesType }) => {
         Last Updated: April 26, 2023
       </Typography>
       <Typography variant="body1">
-        {/* TODO possibly make this generic for all CEA websites once all the cookie banners are done */}
         We use cookies on the FAST Forum. This cookie notice applies only to the FAST Forum. You may access and change your
         cookie preferences at any time by clicking{" "}
         <a onClick={() => openDialog({ componentName: "CookieDialog", componentProps: {} })}>here</a>.
