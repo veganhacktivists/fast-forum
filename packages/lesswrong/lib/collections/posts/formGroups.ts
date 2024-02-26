@@ -29,13 +29,13 @@ export const formGroups: Partial<Record<string, FormGroupType<"Posts">>> = {
   event: {
     name: "event details",
     order: 21,
-    label: preferredHeadingCase("Event Details")
+    label: preferredHeadingCase("Event Details"),
   },
   // Tags go here on EA Forum
   socialPreview: {
     name: "socialPreview",
     order: 23,
-    label: preferredHeadingCase("Edit Link Preview"),
+    label: preferredHeadingCase("Edit Header Images and Link Preview"),
     startCollapsed: !isFriendlyUI,
   },
   highlight: {
@@ -54,24 +54,26 @@ export const formGroups: Partial<Record<string, FormGroupType<"Posts">>> = {
     order: 60,
     name: "moderation",
     label: preferredHeadingCase("Moderation Guidelines"),
-    helpText: "We prefill these moderation guidelines based on your user settings. But you can adjust them for each post.",
+    helpText:
+      "We prefill these moderation guidelines based on your user settings. But you can adjust them for each post.",
     startCollapsed: true,
   },
   options: {
-    order:10,
+    order: 10,
     name: "options",
     defaultStyle: true,
     paddingStyle: true,
-    flexStyle: true
+    flexStyle: true,
   },
-  content: { //TODO – should this be 'contents'? is it needed?
-    order:20,
+  content: {
+    //TODO – should this be 'contents'? is it needed?
+    order: 20,
     name: "Content",
     defaultStyle: true,
     paddingStyle: true,
   },
   canonicalSequence: {
-    order:30,
+    order: 30,
     name: "canonicalSequence",
     label: preferredHeadingCase("Canonical Sequence"),
     startCollapsed: true,
@@ -83,7 +85,7 @@ export const formGroups: Partial<Record<string, FormGroupType<"Posts">>> = {
     startCollapsed: false,
   },
   advancedOptions: {
-    order:40,
+    order: 40,
     name: "advancedOptions",
     label: "Options",
     startCollapsed: true,
@@ -92,12 +94,12 @@ export const formGroups: Partial<Record<string, FormGroupType<"Posts">>> = {
     order: 50,
     name: "audio",
     label: "Audio",
-    startCollapsed: true
+    startCollapsed: true,
   },
   tags: {
     order: isEAForum ? 20 : 60,
     name: "tags",
     label: isEAForum ? `Set ${taggingNamePluralSetting.get()}` : `Apply ${taggingNamePluralCapitalSetting.get()}`,
-    startCollapsed: false
-  }
+    startCollapsed: false,
+  },
 };

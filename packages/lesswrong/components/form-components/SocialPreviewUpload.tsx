@@ -142,7 +142,8 @@ mdi.use(markdownItSup);
  *  3.2 socialPreviewImageUrl is just used directly
  */
 const buildPreviewFromDocument = (
-  document: PostsEditWithLocalData, socialText: string | undefined
+  document: PostsEditWithLocalData,
+  socialText: string | undefined,
 ): { description: string | null; fallbackImageUrl: string | null } => {
   const originalContents = document.contents?.originalContents;
   const customHighlight = document.customHighlight?.originalContents;
@@ -282,7 +283,7 @@ const SocialPreviewUpload = ({
       docWithValue.contents?.dataWithDiscardedSuggestions,
       docWithValue.customHighlight?.originalContents,
       textValue,
-    ]
+    ],
   );
 
   const updateImageId = useCallback(
@@ -295,7 +296,7 @@ const SocialPreviewUpload = ({
         [name]: newValue,
       });
     },
-    [name, updateCurrentValues, value]
+    [name, updateCurrentValues, value],
   );
 
   const updateText = useCallback(
@@ -308,7 +309,7 @@ const SocialPreviewUpload = ({
         [name]: newValue,
       });
     },
-    [name, updateCurrentValues, value]
+    [name, updateCurrentValues, value],
   );
 
   const hasTitle = document.title && document.title.length > 0;
@@ -347,6 +348,7 @@ const SocialPreviewUpload = ({
           </a>{" "}
           or an AI image generator.
         </div>
+        <div>This image also serves as the header image for your post, which shows up at the top.</div>
         <div className={classes.note}>
           <strong>Note:</strong> Text changes here will not affect the post.
         </div>
