@@ -182,13 +182,12 @@ const getStructuredData = ({
 export const styles = (theme: ThemeType): JssStyles => ({
   postListItemImage: {
     height: "auto",
+    width: "auto",
     maxWidth: "100%",
-    // maxWidth: 170,
     objectFit: "cover",
-    marginLeft: 16,
     borderRadius: theme.borderRadius.small,
     [theme.breakpoints.down("xs")]: {
-      display: "none",
+      // display: "none",
     },
   },
   readingProgressBar: {
