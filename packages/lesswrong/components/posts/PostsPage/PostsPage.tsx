@@ -185,6 +185,7 @@ export const styles = (theme: ThemeType): JssStyles => ({
     width: "auto",
     maxWidth: "100%",
     objectFit: "cover",
+    marginBottom: 32,
     borderRadius: theme.borderRadius.small,
     [theme.breakpoints.down("xs")]: {
       // display: "none",
