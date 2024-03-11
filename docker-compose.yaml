@@ -24,6 +24,8 @@ services:
       PORT: "3000"
     ports:
       - "${PORT:-3000}:3000"
+    profiles:
+      - web
   elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.4
     working_dir: "/usr/share/elasticsearch"
@@ -36,6 +38,8 @@ services:
       xpack.security.enabled: "true"
     volumes:
       - "elastic_db:/usr/share/elasticsearch/data"
+    profiles:
+      - elastic
 volumes:
   forum_magnum_db:
     driver: local
