@@ -34,7 +34,7 @@ export const DialogueEditorFeedback = ({ classes, post }: {
   return <div className={classes.root}>
     <div className={classes.feedbackRow}>{clickState === 'unclicked'
       ? <Button className={classes.button} onClick={async _ => { 
-          // eslint-disable-next-line
+          // eslint-disable-next-line babel/new-cap
           window.Intercom(
             'trackEvent',
             'requested-feedback',

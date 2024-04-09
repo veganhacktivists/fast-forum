@@ -46,7 +46,7 @@ const PostExcerpt = ({
   }
 
   if (error) {
-    // eslint-disable-next-line
+    // eslint-disable-next-line no-console
     console.error("Error loading excerpt body:", error);
   }
 

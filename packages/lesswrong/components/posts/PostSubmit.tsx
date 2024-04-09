@@ -115,7 +115,7 @@ const PostSubmit = ({
               if (!!document.title) {
                 updateCurrentValues({draft: true});
                 addToSuccessForm((createdPost: DbPost) => {
-                  // eslint-disable-next-line
+                  // eslint-disable-next-line babel/new-cap
                   window.Intercom(
                     'trackEvent',
                     'requested-feedback',

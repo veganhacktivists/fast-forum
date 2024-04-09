@@ -74,7 +74,7 @@ if (HAS_EMBEDDINGS_FOR_RECOMMENDATIONS) {
         // We never want to prevent a post from being created/edited just
         // because we fail to create embeddings, but we do want to log it
         captureException(e);
-        // eslint-disable-next-line
+        // eslint-disable-next-line no-console
         console.error("Failed to create embeddings:", e);
       }
     }
