@@ -3,3 +3,5 @@ packages/vulcan-*/**/*.test.js
 packages/ddp-server
 packages/webapp
 packages/lesswrong/platform/webpack
+packages/lesswrong/lib/generated
+scripts

@@ -10,7 +10,8 @@ module.exports = {
     // have to delete .eslintcache to make it stop reporting the error.
     // Commented out because there are immport cycles that haven't been resolved
     // yet.
-    "plugin:import/typescript"
+    "plugin:import/typescript",
+    "plugin:prettier/recommended",
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
