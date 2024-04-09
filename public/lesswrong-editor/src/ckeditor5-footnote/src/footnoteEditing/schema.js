@@ -29,7 +29,7 @@ export const defineSchema = schema => {
 		isObject: true,
 		allowContentOf: '$root',
 		allowAttributes: [ATTRIBUTES.footnoteSection, ATTRIBUTES.footnoteId, ATTRIBUTES.footnoteIndex],
-	})
+	});
 
 	/**
 	 * Editable footnote item content container.
@@ -57,8 +57,8 @@ export const defineSchema = schema => {
 		allowIn: ELEMENTS.footnoteItem,
 		isInline: true,
 		isSelectable: false,
-		allowAttributes: [ATTRIBUTES.footnoteBackLink, ATTRIBUTES.footnoteId]
-	})
+		allowAttributes: [ATTRIBUTES.footnoteBackLink, ATTRIBUTES.footnoteId],
+	});
 
 	// @ts-ignore -- returning true here prevents future listeners from firing.
 	// (as does return false; returning false just also prevents the child add operation from happening.)
@@ -71,4 +71,4 @@ export const defineSchema = schema => {
 			return false;
 		}
 	});
-}
+};

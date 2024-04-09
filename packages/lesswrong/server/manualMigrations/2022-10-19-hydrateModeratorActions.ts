@@ -10,12 +10,10 @@ registerMigration({
     await forEachDocumentBatchInCollection({
       collection: Users,
       batchSize: 1000,
-      filter: { lastNotificationsCheck: { $gt: new Date('2022-06-01') } },
+      filter: { lastNotificationsCheck: { $gt: new Date("2022-06-01") } },
       callback: async (users) => {
-        const userAutomodActions = await Promise.all(
-          users.map(user => triggerAutomodIfNeededForUser(user)
-        ));
-      }
+        const userAutomodActions = await Promise.all(users.map((user) => triggerAutomodIfNeededForUser(user)));
+      },
     });
   },
 });

@@ -1,4 +1,4 @@
-import { registerFragment } from '../../vulcan-lib';
+import { registerFragment } from "../../vulcan-lib";
 
 registerFragment(`
   fragment reviewVoteFragment on ReviewVote {
@@ -13,8 +13,7 @@ registerFragment(`
     dummy
     reactions
   }
-`)
-
+`);
 
 registerFragment(`
   fragment reviewVoteWithUserAndPost on ReviewVote {
@@ -28,4 +27,4 @@ registerFragment(`
       ...PostsMinimumInfo
     }
   }
-`)
+`);

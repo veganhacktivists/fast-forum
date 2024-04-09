@@ -1,6 +1,6 @@
 module.exports = {
   _id: "test-seeded-localgroup",
-  schemaVersion : 1,
+  schemaVersion: 1,
   name: "Test Group",
   organizerIds: ["test-user", "test-other-user"],
   isOnline: false,
@@ -8,4 +8,4 @@ module.exports = {
   deleted: false,
   types: [],
   categories: [],
-}
+};

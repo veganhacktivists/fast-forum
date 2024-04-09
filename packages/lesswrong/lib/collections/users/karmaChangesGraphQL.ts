@@ -1,7 +1,7 @@
 import Users from "../users/collection";
-import { userOwns } from '../../vulcan-users/permissions';
-import { addFieldsDict } from '../../utils/schemaUtils';
-import { addGraphQLSchema, addGraphQLResolvers } from '../../vulcan-lib';
+import { userOwns } from "../../vulcan-users/permissions";
+import { addFieldsDict } from "../../utils/schemaUtils";
+import { addGraphQLSchema, addGraphQLResolvers } from "../../vulcan-lib";
 import type { TagCommentType } from "../../collections/comments/types";
 
 addGraphQLSchema(`
@@ -50,59 +50,59 @@ addGraphQLResolvers({
     updateFrequency: async (karmaChangesJSON: any, args: void, context: ResolverContext) => {
       const { currentUser } = context;
       if (!currentUser) return null;
-      const settings = currentUser.karmaChangeNotifierSettings
+      const settings = currentUser.karmaChangeNotifierSettings;
       return settings.updateFrequency;
     },
-  }
-})
+  },
+});
 
 addFieldsDict(Users, {
-  "karmaChanges": {
+  karmaChanges: {
     canRead: userOwns,
     type: "KarmaChanges",
     optional: true,
-  }
+  },
 });
 
 export type KarmaChangesArgs = {
-  userId: string,
-  startDate: Date,
-  endDate: Date,
-  af?: boolean,
-  showNegative?: boolean,
-}
+  userId: string;
+  startDate: Date;
+  endDate: Date;
+  af?: boolean;
+  showNegative?: boolean;
+};
 
 export type ReactionChange = {
-  reactionType: string
-  userId?: string
-}
+  reactionType: string;
+  userId?: string;
+};
 
 export type KarmaChangeBase = {
-  _id: string,
-  collectionName: CollectionNameString,
-  scoreChange: number,
-  addedReacts: ReactionChange[],
-}
+  _id: string;
+  collectionName: CollectionNameString;
+  scoreChange: number;
+  addedReacts: ReactionChange[];
+};
 
 export type CommentKarmaChange = KarmaChangeBase & {
-  description?: string,
-  postId?: string,
-  tagId?: string,
-  tagCommentType?: TagCommentType,
-  
+  description?: string;
+  postId?: string;
+  tagId?: string;
+  tagCommentType?: TagCommentType;
+
   // Not filled in by the initial query; added by a followup query in the resolver
-  tagSlug?: string
-}
+  tagSlug?: string;
+};
 
 export type PostKarmaChange = KarmaChangeBase & {
-  title: string,
-  slug: string,
-}
+  title: string;
+  slug: string;
+};
 
 export type TagRevisionKarmaChange = KarmaChangeBase & {
-  tagId: string,
+  tagId: string;
 
   // Not filled in by the initial query; added by a followup query in the resolver
-  tagSlug?: string
-  tagName?: string
-}
+  tagSlug?: string;
+  tagName?: string;
+};

@@ -1,8 +1,8 @@
-import { requireCssVar } from '../../themes/cssVars';
+import { requireCssVar } from "../../themes/cssVars";
 
 const voteColors = ["error", "primary", "secondary"] as const;
 
-export type VoteColor = typeof voteColors[number];
+export type VoteColor = (typeof voteColors)[number];
 
 export const cssMainVoteColors = Object.fromEntries(
   voteColors.map((color) => [color, requireCssVar("palette", color, "main")]),

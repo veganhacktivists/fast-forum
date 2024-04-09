@@ -26,24 +26,21 @@ const styles = (theme: ThemeType) => ({
     fontSize: 14,
     cursor: "pointer",
     "&:hover": {
-      opacity: 0.5
+      opacity: 0.5,
     },
   },
   registerRssLink: {
     cursor: "pointer",
     "&:hover": {
-      opacity: 0.5
+      opacity: 0.5,
     },
   },
 });
 
-const EAUsersProfileLinks = ({user, classes}: {
-  user: UsersProfile,
-  classes: ClassesType,
-}) => {
+const EAUsersProfileLinks = ({ user, classes }: { user: UsersProfile; classes: ClassesType }) => {
   const currentUser = useCurrentUser();
-  const {flash} = useMessages();
-  const {Typography, LWTooltip, DialogGroup} = Components;
+  const { flash } = useMessages();
+  const { Typography, LWTooltip, DialogGroup } = Components;
 
   const hasLinks = currentUser?.isAdmin || userCanEditUser(currentUser, user);
   if (!hasLinks) {
@@ -52,54 +49,34 @@ const EAUsersProfileLinks = ({user, classes}: {
 
   return (
     <Typography variant="body2" className={classes.links}>
-      {currentUser?.isAdmin &&
+      {currentUser?.isAdmin && (
         <div>
-          <LWTooltip
-            title="Click to copy userId"
-            placement="bottom"
-            className={classes.copyLink}
-          >
-            <CopyToClipboard
-              text={user._id}
-              onCopy={() => flash({messageString: "userId copied!"})}
-            >
+          <LWTooltip title="Click to copy userId" placement="bottom" className={classes.copyLink}>
+            <CopyToClipboard text={user._id} onCopy={() => flash({ messageString: "userId copied!" })}>
               <CopyIcon className={classes.copyIcon} />
             </CopyToClipboard>
           </LWTooltip>
         </div>
-      }
-      {currentUser?.isAdmin &&
+      )}
+      {currentUser?.isAdmin && (
         <div className={classes.registerRssLink}>
-          <DialogGroup
-            actions={[]}
-            trigger={<a>Register RSS</a>}
-          >
-            <div><Components.NewFeedButton user={user} /></div>
+          <DialogGroup actions={[]} trigger={<a>Register RSS</a>}>
+            <div>
+              <Components.NewFeedButton user={user} />
+            </div>
           </DialogGroup>
         </div>
-      }
-      {currentUser && currentUser._id === user._id &&
-        <Link to="/manageSubscriptions">
-          Manage subscriptions
-        </Link>
-      }
-      {userCanEditUser(currentUser, user) &&
-        <Link to={userGetEditUrl(user)}>
-          Account settings
-        </Link>
-      }
+      )}
+      {currentUser && currentUser._id === user._id && <Link to="/manageSubscriptions">Manage subscriptions</Link>}
+      {userCanEditUser(currentUser, user) && <Link to={userGetEditUrl(user)}>Account settings</Link>}
     </Typography>
   );
-}
+};
 
-const EAUsersProfileLinksComponent = registerComponent(
-  "EAUsersProfileLinks",
-  EAUsersProfileLinks,
-  {styles},
-);
+const EAUsersProfileLinksComponent = registerComponent("EAUsersProfileLinks", EAUsersProfileLinks, { styles });
 
 declare global {
   interface ComponentTypes {
-    EAUsersProfileLinks: typeof EAUsersProfileLinksComponent
+    EAUsersProfileLinks: typeof EAUsersProfileLinksComponent;
   }
 }

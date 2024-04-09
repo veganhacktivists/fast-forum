@@ -1,10 +1,6 @@
 import React from "react";
 import { Components, registerComponent, combineUrls } from "../../../lib/vulcan-lib";
-import {
-  fmCrosspostSiteNameSetting,
-  fmCrosspostBaseUrlSetting,
-  isLW,
-} from "../../../lib/instanceSettings";
+import { fmCrosspostSiteNameSetting, fmCrosspostBaseUrlSetting, isLW } from "../../../lib/instanceSettings";
 import { compassIcon } from "../../icons/compassIcon";
 import { lightbulbIcon } from "../../icons/lightbulbIcon";
 import { isFriendlyUI } from "../../../themes/forumTheme";
@@ -22,15 +18,18 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const CrosspostHeaderIcon = ({post, classes}: {
-  post: PostsWithNavigation|PostsWithNavigationAndRevision,
-  classes: ClassesType,
+const CrosspostHeaderIcon = ({
+  post,
+  classes,
+}: {
+  post: PostsWithNavigation | PostsWithNavigationAndRevision;
+  classes: ClassesType;
 }) => {
   if (!post.fmCrosspost) {
     return null;
   }
 
-  const {LWTooltip} = Components;
+  const { LWTooltip } = Components;
   const icon = isLW ? lightbulbIcon : compassIcon;
   const tip = post.fmCrosspost.hostedHere
     ? `This post was crossposted to ${fmCrosspostSiteNameSetting.get()}. Click to view.`
@@ -46,14 +45,12 @@ const CrosspostHeaderIcon = ({post, classes}: {
       </a>
     </div>
   );
-}
+};
 
-const CrosspostHeaderIconComponent = registerComponent(
-  "CrosspostHeaderIcon", CrosspostHeaderIcon, {styles}
-);
+const CrosspostHeaderIconComponent = registerComponent("CrosspostHeaderIcon", CrosspostHeaderIcon, { styles });
 
 declare global {
   interface ComponentTypes {
-    CrosspostHeaderIcon: typeof CrosspostHeaderIconComponent,
+    CrosspostHeaderIcon: typeof CrosspostHeaderIconComponent;
   }
 }

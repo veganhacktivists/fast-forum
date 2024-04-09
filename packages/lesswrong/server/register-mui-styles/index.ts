@@ -28,17 +28,17 @@
 // the MUI source.
 
 // TODO: Add registerStyles() to register styles without the component.
-import { registerComponent } from '../../lib/vulcan-lib';
-import { fade } from '@material-ui/core/styles/colorManipulator';
-import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
+import { registerComponent } from "../../lib/vulcan-lib";
+import { fade } from "@material-ui/core/styles/colorManipulator";
+import Paper from "@material-ui/core/Paper";
+import Button from "@material-ui/core/Button";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
 
 // Some of these baddies won't do well with our themePalette test situation,
 // which involves passing "fakecolor" colors in the theme. This would case
 // `fade` to throw, for example.
-export const themePaletteTestExcludedComponents = ["MuiButton"]
+export const themePaletteTestExcludedComponents = ["MuiButton"];
 
 registerComponent("MuiPaper", Paper, {
   styles: (theme: ThemeType) => {
@@ -55,37 +55,35 @@ registerComponent("MuiButton", Button, {
   styles: (theme: AnyBecauseTodo) => ({
     root: {
       color: theme.palette.text.primary,
-      '&:hover': {
+      "&:hover": {
         backgroundColor: fade(theme.palette.text.primary, theme.palette.action.hoverOpacity),
       },
-      '&$disabled': {
+      "&$disabled": {
         color: theme.palette.action.disabled,
       },
     },
     textPrimary: {
       color: theme.palette.primary.main,
-      '&:hover': {
+      "&:hover": {
         backgroundColor: fade(theme.palette.primary.main, theme.palette.action.hoverOpacity),
       },
     },
     textSecondary: {
       color: theme.palette.secondary.main,
-      '&:hover': {
+      "&:hover": {
         backgroundColor: fade(theme.palette.secondary.main, theme.palette.action.hoverOpacity),
       },
     },
     outlined: {
-      border: `1px solid ${
-        theme.palette.type === 'light' ? 'rgba(0, 0, 0, 0.23)' : 'rgba(255, 255, 255, 0.23)'
-      }`,
-      '&$disabled': {
+      border: `1px solid ${theme.palette.type === "light" ? "rgba(0, 0, 0, 0.23)" : "rgba(255, 255, 255, 0.23)"}`,
+      "&$disabled": {
         border: `1px solid ${theme.palette.action.disabled}`,
       },
     },
     outlinedPrimary: {
       color: theme.palette.primary.main,
       border: `1px solid ${fade(theme.palette.primary.main, 0.5)}`,
-      '&:hover': {
+      "&:hover": {
         border: `1px solid ${theme.palette.primary.main}`,
         backgroundColor: fade(theme.palette.primary.main, theme.palette.action.hoverOpacity),
       },
@@ -93,27 +91,27 @@ registerComponent("MuiButton", Button, {
     outlinedSecondary: {
       color: theme.palette.secondary.main,
       border: `1px solid ${fade(theme.palette.secondary.main, 0.5)}`,
-      '&:hover': {
+      "&:hover": {
         border: `1px solid ${theme.palette.secondary.main}`,
         backgroundColor: fade(theme.palette.secondary.main, theme.palette.action.hoverOpacity),
       },
-      '&$disabled': {
+      "&$disabled": {
         border: `1px solid ${theme.palette.action.disabled}`,
       },
     },
     contained: {
       color: theme.palette.getContrastText(theme.palette.grey[300]),
       backgroundColor: theme.palette.grey[300],
-      '&$disabled': {
+      "&$disabled": {
         color: theme.palette.action.disabled,
         backgroundColor: theme.palette.action.disabledBackground,
       },
-      '&:hover': {
+      "&:hover": {
         backgroundColor: theme.palette.grey.A100,
-        '@media (hover: none)': {
+        "@media (hover: none)": {
           backgroundColor: theme.palette.grey[300],
         },
-        '&$disabled': {
+        "&$disabled": {
           backgroundColor: theme.palette.action.disabledBackground,
         },
       },
@@ -121,9 +119,9 @@ registerComponent("MuiButton", Button, {
     containedPrimary: {
       color: theme.palette.primary.contrastText,
       backgroundColor: theme.palette.primary.main,
-      '&:hover': {
+      "&:hover": {
         backgroundColor: theme.palette.primary.dark,
-        '@media (hover: none)': {
+        "@media (hover: none)": {
           backgroundColor: theme.palette.primary.main,
         },
       },
@@ -131,9 +129,9 @@ registerComponent("MuiButton", Button, {
     containedSecondary: {
       color: theme.palette.secondary.contrastText,
       backgroundColor: theme.palette.secondary.main,
-      '&:hover': {
+      "&:hover": {
         backgroundColor: theme.palette.secondary.dark,
-        '@media (hover: none)': {
+        "@media (hover: none)": {
           backgroundColor: theme.palette.secondary.main,
         },
       },
@@ -145,7 +143,7 @@ registerComponent("MuiButton", Button, {
 registerComponent("MuiListItem", ListItem, {
   styles: (theme: AnyBecauseTodo) => ({
     root: {
-      '&$selected, &$selected:hover, &$selected:focus': {
+      "&$selected, &$selected:hover, &$selected:focus": {
         backgroundColor: theme.palette.action.selected,
       },
     },
@@ -153,10 +151,10 @@ registerComponent("MuiListItem", ListItem, {
       borderBottom: `1px solid ${theme.palette.divider}`,
     },
     button: {
-      '&:hover': {
+      "&:hover": {
         backgroundColor: theme.palette.action.hover,
       },
-      '&:focus': {
+      "&:focus": {
         backgroundColor: theme.palette.action.hover,
       },
     },

@@ -635,7 +635,7 @@ const fillInNullWithDefaultCommands = `
     "cancelled" IS NULL OR
     "documentIsAf" IS NULL OR
     "isUnvote" IS NULL;
-  `
+  `;
 
 const setNotnullCommands = `
   ALTER TABLE "AdvisorRequests"
@@ -1080,7 +1080,7 @@ const setNotnullCommands = `
     ALTER COLUMN "userId" SET NOT NULL,
     ALTER COLUMN "voteType" SET NOT NULL,
     ALTER COLUMN "votedAt" SET NOT NULL;
-`
+`;
 
 const createNewIndexesForOnConflictConstraints = `
   ALTER INDEX "idx_DatabaseMetadata_name"
@@ -1111,7 +1111,7 @@ const createNewIndexesForOnConflictConstraints = `
   CREATE UNIQUE INDEX "idx_ReadStatuses_userId_postId_tagId"
     ON public."ReadStatuses" USING btree
     ("userId", COALESCE("postId", ''::character varying), COALESCE("tagId", ''::character varying));
-`
+`;
 
 const dropNotnullCommands = `
   ALTER TABLE "AdvisorRequests"
@@ -1558,32 +1558,32 @@ const dropNotnullCommands = `
     ALTER COLUMN "userId" DROP NOT NULL,
     ALTER COLUMN "voteType" DROP NOT NULL,
     ALTER COLUMN "votedAt" DROP NOT NULL;
-`
+`;
 
-export const up = async ({db}: MigrationContext) => {
-  const hydrateDefaultCommandList = fillInNullWithDefaultCommands.split(';');
+export const up = async ({ db }: MigrationContext) => {
+  const hydrateDefaultCommandList = fillInNullWithDefaultCommands.split(";");
   hydrateDefaultCommandList.pop();
   for (const hydrateDefaultCommand of hydrateDefaultCommandList) {
     await db.none(hydrateDefaultCommand);
   }
 
-  const setNotNullCommandList = setNotnullCommands.split(';');
+  const setNotNullCommandList = setNotnullCommands.split(";");
   setNotNullCommandList.pop();
   for (const setNotNullCommand of setNotNullCommandList) {
     await db.none(setNotNullCommand);
   }
 
-  const createNewIndexCommandList = createNewIndexesForOnConflictConstraints.split(';');
+  const createNewIndexCommandList = createNewIndexesForOnConflictConstraints.split(";");
   createNewIndexCommandList.pop();
   for (const createNewIndexCommand of createNewIndexCommandList) {
     await db.none(createNewIndexCommand);
   }
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
-  const dropNotNullCommandList = dropNotnullCommands.split(';');
+export const down = async ({ db }: MigrationContext) => {
+  const dropNotNullCommandList = dropNotnullCommands.split(";");
   dropNotNullCommandList.pop();
   for (const setNotNullCommand of dropNotNullCommandList) {
     await db.none(setNotNullCommand);
   }
-}
+};

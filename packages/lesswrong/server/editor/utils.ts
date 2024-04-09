@@ -1,7 +1,7 @@
-import pick from 'lodash/pick'
-import mjAPI from 'mathjax-node'
-import Revisions from '../../lib/collections/revisions/collection'
-import {isAnyTest, isMigrations} from '../../lib/executionEnvironment'
+import pick from "lodash/pick";
+import mjAPI from "mathjax-node";
+import Revisions from "../../lib/collections/revisions/collection";
+import { isAnyTest, isMigrations } from "../../lib/executionEnvironment";
 
 export const trimLatexAndAddCSS = (dom: any, css: string) => {
   // Remove empty paragraphs
@@ -11,36 +11,36 @@ export const trimLatexAndAddCSS = (dom: any, css: string) => {
   // Equations that only have images or something like that. If this happen, we
   // want to adjust this part.
   for (var i = 0, len = paragraphs.length; i < len; i++) {
-      var elem = paragraphs[i];
-      if (elem.textContent.trim() === '') {
-          elem.parentNode.removeChild(elem);
-          i--;
-          len--;
-      }
+    var elem = paragraphs[i];
+    if (elem.textContent.trim() === "") {
+      elem.parentNode.removeChild(elem);
+      i--;
+      len--;
+    }
   }
   const [firstLatexElement] = dom.getElementsByClassName("mjx-chtml");
   const styleNode = dom.createElement("style");
   styleNode.textContent = css;
   if (firstLatexElement) firstLatexElement.appendChild(styleNode);
-  return dom
-}
+  return dom;
+};
 
 const MATHJAX_OPTIONS = {
-  jax: ['input/TeX', 'output/CommonHTML'],
+  jax: ["input/TeX", "output/CommonHTML"],
   TeX: {
-    extensions: ['autoload-all.js', 'Safe.js'],
+    extensions: ["autoload-all.js", "Safe.js"],
   },
-  messageStyles: 'none',
+  messageStyles: "none",
   showProcessingMessages: false,
   showMathMenu: false,
   showMathMenuMSIE: false,
-  preview: 'none',
+  preview: "none",
   delayStartupTypeset: true,
-}
+};
 
 if (!isAnyTest && !isMigrations) {
   mjAPI.config({
-    MathJax: MATHJAX_OPTIONS
+    MathJax: MATHJAX_OPTIONS,
   });
   mjAPI.start();
 }
@@ -61,16 +61,17 @@ export const preProcessLatex = async (content: AnyBecauseTodo) => {
   // gets set to true if a stylesheet has already been added
   let mathjaxStyleUsed = false;
 
-  for (let key in content.entityMap) { // Can't use forEach with await
+  for (let key in content.entityMap) {
+    // Can't use forEach with await
     let value = content.entityMap[key];
-    if(value.type === "INLINETEX" && value.data.teX) {
+    if (value.type === "INLINETEX" && value.data.teX) {
       const mathJax = await mjAPI.typeset({
-            math: value.data.teX,
-            format: "inline-TeX",
-            html: true,
-            css: !mathjaxStyleUsed,
-      })
-      value.data = {...value.data, html: mathJax.html};
+        math: value.data.teX,
+        format: "inline-TeX",
+        html: true,
+        css: !mathjaxStyleUsed,
+      });
+      value.data = { ...value.data, html: mathJax.html };
       if (!mathjaxStyleUsed) {
         value.data.css = mathJax.css;
         mathjaxStyleUsed = true;
@@ -87,8 +88,8 @@ export const preProcessLatex = async (content: AnyBecauseTodo) => {
         format: "TeX",
         html: true,
         css: !mathjaxStyleUsed,
-      })
-      block.data = {...block.data, html: mathJax.html};
+      });
+      block.data = { ...block.data, html: mathJax.html };
       if (!mathjaxStyleUsed) {
         block.data.css = mathJax.css;
         mathjaxStyleUsed = true;
@@ -97,7 +98,7 @@ export const preProcessLatex = async (content: AnyBecauseTodo) => {
   }
 
   return content;
-}
+};
 
 const revisionFieldsToCopy: (keyof DbRevision)[] = [
   "originalContents",
@@ -120,32 +121,31 @@ const revisionFieldsToCopy: (keyof DbRevision)[] = [
 export async function syncDocumentWithLatestRevision<N extends CollectionNameString>(
   collection: CollectionBase<N>,
   document: ObjectsByCollectionName[N],
-  fieldName: string
+  fieldName: string,
 ): Promise<void> {
   const latestRevision = await Revisions.findOne(
     {
       documentId: document._id,
-      draft: false
+      draft: false,
     },
-    { sort: { version: -1 } }
-  )
+    { sort: { version: -1 } },
+  );
   if (!latestRevision) {
     // Some documents are deletable, but typescript doesn't know that
-    if ((document as unknown as {deleted: boolean}).deleted) {
-      return
+    if ((document as unknown as { deleted: boolean }).deleted) {
+      return;
     } else {
-      throw new Error(
-        `Document ${document._id} (${collection.collectionName}) has no revisions`
-      )
+      throw new Error(`Document ${document._id} (${collection.collectionName}) has no revisions`);
     }
   }
   await collection.rawUpdateOne(document._id, {
     $set: {
       [fieldName]: pick(latestRevision, revisionFieldsToCopy),
-      [`${fieldName}_latest`]: latestRevision._id
-    }
-  })
+      [`${fieldName}_latest`]: latestRevision._id,
+    },
+  });
 }
 
-export type MaybeDrafteable = { draft?: boolean } 
-export const isBeingUndrafted = (oldDocument: MaybeDrafteable, newDocument: MaybeDrafteable) => oldDocument.draft && !newDocument.draft
+export type MaybeDrafteable = { draft?: boolean };
+export const isBeingUndrafted = (oldDocument: MaybeDrafteable, newDocument: MaybeDrafteable) =>
+  oldDocument.draft && !newDocument.draft;

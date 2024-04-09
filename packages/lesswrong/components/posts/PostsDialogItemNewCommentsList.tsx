@@ -1,21 +1,25 @@
-import React from 'react';
-import { Components, registerComponent} from '../../lib/vulcan-lib';
-import { useMulti } from '../../lib/crud/withMulti';
-import { CommentTreeOptions } from '../comments/commentTree';
+import React from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useMulti } from "../../lib/crud/withMulti";
+import { CommentTreeOptions } from "../comments/commentTree";
 
-const styles = (theme: ThemeType): JssStyles => ({})
+const styles = (theme: ThemeType): JssStyles => ({});
 
-const PostsDialogItemNewCommentsList = ({ terms, post, treeOptions }: {
-  terms: CommentsViewTerms,
-  classes: ClassesType,
-  post: PostsList & { debate: true },
-  treeOptions: CommentTreeOptions,
+const PostsDialogItemNewCommentsList = ({
+  terms,
+  post,
+  treeOptions,
+}: {
+  terms: CommentsViewTerms;
+  classes: ClassesType;
+  post: PostsList & { debate: true };
+  treeOptions: CommentTreeOptions;
 }) => {
   const { loading, results } = useMulti({
     terms,
     collectionName: "Comments",
-    fragmentName: 'CommentsList',
-    fetchPolicy: 'cache-first',
+    fragmentName: "CommentsList",
+    fetchPolicy: "cache-first",
     limit: 5,
   });
 
@@ -23,28 +27,26 @@ const PostsDialogItemNewCommentsList = ({ terms, post, treeOptions }: {
     collectionName: "Comments",
     fragmentName: "CommentsList",
     terms: {
-      view: 'recentDebateResponses',
+      view: "recentDebateResponses",
       postId: post._id,
       limit: 2,
     },
   });
 
-  const { NoContent, PostsItemNewCommentsListNode } = Components
+  const { NoContent, PostsItemNewCommentsListNode } = Components;
 
   const noCommentsFound = !loading && results && !results.length;
   const noDebateResponsesFound = !debateResponsesLoading && debateResponses && !debateResponses.length;
 
   if (noCommentsFound && noDebateResponsesFound) {
-    return <NoContent>No comments found</NoContent>
-  } 
-  
-  else {
+    return <NoContent>No comments found</NoContent>;
+  } else {
     const commentsNodeProps: React.ComponentProps<typeof PostsItemNewCommentsListNode> = {
       commentsList: results,
       loadingState: loading,
       post,
       treeOptions,
-      title: 'User Comments'
+      title: "User Comments",
     };
 
     const dialogResponsesNodeProps: React.ComponentProps<typeof PostsItemNewCommentsListNode> = {
@@ -52,25 +54,29 @@ const PostsDialogItemNewCommentsList = ({ terms, post, treeOptions }: {
       loadingState: debateResponsesLoading,
       post,
       treeOptions,
-      title: 'Dialog Responses',
-      reverseOrder: true
+      title: "Dialog Responses",
+      reverseOrder: true,
     };
 
-    return <div>
-      <PostsItemNewCommentsListNode {...dialogResponsesNodeProps} />
-      <PostsItemNewCommentsListNode {...commentsNodeProps} />
-    </div>;
+    return (
+      <div>
+        <PostsItemNewCommentsListNode {...dialogResponsesNodeProps} />
+        <PostsItemNewCommentsListNode {...commentsNodeProps} />
+      </div>
+    );
   }
 };
 
 const PostsDialogItemNewCommentsListComponent = registerComponent(
-  'PostsDialogItemNewCommentsList', PostsDialogItemNewCommentsList, {
+  "PostsDialogItemNewCommentsList",
+  PostsDialogItemNewCommentsList,
+  {
     styles,
-  }
+  },
 );
 
 declare global {
   interface ComponentTypes {
-    PostsDialogItemNewCommentsList: typeof PostsDialogItemNewCommentsListComponent
+    PostsDialogItemNewCommentsList: typeof PostsDialogItemNewCommentsListComponent;
   }
 }

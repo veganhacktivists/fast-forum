@@ -1,24 +1,19 @@
-import moment from '../../lib/moment-timezone';
-import * as _ from 'underscore';
+import moment from "../../lib/moment-timezone";
+import * as _ from "underscore";
 
-export type TimeframeType = "daily"|"weekly"|"monthly"|"yearly";
+export type TimeframeType = "daily" | "weekly" | "monthly" | "yearly";
 
-export const timeframeToTimeBlock: Record<TimeframeType,moment.unitOfTime.DurationAs> = {
-  daily: 'day',
-  weekly: 'week',
-  monthly: 'month',
-  yearly: 'year',
-}
+export const timeframeToTimeBlock: Record<TimeframeType, moment.unitOfTime.DurationAs> = {
+  daily: "day",
+  weekly: "week",
+  monthly: "month",
+  yearly: "year",
+};
 
 // Locally valid. Moment supports seconds, but that's not how these functions
 // work.
-type TimeBlockString = moment.unitOfTime.DurationAs
-const VALID_TIME_BLOCKS: Array<TimeBlockString> = [
-  'days', 'day',
-  'weeks', 'week',
-  'months', 'month',
-  'years', 'year',
-]
+type TimeBlockString = moment.unitOfTime.DurationAs;
+const VALID_TIME_BLOCKS: Array<TimeBlockString> = ["days", "day", "weeks", "week", "months", "month", "years", "year"];
 
 // Return a date string for each date which should have a section, in
 // descending order.
@@ -30,37 +25,33 @@ const VALID_TIME_BLOCKS: Array<TimeBlockString> = [
 // timezone. It pretends that everything's in UTC for date-parsing (used for
 // date-math), but this is just a convenient fiction that doesn't effect the
 // result.
-export function getDateRange (after: string|Date, before: string|Date, timeBlock: TimeBlockString) {
+export function getDateRange(after: string | Date, before: string | Date, timeBlock: TimeBlockString) {
   // true for strict parsing
-  const mAfter = moment.utc(after, 'YYYY-MM-DD', true)
-  const mBefore = moment.utc(before, 'YYYY-MM-DD', true)
+  const mAfter = moment.utc(after, "YYYY-MM-DD", true);
+  const mBefore = moment.utc(before, "YYYY-MM-DD", true);
   if (!mAfter.isValid()) {
-    throw new Error(`Invalid after '${after}', expected 'YYYY-MM-DD'`)
+    throw new Error(`Invalid after '${after}', expected 'YYYY-MM-DD'`);
   }
   if (!mBefore.isValid()) {
-    throw new Error(`Invalid before '${before}', expected 'YYYY-MM-DD'`)
+    throw new Error(`Invalid before '${before}', expected 'YYYY-MM-DD'`);
   }
   if (!VALID_TIME_BLOCKS.includes(timeBlock)) {
-    throw new Error(`Invalid timeBlock '${timeBlock}'`)
+    throw new Error(`Invalid timeBlock '${timeBlock}'`);
   }
   // true for decimal result
-  const rawDiff = mBefore.diff(mAfter, timeBlock, true)
+  const rawDiff = mBefore.diff(mAfter, timeBlock, true);
   if (rawDiff < 0) {
-    throw new Error(`getDateRange got after date (${after}) after the before date (${before})`)
+    throw new Error(`getDateRange got after date (${after}) after the before date (${before})`);
   }
   if (rawDiff % 1 !== 0) {
     // eslint-disable-next-line no-console
-    console.warn(`getDateRange: dates ${after}, ${before} are not an integer number of ${timeBlock}s apart`)
+    console.warn(`getDateRange: dates ${after}, ${before} are not an integer number of ${timeBlock}s apart`);
     // No return, ceil the value and return a range that goes before the
     // after
   }
-  const numTimeBlocks = Math.ceil(rawDiff)
-  const greatestDateInRange = mBefore.subtract(1, timeBlock)
-  return _.range(numTimeBlocks).map(
-    i => greatestDateInRange.clone()
-      .subtract(i, timeBlock)
-      .format('YYYY-MM-DD')
-  )
+  const numTimeBlocks = Math.ceil(rawDiff);
+  const greatestDateInRange = mBefore.subtract(1, timeBlock);
+  return _.range(numTimeBlocks).map((i) => greatestDateInRange.clone().subtract(i, timeBlock).format("YYYY-MM-DD"));
 }
 
 // Calculates the initial value for after, as used by PostsTimeframeList
@@ -69,15 +60,20 @@ export function getDateRange (after: string|Date, before: string|Date, timeBlock
 // startOf function. If you wanted to posts for the past 3 weeks, you'd call
 // this with ({numTimeBlocks: 3, timeBlock: 'week'). You would then go to the
 // most recent Sunday, and then two Sundays before that.
-export function getAfterDefault ({numTimeBlocks, timeBlock, timezone, before}: {
-  numTimeBlocks: number,
-  timeBlock: TimeBlockString,
-  timezone: string,
-  before?: string,
+export function getAfterDefault({
+  numTimeBlocks,
+  timeBlock,
+  timezone,
+  before,
+}: {
+  numTimeBlocks: number;
+  timeBlock: TimeBlockString;
+  timezone: string;
+  before?: string;
 }) {
   if (!numTimeBlocks || !timeBlock || !timezone) throw new Error("Missing argument in getAfterDefault");
-  const startCurrentTimeBlock = moment(before).tz(timezone).startOf(timeBlock)
-  return startCurrentTimeBlock.subtract(numTimeBlocks - 1, timeBlock).format('YYYY-MM-DD')
+  const startCurrentTimeBlock = moment(before).tz(timezone).startOf(timeBlock);
+  return startCurrentTimeBlock.subtract(numTimeBlocks - 1, timeBlock).format("YYYY-MM-DD");
 }
 
 // Calculates the initial value for before, as used by PostsTimeframeList. Note that
@@ -85,12 +81,19 @@ export function getAfterDefault ({numTimeBlocks, timeBlock, timezone, before}: {
 //
 // For ease of calculations, we start at the beginning of the next timeBlock.
 // i.e. if today is July 10th, the default 'before' date is August 1st.
-export function getBeforeDefault ({timeBlock, timezone, after}: {
-  timeBlock: TimeBlockString,
-  timezone: string,
-  after?: string,
+export function getBeforeDefault({
+  timeBlock,
+  timezone,
+  after,
+}: {
+  timeBlock: TimeBlockString;
+  timezone: string;
+  after?: string;
 }) {
   if (!timeBlock) throw new Error("Missing argument in getBeforeDefault");
-  const startNextTimeBlock = moment(after).tz(timezone).startOf(timeBlock).add(after ? 3 : 1, timeBlock)
-  return startNextTimeBlock.format('YYYY-MM-DD')
+  const startNextTimeBlock = moment(after)
+    .tz(timezone)
+    .startOf(timeBlock)
+    .add(after ? 3 : 1, timeBlock);
+  return startNextTimeBlock.format("YYYY-MM-DD");
 }

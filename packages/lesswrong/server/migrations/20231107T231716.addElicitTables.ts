@@ -13,16 +13,16 @@
  */
 export const acceptsSchemaHash = "060a65a6bb00ba7b0a4da5397165f444";
 
-import ElicitQuestionPredictions from "../../lib/collections/elicitQuestionPredictions/collection"
-import ElicitQuestions from "../../lib/collections/elicitQuestions/collection"
-import { createTable, dropTable } from "./meta/utils"
+import ElicitQuestionPredictions from "../../lib/collections/elicitQuestionPredictions/collection";
+import ElicitQuestions from "../../lib/collections/elicitQuestions/collection";
+import { createTable, dropTable } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await createTable(db, ElicitQuestions)
-  await createTable(db, ElicitQuestionPredictions)
-}
+export const up = async ({ db }: MigrationContext) => {
+  await createTable(db, ElicitQuestions);
+  await createTable(db, ElicitQuestionPredictions);
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropTable(db, ElicitQuestions)
-  await dropTable(db, ElicitQuestionPredictions)
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropTable(db, ElicitQuestions);
+  await dropTable(db, ElicitQuestionPredictions);
+};

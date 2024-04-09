@@ -1,17 +1,14 @@
-import React from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import classNames from 'classnames';
+import React from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import classNames from "classnames";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
-    ...theme.typography.errorStyle
-  }
-})
+    ...theme.typography.errorStyle,
+  },
+});
 
-const FieldErrors = ({ errors, classes }: {
-  errors: any[]
-  classes: ClassesType
-}) => (
+const FieldErrors = ({ errors, classes }: { errors: any[]; classes: ClassesType }) => (
   <ul className={classNames(classes.root, "form-input-errors")}>
     {errors.map((error, index) => (
       <li key={index}>
@@ -21,10 +18,10 @@ const FieldErrors = ({ errors, classes }: {
   </ul>
 );
 
-const FieldErrorsComponent = registerComponent('FieldErrors', FieldErrors, {styles});
+const FieldErrorsComponent = registerComponent("FieldErrors", FieldErrors, { styles });
 
 declare global {
   interface ComponentTypes {
-    FieldErrors: typeof FieldErrorsComponent
+    FieldErrors: typeof FieldErrorsComponent;
   }
 }

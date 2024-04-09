@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-12-15T01:49:43.000Z by 20231215T014943.add_endedby_field_for_ckeditorusersessions.ts
  * +-- Overall schema hash: 4f18d5a0849cc239555c6263c3e20df4
- *  
+ *
  * @@ -1149,3 +1147,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * --- Schema for "Users", hash: 950f0a8caa012ac9e356a966b267f8d0
  * +-- Schema for "Users", hash: ca3b50eaaefc9ba0cccfc27e6ed8123e
  *  CREATE TABLE "Users" (
@@ -22,7 +22,7 @@
  *      "showRecommendedPartners" bool NOT NULL DEFAULT true,
  * +    "hideActiveDialogueUsers" bool NOT NULL DEFAULT false,
  *      "karmaChangeNotifierSettings" jsonb NOT NULL DEFAULT '{"updateFrequency":"daily","timeOfDayGMT":11,"dayOfWeekGMT":"Saturday","showNegativeKarma":false}' ::jsonb,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -33,13 +33,13 @@
  */
 export const acceptsSchemaHash = "4f18d5a0849cc239555c6263c3e20df4";
 
-import Users from "../../lib/collections/users/collection"
-import { addField, dropField } from "./meta/utils"
+import Users from "../../lib/collections/users/collection";
+import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Users, "hideActiveDialogueUsers")
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Users, "hideActiveDialogueUsers");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Users, "hideActiveDialogueUsers")
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Users, "hideActiveDialogueUsers");
+};

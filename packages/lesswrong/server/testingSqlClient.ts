@@ -36,7 +36,7 @@ export const preparePgTables = () => {
       }
     }
   }
-}
+};
 
 /**
  * These are custom indexes we created during the nullability PR for various ON CONFLICT queries.
@@ -46,29 +46,41 @@ export const preparePgTables = () => {
 const ensureMigratedIndexes = async (client: SqlClient) => {
   const options = { overrideCanEnsureIndexes: true, runImmediately: true, client };
   // eslint-disable-next-line no-console
-  console.log('Creating custom indexes');
-  await ensureCustomPgIndex(`
+  console.log("Creating custom indexes");
+  await ensureCustomPgIndex(
+    `
     CREATE UNIQUE INDEX IF NOT EXISTS "idx_DatabaseMetadata_name"
     ON public."DatabaseMetadata" USING btree
     (name);
-  `, options);
-  await ensureCustomPgIndex(`
+  `,
+    options,
+  );
+  await ensureCustomPgIndex(
+    `
     CREATE UNIQUE INDEX IF NOT EXISTS "idx_DebouncerEvents_dispatched_af_key_name_filtered"
     ON public."DebouncerEvents" USING btree
     (dispatched, af, key, name)
     WHERE (dispatched IS FALSE);
-  `, options);
-  await ensureCustomPgIndex(`
+  `,
+    options,
+  );
+  await ensureCustomPgIndex(
+    `
     CREATE UNIQUE INDEX IF NOT EXISTS "idx_PageCache_path_abTestGroups_bundleHash"
     ON public."PageCache" USING btree
     (path, "abTestGroups", "bundleHash");
-  `, options);
-  await ensureCustomPgIndex(`
+  `,
+    options,
+  );
+  await ensureCustomPgIndex(
+    `
     CREATE UNIQUE INDEX IF NOT EXISTS "idx_ReadStatuses_userId_postId_tagId"
     ON public."ReadStatuses" USING btree
     (COALESCE("userId", ''), COALESCE("postId", ''::character varying), COALESCE("tagId", ''::character varying));
-  `, options);
-}
+  `,
+    options,
+  );
+};
 
 const buildTables = async (client: SqlClient) => {
   await installExtensions(client);
@@ -77,27 +89,27 @@ const buildTables = async (client: SqlClient) => {
 
   for (let collection of Collections) {
     if (collection instanceof PgCollection) {
-      const {collectionName} = collection;
+      const { collectionName } = collection;
       const table = collection.getTable();
       const createTableQuery = new CreateTableQuery(table);
-      const {sql, args} = createTableQuery.compile();
+      const { sql, args } = createTableQuery.compile();
       try {
         await client.any(sql, args);
       } catch (e) {
-        throw new Error(`Create table query failed: ${e.message}: ${sql}: ${inspect(args, {depth: null})}`);
+        throw new Error(`Create table query failed: ${e.message}: ${sql}: ${inspect(args, { depth: null })}`);
       }
 
       const rawIndexes = expectedIndexes[collectionName as CollectionNameString] ?? [];
       for (const rawIndex of rawIndexes) {
-        const {key, ...options} = rawIndex;
-        const fields: MongoIndexKeyObj<any> = typeof key === "string" ? {[key]: 1} : key;
+        const { key, ...options } = rawIndex;
+        const fields: MongoIndexKeyObj<any> = typeof key === "string" ? { [key]: 1 } : key;
         const index = table.getIndex(Object.keys(fields), options) ?? table.addIndex(fields, options);
         const createIndexQuery = new CreateIndexQuery(table, index, true);
-        const {sql, args} = createIndexQuery.compile();
+        const { sql, args } = createIndexQuery.compile();
         try {
           await client.any(sql, args);
         } catch (e) {
-          throw new Error(`Create index query failed: ${e.message}: ${sql}: ${inspect(args, {depth: null})}`);
+          throw new Error(`Create index query failed: ${e.message}: ${sql}: ${inspect(args, { depth: null })}`);
         }
       }
     }
@@ -106,39 +118,39 @@ const buildTables = async (client: SqlClient) => {
   await ensureMigratedIndexes(client);
   await updateFunctions(client);
   await ensurePostgresViewsExist(client);
-}
+};
 
 const makeDbName = (id?: string) => {
   const jestWorkerIdSuffix = process.env.JEST_WORKER_ID ? `_${process.env.JEST_WORKER_ID}` : "";
   id ??= `${new Date().toISOString().replace(/[:.-]/g, "_")}_${process.pid}${jestWorkerIdSuffix}`;
   return `unittest_${id}`.toLowerCase();
-}
+};
 
 const createTemporaryConnection = async () => {
   let client = getSqlClient();
   if (client) {
     return client;
   }
-  const {PG_URL} = process.env;
+  const { PG_URL } = process.env;
   if (!PG_URL) {
     throw new Error("Can't initialize test DB - PG_URL not set");
   }
   client = await createSqlConnection(PG_URL, true);
   setSqlClient(client);
   return client;
-}
+};
 
 export type TestingSqlClient = {
-  sql: SqlClient,
-  dbName: string,
-}
+  sql: SqlClient;
+  dbName: string;
+};
 
 export const createTestingSqlClient = async (
   id: string | undefined = undefined,
   dropExisting = false,
   setAsGlobalClient = true,
 ): Promise<TestingSqlClient> => {
-  const {PG_URL} = process.env;
+  const { PG_URL } = process.env;
   if (!PG_URL) {
     throw new Error("Can't create testing SQL client - PG_URL not set");
   }
@@ -160,10 +172,10 @@ export const createTestingSqlClient = async (
     sql,
     dbName,
   };
-}
+};
 
 export const createTestingSqlClientFromTemplate = async (template: string): Promise<TestingSqlClient> => {
-  const {PG_URL} = process.env;
+  const { PG_URL } = process.env;
   if (!PG_URL) {
     throw new Error("Can't create testing SQL client from template - PG_URL not set");
   }
@@ -180,7 +192,7 @@ export const createTestingSqlClientFromTemplate = async (template: string): Prom
     sql,
     dbName,
   };
-}
+};
 
 /**
  * Our approach to database cleanup is to just delete all the runs older than 1 day.
@@ -198,9 +210,9 @@ export const dropTestingDatabases = async (olderThan?: string | Date) => {
       pg_catalog.pg_get_userbyid(datdba) = CURRENT_USER
   `);
   const secondsPerDay = 1000 * 60 * 60 * 24;
-  olderThan = new Date(olderThan ?? (Date.now() - secondsPerDay));
+  olderThan = new Date(olderThan ?? Date.now() - secondsPerDay);
   for (const database of databases) {
-    const {datname} = database;
+    const { datname } = database;
     if (!datname.match(/^unittest_\d{4}_\d{2}_\d{2}t\d{2}_\d{2}_\d{2}_\d{3}z.*$/)) {
       continue;
     }
@@ -216,35 +228,38 @@ export const dropTestingDatabases = async (olderThan?: string | Date) => {
       await sql.none(`DROP DATABASE ${datname}`);
     }
   }
-}
+};
 
 export const killAllConnections = async (id?: string) => {
   const sql = await createTemporaryConnection();
   const dbName = makeDbName(id);
-  await sql.any(`
+  await sql.any(
+    `
     SELECT pg_terminate_backend(pg_stat_activity.pid)
     FROM pg_stat_activity
     WHERE pg_stat_activity.datname = $1 AND pid <> pg_backend_pid()
-  `, [dbName]);
+  `,
+    [dbName],
+  );
   const client = getSqlClient();
   if (client) {
     await closeSqlClient(client);
   }
-}
+};
 
 const seedData = async <T extends {}>(collection: CollectionBase<any>, data: T[]) => {
   // eslint-disable-next-line no-console
   console.log(`Importing Cypress seed data for ${collection.options.collectionName}`);
   await collection.rawInsert(data);
-}
+};
 
 type DropAndCreatePgArgs = {
-  seed?: boolean,
-  templateId?: string,
-  dropExisting?: boolean,
-}
+  seed?: boolean;
+  templateId?: string;
+  dropExisting?: boolean;
+};
 
-export const dropAndCreatePg = async ({seed, templateId, dropExisting}: DropAndCreatePgArgs) => {
+export const dropAndCreatePg = async ({ seed, templateId, dropExisting }: DropAndCreatePgArgs) => {
   const oldClient = getSqlClient();
   setSqlClient(await createSqlConnection());
   await oldClient?.$pool.end();
@@ -263,7 +278,7 @@ export const dropAndCreatePg = async ({seed, templateId, dropExisting}: DropAndC
       seedData(Users, seedUsers),
     ]);
   }
-}
+};
 
 // In development mode, we need a clean way to reseed the test database for Cypress.
 // We definitely don't ever want this in prod though.
@@ -278,10 +293,10 @@ export const addCypressRoutes = (app: Application) => {
         if (!templateId || typeof templateId !== "string") {
           throw new Error("No templateId provided");
         }
-        const {dbName} = await createTestingSqlClientFromTemplate(templateId)
-        res.status(200).send({status: "ok", dbName});
+        const { dbName } = await createTestingSqlClientFromTemplate(templateId);
+        res.status(200).send({ status: "ok", dbName });
       } catch (e) {
-        res.status(500).send({status: "error", message: e.message});
+        res.status(500).send({ status: "error", message: e.message });
       }
     });
 
@@ -298,10 +313,10 @@ export const addCypressRoutes = (app: Application) => {
           dropExisting: true,
           seed: false,
         });
-        res.status(200).send({status: "ok"});
+        res.status(200).send({ status: "ok" });
       } catch (e) {
-        res.status(500).send({status: "error", message: e.message});
+        res.status(500).send({ status: "error", message: e.message });
       }
     });
   }
-}
+};

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { unflattenComments, addGapIndicators } from '../../lib/utils/unflatten';
-import type { CommentTreeOptions } from './commentTree';
-import withErrorBoundary from '../common/withErrorBoundary';
-import { CommentsNodeProps } from './CommentsNode';
-import { useLocation } from '../../lib/routeUtil';
+import React, { useState } from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { unflattenComments, addGapIndicators } from "../../lib/utils/unflatten";
+import type { CommentTreeOptions } from "./commentTree";
+import withErrorBoundary from "../common/withErrorBoundary";
+import { CommentsNodeProps } from "./CommentsNode";
+import { useLocation } from "../../lib/routeUtil";
 
 const styles = (theme: ThemeType): JssStyles => ({
   showChildren: {
@@ -15,7 +15,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     display: "block",
     fontSize: 14,
   },
-})
+});
 
 export interface CommentWithRepliesProps {
   comment: CommentWithRepliesFragment;
@@ -42,14 +42,14 @@ const CommentWithReplies = ({
 
   const commentId = focusCommentId.slice(1) || null;
 
-  startExpanded ??= comment.latestChildren.some(c => c._id === commentId);
+  startExpanded ??= comment.latestChildren.some((c) => c._id === commentId);
 
   const [maxChildren, setMaxChildren] = useState(startExpanded ? 500 : initialMaxChildren);
 
   if (!comment) return null;
-  
+
   const lastCommentId = comment.latestChildren[0]?._id;
-  
+
   const treeOptions: CommentTreeOptions = {
     lastCommentId,
     highlightDate: lastRead,
@@ -96,12 +96,10 @@ const CommentWithReplies = ({
   );
 };
 
-const CommentWithRepliesComponent = registerComponent(
-  'CommentWithReplies', CommentWithReplies, {
-    styles,
-    hocs: [withErrorBoundary]
-  }
-);
+const CommentWithRepliesComponent = registerComponent("CommentWithReplies", CommentWithReplies, {
+  styles,
+  hocs: [withErrorBoundary],
+});
 
 declare global {
   interface ComponentTypes {

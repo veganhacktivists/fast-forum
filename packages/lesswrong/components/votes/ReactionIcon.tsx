@@ -1,26 +1,31 @@
-import React from 'react';
-import { registerComponent } from '../../lib/vulcan-lib';
-import { defaultFilter, getNamesAttachedReactionsByName} from '../../lib/voting/reactions';
-import classNames from 'classnames';
+import React from "react";
+import { registerComponent } from "../../lib/vulcan-lib";
+import { defaultFilter, getNamesAttachedReactionsByName } from "../../lib/voting/reactions";
+import classNames from "classnames";
 
 const styles = (theme: ThemeType): JssStyles => ({
   reactionSvg: {
     verticalAlign: "middle",
-    marginTop: 1
+    marginTop: 1,
   },
   invertIfDarkMode: {
-    filter: (theme.palette.type==="dark") ? "invert(1)" : undefined,
+    filter: theme.palette.type === "dark" ? "invert(1)" : undefined,
   },
   invertUnlessDarkMode: {
-    filter: (theme.palette.type==="dark") ? undefined : "invert(1)"
-  }
-})
+    filter: theme.palette.type === "dark" ? undefined : "invert(1)",
+  },
+});
 
-const ReactionIcon = ({react, inverted=false, size=18, classes}: {
-  react: string,
-  inverted?: boolean,
-  size?: number,
-  classes: ClassesType
+const ReactionIcon = ({
+  react,
+  inverted = false,
+  size = 18,
+  classes,
+}: {
+  react: string;
+  inverted?: boolean;
+  size?: number;
+  classes: ClassesType;
 }) => {
   const reactionType = getNamesAttachedReactionsByName(react);
   const opacity = reactionType.filter?.opacity ?? defaultFilter.opacity;
@@ -28,36 +33,35 @@ const ReactionIcon = ({react, inverted=false, size=18, classes}: {
   const padding = reactionType.filter?.padding ? `${reactionType.filter.padding}px` : undefined;
 
   const scale = reactionType.filter?.scale ?? defaultFilter.scale;
-  const translateX = reactionType.filter?.translateX ?? defaultFilter.translateX
-  const translateY = reactionType.filter?.translateY ?? defaultFilter.translateY
+  const translateX = reactionType.filter?.translateX ?? defaultFilter.translateX;
+  const translateY = reactionType.filter?.translateY ?? defaultFilter.translateY;
 
-  return <span
-    className={classNames(
-      {
+  return (
+    <span
+      className={classNames({
         [classes.invertIfDarkMode]: !inverted,
         [classes.invertUnlessDarkMode]: inverted,
-      },
-    )}
-  >
-    <img
-      src={reactionType.svg}
-      style={{
-        filter: `opacity(${opacity}) saturate(${saturation})`,
-        transform: `scale(${scale}) translate(${translateX}px, ${translateY}px)`,
-        padding,
-        width:size, height:size,
-      }}
-      className={classes.reactionSvg}
-    />
-  </span>
-}
+      })}
+    >
+      <img
+        src={reactionType.svg}
+        style={{
+          filter: `opacity(${opacity}) saturate(${saturation})`,
+          transform: `scale(${scale}) translate(${translateX}px, ${translateY}px)`,
+          padding,
+          width: size,
+          height: size,
+        }}
+        className={classes.reactionSvg}
+      />
+    </span>
+  );
+};
 
-
-const ReactionIconComponent = registerComponent('ReactionIcon', ReactionIcon, {styles});
+const ReactionIconComponent = registerComponent("ReactionIcon", ReactionIcon, { styles });
 
 declare global {
   interface ComponentTypes {
-    ReactionIcon: typeof ReactionIconComponent
+    ReactionIcon: typeof ReactionIconComponent;
   }
 }
-

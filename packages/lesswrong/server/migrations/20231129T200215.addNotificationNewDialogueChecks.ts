@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-11-29T19:00:47.000Z by 20231129T190047.add_four_fields_for_frontpage_dialogue_widget_customisation.ts
  * +-- Overall schema hash: 6ee0467b3cdea6d954c14e9bee545c42
- *  
+ *
  * @@ -1133,3 +1131,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * --- Schema for "Users", hash: a22133351267b7929fc15b858b0d5748
  * +-- Schema for "Users", hash: 698b626d9959c4ee04993fea28a5263d
  *  CREATE TABLE "Users" (
@@ -22,7 +22,7 @@
  *      "notificationDialogueMatch" jsonb DEFAULT '{"channel":"both","batchingFrequency":"realtime","timeOfDayGMT":12,"dayOfWeekGMT":"Monday"}' ::jsonb,
  * +    "notificationNewDialogueChecks" jsonb DEFAULT '{"channel":"onsite","batchingFrequency":"daily","timeOfDayGMT":12,"dayOfWeekGMT":"Monday"}' ::jsonb,
  *      "hideDialogueFacilitation" bool NOT NULL DEFAULT false,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -33,13 +33,13 @@
  */
 export const acceptsSchemaHash = "6ee0467b3cdea6d954c14e9bee545c42";
 
-import Users from "../../lib/collections/users/collection"
-import { addField, dropField } from "./meta/utils"
+import Users from "../../lib/collections/users/collection";
+import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Users, "notificationNewDialogueChecks")
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Users, "notificationNewDialogueChecks");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Users, "notificationNewDialogueChecks")
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Users, "notificationNewDialogueChecks");
+};

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { isClient } from "../executionEnvironment";
 
-
 /**
  * Given a Range, which is a pair of text nodes plus offsets, mutate the DOM
  * so that there is a single span which encloses that range (and only that
@@ -12,17 +11,17 @@ import { isClient } from "../executionEnvironment";
  * except that it shouldn't fail if the range requires splitting a non-text
  * node.
  */
-export function wrapRangeWithSpan(range: Range): HTMLSpanElement|null {
+export function wrapRangeWithSpan(range: Range): HTMLSpanElement | null {
   // Insert an empty span, just before the start of the selection
   const span = document.createElement("span");
   range.insertNode(span);
   range.setStartAfter(span);
-  
+
   // Use Range.extractContents to detach the selected nodes, and put them into
   // the span
-  const extractedFragment = range.extractContents()
+  const extractedFragment = range.extractContents();
   span.append(extractedFragment);
-  
+
   return span;
 }
 
@@ -36,10 +35,10 @@ export function rawDomNodeToReactComponent(node: Node) {
   if (node.parentElement) {
     throw new Error("Node was not detached");
   }
-  
+
   function DomNodeComponent(props: {}) {
-    const containerRef = useRef<HTMLSpanElement|null>(null);
-    
+    const containerRef = useRef<HTMLSpanElement | null>(null);
+
     useEffect(() => {
       if (containerRef.current) {
         // If this has been attached somewhere else, detach it
@@ -52,10 +51,10 @@ export function rawDomNodeToReactComponent(node: Node) {
         }
       }
     });
-    
-    return <span ref={containerRef}/>
+
+    return <span ref={containerRef} />;
   }
-  
+
   return DomNodeComponent;
 }
 
@@ -68,16 +67,16 @@ export function rawExtractElementChildrenToReactComponent(element: Element) {
   const childNodes = element.childNodes;
   const numChildNodes = childNodes.length;
 
-  if (numChildNodes===0) {
+  if (numChildNodes === 0) {
     return React.Fragment;
-  } else if (numChildNodes===1) {
+  } else if (numChildNodes === 1) {
     const childNode = element.childNodes[0];
     element.removeChild(childNode);
     return rawDomNodeToReactComponent(childNode);
   } else {
     const span = document.createElement("span");
     const children: Node[] = [];
-    for (let i=0; i<numChildNodes; i++) {
+    for (let i = 0; i < numChildNodes; i++) {
       children.push(childNodes[i]);
     }
     for (let node of children) {
@@ -99,33 +98,33 @@ export function splitRangeIntoReplaceableSubRanges(range: Range): Range[] {
   // nodes
   const reducedRange = reduceRangeToText(range);
   if (!reducedRange) return [];
-  
+
   // Iterate over text nodes. For each pair of consecutive text nodes, check
   // whether they have a non-common ancestor that is a block element. If so,
   // split there.
   let textNodesInRange: Text[] = [];
   for (
-    let pos: Text|null = reducedRange.startContainer as Text;
-    pos && pos!==reducedRange.endContainer;
-    pos=nextTextNodeAfter(pos)
+    let pos: Text | null = reducedRange.startContainer as Text;
+    pos && pos !== reducedRange.endContainer;
+    pos = nextTextNodeAfter(pos)
   ) {
     textNodesInRange.push(pos);
   }
   textNodesInRange.push(reducedRange.endContainer as Text);
-  
+
   let subranges: Range[] = [range];
-  for (let i=1; i<textNodesInRange.length; i++) {
-    if (!nodesCanShareSpan(textNodesInRange[i-1], textNodesInRange[i])) {
+  for (let i = 1; i < textNodesInRange.length; i++) {
+    if (!nodesCanShareSpan(textNodesInRange[i - 1], textNodesInRange[i])) {
       let precedingSubrange = subranges.pop()!;
       let beforeSplit = precedingSubrange.cloneRange();
       let afterSplit = precedingSubrange.cloneRange();
-      beforeSplit.setEnd(textNodesInRange[i-1], textNodesInRange[i-1].length);
+      beforeSplit.setEnd(textNodesInRange[i - 1], textNodesInRange[i - 1].length);
       afterSplit.setStart(textNodesInRange[i], 0);
       subranges.push(beforeSplit);
       subranges.push(afterSplit);
     }
   }
-  
+
   return subranges;
 }
 
@@ -136,21 +135,19 @@ export function splitRangeIntoReplaceableSubRanges(range: Range): Range[] {
 function nodesCanShareSpan(first: Node, second: Node): boolean {
   const closestCommonAncestor = getClosestCommonAncestor(first, second);
   if (!closestCommonAncestor) return false;
-  
-  for (let pos: Node|null=first; pos && pos!==closestCommonAncestor; pos=pos.parentElement) {
-    if (isBlockElement(pos))
-      return false;
+
+  for (let pos: Node | null = first; pos && pos !== closestCommonAncestor; pos = pos.parentElement) {
+    if (isBlockElement(pos)) return false;
   }
-  for (let pos: Node|null=second; pos && pos!==closestCommonAncestor; pos=pos.parentElement) {
-    if (isBlockElement(pos))
-      return false;
+  for (let pos: Node | null = second; pos && pos !== closestCommonAncestor; pos = pos.parentElement) {
+    if (isBlockElement(pos)) return false;
   }
-  
+
   return true;
 }
 
-function getClosestCommonAncestor(node1: Node, node2: Node): Node|null {
-  let pos: Node|null = node1;
+function getClosestCommonAncestor(node1: Node, node2: Node): Node | null {
+  let pos: Node | null = node1;
 
   while (pos) {
     if (node2.contains(pos)) {
@@ -166,16 +163,30 @@ function getClosestCommonAncestor(node1: Node, node2: Node): Node|null {
  * be extracted from the DOM and futzed with by inline react hover hihlighting).
  */
 function isBlockElement(node: Node) {
-  if (node.nodeType !== Node.ELEMENT_NODE)
-    return false;
+  if (node.nodeType !== Node.ELEMENT_NODE) return false;
   switch ((node as Element).tagName) {
     // This list of tag names was generated by looking at the allowed tag names
     // in the sanitizer config so it should be reasonably complete
-    case "p": case "div": case 'blockquote':
-    case "li": case "ol": case "ul": case "nl":
-    case 'h1': case 'h2': case 'h3': case 'h4': case 'h5': case 'h6':
-    case "table": case "tbody": case "tr": case "td": case "th":
-    case "section":case "iframe":
+    case "p":
+    case "div":
+    case "blockquote":
+    case "li":
+    case "ol":
+    case "ul":
+    case "nl":
+    case "h1":
+    case "h2":
+    case "h3":
+    case "h4":
+    case "h5":
+    case "h6":
+    case "table":
+    case "tbody":
+    case "tr":
+    case "td":
+    case "th":
+    case "section":
+    case "iframe":
       return true;
     default:
       return false;
@@ -194,13 +205,13 @@ function isBlockElement(node: Node) {
  * text nodes. If the resulting range would have zero size (ie, it doesn't)
  * enclose any text), returns null.
  */
-export function reduceRangeToText(range: Range): Range|null {
+export function reduceRangeToText(range: Range): Range | null {
   if (!isClient) {
     throw new Error("This function can only run in the browser");
   }
-  
+
   let result = range.cloneRange();
-  
+
   // Adjust the start position forwards
   const startContainer = range.startContainer;
   const startOffset = range.startOffset;
@@ -208,7 +219,7 @@ export function reduceRangeToText(range: Range): Range|null {
     // Start position is inside a text node
     // startOffset is the number of characters from the start of this text node
     // to the range boundary.
-    const textNodeLength = startContainer.textContent?.length ?? 0
+    const textNodeLength = startContainer.textContent?.length ?? 0;
     if (textNodeLength === startOffset) {
       // Inside a text node, buf after all of the actual text. Find the next
       // text node in the tree, and set the position to be the start of that
@@ -236,7 +247,7 @@ export function reduceRangeToText(range: Range): Range|null {
       result.setStart(nextTextNode, 0);
     }
   }
-  
+
   // Now adjust the end position backwards. This is very similar to how we do
   // the start position, except everything goes in the opposite direction.
   const endContainer = range.endContainer;
@@ -255,7 +266,7 @@ export function reduceRangeToText(range: Range): Range|null {
     // End position is inside a non-text node
     let pos = endContainer.childNodes[endOffset];
     while (pos.hasChildNodes()) {
-      pos = pos.childNodes[pos.childNodes.length-1];
+      pos = pos.childNodes[pos.childNodes.length - 1];
     }
     if (pos.nodeType === Node.TEXT_NODE) {
       result.setEnd(pos, pos.textContent?.length ?? 0);
@@ -265,32 +276,32 @@ export function reduceRangeToText(range: Range): Range|null {
       result.setEnd(prevTextNode, prevTextNode.textContent?.length ?? 0);
     }
   }
-  
+
   return result;
 }
 
-function nextTextNodeAfter(node: Node): Text|null {
-  let pos: Node|null = node;
+function nextTextNodeAfter(node: Node): Text | null {
+  let pos: Node | null = node;
   do {
     pos = nextLeafNodeAfter(pos);
   } while (pos && pos.nodeType !== Node.TEXT_NODE);
-  return pos as Text|null;
+  return pos as Text | null;
 }
 
-function prevTextNodeBefore(node: Node): Text|null {
-  let pos: Node|null = node;
+function prevTextNodeBefore(node: Node): Text | null {
+  let pos: Node | null = node;
   do {
     pos = prevLeafNodeBefore(pos);
   } while (pos && pos.nodeType !== Node.TEXT_NODE);
-  return pos as Text|null;
+  return pos as Text | null;
 }
 
-function nextLeafNodeAfter(node: Node): Node|null {
+function nextLeafNodeAfter(node: Node): Node | null {
   if (node.nextSibling) {
     return firstDescendentOf(node.nextSibling);
   } else {
     let pos = node;
-    while(pos.parentElement) {
+    while (pos.parentElement) {
       const nextSibling = nextSiblingNodeAfter(pos.parentElement, pos);
       if (nextSibling) {
         return firstDescendentOf(nextSibling);
@@ -301,12 +312,12 @@ function nextLeafNodeAfter(node: Node): Node|null {
   return null;
 }
 
-function prevLeafNodeBefore(node: Node): Node|null {
+function prevLeafNodeBefore(node: Node): Node | null {
   if (node.previousSibling) {
     return lastDescendentOf(node.previousSibling);
   } else {
     let pos = node;
-    while(pos.parentElement) {
+    while (pos.parentElement) {
       const prevSibling = prevSiblingNodeBefore(pos.parentElement, pos);
       if (prevSibling) {
         return lastDescendentOf(prevSibling);
@@ -319,7 +330,7 @@ function prevLeafNodeBefore(node: Node): Node|null {
 
 function firstDescendentOf(node: Node): Node {
   let pos = node;
-  while(pos.hasChildNodes()) {
+  while (pos.hasChildNodes()) {
     pos = pos.childNodes[0];
   }
   return pos;
@@ -327,41 +338,40 @@ function firstDescendentOf(node: Node): Node {
 
 function lastDescendentOf(node: Node): Node {
   let pos = node;
-  while(pos.hasChildNodes()) {
-    pos = pos.childNodes[pos.childNodes.length-1];
+  while (pos.hasChildNodes()) {
+    pos = pos.childNodes[pos.childNodes.length - 1];
   }
   return pos;
 }
 
-function nextSiblingNodeAfter(parentElement: Element, childNode: Node): Node|null {
+function nextSiblingNodeAfter(parentElement: Element, childNode: Node): Node | null {
   let idx = getNodeIndex(parentElement, childNode);
   if (idx === null) {
     return null;
   }
-  if (idx+1 < parentElement.childNodes.length) {
-    return parentElement.childNodes[idx+1];
+  if (idx + 1 < parentElement.childNodes.length) {
+    return parentElement.childNodes[idx + 1];
   } else {
     return null;
   }
 }
 
-function prevSiblingNodeBefore(parentElement: Element, childNode: Node): Node|null {
+function prevSiblingNodeBefore(parentElement: Element, childNode: Node): Node | null {
   let idx = getNodeIndex(parentElement, childNode);
   if (idx === null) {
     return null;
   }
   if (idx > 0) {
-    return parentElement.childNodes[idx-1];
+    return parentElement.childNodes[idx - 1];
   } else {
     return null;
   }
 }
 
-function getNodeIndex(parentElement: Element, node: Node): number|null {
+function getNodeIndex(parentElement: Element, node: Node): number | null {
   const numChildren = parentElement.childNodes.length;
-  for (let i=0; i<numChildren; i++) {
-    if (parentElement.childNodes[i] === node)
-      return i;
+  for (let i = 0; i < numChildren; i++) {
+    if (parentElement.childNodes[i] === node) return i;
   }
   return null;
 }

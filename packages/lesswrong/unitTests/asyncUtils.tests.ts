@@ -12,9 +12,7 @@ describe("executePromiseQueue", () => {
     ];
 
     const promiseQueueResult = await executePromiseQueue(promiseGenerators, 2);
-    const promiseAllResult = await Promise.all(
-      promiseGenerators.map((gen) => gen())
-    );
+    const promiseAllResult = await Promise.all(promiseGenerators.map((gen) => gen()));
 
     expect(promiseQueueResult).toEqual(promiseAllResult);
   });
@@ -32,10 +30,9 @@ describe("executePromiseQueue", () => {
     // Check the start and end times to ensure that there were 4 concurrent promises
     results.sort((a, b) => a.startTime - b.startTime);
     for (let i = 0; i < results.length; i += 4) {
-      expect(
-        Math.max(...results.slice(i, i + 4).map((res) => res.endTime)) -
-          results[i].startTime
-      ).toBeLessThanOrEqual(140); // allow some tolerance
+      expect(Math.max(...results.slice(i, i + 4).map((res) => res.endTime)) - results[i].startTime).toBeLessThanOrEqual(
+        140,
+      ); // allow some tolerance
     }
   });
 });
@@ -56,14 +53,7 @@ describe("executeChunkedQueue", () => {
   test("executeChunkedQueue preserves order and applies default values", async () => {
     // Define a function that sleeps for a random time before returning the input number
     const func = async (chunk: number[]) =>
-      Promise.all(
-        chunk.map(
-          (n) =>
-            new Promise((resolve) =>
-              setTimeout(() => resolve(n), Math.random() * 200)
-            )
-        )
-      );
+      Promise.all(chunk.map((n) => new Promise((resolve) => setTimeout(() => resolve(n), Math.random() * 200))));
 
     const values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 

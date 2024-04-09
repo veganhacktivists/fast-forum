@@ -4,9 +4,7 @@ type OrderPreservingArrayPolicy = "prepend-new" | "append-new" | "interleave-new
 type IndexType = string | number;
 
 const arrayToIndexMap = (arr: IndexType[]): Record<IndexType, number> =>
-  Object.fromEntries(
-    Object.entries(arr).map(([key, val]) => [val, parseInt(key)] as const)
-  );
+  Object.fromEntries(Object.entries(arr).map(([key, val]) => [val, parseInt(key)] as const));
 
 const indexMapToArray = (map: Record<IndexType, number>): IndexType[] => {
   const unsortedKeys = Object.keys(map);
@@ -18,7 +16,7 @@ function buildOrderIndexMap<T>(
   array: T[],
   keyFunc: (elem: T) => IndexType,
   policy: OrderPreservingArrayPolicy,
-  currentOrderingIndexMap: Record<IndexType, number>
+  currentOrderingIndexMap: Record<IndexType, number>,
 ): Record<IndexType, number> {
   const naiveOrdering = array.map(keyFunc);
 
@@ -43,8 +41,9 @@ function buildOrderIndexMap<T>(
       .filter((id) => id in currentOrderingIndexMap)
       .sort((a, b) => currentOrderingIndexMap[a] - currentOrderingIndexMap[b])
       .reverse();
-    const newOrdering = naiveOrdering
-      .map((elem) => (elem in currentOrderingIndexMap ? currentElems.pop() : elem)) as IndexType[];
+    const newOrdering = naiveOrdering.map((elem) =>
+      elem in currentOrderingIndexMap ? currentElems.pop() : elem,
+    ) as IndexType[];
     return arrayToIndexMap(newOrdering);
   }
   // Can't actually reach this line, but typescript can't work that out
@@ -66,13 +65,13 @@ function buildOrderIndexMap<T>(
 export function useOrderPreservingArray<T>(
   array: T[],
   keyFunc: (elem: T) => IndexType,
-  policy: OrderPreservingArrayPolicy = "interleave-new"
+  policy: OrderPreservingArrayPolicy = "interleave-new",
 ): T[] {
   const orderIndexMapRef = useRef<Record<IndexType, number>>({});
 
   orderIndexMapRef.current = useMemo(
     () => buildOrderIndexMap(array, keyFunc, policy, orderIndexMapRef.current),
-    [array, keyFunc, policy]
+    [array, keyFunc, policy],
   );
 
   const sortedArray = array

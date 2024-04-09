@@ -1,6 +1,6 @@
-import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
-import Tags from '../../lib/collections/tags/collection';
-import Users from '../../lib/collections/users/collection';
+import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
+import Tags from "../../lib/collections/tags/collection";
+import Users from "../../lib/collections/users/collection";
 
 registerMigration({
   name: "migrateCommunityFilterSettings",
@@ -37,13 +37,13 @@ registerMigration({
           return {
             updateOne: {
               filter: { _id },
-              update: {$set: {"frontpageFilterSettings.tags": newTags}}
-            }
+              update: { $set: { "frontpageFilterSettings.tags": newTags } },
+            },
           };
         });
 
         await Users.rawCollection().bulkWrite(changes, { ordered: false });
-      }
+      },
     });
   },
 });

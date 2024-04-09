@@ -1,4 +1,4 @@
-import { registerFragment } from '../../vulcan-lib';
+import { registerFragment } from "../../vulcan-lib";
 
 registerFragment(`
   fragment SpotlightMinimumInfo on Spotlight {
@@ -19,7 +19,7 @@ registerFragment(`
     showAuthor
     imageFade
   }
-`)
+`);
 
 registerFragment(`
   fragment SpotlightHeaderEventSubtitle on Spotlight {

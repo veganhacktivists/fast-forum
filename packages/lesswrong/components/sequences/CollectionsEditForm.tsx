@@ -1,7 +1,7 @@
-import { Components, registerComponent, getFragment } from '../../lib/vulcan-lib';
-import React from 'react';
-import Collections from '../../lib/collections/collections/collection';
-import classNames from 'classnames';
+import { Components, registerComponent, getFragment } from "../../lib/vulcan-lib";
+import React from "react";
+import Collections from "../../lib/collections/collections/collection";
+import classNames from "classnames";
 
 export const styles = (theme: ThemeType): JssStyles => ({
   newOrEditForm: {
@@ -11,7 +11,7 @@ export const styles = (theme: ThemeType): JssStyles => ({
     padding: 15,
     borderRadius: 2,
     marginBottom: "2em",
-  
+
     "& form": {
       clear: "both",
       overflow: "auto",
@@ -43,32 +43,36 @@ export const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const CollectionsEditForm = ({documentId, successCallback, cancelCallback, classes}: {
-  documentId: string,
-  successCallback: any,
-  cancelCallback: any,
-  classes: ClassesType,
+const CollectionsEditForm = ({
+  documentId,
+  successCallback,
+  cancelCallback,
+  classes,
+}: {
+  documentId: string;
+  successCallback: any;
+  cancelCallback: any;
+  classes: ClassesType;
 }) => {
   return (
-    <div className={classNames(classes.newOrEditForm,classes.editForm)}>
+    <div className={classNames(classes.newOrEditForm, classes.editForm)}>
       <Components.WrappedSmartForm
         collectionName="Collections"
         documentId={documentId}
         successCallback={successCallback}
         cancelCallback={cancelCallback}
         showRemove={true}
-        queryFragment={getFragment('CollectionsEditFragment')}
-        mutationFragment={getFragment('CollectionsPageFragment')}
+        queryFragment={getFragment("CollectionsEditFragment")}
+        mutationFragment={getFragment("CollectionsPageFragment")}
       />
     </div>
-  )
-}
+  );
+};
 
-const CollectionsEditFormComponent = registerComponent('CollectionsEditForm', CollectionsEditForm, {styles});
+const CollectionsEditFormComponent = registerComponent("CollectionsEditForm", CollectionsEditForm, { styles });
 
 declare global {
   interface ComponentTypes {
-    CollectionsEditForm: typeof CollectionsEditFormComponent
+    CollectionsEditForm: typeof CollectionsEditFormComponent;
   }
 }
-

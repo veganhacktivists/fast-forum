@@ -1,12 +1,12 @@
-import React from 'react';
-import { registerComponent } from '../../lib/vulcan-lib';
-import type { CommentTreeOptions } from './commentTree';
-import classNames from 'classnames';
-import { isFriendlyUI } from '../../themes/forumTheme';
+import React from "react";
+import { registerComponent } from "../../lib/vulcan-lib";
+import type { CommentTreeOptions } from "./commentTree";
+import classNames from "classnames";
+import { isFriendlyUI } from "../../themes/forumTheme";
 
-export const HIGHLIGHT_DURATION = 3
+export const HIGHLIGHT_DURATION = 3;
 
-export const CONDENSED_MARGIN_BOTTOM = 4
+export const CONDENSED_MARGIN_BOTTOM = 4;
 
 const styles = (theme: ThemeType): JssStyles => ({
   node: {
@@ -14,9 +14,9 @@ const styles = (theme: ThemeType): JssStyles => ({
     borderRadius: isFriendlyUI ? theme.borderRadius.small : undefined,
     cursor: "default",
     // Higher specificity to override child class (variant syntax)
-    '&$deleted': {
-      opacity: 0.6
-    }
+    "&$deleted": {
+      opacity: 0.6,
+    },
   },
   commentsNodeRoot: {
     borderRadius: theme.borderRadius.small,
@@ -28,17 +28,15 @@ const styles = (theme: ThemeType): JssStyles => ({
     borderTop: theme.palette.border.commentBorder,
     borderBottom: theme.palette.border.commentBorder,
     borderRight: "none",
-    borderRadius: isFriendlyUI
-      ? `${theme.borderRadius.small}px 0 0 ${theme.borderRadius.small}px`
-      : "2px 0 0 2px",
+    borderRadius: isFriendlyUI ? `${theme.borderRadius.small}px 0 0 ${theme.borderRadius.small}px` : "2px 0 0 2px",
   },
   new: {
-    '&&': {
+    "&&": {
       borderLeft: `solid 5px ${theme.palette.secondary.light}`,
-      '&:hover': {
-        borderLeft: `solid 5px ${theme.palette.secondary.main}`
+      "&:hover": {
+        borderLeft: `solid 5px ${theme.palette.secondary.main}`,
       },
-    }
+    },
   },
   deleted: {},
   isAnswer: {
@@ -49,38 +47,38 @@ const styles = (theme: ThemeType): JssStyles => ({
     border: theme.palette.border.commentBorder,
   },
   childAnswerComment: {
-    borderRight: "none"
+    borderRight: "none",
   },
   oddAnswerComment: {
     backgroundColor: theme.palette.panelBackground.default,
   },
   answerLeafComment: {
-    paddingBottom: 0
+    paddingBottom: 0,
   },
   isSingleLine: {
     marginBottom: 0,
     borderBottom: "none",
     borderTop: theme.palette.border.commentBorder,
-    '&.comments-node-root':{
+    "&.comments-node-root": {
       marginBottom: CONDENSED_MARGIN_BOTTOM,
       borderBottom: theme.palette.border.commentBorder,
-    }
+    },
   },
   condensed: {
-    '&.comments-node-root':{
+    "&.comments-node-root": {
       marginBottom: CONDENSED_MARGIN_BOTTOM,
-    }
+    },
   },
   shortformTop: {
-    '&&': {
-      marginTop: isFriendlyUI ? theme.spacing.unit*2 : theme.spacing.unit*4,
+    "&&": {
+      marginTop: isFriendlyUI ? theme.spacing.unit * 2 : theme.spacing.unit * 4,
       marginBottom: 0,
-    }
+    },
   },
   hoverPreview: {
-    '&&': {
-      marginBottom: 0
-    }
+    "&&": {
+      marginBottom: 0,
+    },
   },
   moderatorHat: {
     "&.comments-node-even": {
@@ -90,7 +88,7 @@ const styles = (theme: ThemeType): JssStyles => ({
       background: theme.palette.panelBackground.commentModeratorHat,
     },
   },
-  '@keyframes higlight-animation': {
+  "@keyframes higlight-animation": {
     from: {
       backgroundColor: theme.palette.panelBackground.commentHighlightAnimation,
       border: theme.palette.border.maxIntensity,
@@ -98,10 +96,10 @@ const styles = (theme: ThemeType): JssStyles => ({
     to: {
       backgroundColor: "none",
       border: theme.palette.border.commentBorder,
-    }
+    },
   },
   highlightAnimation: {
-    animation: `higlight-animation ${HIGHLIGHT_DURATION}s ease-in-out 0s;`
+    animation: `higlight-animation ${HIGHLIGHT_DURATION}s ease-in-out 0s;`,
   },
   promoted: {
     border: `solid 1px ${theme.palette.lwTertiary.main}`,
@@ -126,7 +124,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     backgroundImage: `linear-gradient(to bottom right, ${theme.palette.border.secondaryHighlight}, ${theme.palette.border.primaryHighlight})`,
     border: "none",
     zIndex: 0,
-    '&.CommentFrame-isAnswer': {
+    "&.CommentFrame-isAnswer": {
       backgroundImage: `linear-gradient(to bottom right, ${theme.palette.border.secondaryHighlight2}, ${theme.palette.border.primaryHighlight2})`,
     },
   },
@@ -149,38 +147,38 @@ const CommentFrame = ({
   showPinnedOnProfile,
   children,
   className,
-  classes
+  classes,
 }: {
-  comment: CommentsList,
-  treeOptions: CommentTreeOptions,
-  onClick?: (event: any)=>void,
-  id?: string,
-  
-  nestingLevel: number,
-  hasChildren?: boolean,
-  highlighted?: boolean,
-  isSingleLine?: boolean,
-  isChild?: boolean,
-  isNewComment?: boolean,
-  isReplyToAnswer?: boolean,
-  hoverPreview?: boolean,
-  shortform?: boolean,
-  showPinnedOnProfile?: boolean,
-  
-  children: React.ReactNode,
-  className?: string,
-  classes: ClassesType,
+  comment: CommentsList;
+  treeOptions: CommentTreeOptions;
+  onClick?: (event: any) => void;
+  id?: string;
+
+  nestingLevel: number;
+  hasChildren?: boolean;
+  highlighted?: boolean;
+  isSingleLine?: boolean;
+  isChild?: boolean;
+  isNewComment?: boolean;
+  isReplyToAnswer?: boolean;
+  hoverPreview?: boolean;
+  shortform?: boolean;
+  showPinnedOnProfile?: boolean;
+
+  children: React.ReactNode;
+  className?: string;
+  classes: ClassesType;
 }) => {
   const { condensed, postPage, switchAlternatingHighlights } = treeOptions;
   const effectiveNestingLevel = nestingLevel + (switchAlternatingHighlights ? 1 : 0);
-  
+
   const nodeClass = classNames(
     "comments-node",
     nestingLevelToClass(effectiveNestingLevel, classes),
     classes.node,
     className,
     {
-      "af":comment.af,
+      af: comment.af,
       [classes.highlightAnimation]: highlighted,
       [classes.child]: isChild,
       [classes.new]: isNewComment,
@@ -189,28 +187,30 @@ const CommentFrame = ({
       [classes.isAnswer]: comment.answer,
       [classes.answerChildComment]: isReplyToAnswer,
       [classes.childAnswerComment]: isChild && isReplyToAnswer,
-      [classes.oddAnswerComment]: (effectiveNestingLevel % 2 !== 0) && isReplyToAnswer,
+      [classes.oddAnswerComment]: effectiveNestingLevel % 2 !== 0 && isReplyToAnswer,
       [classes.answerLeafComment]: !hasChildren,
       [classes.isSingleLine]: isSingleLine,
       [classes.condensed]: condensed,
-      [classes.shortformTop]: postPage && shortform && (effectiveNestingLevel===1),
+      [classes.shortformTop]: postPage && shortform && effectiveNestingLevel === 1,
       [classes.hoverPreview]: hoverPreview,
       [classes.moderatorHat]: comment.hideModeratorHat ? false : comment.moderatorHat,
-      [classes.promoted]: comment.promoted
-    }
-  )
-  
-  return <div className={nodeClass} onClick={onClick} id={id}>
-    {children}
-  </div>
-}
+      [classes.promoted]: comment.promoted,
+    },
+  );
+
+  return (
+    <div className={nodeClass} onClick={onClick} id={id}>
+      {children}
+    </div>
+  );
+};
 
 const nestingLevelToClass = (nestingLevel: number, classes: ClassesType): string => {
   return classNames({
-    [classes.commentsNodeRoot] : nestingLevel === 1,
-    "comments-node-root" : nestingLevel === 1,
-    "comments-node-even" : nestingLevel % 2 === 0,
-    "comments-node-odd"  : nestingLevel % 2 !== 0,
+    [classes.commentsNodeRoot]: nestingLevel === 1,
+    "comments-node-root": nestingLevel === 1,
+    "comments-node-even": nestingLevel % 2 === 0,
+    "comments-node-odd": nestingLevel % 2 !== 0,
     "comments-node-its-getting-nested-here": nestingLevel > 8,
     "comments-node-so-take-off-all-your-margins": nestingLevel > 12,
     "comments-node-im-getting-so-nested": nestingLevel > 16,
@@ -221,13 +221,12 @@ const nestingLevelToClass = (nestingLevel: number, classes: ClassesType): string
     "comments-node-are-you-curi-and-lumifer-specifically": nestingLevel > 36,
     "comments-node-cuz-i-guess-that-makes-sense-but-like-really-tho": nestingLevel > 40,
   });
-}
+};
 
-
-const CommentFrameComponent = registerComponent('CommentFrame', CommentFrame, {styles, stylePriority: -1});
+const CommentFrameComponent = registerComponent("CommentFrame", CommentFrame, { styles, stylePriority: -1 });
 
 declare global {
   interface ComponentTypes {
-    CommentFrame: typeof CommentFrameComponent,
+    CommentFrame: typeof CommentFrameComponent;
   }
 }

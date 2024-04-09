@@ -15,9 +15,9 @@ import { createTable, dropTable } from "./meta/utils";
  * -
  * --- Accepted on 2022-12-24T17:14:07.000Z by 20221224T171407.add_comment_title.ts
  * +-- Overall schema hash: f4f463411c2e217e442be3f540ae0f74
- *  
+ *
  * @@ -829,2 +827,13 @@ CREATE TABLE "Tags" (
- *  
+ *
  * +-- Schema for "UserMostValuablePosts", hash: 7ef73010687dba18fda0b20b6f38871e
  * +CREATE TABLE "UserMostValuablePosts" (
  * +    _id varchar(27) PRIMARY KEY,
@@ -30,7 +30,7 @@ import { createTable, dropTable } from "./meta/utils";
  * +);
  * +
  *  -- Schema for "UserTagRels", hash: 0d561800b9a8262660a82c0e4125d99a
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -41,10 +41,10 @@ import { createTable, dropTable } from "./meta/utils";
  */
 export const acceptsSchemaHash = "f9a5c9f182dad6b94bd1361b603906fd";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await createTable(db, UserMostValuablePosts);
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropTable(db, UserMostValuablePosts);
-}
+};

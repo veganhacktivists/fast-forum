@@ -19,30 +19,33 @@ export const useElectionVote = (electionName: string) => {
     createIfMissing: {
       electionName,
       userId: currentUser?._id,
-      vote: {}
+      vote: {},
     },
   });
   const voteDocument = results?.[0];
 
-  const {mutate: updateVoteDb} = useUpdate({
+  const { mutate: updateVoteDb } = useUpdate({
     collectionName: "ElectionVotes",
-    fragmentName: 'ElectionVoteInfo',
+    fragmentName: "ElectionVoteInfo",
   });
 
-  const updateVote = useCallback(async (data: NullablePartial<DbElectionVote>) => {
-    if (!voteDocument) {
-      return;
-    }
+  const updateVote = useCallback(
+    async (data: NullablePartial<DbElectionVote>) => {
+      if (!voteDocument) {
+        return;
+      }
 
-    await updateVoteDb({
-      selector: {
-        _id: voteDocument._id,
-      },
-      data,
-    });
+      await updateVoteDb({
+        selector: {
+          _id: voteDocument._id,
+        },
+        data,
+      });
 
-    refetch();
-  }, [voteDocument, refetch, updateVoteDb]);
+      refetch();
+    },
+    [voteDocument, refetch, updateVoteDb],
+  );
 
   return {
     electionVote: voteDocument,
@@ -50,4 +53,4 @@ export const useElectionVote = (electionName: string) => {
     loading,
     error,
   };
-}
+};

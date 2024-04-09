@@ -73,59 +73,31 @@ const styles = (theme: ThemeType): JssStyles => ({
 });
 
 const formatRole = (jobTitle?: string, organization?: string): string =>
-  jobTitle && organization
-    ? `${jobTitle} @ ${organization}`
-    : (jobTitle || organization) ?? "";
+  jobTitle && organization ? `${jobTitle} @ ${organization}` : (jobTitle || organization) ?? "";
 
 const formatBio = (bio?: string): string => htmlToTextDefault(bio ?? "");
 
 export const formatStat = (value?: number): string => {
   value ??= 0;
-  return value > 10000
-    ? `${Math.floor(value / 1000)} ${String(value % 1000).padStart(3, "0")}`
-    : String(value);
-}
+  return value > 10000 ? `${Math.floor(value / 1000)} ${String(value % 1000).padStart(3, "0")}` : String(value);
+};
 
-const EAUserTooltipContent = ({user, classes}: {
-  user: UsersMinimumInfo,
-  classes: ClassesType,
-}) => {
-  const {
-    displayName,
-    createdAt,
-    jobTitle,
-    organization,
-    htmlBio,
-    karma,
-    postCount,
-    commentCount,
-  } = user;
+const EAUserTooltipContent = ({ user, classes }: { user: UsersMinimumInfo; classes: ClassesType }) => {
+  const { displayName, createdAt, jobTitle, organization, htmlBio, karma, postCount, commentCount } = user;
   const role = formatRole(jobTitle, organization);
   const textBio = useMemo(() => formatBio(htmlBio), [htmlBio]);
-  const {UsersProfileImage} = Components;
+  const { UsersProfileImage } = Components;
   return (
     <div className={classes.root}>
       <div className={classes.header}>
-        <UsersProfileImage
-          user={user}
-          size={40}
-          className={classes.profileImage}
-        />
+        <UsersProfileImage user={user} size={40} className={classes.profileImage} />
         <div className={classes.headerInfo}>
           <div>{displayName}</div>
           <div>Joined {moment(createdAt).fromNow()} ago</div>
         </div>
       </div>
-      {role &&
-        <div className={classes.role}>
-          {role}
-        </div>
-      }
-      {textBio &&
-        <div className={classes.bio}>
-          {textBio}
-        </div>
-      }
+      {role && <div className={classes.role}>{role}</div>}
+      {textBio && <div className={classes.bio}>{textBio}</div>}
       <div className={classes.stats}>
         <div className={classes.stat}>
           <div>{formatStat(karma)}</div>
@@ -142,16 +114,12 @@ const EAUserTooltipContent = ({user, classes}: {
       </div>
     </div>
   );
-}
+};
 
-const EAUserTooltipContentComponent = registerComponent(
-  "EAUserTooltipContent",
-  EAUserTooltipContent,
-  {styles},
-);
+const EAUserTooltipContentComponent = registerComponent("EAUserTooltipContent", EAUserTooltipContent, { styles });
 
 declare global {
   interface ComponentTypes {
-    EAUserTooltipContent: typeof EAUserTooltipContentComponent
+    EAUserTooltipContent: typeof EAUserTooltipContentComponent;
   }
 }

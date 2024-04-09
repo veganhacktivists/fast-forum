@@ -1,7 +1,7 @@
-import React from 'react';
-import { registerComponent } from '../../lib/vulcan-lib';
-import classNames from 'classnames';
-import SwapVert from '@material-ui/icons/SwapVert';
+import React from "react";
+import { registerComponent } from "../../lib/vulcan-lib";
+import classNames from "classnames";
+import SwapVert from "@material-ui/icons/SwapVert";
 
 const styles = (theme: ThemeType): JssStyles => ({
   icon: {
@@ -22,28 +22,36 @@ const styles = (theme: ThemeType): JssStyles => ({
     fontSize: 14,
     color: theme.palette.grey[600],
   },
-})
+});
 
-const SortButton = ({classes, className, onClick, showIcon=true, label=""}: {
-  classes: ClassesType,
-  className?: string,
-  onClick?: any,
-  label?: JSX.Element|string,
-  showIcon?: boolean
+const SortButton = ({
+  classes,
+  className,
+  onClick,
+  showIcon = true,
+  label = "",
+}: {
+  classes: ClassesType;
+  className?: string;
+  onClick?: any;
+  label?: JSX.Element | string;
+  showIcon?: boolean;
 }) => {
   if (label) {
-    return <span className={classes.iconWithLabelGroup} onClick={onClick}>
-      {showIcon && <SwapVert className={classNames(classes.icon, classes.iconWithLabel, className)}/>}
-      <span className={classes.label}>{ label }</span>
-    </span>
+    return (
+      <span className={classes.iconWithLabelGroup} onClick={onClick}>
+        {showIcon && <SwapVert className={classNames(classes.icon, classes.iconWithLabel, className)} />}
+        <span className={classes.label}>{label}</span>
+      </span>
+    );
   }
-  return <SwapVert className={classNames(classes.icon, className)} onClick={onClick}/>
-}
+  return <SwapVert className={classNames(classes.icon, className)} onClick={onClick} />;
+};
 
-const SortButtonComponent = registerComponent('SortButton', SortButton, {styles});
+const SortButtonComponent = registerComponent("SortButton", SortButton, { styles });
 
 declare global {
   interface ComponentTypes {
-    SortButton: typeof SortButtonComponent
+    SortButton: typeof SortButtonComponent;
   }
 }

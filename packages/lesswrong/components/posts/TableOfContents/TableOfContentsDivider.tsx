@@ -1,28 +1,25 @@
-import React from 'react';
+import React from "react";
 import { registerComponent } from "../../../lib/vulcan-lib";
 
 const styles = (theme: ThemeType): JssStyles => ({
   divider: {
     width: 80,
-    marginBottom:theme.spacing.unit,
+    marginBottom: theme.spacing.unit,
     marginRight: "auto",
     borderBottom: theme.palette.border.faint,
     paddingBottom: theme.spacing.unit,
-    display:"block",
-  }
-})
+    display: "block",
+  },
+});
 
-const TableOfContentsDivider = ({classes}: {
-  classes: ClassesType,
-}) => {
-  return <div className={classes.divider}/>
-}
+const TableOfContentsDivider = ({ classes }: { classes: ClassesType }) => {
+  return <div className={classes.divider} />;
+};
 
-const TableOfContentsDividerComponent = registerComponent('TableOfContentsDivider', TableOfContentsDivider, {styles});
+const TableOfContentsDividerComponent = registerComponent("TableOfContentsDivider", TableOfContentsDivider, { styles });
 
 declare global {
   interface ComponentTypes {
-    TableOfContentsDivider: typeof TableOfContentsDividerComponent
+    TableOfContentsDivider: typeof TableOfContentsDividerComponent;
   }
 }
-

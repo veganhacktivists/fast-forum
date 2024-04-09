@@ -3,17 +3,17 @@ import Table from "../Table";
 import Query from "../Query";
 
 export type DbTestObject = {
-  _id: string,
-  a?: number,
-  b?: string,
+  _id: string;
+  a?: number;
+  b?: string;
   c?: {
     d: {
-      e: string,
-    },
-  },
-  d?: string[],
-  schemaVersion: number,
-}
+      e: string;
+    };
+  };
+  d?: string[];
+  schemaVersion: number;
+};
 
 export const TestCollection = {
   collectionName: "TestCollection",
@@ -32,10 +32,10 @@ export const TestCollection = {
       type: Object,
     },
     d: {
-      type: Array
+      type: Array,
     },
-    'd.$': {
-      type: String
+    "d.$": {
+      type: String,
     },
     schemaVersion: {
       type: Number,
@@ -45,17 +45,17 @@ export const TestCollection = {
 
 export const testTable = Table.fromCollection<CollectionNameString, DbTestObject>(TestCollection);
 
-testTable.addIndex({a: 1, b: 1});
-testTable.addIndex({a: 1, "c.d": 1});
-testTable.addIndex({a: 1, b: 1}, {unique: true});
-testTable.addIndex({a: 1, b: 1}, {partialFilterExpression: {a: {$gt: 3}, b: "test"}});
-testTable.addIndex({b: 1}, {collation: {locale: "en", strength: 2}});
+testTable.addIndex({ a: 1, b: 1 });
+testTable.addIndex({ a: 1, "c.d": 1 });
+testTable.addIndex({ a: 1, b: 1 }, { unique: true });
+testTable.addIndex({ a: 1, b: 1 }, { partialFilterExpression: { a: { $gt: 3 }, b: "test" } });
+testTable.addIndex({ b: 1 }, { collation: { locale: "en", strength: 2 } });
 
 export type DbTestObject2 = {
-  _id: string,
-  data?: number,
-  schemaVersion: number,
-}
+  _id: string;
+  data?: number;
+  schemaVersion: number;
+};
 
 export const TestCollection2 = {
   collectionName: "TestCollection2",
@@ -75,9 +75,9 @@ export const TestCollection2 = {
 export const testTable2 = Table.fromCollection<CollectionNameString, DbTestObject2>(TestCollection2);
 
 export type DbTestObject3 = {
-  _id: string,
-  notNullData: string,
-  schemaVersion: number
+  _id: string;
+  notNullData: string;
+  schemaVersion: number;
 };
 
 export const TestCollection3 = {
@@ -88,12 +88,12 @@ export const TestCollection3 = {
     },
     notNullData: {
       type: String,
-      nullable: false
+      nullable: false,
     },
     schemaVersion: {
       type: Number,
-    }
-  }
+    },
+  },
 } as unknown as CollectionBase<CollectionNameString>;
 
 export const testTable3 = Table.fromCollection<CollectionNameString, DbTestObject3>(TestCollection3);
@@ -105,17 +105,17 @@ registerCollection(TestCollection3);
 export const normalizeWhitespace = (s: string) => s.trim().replace(/\s+/g, " ");
 
 export type SuccessResult = {
-  expectedSql: string,
-  expectedArgs: any[],
-}
+  expectedSql: string;
+  expectedArgs: any[];
+};
 
 export type ErrorResult = {
-  expectedError: string,
-}
+  expectedError: string;
+};
 
 export type TestCase = {
-  name: string,
-  getQuery: () => Query<DbTestObject>,
+  name: string;
+  getQuery: () => Query<DbTestObject>;
 } & (SuccessResult | ErrorResult);
 
 export const runTestCases = (tests: TestCase[]) => {
@@ -125,11 +125,11 @@ export const runTestCases = (tests: TestCase[]) => {
         expect(test.getQuery).toThrowError(test.expectedError);
       } else {
         const query = test.getQuery();
-        const {sql, args} = query.compile();
+        const { sql, args } = query.compile();
         const normalizedSql = normalizeWhitespace(sql);
         expect(normalizedSql).toBe(test.expectedSql);
         expect(args).toStrictEqual(test.expectedArgs);
       }
     });
   }
-}
+};

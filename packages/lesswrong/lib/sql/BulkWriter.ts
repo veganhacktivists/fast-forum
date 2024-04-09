@@ -5,8 +5,8 @@ import UpdateQuery from "./UpdateQuery";
 import DeleteQuery from "./DeleteQuery";
 
 export type BulkWriterResult = {
-  ok: number,
-}
+  ok: number;
+};
 
 /**
  * This class acts as a helper to facilitate the Mongo `bulkWrite` operation.
@@ -57,27 +57,39 @@ class BulkWriter<T extends DbObject> {
     }
 
     if (inserts.length) {
-      this.queries.push(new InsertQuery(table, inserts.map(({document}) => document)));
+      this.queries.push(
+        new InsertQuery(
+          table,
+          inserts.map(({ document }) => document),
+        ),
+      );
     }
     if (updateOnes.length) {
-      this.queries = this.queries.concat(updateOnes.map(({filter, update, upsert}) => upsert
-        ? new InsertQuery(table, update as T, {}, {conflictStrategy: "upsert", upsertSelector: filter})
-        : new UpdateQuery(table, filter, update)
-      ));
+      this.queries = this.queries.concat(
+        updateOnes.map(({ filter, update, upsert }) =>
+          upsert
+            ? new InsertQuery(table, update as T, {}, { conflictStrategy: "upsert", upsertSelector: filter })
+            : new UpdateQuery(table, filter, update),
+        ),
+      );
     }
     if (updateManys.length) {
-      this.queries = this.queries.concat(updateManys.map(({filter, update, upsert}) => {
-        if (upsert) {
-          throw new Error("Upsert not implemented for multi-updates");
-        }
-        return new UpdateQuery(table, filter, update);
-      }));
+      this.queries = this.queries.concat(
+        updateManys.map(({ filter, update, upsert }) => {
+          if (upsert) {
+            throw new Error("Upsert not implemented for multi-updates");
+          }
+          return new UpdateQuery(table, filter, update);
+        }),
+      );
     }
     if (deleteOnes.length) {
-      this.queries = this.queries.concat(deleteOnes.map(({filter}) => new DeleteQuery(table, filter, {}, {limit: 1})));
+      this.queries = this.queries.concat(
+        deleteOnes.map(({ filter }) => new DeleteQuery(table, filter, {}, { limit: 1 })),
+      );
     }
     if (deleteManys.length) {
-      this.queries = this.queries.concat(deleteManys.map(({filter}) => new DeleteQuery(table, filter, {})));
+      this.queries = this.queries.concat(deleteManys.map(({ filter }) => new DeleteQuery(table, filter, {})));
     }
     if (replaces.length) {
       // Currently not used in our code base and it's complicated to implement...

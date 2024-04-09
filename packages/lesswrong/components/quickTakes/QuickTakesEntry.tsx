@@ -5,11 +5,8 @@ import { styles as buttonStyles } from "../form-components/FormSubmit";
 import { styles as submitButtonStyles } from "../posts/PostSubmit";
 import { useQuickTakesTags } from "./useQuickTakesTags";
 import { useCreate } from "../../lib/crud/withCreate";
-import type { Editor as EditorType }  from "../editor/Editor";
-import type {
-  CommentCancelCallback,
-  CommentSuccessCallback,
-} from "../comments/CommentsNewForm";
+import type { Editor as EditorType } from "../editor/Editor";
+import type { CommentCancelCallback, CommentSuccessCallback } from "../comments/CommentsNewForm";
 import Button from "@material-ui/core/Button";
 import classNames from "classnames";
 
@@ -85,29 +82,24 @@ const QuickTakesEntry = ({
   cancelCallback,
   classes,
 }: {
-  currentUser: UsersCurrent | null,
-  defaultExpanded?: boolean,
-  defaultFocus?: boolean,
-  submitButtonAtBottom?: boolean,
-  className?: string,
-  editorClassName?: string,
-  tagsClassName?: string,
-  buttonClassName?: string,
-  successCallback?: CommentSuccessCallback,
-  cancelCallback?: CommentCancelCallback,
-  classes: ClassesType,
+  currentUser: UsersCurrent | null;
+  defaultExpanded?: boolean;
+  defaultFocus?: boolean;
+  submitButtonAtBottom?: boolean;
+  className?: string;
+  editorClassName?: string;
+  tagsClassName?: string;
+  buttonClassName?: string;
+  successCallback?: CommentSuccessCallback;
+  cancelCallback?: CommentCancelCallback;
+  classes: ClassesType;
 }) => {
   const editorType = "ckEditorMarkup";
   const editorRef = useRef<EditorType>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
-  const [contents, setContents] = useState(() => getInitialEditorContents(
-    undefined,
-    null,
-    "contents",
-    currentUser,
-  ));
+  const [contents, setContents] = useState(() => getInitialEditorContents(undefined, null, "contents", currentUser));
   const {
     loading: loadingTags,
     frontpage,
@@ -117,58 +109,54 @@ const QuickTakesEntry = ({
     onTagSelected,
     onTagRemoved,
   } = useQuickTakesTags();
-  const {create} = useCreate({
+  const { create } = useCreate({
     collectionName: "Comments",
     fragmentName: "ShortformComments",
   });
 
-  const onChange = useCallback(({contents}: AnyBecauseTodo) => {
+  const onChange = useCallback(({ contents }: AnyBecauseTodo) => {
     setContents(contents);
   }, []);
 
   const lastSubmittedAt = useRef(0);
 
-  const onSubmit = useCallback(async (ev?: MouseEvent) => {
-    ev?.preventDefault();
+  const onSubmit = useCallback(
+    async (ev?: MouseEvent) => {
+      ev?.preventDefault();
 
-    // Prevent accidental double submits
-    if (Date.now() - lastSubmittedAt.current < 1000) {
-      return;
-    }
-    lastSubmittedAt.current = Date.now();
+      // Prevent accidental double submits
+      if (Date.now() - lastSubmittedAt.current < 1000) {
+        return;
+      }
+      lastSubmittedAt.current = Date.now();
 
-    setLoadingSubmit(true);
-    try {
-      const contents = await editorRef.current?.submitData();
-      const response = await create({
-        data: {
-          shortform: true,
-          shortformFrontpage: frontpage,
-          relevantTagIds: selectedTagIds,
-          // There's some magic that makes this work even though it is missing
-          // some fields that are marked as required. It hard to work out exactly
-          // what's going on without getting lost in the seas of `any`.
-          // @ts-ignore
-          contents,
-        },
-      });
-      const comment = response.data?.createComment.data;
-      void successCallback?.(comment, {form: formRef.current});
-      editorRef.current?.clear(currentUser);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
-      void cancelCallback?.(e);
-    }
-    setLoadingSubmit(false);
-  }, [
-    create,
-    frontpage,
-    selectedTagIds,
-    successCallback,
-    cancelCallback,
-    currentUser,
-  ]);
+      setLoadingSubmit(true);
+      try {
+        const contents = await editorRef.current?.submitData();
+        const response = await create({
+          data: {
+            shortform: true,
+            shortformFrontpage: frontpage,
+            relevantTagIds: selectedTagIds,
+            // There's some magic that makes this work even though it is missing
+            // some fields that are marked as required. It hard to work out exactly
+            // what's going on without getting lost in the seas of `any`.
+            // @ts-ignore
+            contents,
+          },
+        });
+        const comment = response.data?.createComment.data;
+        void successCallback?.(comment, { form: formRef.current });
+        editorRef.current?.clear(currentUser);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+        void cancelCallback?.(e);
+      }
+      setLoadingSubmit(false);
+    },
+    [create, frontpage, selectedTagIds, successCallback, cancelCallback, currentUser],
+  );
 
   const onFocus = useCallback(() => setExpanded(true), []);
 
@@ -181,8 +169,8 @@ const QuickTakesEntry = ({
           event.stopPropagation();
           void onSubmit();
         }
-      }
-      form.addEventListener("keydown", handler, {capture: true});
+      };
+      form.addEventListener("keydown", handler, { capture: true });
       return () => form.removeEventListener("keydown", handler);
     }
   }, [formRef, onSubmit]);
@@ -205,12 +193,14 @@ const QuickTakesEntry = ({
     return null;
   }
 
-  const {Editor, Loading, TagsChecklist} = Components;
+  const { Editor, Loading, TagsChecklist } = Components;
   const submitButton = (
-    <div className={classNames(buttonClassName, {
-      [classes.editorButtonContainer]: !submitButtonAtBottom,
-      [classes.bottomButtonContainer]: submitButtonAtBottom,
-    })}>
+    <div
+      className={classNames(buttonClassName, {
+        [classes.editorButtonContainer]: !submitButtonAtBottom,
+        [classes.bottomButtonContainer]: submitButtonAtBottom,
+      })}
+    >
       <Button
         type="submit"
         disabled={loadingSubmit}
@@ -219,22 +209,18 @@ const QuickTakesEntry = ({
         color="primary"
         onClick={onSubmit}
       >
-        {loadingSubmit
-          ? <Loading />
-          : "Publish"
-        }
+        {loadingSubmit ? <Loading /> : "Publish"}
       </Button>
     </div>
   );
   return (
-    <form
-      ref={formRef}
-      className={classNames(classes.root, className)}
-    >
-      <div className={classNames(classes.commentEditor, editorClassName, {
-        [classes.commentEditorBottomButtom]: submitButtonAtBottom,
-        [classes.collapsed]: !expanded,
-      })}>
+    <form ref={formRef} className={classNames(classes.root, className)}>
+      <div
+        className={classNames(classes.commentEditor, editorClassName, {
+          [classes.commentEditorBottomButtom]: submitButtonAtBottom,
+          [classes.collapsed]: !expanded,
+        })}
+      >
         <Editor
           ref={editorRef}
           currentUser={currentUser}
@@ -252,45 +238,37 @@ const QuickTakesEntry = ({
           _classes={classes}
         />
       </div>
-      {expanded &&
+      {expanded && (
         <>
           {!submitButtonAtBottom && submitButton}
-          {loadingTags
-            ? <Loading />
-            : (
-              <div className={classNames(classes.tagContainer, tagsClassName)}>
-                <span className={classes.tagLabel}>Set topic</span>
-                <TagsChecklist
-                  tags={tags}
-                  displaySelected="highlight"
-                  selectedTagIds={[
-                    ...(frontpage ? [frontpageTagId] : []),
-                    ...selectedTagIds,
-                  ]}
-                  onTagSelected={onTagSelected}
-                  onTagRemoved={onTagRemoved}
-                  tooltips={false}
-                  truncate
-                  smallText
-                />
-              </div>
-            )
-          }
+          {loadingTags ? (
+            <Loading />
+          ) : (
+            <div className={classNames(classes.tagContainer, tagsClassName)}>
+              <span className={classes.tagLabel}>Set topic</span>
+              <TagsChecklist
+                tags={tags}
+                displaySelected="highlight"
+                selectedTagIds={[...(frontpage ? [frontpageTagId] : []), ...selectedTagIds]}
+                onTagSelected={onTagSelected}
+                onTagRemoved={onTagRemoved}
+                tooltips={false}
+                truncate
+                smallText
+              />
+            </div>
+          )}
           {submitButtonAtBottom && submitButton}
         </>
-      }
+      )}
     </form>
   );
-}
+};
 
-const QuickTakesEntryComponent = registerComponent(
-  "QuickTakesEntry",
-  QuickTakesEntry,
-  {styles},
-);
+const QuickTakesEntryComponent = registerComponent("QuickTakesEntry", QuickTakesEntry, { styles });
 
 declare global {
   interface ComponentTypes {
-    QuickTakesEntry: typeof QuickTakesEntryComponent
+    QuickTakesEntry: typeof QuickTakesEntryComponent;
   }
 }

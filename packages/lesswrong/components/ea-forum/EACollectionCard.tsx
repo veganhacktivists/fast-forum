@@ -10,21 +10,16 @@ const defaultImageId = forumSelect({
   default: "sequences/vnyzzznenju0hzdv6pqb.jpg",
 });
 
-const getCardDetails = ({
-  _id,
-  title,
-  user,
-  gridImageId,
-}: CollectionsBestOfFragment) => {
+const getCardDetails = ({ _id, title, user, gridImageId }: CollectionsBestOfFragment) => {
   // Add special case short names for the EA handbook
   if (_id === "MobebwWs2o86cS9Rd") {
     return {
       title: "The EA Handbook",
       author: user
         ? {
-          ...user,
-          displayName: "CEA",
-        }
+            ...user,
+            displayName: "CEA",
+          }
         : null,
       imageId: "268969264-1881a4b1-01d3-4d79-9481-e6b3eae202fc",
     };
@@ -35,19 +30,19 @@ const getCardDetails = ({
     author: user,
     imageId: gridImageId || defaultImageId,
   };
-}
+};
 
-const EACollectionCard = ({collection}: {collection: CollectionsBestOfFragment}) => {
-  const {eventHandlers} = useHover({
+const EACollectionCard = ({ collection }: { collection: CollectionsBestOfFragment }) => {
+  const { eventHandlers } = useHover({
     pageElementContext: "collectionCard",
     documentId: collection._id,
     documentSlug: collection.slug,
   });
 
-  const {title, author, imageId} = getCardDetails(collection);
+  const { title, author, imageId } = getCardDetails(collection);
   const href = collectionGetPageUrl(collection);
 
-  const {EASequenceOrCollectionCard, CollectionsHoverOver} = Components;
+  const { EASequenceOrCollectionCard, CollectionsHoverOver } = Components;
   return (
     <AnalyticsContext documentSlug={collection.slug}>
       <EASequenceOrCollectionCard
@@ -62,12 +57,9 @@ const EACollectionCard = ({collection}: {collection: CollectionsBestOfFragment})
       />
     </AnalyticsContext>
   );
-}
+};
 
-const EACollectionCardComponent = registerComponent(
-  "EACollectionCard",
-  EACollectionCard,
-);
+const EACollectionCardComponent = registerComponent("EACollectionCard", EACollectionCard);
 
 declare global {
   interface ComponentTypes {

@@ -1,59 +1,62 @@
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { useMulti } from '../../lib/crud/withMulti';
-import React from 'react';
-import { userCanDo } from '../../lib/vulcan-users/permissions';
-import { Link } from '../../lib/reactRouterWrapper';
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useMulti } from "../../lib/crud/withMulti";
+import React from "react";
+import { userCanDo } from "../../lib/vulcan-users/permissions";
+import { Link } from "../../lib/reactRouterWrapper";
 
 const styles = (theme: ThemeType): JssStyles => ({
   loadMore: {
     fontSize: "1rem",
     textAlign: "right",
     paddingRight: 12,
-    paddingBottom: 8
-  }
-})
+    paddingBottom: 8,
+  },
+});
 
-const SunshineNewUsersList = ({ classes, terms, currentUser }: {
-  terms: UsersViewTerms,
-  classes: ClassesType,
-  currentUser: UsersCurrent,
+const SunshineNewUsersList = ({
+  classes,
+  terms,
+  currentUser,
+}: {
+  terms: UsersViewTerms;
+  classes: ClassesType;
+  currentUser: UsersCurrent;
 }) => {
   const { results, totalCount, loadMoreProps, refetch } = useMulti({
     terms,
     collectionName: "Users",
-    fragmentName: 'SunshineUsersList',
+    fragmentName: "SunshineUsersList",
     enableTotal: true,
-    itemsPerPage: 60
+    itemsPerPage: 60,
   });
-  const { SunshineListCount, SunshineListTitle, SunshineNewUsersItem, LoadMore } = Components
+  const { SunshineListCount, SunshineListTitle, SunshineNewUsersItem, LoadMore } = Components;
 
   if (results && results.length && userCanDo(currentUser, "posts.moderate.all")) {
     return (
       <div>
         <SunshineListTitle>
           <Link to="/admin/moderation">Unreviewed Users</Link>
-          <SunshineListCount count={totalCount}/>
+          <SunshineListCount count={totalCount} />
         </SunshineListTitle>
-        {results.map(user =>
-          <div key={user._id} >
-            <SunshineNewUsersItem user={user} refetch={refetch} currentUser={currentUser}/>
+        {results.map((user) => (
+          <div key={user._id}>
+            <SunshineNewUsersItem user={user} refetch={refetch} currentUser={currentUser} />
           </div>
-        )}
+        ))}
         <div className={classes.loadMore}>
-          <LoadMore {...loadMoreProps}/>
+          <LoadMore {...loadMoreProps} />
         </div>
       </div>
-    )
+    );
   } else {
-    return null
+    return null;
   }
-}
+};
 
-const SunshineNewUsersListComponent = registerComponent('SunshineNewUsersList', SunshineNewUsersList, {styles});
+const SunshineNewUsersListComponent = registerComponent("SunshineNewUsersList", SunshineNewUsersList, { styles });
 
 declare global {
   interface ComponentTypes {
-    SunshineNewUsersList: typeof SunshineNewUsersListComponent
+    SunshineNewUsersList: typeof SunshineNewUsersListComponent;
   }
 }
-

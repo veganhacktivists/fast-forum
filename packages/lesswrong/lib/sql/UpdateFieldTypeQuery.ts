@@ -9,11 +9,7 @@ import Table from "./Table";
 class UpdateFieldTypeQuery<T extends DbObject> extends Query<T> {
   constructor(table: Table<T>, fieldName: string) {
     const fieldType = table.getFields()[fieldName];
-    super(table, [
-      "ALTER TABLE",
-      table,
-      `ALTER COLUMN "${fieldName}" TYPE ${fieldType.toConcrete().toString()}`,
-    ]);
+    super(table, ["ALTER TABLE", table, `ALTER COLUMN "${fieldName}" TYPE ${fieldType.toConcrete().toString()}`]);
   }
 }
 

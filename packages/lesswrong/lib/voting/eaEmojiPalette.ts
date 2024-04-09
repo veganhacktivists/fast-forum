@@ -7,10 +7,10 @@ import { LightbulbReactionIcon } from "../../components/icons/reactions/Lightbul
 import { DeltaReactionIcon } from "../../components/icons/reactions/DeltaReactionIcon";
 
 export type EmojiOption = {
-  Component: ComponentType,
-  name: string,
-  label: string,
-}
+  Component: ComponentType;
+  name: string;
+  label: string;
+};
 
 export const eaAnonymousEmojiPalette: EmojiOption[] = [
   {
@@ -48,20 +48,17 @@ export const eaEmojiPalette: EmojiOption[] = [
   },
 ];
 
-export const eaEmojiNames = [
-  ...eaAnonymousEmojiPalette,
-  ...eaEmojiPalette,
-].map(({name}) => name);
+export const eaEmojiNames = [...eaAnonymousEmojiPalette, ...eaEmojiPalette].map(({ name }) => name);
 
-export const eaPublicEmojiNames = eaEmojiPalette.map(({name}) => name);
+export const eaPublicEmojiNames = eaEmojiPalette.map(({ name }) => name);
 
 export const getEmojiMutuallyExclusivePartner = (emojiName: string) => {
   switch (emojiName) {
-  case "agree":
-    return "disagree";
-  case "disagree":
-    return "agree";
-  default:
-    return undefined;
+    case "agree":
+      return "disagree";
+    case "disagree":
+      return "agree";
+    default:
+      return undefined;
   }
-}
+};

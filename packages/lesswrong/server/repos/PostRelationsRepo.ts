@@ -8,7 +8,8 @@ class PostRelationsRepo extends AbstractRepo<"PostRelations"> {
   }
 
   getPostRelationsByPostId(postId: string, depth = 3): Promise<DbPostRelation[]> {
-    return this.any(`
+    return this.any(
+      `
       -- PostRelationsRepo.getPostRelationsByPostId
       WITH RECURSIVE search_tree(
         "_id", "createdAt", "type", "sourcePostId", "targetPostId", "order", "schemaVersion", "depth"
@@ -24,7 +25,9 @@ class PostRelationsRepo extends AbstractRepo<"PostRelations"> {
       )
       SELECT "_id", "createdAt", "type", "sourcePostId", "targetPostId", "order", "schemaVersion"
       FROM search_tree;
-    `, [postId, depth]);
+    `,
+      [postId, depth],
+    );
   }
 }
 

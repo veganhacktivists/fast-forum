@@ -39,10 +39,10 @@ const UserCommentMarkers = ({
   className,
   classes,
 }: {
-  user?: UsersMinimumInfo|null,
-  isPostAuthor?: boolean,
-  className?: string,
-  classes: ClassesType,
+  user?: UsersMinimumInfo | null;
+  isPostAuthor?: boolean;
+  className?: string;
+  classes: ClassesType;
 }) => {
   if (!user) {
     return null;
@@ -57,19 +57,15 @@ const UserCommentMarkers = ({
     return null;
   }
 
-  const {LWTooltip, ForumIcon} = Components;
+  const { LWTooltip, ForumIcon } = Components;
   return (
     <span className={className}>
-      {showAuthorIcon &&
-        <LWTooltip
-          placement="bottom-start"
-          title="Post author"
-          className={classes.iconWrapper}
-        >
+      {showAuthorIcon && (
+        <LWTooltip placement="bottom-start" title="Post author" className={classes.iconWrapper}>
           <ForumIcon icon="Author" className={classes.postAuthorIcon} />
         </LWTooltip>
-      }
-      {showNewUserIcon &&
+      )}
+      {showNewUserIcon && (
         <LWTooltip
           placement="bottom-start"
           title={`${user.displayName} is either new on FAST Forum or doesn't have much karma yet.`}
@@ -77,37 +73,25 @@ const UserCommentMarkers = ({
         >
           <ForumIcon icon="Sprout" className={classes.sproutIcon} />
         </LWTooltip>
-      }
-      {showDonatedIcon &&
-        <LWTooltip
-          placement="bottom-start"
-          title={`Donated to the Donation Election`}
-          className={classes.iconWrapper}
-        >
+      )}
+      {showDonatedIcon && (
+        <LWTooltip placement="bottom-start" title={`Donated to the Donation Election`} className={classes.iconWrapper}>
           <ForumIcon icon="GivingHand" className={classes.donatedIcon} />
         </LWTooltip>
-      }
-      {showVotedIcon &&
-        <LWTooltip
-          placement="bottom-start"
-          title={`Voted in the Donation Election`}
-          className={classes.iconWrapper}
-        >
+      )}
+      {showVotedIcon && (
+        <LWTooltip placement="bottom-start" title={`Voted in the Donation Election`} className={classes.iconWrapper}>
           <ForumIcon icon="Voted" className={classes.votedIcon} />
         </LWTooltip>
-      }
+      )}
     </span>
   );
-}
+};
 
-const UserCommentMarkersComponent = registerComponent(
-  "UserCommentMarkers",
-  UserCommentMarkers,
-  {styles},
-);
+const UserCommentMarkersComponent = registerComponent("UserCommentMarkers", UserCommentMarkers, { styles });
 
 declare global {
   interface ComponentTypes {
-    UserCommentMarkers: typeof UserCommentMarkersComponent
+    UserCommentMarkers: typeof UserCommentMarkersComponent;
   }
 }

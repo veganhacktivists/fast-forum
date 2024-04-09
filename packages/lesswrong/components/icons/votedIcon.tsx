@@ -15,4 +15,4 @@ export const VotedIcon = (props: React.HTMLAttributes<SVGElement>) => {
       />
     </svg>
   );
-}
+};

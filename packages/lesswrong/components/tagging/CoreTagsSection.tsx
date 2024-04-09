@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import { useMulti } from '../../lib/crud/withMulti';
-import { AnalyticsContext } from '../../lib/analyticsEvents';
+import React, { useState } from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import { useMulti } from "../../lib/crud/withMulti";
+import { AnalyticsContext } from "../../lib/analyticsEvents";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -19,14 +19,12 @@ const styles = (theme: ThemeType): JssStyles => ({
     fontSize: 14,
     fontWeight: 600,
     marginTop: 8,
-  }
+  },
 });
 
 const INITIAL_LIMIT = 8;
 
-const CoreTagsSection = ({classes}: {
-  classes: ClassesType,
-}) => {
+const CoreTagsSection = ({ classes }: { classes: ClassesType }) => {
   const { results } = useMulti({
     terms: {
       view: "coreTags",
@@ -45,25 +43,23 @@ const CoreTagsSection = ({classes}: {
   return (
     <AnalyticsContext pageSectionContext="coreTagsSection">
       <div className={classes.root}>
-        <div className={classes.grid}>
-          {resultsToDisplay?.map((tag) => (
-            <CoreTagCard key={tag._id} tag={tag} />
-          ))}
-        </div>
+        <div className={classes.grid}>{resultsToDisplay?.map((tag) => <CoreTagCard key={tag._id} tag={tag} />)}</div>
         <div className={classes.showMore}>
           {!!results?.length && results?.length > INITIAL_LIMIT && (
-            <a onClick={() => setShowAll(!showAll)}>Show {showAll ? "less" : `${results.length - INITIAL_LIMIT} more`}</a>
+            <a onClick={() => setShowAll(!showAll)}>
+              Show {showAll ? "less" : `${results.length - INITIAL_LIMIT} more`}
+            </a>
           )}
         </div>
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const CoreTagsSectionComponent = registerComponent("CoreTagsSection", CoreTagsSection, {styles});
+const CoreTagsSectionComponent = registerComponent("CoreTagsSection", CoreTagsSection, { styles });
 
 declare global {
   interface ComponentTypes {
-    CoreTagsSection: typeof CoreTagsSectionComponent
+    CoreTagsSection: typeof CoreTagsSectionComponent;
   }
 }

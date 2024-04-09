@@ -1,3 +1,2 @@
-
-const Intercom: AnyBecauseTodo
-export default Intercom
+const Intercom: AnyBecauseTodo;
+export default Intercom;

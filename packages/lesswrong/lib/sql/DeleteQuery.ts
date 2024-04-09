@@ -3,9 +3,9 @@ import Table from "./Table";
 import SelectQuery from "./SelectQuery";
 
 export type DeleteSqlOptions = Partial<{
-  limit: number,
-  noSafetyHarness: boolean,
-}>
+  limit: number;
+  noSafetyHarness: boolean;
+}>;
 
 /**
  * Builds a Postgres query to delete data from the given table.
@@ -24,7 +24,7 @@ class DeleteQuery<T extends DbObject> extends Query<T> {
     super(table, ["DELETE FROM", table]);
 
     if (typeof selector === "string") {
-      selector = {_id: selector};
+      selector = { _id: selector };
     }
 
     if (!Object.keys(selector).length) {
@@ -39,7 +39,7 @@ class DeleteQuery<T extends DbObject> extends Query<T> {
 
     if (sqlOptions?.limit) {
       this.nameSubqueries = false;
-      const subquery = new SelectQuery(table, selector, {projection: {_id: 1}, limit: sqlOptions.limit});
+      const subquery = new SelectQuery(table, selector, { projection: { _id: 1 }, limit: sqlOptions.limit });
       this.atoms = this.atoms.concat(["_id IN", subquery]);
     } else {
       this.appendSelector(selector);

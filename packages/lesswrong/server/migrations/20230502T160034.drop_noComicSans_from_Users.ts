@@ -12,8 +12,8 @@
  * -
  * --- Accepted on 2023-05-02T08:32:10.000Z by 20230502T083210.add_shortformFrontpage.ts
  * +-- Overall schema hash: 5d840ee3f919bdbf70df33e470b65666
- *  
- * 
+ *
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -24,13 +24,13 @@
  */
 export const acceptsSchemaHash = "5d840ee3f919bdbf70df33e470b65666";
 
-import Users from "../../lib/collections/users/collection"
-import { addRemovedField, dropRemovedField } from "./meta/utils"
+import Users from "../../lib/collections/users/collection";
+import { addRemovedField, dropRemovedField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await dropRemovedField(db, Users, "noComicSans")
-}
+export const up = async ({ db }: MigrationContext) => {
+  await dropRemovedField(db, Users, "noComicSans");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await addRemovedField(db, Users, "noComicSans")
-}
+export const down = async ({ db }: MigrationContext) => {
+  await addRemovedField(db, Users, "noComicSans");
+};

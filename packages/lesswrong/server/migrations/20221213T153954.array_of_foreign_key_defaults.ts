@@ -23,7 +23,7 @@ import Posts from "../../lib/collections/posts/collection";
 import Tags from "../../lib/collections/tags/collection";
 import Users from "../../lib/collections/users/collection";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await updateDefaultValue(db, Books, "postIds");
   await updateDefaultValue(db, Books, "sequenceIds");
   await updateDefaultValue(db, Chapters, "postIds");
@@ -39,4 +39,4 @@ export const up = async ({db}: MigrationContext) => {
   await updateDefaultValue(db, Users, "hiddenPostsMetadata");
   await updateDefaultValue(db, Users, "profileTagIds");
   await updateDefaultValue(db, Users, "organizerOfGroupIds");
-}
+};

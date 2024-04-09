@@ -1,7 +1,7 @@
-import React from 'react';
-import { registerComponent } from '../../lib/vulcan-lib';
-import classNames from 'classnames'
-import CommentIcon from '@material-ui/icons/ModeComment';
+import React from "react";
+import { registerComponent } from "../../lib/vulcan-lib";
+import classNames from "classnames";
+import CommentIcon from "@material-ui/icons/ModeComment";
 
 const styles = (theme: ThemeType): JssStyles => ({
   commentsIconSmall: {
@@ -11,13 +11,13 @@ const styles = (theme: ThemeType): JssStyles => ({
     height: 24,
     position: "relative",
     flexShrink: 0,
-    
+
     "& .MuiSvgIcon-root": {
       height: "100%",
     },
-    '& div': {
+    "& div": {
       marginTop: -2,
-    }
+    },
   },
   commentsIconLarge: {
     width: 26,
@@ -26,18 +26,18 @@ const styles = (theme: ThemeType): JssStyles => ({
     position: "relative",
     flexShrink: 0,
     top: 2,
-    '& div': {
+    "& div": {
       marginTop: -3,
-    }
+    },
   },
   commentCount: {
-    position:"absolute",
-    right:"50%",
-    top:"50%",
-    transform:"translate(50%, -50%)",
+    position: "absolute",
+    right: "50%",
+    top: "50%",
+    transform: "translate(50%, -50%)",
     color: theme.palette.icon.commentsBubble.commentCount,
-    fontVariantNumeric:"lining-nums",
-    ...theme.typography.commentStyle
+    fontVariantNumeric: "lining-nums",
+    ...theme.typography.commentStyle,
   },
   noUnreadComments: {
     color: theme.palette.icon.commentsBubble.noUnread,
@@ -49,42 +49,50 @@ const styles = (theme: ThemeType): JssStyles => ({
     color: theme.palette.icon.commentsBubble.newPromoted,
   },
   commentCountIcon: {
-    position:"absolute",
-    right:"50%",
-    top:"50%",
-    transform:"translate(50%, -50%)",
-    width:30,
-    height:30,
+    position: "absolute",
+    right: "50%",
+    top: "50%",
+    transform: "translate(50%, -50%)",
+    width: 30,
+    height: 30,
   },
-})
+});
 
-const PostsItemComments = ({ commentCount, small, onClick, unreadComments, newPromotedComments, classes }: {
-  commentCount: number,
-  small: boolean,
-  onClick?: ()=>void,
-  unreadComments: boolean,
-  newPromotedComments: boolean,
-  classes: ClassesType,
+const PostsItemComments = ({
+  commentCount,
+  small,
+  onClick,
+  unreadComments,
+  newPromotedComments,
+  classes,
+}: {
+  commentCount: number;
+  small: boolean;
+  onClick?: () => void;
+  unreadComments: boolean;
+  newPromotedComments: boolean;
+  classes: ClassesType;
 }) => {
-  let unreadCommentsClass =  classes.noUnreadComments
-  if (unreadComments) { unreadCommentsClass = classes.unreadComments }
-  if (newPromotedComments) { unreadCommentsClass = classes.unreadComments }
+  let unreadCommentsClass = classes.noUnreadComments;
+  if (unreadComments) {
+    unreadCommentsClass = classes.unreadComments;
+  }
+  if (newPromotedComments) {
+    unreadCommentsClass = classes.unreadComments;
+  }
 
   return (
     <div className={small ? classes.commentsIconSmall : classes.commentsIconLarge} onClick={onClick}>
-      <CommentIcon className={classNames(classes.commentCountIcon, unreadCommentsClass)}/>
-      <div className={classes.commentCount}>
-        { commentCount }
-      </div>
+      <CommentIcon className={classNames(classes.commentCountIcon, unreadCommentsClass)} />
+      <div className={classes.commentCount}>{commentCount}</div>
     </div>
-  )
-}
+  );
+};
 
-const PostsItemCommentsComponent = registerComponent('PostsItemComments', PostsItemComments, {styles});
+const PostsItemCommentsComponent = registerComponent("PostsItemComments", PostsItemComments, { styles });
 
 declare global {
   interface ComponentTypes {
-    PostsItemComments: typeof PostsItemCommentsComponent
+    PostsItemComments: typeof PostsItemCommentsComponent;
   }
 }
-

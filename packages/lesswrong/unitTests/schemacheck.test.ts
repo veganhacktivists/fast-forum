@@ -4,9 +4,9 @@ import { makeMigrations } from "../server/scripts/makeMigrations";
 
 const rootPath = path.join(__dirname, "../../../");
 
-describe('Schema check', () => {
-  it('Has an accepted_schema.sql file which matches the schema defined in code', async () => {
-    require('../server.ts');
+describe("Schema check", () => {
+  it("Has an accepted_schema.sql file which matches the schema defined in code", async () => {
+    require("../server.ts");
     await makeMigrations({
       writeSchemaChangelog: false,
       writeAcceptedSchema: true,
@@ -17,7 +17,7 @@ describe('Schema check', () => {
     });
   }, 60000);
 
-  it('accpeted_schema.sql overall hash matches most recent changelog item', async () => {
+  it("accpeted_schema.sql overall hash matches most recent changelog item", async () => {
     const acceptedSchemaPath = path.join(rootPath, "schema/accepted_schema.sql");
     const acceptedData = await readFile(acceptedSchemaPath);
     const acceptedHashSearch = /.*hash: (.*)/.exec(acceptedData.toString());

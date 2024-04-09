@@ -1,19 +1,19 @@
-import React from 'react';
-import { Components, registerComponent} from '../../lib/vulcan-lib';
-import { Link } from '../../lib/reactRouterWrapper';
-import type { Hit } from 'react-instantsearch-core';
-import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
-import { Snippet } from 'react-instantsearch-dom';
-import { SearchHitComponentProps } from './types';
-import { isFriendlyUI } from '../../themes/forumTheme';
+import React from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { Link } from "../../lib/reactRouterWrapper";
+import type { Hit } from "react-instantsearch-core";
+import LocalLibraryIcon from "@material-ui/icons/LocalLibrary";
+import { Snippet } from "react-instantsearch-dom";
+import { SearchHitComponentProps } from "./types";
+import { isFriendlyUI } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     padding: 8,
     paddingLeft: 10,
     paddingRight: 10,
-    display: 'flex',
-    alignItems: 'center'
+    display: "flex",
+    alignItems: "center",
   },
   title: {
     display: "inline",
@@ -33,7 +33,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     width: 20,
     color: theme.palette.grey[500],
     marginRight: 12,
-    marginLeft: 4
+    marginLeft: 4,
   },
   meta: {
     display: "inline-block",
@@ -41,50 +41,53 @@ const styles = (theme: ThemeType): JssStyles => ({
     "& div": {
       display: "inline-block",
       marginRight: 5,
-    }
+    },
   },
   snippet: {
     ...theme.typography.postStyle,
     lineHeight: "1.3rem",
     marginTop: 4,
-    wordBreak: "break-word"
-  }
+    wordBreak: "break-word",
+  },
 });
 
-const SequencesSearchHit = ({hit, clickAction, classes, showIcon=false}: SearchHitComponentProps) => {
+const SequencesSearchHit = ({ hit, clickAction, classes, showIcon = false }: SearchHitComponentProps) => {
   const sequence: SearchSequence = hit;
-  const { LWTooltip, MetaInfo } = Components
-  
-  const showSnippet = hit._snippetResult?.body?.matchLevel !== "none"
+  const { LWTooltip, MetaInfo } = Components;
 
-  return <div className={classes.root}>
-      {showIcon && <LWTooltip title="Sequence">
-        <LocalLibraryIcon className={classes.icon}/>
-      </LWTooltip>}
+  const showSnippet = hit._snippetResult?.body?.matchLevel !== "none";
+
+  return (
+    <div className={classes.root}>
+      {showIcon && (
+        <LWTooltip title="Sequence">
+          <LocalLibraryIcon className={classes.icon} />
+        </LWTooltip>
+      )}
       <Link to={"/sequences/" + sequence._id} onClick={() => clickAction(sequence._id)}>
         <div className="sequences-item-body ">
-          <div className={classes.title}>
-            {sequence.title}
-          </div>
+          <div className={classes.title}>{sequence.title}</div>
           <div className={classes.meta}>
             <MetaInfo>{sequence.authorDisplayName}</MetaInfo>
             <MetaInfo className="sequences-item-created-date">
-              <Components.FormatDate date={sequence.createdAt}/>
+              <Components.FormatDate date={sequence.createdAt} />
             </MetaInfo>
           </div>
         </div>
-        {showSnippet && <div className={classes.snippet}>
-          <Snippet attribute="description" hit={sequence} tagName="mark" />
-        </div>}
+        {showSnippet && (
+          <div className={classes.snippet}>
+            <Snippet attribute="description" hit={sequence} tagName="mark" />
+          </div>
+        )}
       </Link>
-  </div>
-}
+    </div>
+  );
+};
 
-const SequencesSearchHitComponent = registerComponent("SequencesSearchHit", SequencesSearchHit, {styles});
+const SequencesSearchHitComponent = registerComponent("SequencesSearchHit", SequencesSearchHit, { styles });
 
 declare global {
   interface ComponentTypes {
-    SequencesSearchHit: typeof SequencesSearchHitComponent
+    SequencesSearchHit: typeof SequencesSearchHitComponent;
   }
 }
-

@@ -1,6 +1,6 @@
-import { Collections } from '../../lib/vulcan-lib';
-import { registerMigration, migrateDocuments } from './migrationUtils';
-import { isUnbackedCollection } from '../../lib/collectionUtils';
+import { Collections } from "../../lib/vulcan-lib";
+import { registerMigration, migrateDocuments } from "./migrationUtils";
+import { isUnbackedCollection } from "../../lib/collectionUtils";
 
 registerMigration({
   name: "addSchemaVersionEverywhere",
@@ -8,35 +8,31 @@ registerMigration({
   idempotent: true,
   action: async () => {
     for (let collection of Collections) {
-      if (isUnbackedCollection(collection))
-        continue;
-      
+      if (isUnbackedCollection(collection)) continue;
+
       await migrateDocuments({
         description: `Add schema version to ${collection.collectionName}`,
         collection,
         batchSize: 1000,
         unmigratedDocumentQuery: {
-          schemaVersion: {$exists: false}
+          schemaVersion: { $exists: false },
         },
         migrate: async (documents) => {
-          const updates = documents.map(doc => {
+          const updates = documents.map((doc) => {
             return {
               updateOne: {
-                filter: {_id: doc._id},
+                filter: { _id: doc._id },
                 update: {
                   $set: {
                     schemaVersion: 1,
-                  }
-                }
-              }
-            }
-          })
-          await collection.rawCollection().bulkWrite(
-            updates,
-            { ordered: false }
-          )
-        }
-      })
+                  },
+                },
+              },
+            };
+          });
+          await collection.rawCollection().bulkWrite(updates, { ordered: false });
+        },
+      });
     }
   },
 });

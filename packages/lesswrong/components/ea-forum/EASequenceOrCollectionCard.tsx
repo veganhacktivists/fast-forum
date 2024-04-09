@@ -30,7 +30,7 @@ const styles = (theme: ThemeType) => ({
     border: "1px solid transparent",
     "&:hover": {
       background: theme.palette.grey[50],
-      border: `1px solid ${theme.palette.grey[250]}`
+      border: `1px solid ${theme.palette.grey[250]}`,
     },
   },
   sequenceCardImageWrapper: {
@@ -88,38 +88,34 @@ const EASequenceOrCollectionCard = ({
   className,
   classes,
 }: {
-  title: string,
-  author: UsersMinimumInfo | null,
-  hoverOver?: ReactNode,
-  postCount: number,
-  readCount: number,
-  imageId: string,
-  href: string,
+  title: string;
+  author: UsersMinimumInfo | null;
+  hoverOver?: ReactNode;
+  postCount: number;
+  readCount: number;
+  imageId: string;
+  href: string;
   eventHandlers: {
-    onMouseOver: (event: MouseEvent<HTMLDivElement>) => void,
-    onMouseLeave: () => void,
-  },
-  className?: string,
-  classes: ClassesType,
+    onMouseOver: (event: MouseEvent<HTMLDivElement>) => void;
+    onMouseLeave: () => void;
+  };
+  className?: string;
+  classes: ClassesType;
 }) => {
-  const {onClick} = useClickableCell({href});
+  const { onClick } = useClickableCell({ href });
   const readProgress = `${readCount}/${postCount}`;
-  const {CloudinaryImage2, UsersNameDisplay, LWTooltip} = Components;
+  const { CloudinaryImage2, UsersNameDisplay, LWTooltip } = Components;
 
-  const TitleWrapper: FC<{children: ReactNode}> = hoverOver
-    ? ({children}) => (
-      <LWTooltip title={hoverOver} tooltip={false} placement="bottom">
-        {children}
-      </LWTooltip>
-    )
-    : ({children}) => <>{children}</>;
+  const TitleWrapper: FC<{ children: ReactNode }> = hoverOver
+    ? ({ children }) => (
+        <LWTooltip title={hoverOver} tooltip={false} placement="bottom">
+          {children}
+        </LWTooltip>
+      )
+    : ({ children }) => <>{children}</>;
 
   return (
-    <div
-      {...eventHandlers}
-      onClick={onClick}
-      className={classNames(classes.root, className)}
-    >
+    <div {...eventHandlers} onClick={onClick} className={classNames(classes.root, className)}>
       <div className={classes.sequenceCardImageWrapper}>
         <CloudinaryImage2
           publicId={imageId}
@@ -154,7 +150,7 @@ const EASequenceOrCollectionCard = ({
 const EASequenceOrCollectionCardComponent = registerComponent(
   "EASequenceOrCollectionCard",
   EASequenceOrCollectionCard,
-  {styles, stylePriority: -1},
+  { styles, stylePriority: -1 },
 );
 
 declare global {

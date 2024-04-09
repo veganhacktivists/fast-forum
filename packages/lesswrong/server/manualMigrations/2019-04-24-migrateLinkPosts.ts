@@ -1,6 +1,6 @@
-import { registerMigration } from './migrationUtils';
-import { Posts } from '../../lib/collections/posts'
-import * as _ from 'underscore';
+import { registerMigration } from "./migrationUtils";
+import { Posts } from "../../lib/collections/posts";
+import * as _ from "underscore";
 
 registerMigration({
   name: "migrateLinkPosts",
@@ -15,33 +15,33 @@ registerMigration({
       // which, after making its way through the old DB schema and our import
       // script, is either present and "t" (a self-post), or missing (a
       // link-post).
-      "legacyData.is_self": { "$exists": false },
-      
+      "legacyData.is_self": { $exists: false },
+
       // Also make sure it actually has a legacy URL. This excludes non-legacy
       // posts.
-      "legacyData.url": { "$exists": true, },
-      
+      "legacyData.url": { $exists: true },
+
       // And it isn't already a linkpost, ie, this script hasn't already
       // migrated it.
-      url: {$exists:false}
+      url: { $exists: false },
     }).fetch();
-    
+
     // eslint-disable-next-line no-console
     console.log(`Found ${unmigratedLinkposts.length} old linkposts to migrate`);
-    
-    const updates = _.map(unmigratedLinkposts, post => ({
+
+    const updates = _.map(unmigratedLinkposts, (post) => ({
       updateOne: {
         filter: { _id: post._id },
         update: {
           $set: {
             url: (post as any).legacyData.url,
-          }
-        }
-      }
+          },
+        },
+      },
     }));
-    
+
     if (updates.length > 0) {
       Posts.rawCollection().bulkWrite(updates, { ordered: false });
     }
-  }
+  },
 });

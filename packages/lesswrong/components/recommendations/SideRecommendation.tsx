@@ -47,24 +47,20 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const SideRecommendation = ({post, classes}: {
-  post: PostsListWithVotesAndSequence,
-  classes: ClassesType,
-}) => {
+const SideRecommendation = ({ post, classes }: { post: PostsListWithVotesAndSequence; classes: ClassesType }) => {
   const href = postGetPageUrl(post);
-  const {onClick: onClickCell} = useClickableCell({href});
-  const {ref, onClick: onClickLink} = useRecommendationAnalytics(post._id);
-  const onClick = useCallback((e: MouseEvent<HTMLDivElement>) => {
-    onClickLink(e);
-    onClickCell(e);
-  }, [onClickCell, onClickLink]);
-  const {ForumIcon, KarmaDisplay, PostsItemTooltipWrapper} = Components;
+  const { onClick: onClickCell } = useClickableCell({ href });
+  const { ref, onClick: onClickLink } = useRecommendationAnalytics(post._id);
+  const onClick = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      onClickLink(e);
+      onClickCell(e);
+    },
+    [onClickCell, onClickLink],
+  );
+  const { ForumIcon, KarmaDisplay, PostsItemTooltipWrapper } = Components;
   return (
-    <div
-      className={classes.root}
-      onClick={onClick}
-      ref={ref}
-    >
+    <div className={classes.root} onClick={onClick} ref={ref}>
       <div className={classes.karma}>
         <div className={classes.voteArrow}>
           <ForumIcon icon="SoftUpArrow" />
@@ -78,16 +74,12 @@ const SideRecommendation = ({post, classes}: {
       </PostsItemTooltipWrapper>
     </div>
   );
-}
+};
 
-const SideRecommendationComponent = registerComponent(
-  "SideRecommendation",
-  SideRecommendation,
-  {styles},
-);
+const SideRecommendationComponent = registerComponent("SideRecommendation", SideRecommendation, { styles });
 
 declare global {
   interface ComponentTypes {
-    SideRecommendation: typeof SideRecommendationComponent
+    SideRecommendation: typeof SideRecommendationComponent;
   }
 }

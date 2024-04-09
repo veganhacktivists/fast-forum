@@ -14,26 +14,22 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const DropdownMenu = ({children, className, classes}: {
-  children: ReactNode,
-  className?: string,
-  classes: ClassesType,
+const DropdownMenu = ({
+  children,
+  className,
+  classes,
+}: {
+  children: ReactNode;
+  className?: string;
+  classes: ClassesType;
 }) => {
-  return (
-    <div className={classNames(classes.root, className)}>
-      {children}
-    </div>
-  );
-}
+  return <div className={classNames(classes.root, className)}>{children}</div>;
+};
 
-const DropdownMenuComponent = registerComponent(
-  "DropdownMenu",
-  DropdownMenu,
-  {styles},
-);
+const DropdownMenuComponent = registerComponent("DropdownMenu", DropdownMenu, { styles });
 
 declare global {
   interface ComponentTypes {
-    DropdownMenu: typeof DropdownMenuComponent
+    DropdownMenu: typeof DropdownMenuComponent;
   }
 }

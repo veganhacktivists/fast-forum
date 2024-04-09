@@ -1,4 +1,3 @@
-
 export default (theme: ThemeType): string => `
 /*
  * TODO: These classes are used by 248 posts in the database that were authored
@@ -254,4 +253,4 @@ div#mocha {
   width: 20px;
   z-index: 10000000;
 }
-`
+`;

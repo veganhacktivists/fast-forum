@@ -8,14 +8,14 @@
   "use strict";
 
   /*global define*/
-  if (typeof module === 'object' && module.exports) {
-    module.exports = factory(require('moment')); // Node
-  } else if (typeof define === 'function' && define.amd) {
-    define(['moment'], factory);                 // AMD
+  if (typeof module === "object" && module.exports) {
+    module.exports = factory(require("moment")); // Node
+  } else if (typeof define === "function" && define.amd) {
+    define(["moment"], factory); // AMD
   } else {
-    factory(root.moment);                        // Browser
+    factory(root.moment); // Browser
   }
-}(this, function (moment) {
+})(this, function (moment) {
   "use strict";
 
   // Resolves es6 module loading issue
@@ -37,17 +37,19 @@
     guesses = {},
     cachedGuess;
 
-  if (!moment || typeof moment.version !== 'string') {
-    logError('Moment Timezone requires Moment.js. See https://momentjs.com/timezone/docs/#/use-it/browser/');
+  if (!moment || typeof moment.version !== "string") {
+    logError("Moment Timezone requires Moment.js. See https://momentjs.com/timezone/docs/#/use-it/browser/");
   }
 
-  var momentVersion = moment.version.split('.'),
+  var momentVersion = moment.version.split("."),
     major = +momentVersion[0],
     minor = +momentVersion[1];
 
   // Moment.js version check
   if (major < 2 || (major === 2 && minor < 6)) {
-    logError('Moment Timezone requires Moment.js >= 2.6.0. You are using Moment.js ' + moment.version + '. See momentjs.com');
+    logError(
+      "Moment Timezone requires Moment.js >= 2.6.0. You are using Moment.js " + moment.version + ". See momentjs.com",
+    );
   }
 
   /************************************
@@ -65,9 +67,9 @@
 
   function unpackBase60(string) {
     var i = 0,
-      parts = string.split('.'),
+      parts = string.split("."),
       whole = parts[0],
-      fractional = parts[1] || '',
+      fractional = parts[1] || "",
       multiplier = 1,
       num,
       out = 0,
@@ -82,7 +84,7 @@
     // handle digits before the decimal
     for (i; i < whole.length; i++) {
       num = charCodeToInt(whole.charCodeAt(i));
-      out = (60 * out) + num;
+      out = 60 * out + num;
     }
 
     // handle digits after the decimal
@@ -95,22 +97,23 @@
     return out * sign;
   }
 
-  function arrayToInt (array) {
+  function arrayToInt(array) {
     for (var i = 0; i < array.length; i++) {
       array[i] = unpackBase60(array[i]);
     }
   }
 
-  function intToUntil (array, length) {
+  function intToUntil(array, length) {
     for (var i = 0; i < length; i++) {
-      array[i] = Math.round((array[i - 1] || 0) + (array[i] * 60000)); // minutes to milliseconds
+      array[i] = Math.round((array[i - 1] || 0) + array[i] * 60000); // minutes to milliseconds
     }
 
     array[length - 1] = Infinity;
   }
 
-  function mapIndices (source, indices) {
-    var out = [], i;
+  function mapIndices(source, indices) {
+    var out = [],
+      i;
 
     for (i = 0; i < indices.length; i++) {
       out[i] = source[indices[i]];
@@ -119,11 +122,11 @@
     return out;
   }
 
-  function unpack (string) {
-    var data = string.split('|'),
-      offsets = data[2].split(' '),
-      indices = data[3].split(''),
-      untils  = data[4].split(' ');
+  function unpack(string) {
+    var data = string.split("|"),
+      offsets = data[2].split(" "),
+      indices = data[3].split(""),
+      untils = data[4].split(" ");
 
     arrayToInt(offsets);
     arrayToInt(indices);
@@ -132,11 +135,11 @@
     intToUntil(untils, indices.length);
 
     return {
-      name       : data[0],
-      abbrs      : mapIndices(data[1].split(' '), indices),
-      offsets    : mapIndices(offsets, indices),
-      untils     : untils,
-      population : data[5] | 0
+      name: data[0],
+      abbrs: mapIndices(data[1].split(" "), indices),
+      offsets: mapIndices(offsets, indices),
+      untils: untils,
+      population: data[5] | 0,
     };
   }
 
@@ -144,22 +147,22 @@
     Zone object
   ************************************/
 
-  function Zone (packedString) {
+  function Zone(packedString) {
     if (packedString) {
       this._set(unpack(packedString));
     }
   }
 
   Zone.prototype = {
-    _set : function (unpacked) {
-      this.name       = unpacked.name;
-      this.abbrs      = unpacked.abbrs;
-      this.untils     = unpacked.untils;
-      this.offsets    = unpacked.offsets;
+    _set: function (unpacked) {
+      this.name = unpacked.name;
+      this.abbrs = unpacked.abbrs;
+      this.untils = unpacked.untils;
+      this.offsets = unpacked.offsets;
       this.population = unpacked.population;
     },
 
-    _index : function (timestamp) {
+    _index: function (timestamp) {
       var target = +timestamp,
         untils = this.untils,
         i;
@@ -171,22 +174,25 @@
       }
     },
 
-    countries : function () {
+    countries: function () {
       var zone_name = this.name;
       return Object.keys(countries).filter(function (country_code) {
         return countries[country_code].zones.indexOf(zone_name) !== -1;
       });
     },
 
-    parse : function (timestamp) {
-      var target  = +timestamp,
+    parse: function (timestamp) {
+      var target = +timestamp,
         offsets = this.offsets,
-        untils  = this.untils,
-        max     = untils.length - 1,
-        offset, offsetNext, offsetPrev, i;
+        untils = this.untils,
+        max = untils.length - 1,
+        offset,
+        offsetNext,
+        offsetPrev,
+        i;
 
       for (i = 0; i < max; i++) {
-        offset     = offsets[i];
+        offset = offsets[i];
         offsetNext = offsets[i + 1];
         offsetPrev = offsets[i ? i - 1 : i];
 
@@ -196,7 +202,7 @@
           offset = offsetPrev;
         }
 
-        if (target < untils[i] - (offset * 60000)) {
+        if (target < untils[i] - offset * 60000) {
           return offsets[i];
         }
       }
@@ -204,25 +210,25 @@
       return offsets[max];
     },
 
-    abbr : function (mom) {
+    abbr: function (mom) {
       return this.abbrs[this._index(mom)];
     },
 
-    offset : function (mom) {
+    offset: function (mom) {
       logError("zone.offset has been deprecated in favor of zone.utcOffset");
       return this.offsets[this._index(mom)];
     },
 
-    utcOffset : function (mom) {
+    utcOffset: function (mom) {
       return this.offsets[this._index(mom)];
-    }
+    },
   };
 
   /************************************
     Country object
   ************************************/
 
-  function Country (country_name, zone_names) {
+  function Country(country_name, zone_names) {
     this.name = country_name;
     this.zones = zone_names;
   }
@@ -238,7 +244,7 @@
       // 17:56:31 GMT-0600 (CST)
       // 17:56:31 GMT-0600 (Central Standard Time)
       abbr = abbr[0].match(/[A-Z]/g);
-      abbr = abbr ? abbr.join('') : undefined;
+      abbr = abbr ? abbr.join("") : undefined;
     } else {
       // 17:56:31 CST
       // 17:56:31 GMT+0800 (台北標準時間)
@@ -246,7 +252,7 @@
       abbr = abbr ? abbr[0] : undefined;
     }
 
-    if (abbr === 'GMT') {
+    if (abbr === "GMT") {
       abbr = undefined;
     }
 
@@ -263,7 +269,7 @@
 
   ZoneScore.prototype.scoreOffsetAt = function (offsetAt) {
     this.offsetScore += Math.abs(this.zone.utcOffset(offsetAt.at) - offsetAt.offset);
-    if (this.zone.abbr(offsetAt.at).replace(/[^A-Z]/g, '') !== offsetAt.abbr) {
+    if (this.zone.abbr(offsetAt.at).replace(/[^A-Z]/g, "") !== offsetAt.abbr) {
       this.abbrScore++;
     }
   };
@@ -271,7 +277,7 @@
   function findChange(low, high) {
     var mid, diff;
 
-    while ((diff = ((high.at - low.at) / 12e4 | 0) * 6e4)) {
+    while ((diff = (((high.at - low.at) / 12e4) | 0) * 6e4)) {
       mid = new OffsetAt(new Date(low.at + diff));
       if (mid.offset === low.offset) {
         low = mid;
@@ -287,7 +293,9 @@
     var startYear = new Date().getFullYear() - 2,
       last = new OffsetAt(new Date(startYear, 0, 1)),
       offsets = [last],
-      change, next, i;
+      change,
+      next,
+      i;
 
     for (i = 1; i < 48; i++) {
       next = new OffsetAt(new Date(startYear, i, 1));
@@ -307,7 +315,7 @@
     return offsets;
   }
 
-  function sortZoneScores (a, b) {
+  function sortZoneScores(a, b) {
     if (a.offsetScore !== b.offsetScore) {
       return a.offsetScore - b.offsetScore;
     }
@@ -320,7 +328,7 @@
     return b.zone.name.localeCompare(a.zone.name);
   }
 
-  function addToGuesses (name, offsets) {
+  function addToGuesses(name, offsets) {
     var i, offset;
     arrayToInt(offsets);
     for (i = 0; i < offsets.length; i++) {
@@ -330,11 +338,13 @@
     }
   }
 
-  function guessesForUserOffsets (offsets) {
+  function guessesForUserOffsets(offsets) {
     var offsetsLength = offsets.length,
       filteredGuesses = {},
       out = [],
-      i, j, guessesOffset;
+      i,
+      j,
+      guessesOffset;
 
     for (i = 0; i < offsetsLength; i++) {
       guessesOffset = guesses[offsets[i].offset] || {};
@@ -354,8 +364,7 @@
     return out;
   }
 
-  function rebuildGuess () {
-
+  function rebuildGuess() {
     // use Intl API when available and returning valid time zone
     try {
       var intlName = Intl.DateTimeFormat().resolvedOptions().timeZone; //eslint-disable-line babel/new-cap
@@ -374,7 +383,9 @@
       offsetsLength = offsets.length,
       guesses = guessesForUserOffsets(offsets),
       zoneScores = [],
-      zoneScore, i, j;
+      zoneScore,
+      i,
+      j;
 
     for (i = 0; i < guesses.length; i++) {
       zoneScore = new ZoneScore(getZone(guesses[i]), offsetsLength);
@@ -389,7 +400,7 @@
     return zoneScores.length > 0 ? zoneScores[0].zone.name : undefined;
   }
 
-  function guess (ignoreCache) {
+  function guess(ignoreCache) {
     if (!cachedGuess || ignoreCache) {
       cachedGuess = rebuildGuess();
     }
@@ -400,11 +411,11 @@
     Global Methods
   ************************************/
 
-  function normalizeName (name) {
-    return (name || '').toLowerCase().replace(/\//g, '_');
+  function normalizeName(name) {
+    return (name || "").toLowerCase().replace(/\//g, "_");
   }
 
-  function addZone (packed) {
+  function addZone(packed) {
     var i, name, split, normalized;
 
     if (typeof packed === "string") {
@@ -412,17 +423,16 @@
     }
 
     for (i = 0; i < packed.length; i++) {
-      split = packed[i].split('|');
+      split = packed[i].split("|");
       name = split[0];
       normalized = normalizeName(name);
       zones[normalized] = packed[i];
       names[normalized] = name;
-      addToGuesses(normalized, split[2].split(' '));
+      addToGuesses(normalized, split[2].split(" "));
     }
   }
 
-  function getZone (name, caller) {
-
+  function getZone(name, caller) {
     name = normalizeName(name);
 
     var zone = zones[name];
@@ -432,7 +442,7 @@
       return zone;
     }
 
-    if (typeof zone === 'string') {
+    if (typeof zone === "string") {
       zone = new Zone(zone);
       zones[name] = zone;
       return zone;
@@ -449,8 +459,9 @@
     return null;
   }
 
-  function getNames () {
-    var i, out = [];
+  function getNames() {
+    var i,
+      out = [];
 
     for (i in names) {
       if (names.hasOwnProperty(i) && (zones[i] || zones[links[i]]) && names[i]) {
@@ -461,11 +472,11 @@
     return out.sort();
   }
 
-  function getCountryNames () {
+  function getCountryNames() {
     return Object.keys(countries);
   }
 
-  function addLink (aliases) {
+  function addLink(aliases) {
     var i, alias, normal0, normal1;
 
     if (typeof aliases === "string") {
@@ -473,7 +484,7 @@
     }
 
     for (i = 0; i < aliases.length; i++) {
-      alias = aliases[i].split('|');
+      alias = aliases[i].split("|");
 
       normal0 = normalizeName(alias[0]);
       normal1 = normalizeName(alias[1]);
@@ -486,21 +497,18 @@
     }
   }
 
-  function addCountries (data) {
+  function addCountries(data) {
     var i, country_code, country_zones, split;
     if (!data || !data.length) return;
     for (i = 0; i < data.length; i++) {
-      split = data[i].split('|');
+      split = data[i].split("|");
       country_code = split[0].toUpperCase();
-      country_zones = split[1].split(' ');
-      countries[country_code] = new Country(
-        country_code,
-        country_zones
-      );
+      country_zones = split[1].split(" ");
+      countries[country_code] = new Country(country_code, country_zones);
     }
   }
 
-  function getCountry (name) {
+  function getCountry(name) {
     name = name.toUpperCase();
     return countries[name] || null;
   }
@@ -517,7 +525,7 @@
         var zone = getZone(zone_name);
         return {
           name: zone_name,
-          offset: zone.utcOffset(new Date())
+          offset: zone.utcOffset(new Date()),
         };
       });
     }
@@ -525,28 +533,29 @@
     return zones;
   }
 
-  function loadData (data) {
+  function loadData(data) {
     addZone(data.zones);
     addLink(data.links);
     addCountries(data.countries);
     tz.dataVersion = data.version;
   }
 
-  function zoneExists (name) {
+  function zoneExists(name) {
     if (!zoneExists.didShowError) {
       zoneExists.didShowError = true;
-        logError("moment.tz.zoneExists('" + name + "') has been deprecated in favor of !moment.tz.zone('" + name + "')");
+      logError("moment.tz.zoneExists('" + name + "') has been deprecated in favor of !moment.tz.zone('" + name + "')");
     }
     return !!getZone(name);
   }
 
-  function needsOffset (m) {
-    var isUnixTimestamp = (m._f === 'X' || m._f === 'x');
-    return !!(m._a && (m._tzm === undefined) && !isUnixTimestamp);
+  function needsOffset(m) {
+    var isUnixTimestamp = m._f === "X" || m._f === "x";
+    return !!(m._a && m._tzm === undefined && !isUnixTimestamp);
   }
 
-  function logError (message) {
-    if (typeof console !== 'undefined' && typeof console.error === 'function') { // eslint-disable-line no-console
+  function logError(message) {
+    if (typeof console !== "undefined" && typeof console.error === "function") {
+      // eslint-disable-line no-console
       console.error(message); // eslint-disable-line no-console
     }
   }
@@ -555,14 +564,14 @@
     moment.tz namespace
   ************************************/
 
-  function tz (input) {
+  function tz(input) {
     var args = Array.prototype.slice.call(arguments, 0, -1),
       name = arguments[arguments.length - 1],
       zone = getZone(name),
-      out  = moment.utc.apply(null, args);
+      out = moment.utc.apply(null, args);
 
     if (zone && !moment.isMoment(input) && needsOffset(out)) {
-      out.add(zone.parse(out), 'minutes');
+      out.add(zone.parse(out), "minutes");
     }
 
     out.tz(name);
@@ -570,26 +579,26 @@
     return out;
   }
 
-  tz.version      = VERSION;
-  tz.dataVersion  = '';
-  tz._zones       = zones;
-  tz._links       = links;
-  tz._names       = names;
+  tz.version = VERSION;
+  tz.dataVersion = "";
+  tz._zones = zones;
+  tz._links = links;
+  tz._names = names;
   tz._countries = countries;
-  tz.add          = addZone;
-  tz.link         = addLink;
-  tz.load         = loadData;
-  tz.zone         = getZone;
-  tz.zoneExists   = zoneExists; // deprecated in 0.1.0
-  tz.guess        = guess;
-  tz.names        = getNames;
-  tz.Zone         = Zone;
-  tz.unpack       = unpack;
+  tz.add = addZone;
+  tz.link = addLink;
+  tz.load = loadData;
+  tz.zone = getZone;
+  tz.zoneExists = zoneExists; // deprecated in 0.1.0
+  tz.guess = guess;
+  tz.names = getNames;
+  tz.Zone = Zone;
+  tz.unpack = unpack;
   tz.unpackBase60 = unpackBase60;
-  tz.needsOffset  = needsOffset;
-  tz.moveInvalidForward   = true;
+  tz.needsOffset = needsOffset;
+  tz.moveInvalidForward = true;
   tz.moveAmbiguousForward = false;
-  tz.countries    = getCountryNames;
+  tz.countries = getCountryNames;
   tz.zonesForCountry = zonesForCountry;
 
   /************************************
@@ -609,7 +618,7 @@
     if (mom._z === undefined) {
       if (zone && needsOffset(mom) && !mom._isUTC) {
         mom._d = moment.utc(mom._a)._d;
-        mom.utc().add(zone.parse(mom), 'minutes');
+        mom.utc().add(zone.parse(mom), "minutes");
       }
       mom._z = zone;
     }
@@ -630,50 +639,58 @@
 
   fn.tz = function (name, keepTime) {
     if (name) {
-      if (typeof name !== 'string') {
-        throw new Error('Time zone name must be a string, got ' + name + ' [' + typeof name + ']');
+      if (typeof name !== "string") {
+        throw new Error("Time zone name must be a string, got " + name + " [" + typeof name + "]");
       }
       this._z = getZone(name);
       if (this._z) {
         moment.updateOffset(this, keepTime);
       } else {
-        logError("Moment Timezone has no data for " + name + ". See http://momentjs.com/timezone/docs/#/data-loading/.");
+        logError(
+          "Moment Timezone has no data for " + name + ". See http://momentjs.com/timezone/docs/#/data-loading/.",
+        );
       }
       return this;
     }
-    if (this._z) { return this._z.name; }
+    if (this._z) {
+      return this._z.name;
+    }
   };
 
-  function abbrWrap (old) {
+  function abbrWrap(old) {
     return function () {
-      if (this._z) { return this._z.abbr(this); }
+      if (this._z) {
+        return this._z.abbr(this);
+      }
       return old.call(this);
     };
   }
 
-  function resetZoneWrap (old) {
+  function resetZoneWrap(old) {
     return function () {
       this._z = null;
       return old.apply(this, arguments);
     };
   }
 
-  function resetZoneWrap2 (old) {
+  function resetZoneWrap2(old) {
     return function () {
       if (arguments.length > 0) this._z = null;
       return old.apply(this, arguments);
     };
   }
 
-  fn.zoneName  = abbrWrap(fn.zoneName);
-  fn.zoneAbbr  = abbrWrap(fn.zoneAbbr);
-  fn.utc       = resetZoneWrap(fn.utc);
-  fn.local     = resetZoneWrap(fn.local);
+  fn.zoneName = abbrWrap(fn.zoneName);
+  fn.zoneAbbr = abbrWrap(fn.zoneAbbr);
+  fn.utc = resetZoneWrap(fn.utc);
+  fn.local = resetZoneWrap(fn.local);
   fn.utcOffset = resetZoneWrap2(fn.utcOffset);
 
-  moment.tz.setDefault = function(name) {
+  moment.tz.setDefault = function (name) {
     if (major < 2 || (major === 2 && minor < 9)) {
-      logError('Moment Timezone setDefault() requires Moment.js >= 2.9.0. You are using Moment.js ' + moment.version + '.');
+      logError(
+        "Moment Timezone setDefault() requires Moment.js >= 2.9.0. You are using Moment.js " + moment.version + ".",
+      );
     }
     moment.defaultZone = name ? getZone(name) : null;
     return moment;
@@ -681,18 +698,18 @@
 
   // Cloning a moment should include the _z property.
   var momentProperties = moment.momentProperties;
-  if (Object.prototype.toString.call(momentProperties) === '[object Array]') {
+  if (Object.prototype.toString.call(momentProperties) === "[object Array]") {
     // moment 2.8.1+
-    momentProperties.push('_z');
-    momentProperties.push('_a');
+    momentProperties.push("_z");
+    momentProperties.push("_a");
   } else if (momentProperties) {
     // moment 2.7.0
     momentProperties._z = null;
   }
 
   loadData({
-    "version": "2020a",
-    "zones": [
+    version: "2020a",
+    zones: [
       "Africa/Abidjan|GMT|0|0||48e5",
       "Africa/Nairobi|EAT|-30|0||47e5",
       "Africa/Algiers|WET WEST CET CEST|0 -10 -10 -20|01012320102|3bX0 11A0 dDd0 17b0 11B0 1cN0 2Dy0 1cN0 1fB0 1cL0|26e5",
@@ -1025,9 +1042,9 @@
       "Pacific/Pitcairn|-0830 -08|8u 80|01|18Vku|56",
       "Pacific/Rarotonga|-1030 -0930 -10|au 9u a0|012121212121212121212121212|lyWu IL0 1zcu Onu 1zcu Onu 1zcu Rbu 1zcu Onu 1zcu Onu 1zcu Onu 1zcu Onu 1zcu Onu 1zcu Rbu 1zcu Onu 1zcu Onu 1zcu Onu|13e3",
       "Pacific/Tongatapu|+13 +14|-d0 -e0|010101010|1csd0 15A0 1wo0 xz0 1Q10 xz0 zWN0 s00|75e3",
-      "WET|WET WEST|0 -10|0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|hDB0 1a00 1fA0 1cM0 1cM0 1cM0 1fA0 1a00 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1fA0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1fA0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1fA0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00|"
+      "WET|WET WEST|0 -10|0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010|hDB0 1a00 1fA0 1cM0 1cM0 1cM0 1fA0 1a00 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1fA0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1fA0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1cM0 1fA0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00|",
     ],
-    "links": [
+    links: [
       "Africa/Abidjan|Africa/Accra",
       "Africa/Abidjan|Africa/Bamako",
       "Africa/Abidjan|Africa/Banjul",
@@ -1288,9 +1305,9 @@
       "Pacific/Tarawa|Pacific/Funafuti",
       "Pacific/Tarawa|Pacific/Majuro",
       "Pacific/Tarawa|Pacific/Wake",
-      "Pacific/Tarawa|Pacific/Wallis"
+      "Pacific/Tarawa|Pacific/Wallis",
     ],
-    "countries": [
+    countries: [
       "AD|Europe/Andorra",
       "AE|Asia/Dubai",
       "AF|Asia/Kabul",
@@ -1537,10 +1554,9 @@
       "YT|Africa/Nairobi Indian/Mayotte",
       "ZA|Africa/Johannesburg",
       "ZM|Africa/Maputo Africa/Lusaka",
-      "ZW|Africa/Maputo Africa/Harare"
-    ]
+      "ZW|Africa/Maputo Africa/Harare",
+    ],
   });
 
-
   return moment;
-}));
+});

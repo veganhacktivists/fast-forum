@@ -1,32 +1,34 @@
-import { SubscriptionType, subscriptionTypes } from './collections/subscriptions/schema';
-import * as _ from 'underscore';
-import { getConfirmedCoauthorIds } from './collections/posts/helpers';
+import { SubscriptionType, subscriptionTypes } from "./collections/subscriptions/schema";
+import * as _ from "underscore";
+import { getConfirmedCoauthorIds } from "./collections/posts/helpers";
 
-export function userIsDefaultSubscribed({user, subscriptionType, collectionName, document}: {
-  user: DbUser|UsersCurrent|null,
-  subscriptionType: SubscriptionType,
-  collectionName: CollectionNameString,
-  document: any,
-}): boolean
-{
+export function userIsDefaultSubscribed({
+  user,
+  subscriptionType,
+  collectionName,
+  document,
+}: {
+  user: DbUser | UsersCurrent | null;
+  subscriptionType: SubscriptionType;
+  collectionName: CollectionNameString;
+  document: any;
+}): boolean {
   if (!user) return false;
-  
-  switch(subscriptionType)
-  {
+
+  switch (subscriptionType) {
     case subscriptionTypes.newComments:
-      return user.auto_subscribe_to_my_posts && document.userId===user._id;
+      return user.auto_subscribe_to_my_posts && document.userId === user._id;
     case subscriptionTypes.newPosts:
       return false;
     case subscriptionTypes.newRelatedQuestions:
       // TODO
       return false;
     case subscriptionTypes.newEvents:
-      return _.some(document.organizers, organizerId=>organizerId===user._id)
-        && user.autoSubscribeAsOrganizer;
+      return _.some(document.organizers, (organizerId) => organizerId === user._id) && user.autoSubscribeAsOrganizer;
     case subscriptionTypes.newReplies:
-      return user.auto_subscribe_to_my_comments && document.userId===user._id;
+      return user.auto_subscribe_to_my_comments && document.userId === user._id;
     case subscriptionTypes.newTagPosts:
-      return false
+      return false;
     case subscriptionTypes.newShortform:
       return false;
     case subscriptionTypes.newDebateComments:
@@ -38,7 +40,7 @@ export function userIsDefaultSubscribed({user, subscriptionType, collectionName,
       return authorIds.includes(user._id);
     default:
       //eslint-disable-next-line no-console
-      console.error("Unrecognized subscription type: "+subscriptionType);
+      console.error("Unrecognized subscription type: " + subscriptionType);
       return false;
   }
 }

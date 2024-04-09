@@ -16,7 +16,8 @@ class DebouncerEventsRepo extends AbstractRepo<"DebouncerEvents"> {
     key: string,
     data?: string,
   ): Promise<null> {
-    return this.none(`
+    return this.none(
+      `
       -- DebouncerEventsRepo.recordEvent
       INSERT INTO "DebouncerEvents" (
         "_id",
@@ -39,16 +40,9 @@ class DebouncerEventsRepo extends AbstractRepo<"DebouncerEvents"> {
         "delayTime" = GREATEST("DebouncerEvents"."delayTime", $4),
         "upperBoundTime" = LEAST("DebouncerEvents"."upperBoundTime", $5),
         "pendingEvents" = ARRAY_APPEND("DebouncerEvents"."pendingEvents", $8)
-    `, [
-      randomId(),
-      name,
-      af,
-      delayTime,
-      upperBoundTime,
-      key,
-      data === undefined ? null : [data],
-      data,
-    ]);
+    `,
+      [randomId(), name, af, delayTime, upperBoundTime, key, data === undefined ? null : [data], data],
+    );
   }
 }
 

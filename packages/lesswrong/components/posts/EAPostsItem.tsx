@@ -125,8 +125,8 @@ export const styles = (theme: ThemeType) => ({
       opacity: 1,
     },
     [theme.breakpoints.up("sm")]: {
-      padding: '10px 0',
-    }
+      padding: "10px 0",
+    },
   },
   newComments: {
     fontWeight: 700,
@@ -167,15 +167,11 @@ export const styles = (theme: ThemeType) => ({
 });
 
 export type EAPostsItemProps = PostsItemConfig & {
-  hideSecondaryInfo?: boolean,
-  classes: ClassesType<typeof styles>,
+  hideSecondaryInfo?: boolean;
+  classes: ClassesType<typeof styles>;
 };
 
-const EAPostsItem = ({
-  hideSecondaryInfo,
-  classes,
-  ...props
-}: EAPostsItemProps) => {
+const EAPostsItem = ({ hideSecondaryInfo, classes, ...props }: EAPostsItemProps) => {
   const {
     post,
     postLink,
@@ -206,44 +202,53 @@ const EAPostsItem = ({
     isVoteable,
     className,
   } = usePostsItem(props);
-  const {onClick} = useClickableCell({href: postLink});
+  const { onClick } = useClickableCell({ href: postLink });
 
   if (isRepeated) {
     return null;
   }
 
   const {
-    PostsTitle, ForumIcon, PostActionsButton, EAKarmaDisplay, EAPostMeta,
-    PostsItemTagRelevance, PostsItemTooltipWrapper, PostsVote,
-    PostsItemTrailingButtons, PostReadCheckbox, PostsItemNewCommentsWrapper,
+    PostsTitle,
+    ForumIcon,
+    PostActionsButton,
+    EAKarmaDisplay,
+    EAPostMeta,
+    PostsItemTagRelevance,
+    PostsItemTooltipWrapper,
+    PostsVote,
+    PostsItemTrailingButtons,
+    PostReadCheckbox,
+    PostsItemNewCommentsWrapper,
     PostMostValuableCheckbox,
   } = Components;
 
-  const SecondaryInfo = () => (hideSecondaryInfo || showMostValuableCheckbox) ? null : (
-    <>
-      <InteractionWrapper className={classes.interactionWrapper}>
-        <a onClick={toggleComments} className={classNames(
-          classes.comments,
-          {[classes.newComments]: hasUnreadComments},
-        )}>
-          <ForumIcon icon="Comment" />
-          {commentCount}
-        </a>
-      </InteractionWrapper>
-      <div className={classes.postActions}>
+  const SecondaryInfo = () =>
+    hideSecondaryInfo || showMostValuableCheckbox ? null : (
+      <>
         <InteractionWrapper className={classes.interactionWrapper}>
-          <PostActionsButton post={post} popperGap={16} autoPlace vertical />
+          <a
+            onClick={toggleComments}
+            className={classNames(classes.comments, { [classes.newComments]: hasUnreadComments })}
+          >
+            <ForumIcon icon="Comment" />
+            {commentCount}
+          </a>
         </InteractionWrapper>
-      </div>
-      {tagRel &&
-        <div className={classes.tagRelWrapper}>
+        <div className={classes.postActions}>
           <InteractionWrapper className={classes.interactionWrapper}>
-            <PostsItemTagRelevance tagRel={tagRel} />
+            <PostActionsButton post={post} popperGap={16} autoPlace vertical />
           </InteractionWrapper>
         </div>
-      }
-    </>
-  );
+        {tagRel && (
+          <div className={classes.tagRelWrapper}>
+            <InteractionWrapper className={classes.interactionWrapper}>
+              <PostsItemTagRelevance tagRel={tagRel} />
+            </InteractionWrapper>
+          </div>
+        )}
+      </>
+    );
 
   // The nesting here gets a little messy: we need to add the extra `Link`
   // around the title to make it right-clickable/cmd+clickable. However,
@@ -251,7 +256,7 @@ const EAPostsItem = ({
   // normally requiring the user to press back twice to get to where they
   // started so we need to wrap that whole thing in an `InteractionWrapper`
   // too.
-  const TitleWrapper: FC = ({children}) => (
+  const TitleWrapper: FC = ({ children }) => (
     <PostsItemTooltipWrapper post={post} placement={tooltipPlacement} As="span">
       <InteractionWrapper className={classes.titleWrapper}>
         <Link to={postLink}>{children}</Link>
@@ -262,26 +267,20 @@ const EAPostsItem = ({
   return (
     <AnalyticsContext {...analyticsProps}>
       <div className={classNames(classes.root, className)}>
-        {showReadCheckbox &&
+        {showReadCheckbox && (
           <div className={classes.readCheckbox}>
             <PostReadCheckbox post={post} width={14} />
           </div>
-        }
+        )}
         <div className={classes.expandedCommentsWrapper}>
           <div className={classes.container} onClick={onClick}>
-            {isVoteable
-              ? (
-                <InteractionWrapper className={classNames(
-                  classes.interactionWrapper,
-                  classes.postsVote,
-                )}>
-                  <PostsVote post={post} />
-                </InteractionWrapper>
-              )
-              : (
-                <EAKarmaDisplay post={post} className={classes.karmaDisplay} />
-              )
-            }
+            {isVoteable ? (
+              <InteractionWrapper className={classNames(classes.interactionWrapper, classes.postsVote)}>
+                <PostsVote post={post} />
+              </InteractionWrapper>
+            ) : (
+              <EAKarmaDisplay post={post} className={classes.karmaDisplay} />
+            )}
             <div className={classes.details}>
               <PostsTitle
                 {...{
@@ -300,10 +299,7 @@ const EAPostsItem = ({
               />
               <div className={classes.meta}>
                 <EAPostMeta post={post} />
-                <div className={classNames(
-                  classes.secondaryContainer,
-                  classes.onlyMobile,
-                )}>
+                <div className={classNames(classes.secondaryContainer, classes.onlyMobile)}>
                   <SecondaryInfo />
                 </div>
               </div>
@@ -320,11 +316,13 @@ const EAPostsItem = ({
                 */}
               <SecondaryInfo />
             </div>
-            {showMostValuableCheckbox && <div className={classes.secondaryContainer}>
-              <InteractionWrapper className={classes.interactionWrapper}>
-                <PostMostValuableCheckbox post={post} />
-              </InteractionWrapper>
-            </div>}
+            {showMostValuableCheckbox && (
+              <div className={classes.secondaryContainer}>
+                <InteractionWrapper className={classes.interactionWrapper}>
+                  <PostMostValuableCheckbox post={post} />
+                </InteractionWrapper>
+              </div>
+            )}
             <InteractionWrapper className={classes.interactionWrapper}>
               <PostsItemTrailingButtons
                 showArchiveButton={false}
@@ -340,7 +338,7 @@ const EAPostsItem = ({
               />
             </InteractionWrapper>
           </div>
-          {renderComments &&
+          {renderComments && (
             <div className={classes.expandedComments}>
               <PostsItemNewCommentsWrapper
                 terms={commentTerms}
@@ -351,28 +349,24 @@ const EAPostsItem = ({
                 }}
               />
             </div>
-          }
+          )}
         </div>
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const EAPostsItemComponent = registerComponent(
-  "EAPostsItem",
-  EAPostsItem,
-  {
-    styles,
-    stylePriority: 1,
-    hocs: [withErrorBoundary],
-    areEqual: {
-      terms: "deep",
-    },
+const EAPostsItemComponent = registerComponent("EAPostsItem", EAPostsItem, {
+  styles,
+  stylePriority: 1,
+  hocs: [withErrorBoundary],
+  areEqual: {
+    terms: "deep",
   },
-);
+});
 
 declare global {
   interface ComponentTypes {
-    EAPostsItem: typeof EAPostsItemComponent
+    EAPostsItem: typeof EAPostsItemComponent;
   }
 }

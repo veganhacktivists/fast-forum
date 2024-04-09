@@ -61,7 +61,7 @@ import ArrowRightIcon from "@heroicons/react/24/solid/ArrowRightIcon";
 import ArrowCircleIcon from "@heroicons/react/20/solid/ArrowPathRoundedSquareIcon";
 import FunnelIcon from "@heroicons/react/24/outline/FunnelIcon";
 import BarsArrowDown from "@heroicons/react/24/outline/BarsArrowDownIcon";
-import InformationCircleIcon from '@heroicons/react/24/solid/InformationCircleIcon';
+import InformationCircleIcon from "@heroicons/react/24/solid/InformationCircleIcon";
 import AddBox from "@material-ui/icons/AddBox";
 import MuiVolumeUpIcon from "@material-ui/icons/VolumeUp";
 import MuiBookmarkIcon from "@material-ui/icons/Bookmark";
@@ -72,7 +72,7 @@ import MuiStarIcon from "@material-ui/icons/Star";
 import MuiStarBorderIcon from "@material-ui/icons/StarBorder";
 import MuiPersonIcon from "@material-ui/icons/Person";
 import MuiPeopleIcon from "@material-ui/icons/People";
-import MuiNotificationsIcon from '@material-ui/icons/Notifications';
+import MuiNotificationsIcon from "@material-ui/icons/Notifications";
 import MuiLinkIcon from "@material-ui/icons/Link";
 import MuiTagIcon from "@material-ui/icons/LocalOfferOutlined";
 import MuiReportIcon from "@material-ui/icons/ReportOutlined";
@@ -89,9 +89,9 @@ import MuiPuzzleIcon from "@material-ui/icons/Extension";
 import MuiCheckIcon from "@material-ui/icons/Check";
 import MuiEllipsisVerticalIcon from "@material-ui/icons/MoreVert";
 import MuiShareIcon from "@material-ui/icons/Share";
-import MuiSearchIcon from '@material-ui/icons/Search';
+import MuiSearchIcon from "@material-ui/icons/Search";
 import MuiMenuIcon from "@material-ui/icons/Menu";
-import MuiForumIcon from '@material-ui/icons/Forum';
+import MuiForumIcon from "@material-ui/icons/Forum";
 
 /**
  * ForumIcon can be used with custom SVG elements but you MUST pass through
@@ -126,89 +126,89 @@ import { DiscussIcon } from "../icons/givingSeasonIcons";
  * from MaterialUI and `EAForum` generally uses icons from HeroIcons.
  */
 export type ForumIconName =
-  "VolumeUp" |
-  "BookOpen" |
-  "Bookmark" |
-  "BookmarkBorder" |
-  "Bookmarks" |
-  "Karma" |
-  "KarmaOutline" |
-  "Star" |
-  "User" |
-  "Users" |
-  "UsersOutline" |
-  "Bell" |
-  "BellAlert" |
-  "BellBorder" |
-  "AddEmoji" |
-  "Link" |
-  "BoldLink" |
-  "Pin" |
-  "Author" |
-  "Sprout" |
-  "GivingHand" |
-  "Close" |
-  "Calendar" |
-  "CalendarDays" |
-  "Work" |
-  "School" |
-  "MapPin" |
-  "Pencil" |
-  "PencilSquare" |
-  "Comment" |
-  "CommentFilled" |
-  "ChatBubbleLeftRight" |
-  "ChatBubbleLeftRightFilled" |
-  "Shortform" |
-  "Warning" |
-  "Report" |
-  "ListBullet" |
-  "Eye" |
-  "EyeOutline" |
-  "Tag" |
-  "TagFilled" |
-  "Edit" |
-  "Analytics" |
-  "ThickChevronLeft" |
-  "ThickChevronRight" |
-  "ThickChevronDown" |
-  "NarrowArrowDown" |
-  "Plus" |
-  "Check" |
-  "CheckCircle" |
-  "Card" |
-  "List" |
-  "PlusSmall" |
-  "MinusSmall" |
-  "Heart" |
-  "HeartOutline" |
-  "Settings" |
-  "Email" |
-  "Puzzle" |
-  "Image" |
-  "Document" |
-  "DocumentFilled" |
-  "SoftUpArrow" |
-  "ArrowRight" |
-  "ArrowCircle" |
-  "EllipsisVertical" |
-  "Share" |
-  "ClipboardDocumentList" |
-  "ClipboardDocument" |
-  "QuestionMarkCircle" |
-  "Search" |
-  "ComputerDesktop" |
-  "Menu" |
-  "CloseMenu" |
-  "Q" |
-  "BarChart" |
-  "Funnel" |
-  "Voted" |
-  "InfoCircle" |
-  "BarsArrowDown" |
-  "LightbulbChat" |
-  "AddBoxIcon" |
-  "DiscussIcon";
+  | "VolumeUp"
+  | "BookOpen"
+  | "Bookmark"
+  | "BookmarkBorder"
+  | "Bookmarks"
+  | "Karma"
+  | "KarmaOutline"
+  | "Star"
+  | "User"
+  | "Users"
+  | "UsersOutline"
+  | "Bell"
+  | "BellAlert"
+  | "BellBorder"
+  | "AddEmoji"
+  | "Link"
+  | "BoldLink"
+  | "Pin"
+  | "Author"
+  | "Sprout"
+  | "GivingHand"
+  | "Close"
+  | "Calendar"
+  | "CalendarDays"
+  | "Work"
+  | "School"
+  | "MapPin"
+  | "Pencil"
+  | "PencilSquare"
+  | "Comment"
+  | "CommentFilled"
+  | "ChatBubbleLeftRight"
+  | "ChatBubbleLeftRightFilled"
+  | "Shortform"
+  | "Warning"
+  | "Report"
+  | "ListBullet"
+  | "Eye"
+  | "EyeOutline"
+  | "Tag"
+  | "TagFilled"
+  | "Edit"
+  | "Analytics"
+  | "ThickChevronLeft"
+  | "ThickChevronRight"
+  | "ThickChevronDown"
+  | "NarrowArrowDown"
+  | "Plus"
+  | "Check"
+  | "CheckCircle"
+  | "Card"
+  | "List"
+  | "PlusSmall"
+  | "MinusSmall"
+  | "Heart"
+  | "HeartOutline"
+  | "Settings"
+  | "Email"
+  | "Puzzle"
+  | "Image"
+  | "Document"
+  | "DocumentFilled"
+  | "SoftUpArrow"
+  | "ArrowRight"
+  | "ArrowCircle"
+  | "EllipsisVertical"
+  | "Share"
+  | "ClipboardDocumentList"
+  | "ClipboardDocument"
+  | "QuestionMarkCircle"
+  | "Search"
+  | "ComputerDesktop"
+  | "Menu"
+  | "CloseMenu"
+  | "Q"
+  | "BarChart"
+  | "Funnel"
+  | "Voted"
+  | "InfoCircle"
+  | "BarsArrowDown"
+  | "LightbulbChat"
+  | "AddBoxIcon"
+  | "DiscussIcon";
 
 const ICONS: ForumOptions<Record<ForumIconName, IconComponent>> = {
   default: {
@@ -294,7 +294,7 @@ const ICONS: ForumOptions<Record<ForumIconName, IconComponent>> = {
     BarsArrowDown: BarsArrowDown,
     LightbulbChat: LightbulbChatIcon,
     AddBoxIcon: AddBox,
-    DiscussIcon: DiscussIcon
+    DiscussIcon: DiscussIcon,
   },
 };
 
@@ -303,14 +303,13 @@ const CUSTOM_CLASSES: ForumOptions<Partial<Record<ForumIconName, string>>> = {
   default: {
     Link: "linkRotation",
   },
-  EAForum: {
-  },
+  EAForum: {},
 };
 
 export type IconProps = {
-  className: string,
-  onClick: MouseEventHandler<SVGElement>,
-}
+  className: string;
+  onClick: MouseEventHandler<SVGElement>;
+};
 
 export type IconComponent = ComponentType<Partial<IconProps>>;
 
@@ -325,26 +324,20 @@ const styles = (_: ThemeType): JssStyles => ({
   },
   linkRotation: {
     transform: "rotate(-45deg)",
-    '&.MuiListItemIcon-root': {
-      marginRight: 12
-    }
+    "&.MuiListItemIcon-root": {
+      marginRight: 12,
+    },
   },
 });
 
 type ForumIconProps = Partial<IconProps> & {
-  icon: ForumIconName,
-  noDefaultStyles?: boolean,
-  classes: ClassesType,
-  style?: CSSProperties,
+  icon: ForumIconName;
+  noDefaultStyles?: boolean;
+  classes: ClassesType;
+  style?: CSSProperties;
 };
 
-const ForumIcon = ({
-  icon,
-  noDefaultStyles,
-  className,
-  classes,
-  ...props
-}: ForumIconProps) => {
+const ForumIcon = ({ icon, noDefaultStyles, className, classes, ...props }: ForumIconProps) => {
   const icons = forumSelect(ICONS);
   const Icon = icons[icon] ?? ICONS.default[icon];
   if (!Icon) {
@@ -361,7 +354,7 @@ const ForumIcon = ({
   });
 
   return <Icon className={fullClassName} {...props} />;
-}
+};
 
 const ForumIconComponent = registerComponent("ForumIcon", memo(ForumIcon), {
   styles,
@@ -370,6 +363,6 @@ const ForumIconComponent = registerComponent("ForumIcon", memo(ForumIcon), {
 
 declare global {
   interface ComponentTypes {
-    ForumIcon: typeof ForumIconComponent
+    ForumIcon: typeof ForumIconComponent;
   }
 }

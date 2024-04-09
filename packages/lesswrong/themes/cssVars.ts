@@ -1,5 +1,5 @@
-import type { Theme as MuiThemeType } from '@material-ui/core/styles';
-import { getAtPath } from '../lib/helpers';
+import type { Theme as MuiThemeType } from "@material-ui/core/styles";
+import { getAtPath } from "../lib/helpers";
 
 type ThemePathItem = string | number;
 type ThemePath = ThemePathItem[];
@@ -9,7 +9,7 @@ const requestedCssVars = new Set<string>();
 const parsePathItem = (item: string): ThemePathItem => {
   const parsed = parseInt(item);
   return Number.isNaN(parsed) ? item : parsed;
-}
+};
 
 const separator = ":";
 const pathToKey = (path: ThemePath): string => path.join(separator);
@@ -37,7 +37,7 @@ export const requireCssVar = (...path: ThemePath): string => {
   const key = pathToKey(path);
   requestedCssVars.add(key);
   return keyToVarRef(key);
-}
+};
 
 export const requestedCssVarsToString = (theme: MuiThemeType & ThemeType, selector = ":root"): string => {
   const vars: string[] = [];
@@ -51,4 +51,4 @@ export const requestedCssVarsToString = (theme: MuiThemeType & ThemeType, select
     }
   }
   return `${selector} { ${vars.join("")} }`;
-}
+};

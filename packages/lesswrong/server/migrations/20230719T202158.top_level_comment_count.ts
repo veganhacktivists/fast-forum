@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-07-07T15:28:42.000Z by 20230707T152842.migrate_socialPreview.ts
  * +-- Overall schema hash: 1f4a770fddeffde4615bb22682170332
- *  
+ *
  * @@ -533,3 +531,3 @@ CREATE TABLE "PostRelations" (
- *  
+ *
  * --- Schema for "Posts", hash: 2b65af6cd1fd340fd8a4955cfc038f7c
  * +-- Schema for "Posts", hash: dd038517e1407f815e01db8a29b4a854
  *  CREATE TABLE "Posts" (
@@ -25,11 +25,10 @@
  */
 export const acceptsSchemaHash = "1f4a770fddeffde4615bb22682170332";
 
-
 import Posts from "../../lib/collections/posts/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Posts, "topLevelCommentCount");
 
   await db.any(`
@@ -45,8 +44,8 @@ export const up = async ({db}: MigrationContext) => {
     ) AS subquery
     WHERE "Posts"._id = subquery."postId";
   `);
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Posts, "topLevelCommentCount");
-}
+};

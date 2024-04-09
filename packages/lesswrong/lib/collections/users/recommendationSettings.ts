@@ -1,9 +1,9 @@
-import SimpleSchema from 'simpl-schema';
-import { addFieldsDict } from '../../utils/schemaUtils';
+import SimpleSchema from "simpl-schema";
+import { addFieldsDict } from "../../utils/schemaUtils";
 import Users from "../users/collection";
-import { userOwns } from '../../vulcan-users/permissions';
-import { ReviewYear } from '../../reviewUtils';
-import { TupleSet, UnionOf } from '../../utils/typeGuardUtils';
+import { userOwns } from "../../vulcan-users/permissions";
+import { ReviewYear } from "../../reviewUtils";
+import { TupleSet, UnionOf } from "../../utils/typeGuardUtils";
 
 export const recommendationStrategyNames = new TupleSet([
   "moreFromAuthor",
@@ -15,9 +15,8 @@ export const recommendationStrategyNames = new TupleSet([
   "feature",
 ] as const);
 
-export const isRecommendationStrategyName =
-  (name: string): name is RecommendationStrategyName =>
-    recommendationStrategyNames.has(name);
+export const isRecommendationStrategyName = (name: string): name is RecommendationStrategyName =>
+  recommendationStrategyNames.has(name);
 
 export type RecommendationStrategyName = UnionOf<typeof recommendationStrategyNames>;
 
@@ -29,83 +28,79 @@ export const recommendationFeatureNames = new TupleSet([
   "textSimilarity",
 ] as const);
 
-export const isRecommendationFeatureName =
-  (name: string): name is RecommendationFeatureName =>
-    recommendationFeatureNames.has(name);
+export const isRecommendationFeatureName = (name: string): name is RecommendationFeatureName =>
+  recommendationFeatureNames.has(name);
 
 export type RecommendationFeatureName = UnionOf<typeof recommendationFeatureNames>;
 
 export type WeightedFeature = {
-  feature: RecommendationFeatureName,
-  weight: number,
-}
+  feature: RecommendationFeatureName;
+  weight: number;
+};
 
 export interface StrategySettings {
   /** The post to generate recommendations for. */
-  postId: string,
+  postId: string;
   /** Various strategy use a bias parameter in different ways for tuning - this
    *  is now mostly deprecated in favour of using features. */
-  bias?: number,
+  bias?: number;
   /** Weighted scoring factors for defining a recommendation algorithm. */
-  features?: WeightedFeature[],
+  features?: WeightedFeature[];
   /** The tag to generate recommendations (only used by some some strategies). */
-  tagId?: string,
+  tagId?: string;
   /** Optional context string - this is not used to generate recommendations,
    *  but is stored along with the recommendation data in the database for
    *  analytics purposes. */
-  context?: string,
+  context?: string;
 }
 
 export interface StrategySpecification extends StrategySettings {
-  name: RecommendationStrategyName,
-  forceLoggedOutView?: boolean,
+  name: RecommendationStrategyName;
+  forceLoggedOutView?: boolean;
 }
 
 export interface RecommendationsAlgorithmWithStrategy {
   /** The strategy to use */
-  strategy: StrategySpecification,
+  strategy: StrategySpecification;
   /** The maximum number of results to return */
-  count?: number,
+  count?: number;
   /** If the selected strategy fails to generate `count` results then, by
    * default, we automatically switch to using a different strategy as a
    * fallback. Set `disableFallbacks` to true to prevent this. */
-  disableFallbacks?: boolean,
+  disableFallbacks?: boolean;
 }
 
 export interface DefaultRecommendationsAlgorithm {
-  method: "top"|"sample"
-  count?: number
-  scoreOffset: number
-  scoreExponent: number
-  coronavirus?: boolean
-  reviewNominations?: ReviewYear
-  reviewReviews?: ReviewYear
-  reviewFinal?: ReviewYear,
-  includePersonal?: boolean
-  includeMeta?: boolean
-  minimumBaseScore?: number
-  excludeDefaultRecommendations?: boolean
-  onlyUnread?: boolean
-  lwRationalityOnly?: boolean,
+  method: "top" | "sample";
+  count?: number;
+  scoreOffset: number;
+  scoreExponent: number;
+  coronavirus?: boolean;
+  reviewNominations?: ReviewYear;
+  reviewReviews?: ReviewYear;
+  reviewFinal?: ReviewYear;
+  includePersonal?: boolean;
+  includeMeta?: boolean;
+  minimumBaseScore?: number;
+  excludeDefaultRecommendations?: boolean;
+  onlyUnread?: boolean;
+  lwRationalityOnly?: boolean;
 
-  curatedModifier?: number
-  frontpageModifier?: number
-  personalBlogpostModifier?: number
+  curatedModifier?: number;
+  frontpageModifier?: number;
+  personalBlogpostModifier?: number;
 
-  hideFrontpage?: boolean,
-  hideContinueReading?: boolean,
-  hideBookmarks?: boolean,
-  hideReview?: boolean,
+  hideFrontpage?: boolean;
+  hideContinueReading?: boolean;
+  hideBookmarks?: boolean;
+  hideReview?: boolean;
 }
 
-export type RecommendationsAlgorithm =
-  RecommendationsAlgorithmWithStrategy |
-  DefaultRecommendationsAlgorithm;
+export type RecommendationsAlgorithm = RecommendationsAlgorithmWithStrategy | DefaultRecommendationsAlgorithm;
 
 export const recommendationsAlgorithmHasStrategy = (
   algorithm: RecommendationsAlgorithm,
-): algorithm is RecommendationsAlgorithmWithStrategy =>
-  "strategy" in algorithm;
+): algorithm is RecommendationsAlgorithmWithStrategy => "strategy" in algorithm;
 
 export const defaultAlgorithmSettings: DefaultRecommendationsAlgorithm = {
   method: "top",

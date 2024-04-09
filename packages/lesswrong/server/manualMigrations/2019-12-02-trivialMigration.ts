@@ -1,4 +1,4 @@
-import { registerMigration } from './migrationUtils';
+import { registerMigration } from "./migrationUtils";
 
 // A migration which is a no-op. Used for testing bits of migration infrastructure.
 registerMigration({
@@ -8,5 +8,5 @@ registerMigration({
   action: async () => {
     // eslint-disable-next-line no-console
     console.log("Running trivial migration");
-  }
+  },
 });

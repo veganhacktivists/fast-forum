@@ -9,11 +9,7 @@ const TypeformScript: FC = () => (
   </Helmet>
 );
 
-const useTypeformCallback = (
-  widgetId: string,
-  event: "close" | "submit",
-  onEvent?: () => void,
-) => {
+const useTypeformCallback = (widgetId: string, event: "close" | "submit", onEvent?: () => void) => {
   const callbackName = `fm_tf_on_${event}_${widgetId}`;
   useEffect(() => {
     if (onEvent) {
@@ -27,16 +23,16 @@ const useTypeformCallback = (
       };
     }
   }, [callbackName, onEvent]);
-  return onEvent ? {[`data-tf-on-${event}`]: callbackName} : {};
-}
+  return onEvent ? { [`data-tf-on-${event}`]: callbackName } : {};
+};
 
 export const TypeformStandardEmbed: FC<{
-  widgetId: string,
-  domain?: string,
-  title: string,
-  parameters?: TypeformParameters,
-  className?: string,
-}> = ({widgetId, domain, title, parameters, className}) => (
+  widgetId: string;
+  domain?: string;
+  title: string;
+  parameters?: TypeformParameters;
+  className?: string;
+}> = ({ widgetId, domain, title, parameters, className }) => (
   <>
     <TypeformScript />
     <div
@@ -53,12 +49,12 @@ export const TypeformStandardEmbed: FC<{
 );
 
 export const TypeformFullPageEmbed: FC<{
-  widgetId: string,
-  title: string,
-  domain?: string,
-  parameters?: TypeformParameters,
-  className?: string,
-}> = ({widgetId, domain, title, parameters, className}) => (
+  widgetId: string;
+  title: string;
+  domain?: string;
+  parameters?: TypeformParameters;
+  className?: string;
+}> = ({ widgetId, domain, title, parameters, className }) => (
   <TypeformStandardEmbed
     widgetId={widgetId}
     title={title}
@@ -74,15 +70,15 @@ export const TypeformFullPageEmbed: FC<{
 );
 
 export const TypeformPopupEmbed: FC<{
-  widgetId: string,
-  domain?: string,
-  title: string,
-  label?: string,
-  onClose?: () => void,
-  onSubmit?: () => void,
-  parameters?: TypeformParameters,
-  className?: string,
-}> = ({widgetId, domain, title, label, onClose, onSubmit, parameters, className}) => {
+  widgetId: string;
+  domain?: string;
+  title: string;
+  label?: string;
+  onClose?: () => void;
+  onSubmit?: () => void;
+  parameters?: TypeformParameters;
+  className?: string;
+}> = ({ widgetId, domain, title, label, onClose, onSubmit, parameters, className }) => {
   const onCloseProps = useTypeformCallback(widgetId, "close", onClose);
   const onSubmitProps = useTypeformCallback(widgetId, "submit", onSubmit);
   return (
@@ -105,7 +101,7 @@ export const TypeformPopupEmbed: FC<{
       </button>
     </>
   );
-}
+};
 
 /**
  * Defines when to open the side popup.
@@ -117,34 +113,20 @@ export const TypeformPopupEmbed: FC<{
 export type TypeformSideEmbedOpenBehaviour = "onClick" | "onLoad" | number;
 
 export const TypeformSideEmbed: FC<{
-  widgetId: string,
-  domain?: string,
-  title: string,
-  label?: string,
-  onClose?: () => void,
-  onSubmit?: () => void,
-  parameters?: TypeformParameters,
-  openBehaviour?: TypeformSideEmbedOpenBehaviour,
-  className?: string,
-}> = ({
-  widgetId,
-  domain,
-  title,
-  label,
-  onClose,
-  onSubmit,
-  parameters,
-  openBehaviour = "onClick",
-  className,
-}) => {
+  widgetId: string;
+  domain?: string;
+  title: string;
+  label?: string;
+  onClose?: () => void;
+  onSubmit?: () => void;
+  parameters?: TypeformParameters;
+  openBehaviour?: TypeformSideEmbedOpenBehaviour;
+  className?: string;
+}> = ({ widgetId, domain, title, label, onClose, onSubmit, parameters, openBehaviour = "onClick", className }) => {
   const onCloseProps = useTypeformCallback(widgetId, "close", onClose);
   const onSubmitProps = useTypeformCallback(widgetId, "submit", onSubmit);
-  const tfOpen = openBehaviour === "onClick"
-    ? undefined
-    : (openBehaviour === "onLoad" ? "load" : "scroll");
-  const tfOpenValue = typeof openBehaviour === "number"
-    ? String(openBehaviour)
-    : undefined;
+  const tfOpen = openBehaviour === "onClick" ? undefined : openBehaviour === "onLoad" ? "load" : "scroll";
+  const tfOpenValue = typeof openBehaviour === "number" ? String(openBehaviour) : undefined;
   return (
     <>
       <TypeformScript />
@@ -167,4 +149,4 @@ export const TypeformSideEmbed: FC<{
       </button>
     </>
   );
-}
+};

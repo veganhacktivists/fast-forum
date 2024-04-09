@@ -1,33 +1,33 @@
-import React from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import type { CommentWithModeratorActions } from './CommentsReviewInfoCard';
+import React from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import type { CommentWithModeratorActions } from "./CommentsReviewInfoCard";
 
 const styles = (theme: ThemeType): JssStyles => ({
-  root: {
-
-  }
+  root: {},
 });
 
-export const CommentsReviewTab = ({commentsWithActions, classes}: {
-  commentsWithActions: CommentWithModeratorActions[],
-  classes: ClassesType,
+export const CommentsReviewTab = ({
+  commentsWithActions,
+  classes,
+}: {
+  commentsWithActions: CommentWithModeratorActions[];
+  classes: ClassesType;
 }) => {
   const { CommentsReviewInfoCard } = Components;
 
-  return <div className={classes.root}>
-    {commentsWithActions.map(commentWithActions =>
-      <CommentsReviewInfoCard
-        key={commentWithActions.comment._id}
-        commentModeratorAction={commentWithActions}
-      />
-    )}
-  </div>;
-}
+  return (
+    <div className={classes.root}>
+      {commentsWithActions.map((commentWithActions) => (
+        <CommentsReviewInfoCard key={commentWithActions.comment._id} commentModeratorAction={commentWithActions} />
+      ))}
+    </div>
+  );
+};
 
-const CommentsReviewTabComponent = registerComponent('CommentsReviewTab', CommentsReviewTab, {styles});
+const CommentsReviewTabComponent = registerComponent("CommentsReviewTab", CommentsReviewTab, { styles });
 
 declare global {
   interface ComponentTypes {
-    CommentsReviewTab: typeof CommentsReviewTabComponent
+    CommentsReviewTab: typeof CommentsReviewTabComponent;
   }
 }

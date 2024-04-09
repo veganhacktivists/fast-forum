@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import Geosuggest from 'react-geosuggest';
+import React, { useState, useEffect, useRef } from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import Geosuggest from "react-geosuggest";
 // These imports need to be separate to satisfy eslint, for some reason
-import type { Suggest } from 'react-geosuggest';
-import { isClient } from '../../lib/executionEnvironment';
-import { DatabasePublicSetting } from '../../lib/publicSettings';
-import FormLabel from '@material-ui/core/FormLabel';
+import type { Suggest } from "react-geosuggest";
+import { isClient } from "../../lib/executionEnvironment";
+import { DatabasePublicSetting } from "../../lib/publicSettings";
+import FormLabel from "@material-ui/core/FormLabel";
 
 // Recommended styling for React-geosuggest: https://github.com/ubilabs/react-geosuggest/blob/master/src/geosuggest.css
 export const geoSuggestStyles = (theme: ThemeType): JssStyles => ({
@@ -16,17 +16,17 @@ export const geoSuggestStyles = (theme: ThemeType): JssStyles => ({
     width: "100%",
     textAlign: "left",
   },
-  
+
   "& .geosuggest__input": {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     border: "2px solid transparent",
     borderBottom: `1px solid ${theme.palette.text.normal}`,
     padding: ".5em .5em 0.5em 0em !important",
     width: 350,
     fontSize: 13,
     color: theme.palette.primary.main,
-    [theme.breakpoints.down('sm')]: {
-      width: "100%"
+    [theme.breakpoints.down("sm")]: {
+      width: "100%",
     },
   },
   "& .geosuggest__input:focus": {
@@ -35,7 +35,7 @@ export const geoSuggestStyles = (theme: ThemeType): JssStyles => ({
     borderBottomColor: theme.palette.geosuggest.dropdownActiveBackground,
     boxShadow: "0 0 0 transparent",
   },
-  
+
   "& .geosuggest__suggests": {
     position: "absolute",
     top: "100%",
@@ -58,7 +58,7 @@ export const geoSuggestStyles = (theme: ThemeType): JssStyles => ({
     overflow: "hidden",
     borderWidth: 0,
   },
-  
+
   "& .geosuggest__item": {
     fontSize: "1rem",
     padding: ".5em .65em",
@@ -76,27 +76,27 @@ export const geoSuggestStyles = (theme: ThemeType): JssStyles => ({
   },
   "& .geosuggest__item__matched-text": {
     fontWeight: "bold",
-  }
-})
+  },
+});
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     ...geoSuggestStyles(theme),
-    ...theme.typography.commentStyle
+    ...theme.typography.commentStyle,
   },
   label: {
-    fontSize: 10
-  }
+    fontSize: 10,
+  },
 });
 
-export const mapsAPIKeySetting = new DatabasePublicSetting<string | null>('googleMaps.apiKey', null)
+export const mapsAPIKeySetting = new DatabasePublicSetting<string | null>("googleMaps.apiKey", null);
 
-let mapsLoadingState: "unloaded"|"loading"|"loaded" = "unloaded";
-let onMapsLoaded: Array<()=>void> = [];
+let mapsLoadingState: "unloaded" | "loading" | "loaded" = "unloaded";
+let onMapsLoaded: Array<() => void> = [];
 
 export const useGoogleMaps = (): [boolean, any] => {
   const [isMapsLoaded, setIsMapsLoaded] = useState(false);
-  
+
   useEffect(() => {
     if (isClient) {
       if (mapsLoadingState === "loaded") {
@@ -106,11 +106,11 @@ export const useGoogleMaps = (): [boolean, any] => {
           setIsMapsLoaded(true);
         });
       }
-      
+
       if (mapsLoadingState === "unloaded") {
         mapsLoadingState = "loading";
-        
-        var tag = document.createElement('script');
+
+        var tag = document.createElement("script");
         tag.async = false;
         tag.src = `https://maps.googleapis.com/maps/api/js?key=${mapsAPIKeySetting.get()}&libraries=places&callback=googleMapsFinishedLoading`;
         window.googleMapsFinishedLoading = () => {
@@ -120,104 +120,120 @@ export const useGoogleMaps = (): [boolean, any] => {
           for (let callback of callbacks) {
             callback();
           }
-        }
+        };
         document.body.appendChild(tag);
       }
     }
   }, []);
-  
+
   if (!isMapsLoaded) return [false, null];
   return [true, window?.google?.maps];
-}
-
+};
 
 /**
  * LocationPicker: A textbox for typing in a location. This is split from LocationFormComponent
  * so that it can be used outside of vulcan-forms.
  */
-const LocationPicker = ({document, path, label, value, updateCurrentValues, stringVersionFieldName, classes}: {
-  document: any,
-  path: string,
-  label?: string,
-  value: any,
-  updateCurrentValues: any,
-  stringVersionFieldName?: string|null,
-  classes: ClassesType,
+const LocationPicker = ({
+  document,
+  path,
+  label,
+  value,
+  updateCurrentValues,
+  stringVersionFieldName,
+  classes,
+}: {
+  document: any;
+  path: string;
+  label?: string;
+  value: any;
+  updateCurrentValues: any;
+  stringVersionFieldName?: string | null;
+  classes: ClassesType;
 }) => {
   // if this location field has a matching field that just stores the string version of the location,
   // make sure to update the matching field along with this one
-  const locationFieldName: string|null = stringVersionFieldName || null;
+  const locationFieldName: string | null = stringVersionFieldName || null;
 
-  const location =
-    (locationFieldName && document?.[locationFieldName])
-    || document?.[path]?.formatted_address
-    || ""
-  const [ mapsLoaded ] = useGoogleMaps()
-  const geosuggestEl = useRef<any>(null)
-  
+  const location = (locationFieldName && document?.[locationFieldName]) || document?.[path]?.formatted_address || "";
+  const [mapsLoaded] = useGoogleMaps();
+  const geosuggestEl = useRef<any>(null);
+
   useEffect(() => {
     if (geosuggestEl && geosuggestEl.current) {
-      geosuggestEl.current.update(value?.formatted_address)
+      geosuggestEl.current.update(value?.formatted_address);
     }
-  }, [value])
-  
+  }, [value]);
+
   const handleCheckClear = (value: any) => {
     // clear location fields if the user deletes the input text
-    if (value === '') {
+    if (value === "") {
       updateCurrentValues({
-        ...(locationFieldName ? {[locationFieldName]: null} : {}),
+        ...(locationFieldName ? { [locationFieldName]: null } : {}),
         [path]: null,
-      })
+      });
     }
-  }
+  };
 
   const handleSuggestSelect = (suggestion: Suggest) => {
     if (suggestion && suggestion.gmaps) {
       updateCurrentValues({
-        ...(locationFieldName ? {
-          [locationFieldName]: suggestion.label
-        } : {}),
+        ...(locationFieldName
+          ? {
+              [locationFieldName]: suggestion.label,
+            }
+          : {}),
         [path]: suggestion.gmaps,
-      })
+      });
     }
-  }
-
+  };
 
   if (document && mapsLoaded) {
-    return <div className={classes.root}>
-      {value && label && <FormLabel className={classes.label}>{label}</FormLabel>}
-      <Geosuggest
-        ref={geosuggestEl}
-        placeholder={label}
-        onChange={handleCheckClear}
-        onSuggestSelect={handleSuggestSelect}
-        initialValue={location}
-      />
-    </div>
+    return (
+      <div className={classes.root}>
+        {value && label && <FormLabel className={classes.label}>{label}</FormLabel>}
+        <Geosuggest
+          ref={geosuggestEl}
+          placeholder={label}
+          onChange={handleCheckClear}
+          onSuggestSelect={handleSuggestSelect}
+          initialValue={location}
+        />
+      </div>
+    );
   } else {
-    return <Components.Loading/>;
+    return <Components.Loading />;
   }
-}
+};
 
-const LocationFormComponent = ({document, path, label, value, updateCurrentValues, stringVersionFieldName}: FormComponentProps<any> & {
-  stringVersionFieldName?: string|null,
+const LocationFormComponent = ({
+  document,
+  path,
+  label,
+  value,
+  updateCurrentValues,
+  stringVersionFieldName,
+}: FormComponentProps<any> & {
+  stringVersionFieldName?: string | null;
 }) => {
-  return <Components.LocationPicker
-    document={document}
-    path={path}
-    label={label}
-    value={value}
-    updateCurrentValues={updateCurrentValues}
-    stringVersionFieldName={stringVersionFieldName}
-  />
-}
+  return (
+    <Components.LocationPicker
+      document={document}
+      path={path}
+      label={label}
+      value={value}
+      updateCurrentValues={updateCurrentValues}
+      stringVersionFieldName={stringVersionFieldName}
+    />
+  );
+};
 
-const LocationPickerComponent = registerComponent("LocationPicker", LocationPicker, {styles});
-const LocationFormComponentComponent = registerComponent("LocationFormComponent", LocationFormComponent, {styles});
+const LocationPickerComponent = registerComponent("LocationPicker", LocationPicker, { styles });
+const LocationFormComponentComponent = registerComponent("LocationFormComponent", LocationFormComponent, { styles });
 
 declare global {
   interface ComponentTypes {
-    LocationPicker: typeof LocationPickerComponent
-    LocationFormComponent: typeof LocationFormComponentComponent
+    LocationPicker: typeof LocationPickerComponent;
+    LocationFormComponent: typeof LocationFormComponentComponent;
   }
 }

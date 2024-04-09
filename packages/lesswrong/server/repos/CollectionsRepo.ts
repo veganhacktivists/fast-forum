@@ -28,10 +28,10 @@ class CollectionsRepo extends AbstractRepo<"Collections"> {
         cols._id = ANY($1)
       GROUP BY cols._id
     `;
-  
-    const results = await this.getRawDb().any<{_id: string, total_count: string}>(query, [collectionIds]);
-    const resultsById = keyBy(results, '_id');
-    return collectionIds.map(id => {
+
+    const results = await this.getRawDb().any<{ _id: string; total_count: string }>(query, [collectionIds]);
+    const resultsById = keyBy(results, "_id");
+    return collectionIds.map((id) => {
       const result = resultsById[id];
       return result ? parseInt(result.total_count, 10) : 0;
     });
@@ -41,9 +41,9 @@ class CollectionsRepo extends AbstractRepo<"Collections"> {
    * The number of read posts for the given (collectionId, userId) combinations, returned in the order given.
    */
   async readPostsCount(params: { collectionId: string; userId: string }[]): Promise<number[]> {
-    const collectionIds = params.map(p => p.collectionId);
-    const userIds = params.map(p => p.userId);
-  
+    const collectionIds = params.map((p) => p.collectionId);
+    const userIds = params.map((p) => p.userId);
+
     const query = `
       -- CollectionsRepo.postsCount
       SELECT
@@ -60,11 +60,14 @@ class CollectionsRepo extends AbstractRepo<"Collections"> {
         cols._id = ANY($1)
       GROUP BY composite_id
     `;
-  
-    const results = await this.getRawDb().any<{ composite_id: string, read_count: string }>(query, [collectionIds, userIds]);
-    const resultsById = keyBy(results, 'composite_id');
-  
-    return params.map(param => {
+
+    const results = await this.getRawDb().any<{ composite_id: string; read_count: string }>(query, [
+      collectionIds,
+      userIds,
+    ]);
+    const resultsById = keyBy(results, "composite_id");
+
+    return params.map((param) => {
       const compositeId = `${param.collectionId}-${param.userId}`;
       const result = resultsById[compositeId];
       return result ? parseInt(result.read_count, 10) : 0;

@@ -35,25 +35,31 @@ class SequencesRepo extends AbstractRepo<"Sequences"> {
   }
 
   getSearchDocumentById(id: string): Promise<SearchSequence> {
-    return this.getRawDb().one(`
+    return this.getRawDb().one(
+      `
       -- SequencesRepo.getSearchDocumentById
       ${this.getSearchDocumentQuery()}
       WHERE s."_id" = $1
-    `, [id]);
+    `,
+      [id],
+    );
   }
 
   getSearchDocuments(limit: number, offset: number): Promise<SearchSequence[]> {
-    return this.getRawDb().any(`
+    return this.getRawDb().any(
+      `
       -- SequencesRepo.getSearchDocuments
       ${this.getSearchDocumentQuery()}
       ORDER BY s."createdAt" DESC
       LIMIT $1
       OFFSET $2
-    `, [limit, offset]);
+    `,
+      [limit, offset],
+    );
   }
 
   async countSearchDocuments(): Promise<number> {
-    const {count} = await this.getRawDb().one(`SELECT COUNT(*) FROM "Sequences"`);
+    const { count } = await this.getRawDb().one(`SELECT COUNT(*) FROM "Sequences"`);
     return count;
   }
 
@@ -74,22 +80,22 @@ class SequencesRepo extends AbstractRepo<"Sequences"> {
         s._id = ANY($1)
       GROUP BY s._id
     `;
-  
-    const results = await this.getRawDb().any<{_id: string, total_count: string}>(query, [sequenceIds]);
-    const resultsById = keyBy(results, '_id')
-    return sequenceIds.map(id => {
+
+    const results = await this.getRawDb().any<{ _id: string; total_count: string }>(query, [sequenceIds]);
+    const resultsById = keyBy(results, "_id");
+    return sequenceIds.map((id) => {
       const result = resultsById[id];
       return result ? parseInt(result.total_count, 10) : 0;
-    })
+    });
   }
 
   /**
    * The number of read posts for the given (sequenceId, userId) combinations, returned in the order given.
    */
   async readPostsCount(params: { sequenceId: string; userId: string }[]): Promise<number[]> {
-    const sequenceIds = params.map(p => p.sequenceId);
-    const userIds = params.map(p => p.userId);
-  
+    const sequenceIds = params.map((p) => p.sequenceId);
+    const userIds = params.map((p) => p.userId);
+
     const query = `
       -- SequencesRepo.readPostsCount
       SELECT
@@ -104,14 +110,17 @@ class SequencesRepo extends AbstractRepo<"Sequences"> {
         s._id = ANY($1)
       GROUP BY composite_id
     `;
-  
-    const results = await this.getRawDb().any<{ composite_id: string, read_count: string }>(query, [sequenceIds, userIds]);
-    const resultsById = keyBy(results, 'composite_id');
-  
-    return params.map(param => {
+
+    const results = await this.getRawDb().any<{ composite_id: string; read_count: string }>(query, [
+      sequenceIds,
+      userIds,
+    ]);
+    const resultsById = keyBy(results, "composite_id");
+
+    return params.map((param) => {
       const compositeId = `${param.sequenceId}-${param.userId}`;
       const result = resultsById[compositeId];
-      return result ? parseInt(result.read_count, 10) : 0
+      return result ? parseInt(result.read_count, 10) : 0;
     });
   }
 }

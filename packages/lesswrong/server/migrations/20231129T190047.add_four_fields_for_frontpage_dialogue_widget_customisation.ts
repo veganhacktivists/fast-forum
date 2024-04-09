@@ -18,9 +18,9 @@
  * --- Accepted on 2023-11-29T08:07:01.000Z by 20231129T080701.add_givingSeason2023VotedFlair.ts
  * ->>>>>>> master
  * +-- Overall schema hash: 5cb40349b3ff94014c31fb0418ffa6ea
- *  
+ *
  * @@ -1139,7 +1131,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * -<<<<<<< HEAD
  * --- Schema for "Users", hash: 82b73b743a883191481c33ffcb35e08c
  * -=======
@@ -28,7 +28,7 @@
  * ->>>>>>> master
  * +-- Schema for "Users", hash: a22133351267b7929fc15b858b0d5748
  *  CREATE TABLE "Users" (
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -42,17 +42,16 @@ export const acceptsSchemaHash = "5cb40349b3ff94014c31fb0418ffa6ea";
 import Users from "../../lib/collections/users/collection";
 import { addField, dropField } from "./meta/utils";
 
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Users, "showDialoguesList");
+  await addField(db, Users, "showMyDialogues");
+  await addField(db, Users, "showMatches");
+  await addField(db, Users, "showRecommendedPartners");
+};
 
-export const up = async ({db}: MigrationContext) => {
- await addField(db, Users, "showDialoguesList");
- await addField(db, Users, "showMyDialogues");
- await addField(db, Users, "showMatches");
- await addField(db, Users, "showRecommendedPartners");
-}
-
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Users, "showDialoguesList");
   await dropField(db, Users, "showMyDialogues");
   await dropField(db, Users, "showMatches");
   await dropField(db, Users, "showRecommendedPartners");
-}
+};

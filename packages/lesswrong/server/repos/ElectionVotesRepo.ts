@@ -12,7 +12,7 @@ class ElectionVotesRepo extends AbstractRepo<"ElectionVotes"> {
       `
       SELECT COUNT(*) as submitted_count FROM "ElectionVotes" WHERE "electionName" = $1 AND "submittedAt" IS NOT NULL
     `,
-      [electionName]
+      [electionName],
     );
 
     return res ? parseInt(res.submitted_count) : 0;

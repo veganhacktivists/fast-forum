@@ -1,9 +1,6 @@
 import React, { FC, MouseEvent, useState, useCallback } from "react";
 import { Components, registerComponent } from "../../lib/vulcan-lib";
-import type {
-  CommentVotingComponentProps,
-  PostVotingComponentProps,
-} from "../../lib/voting/votingSystems";
+import type { CommentVotingComponentProps, PostVotingComponentProps } from "../../lib/voting/votingSystems";
 import { useTracking } from "../../lib/analyticsEvents";
 import { useCurrentUser } from "../common/withUser";
 import { useDialog } from "../common/withDialog";
@@ -48,9 +45,9 @@ const styles = (theme: ThemeType): JssStyles => ({
     },
   },
   buttonViewOnly: {
-    cursor: 'default',
+    cursor: "default",
     "&:hover": {
-      background: 'none'
+      background: "none",
     },
   },
   emojiPreview: {
@@ -103,14 +100,10 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const isEmojiSelected = (
-  currentUserExtendedVote: AnyBecauseHard,
-  emojiOption: EmojiOption,
-) => Boolean(currentUserExtendedVote?.[emojiOption.name]);
+const isEmojiSelected = (currentUserExtendedVote: AnyBecauseHard, emojiOption: EmojiOption) =>
+  Boolean(currentUserExtendedVote?.[emojiOption.name]);
 
-const getCurrentReactions = (
-  extendedScore?: AnyBecauseHard,
-) => {
+const getCurrentReactions = (extendedScore?: AnyBecauseHard) => {
   const result = [];
   for (const emojiOption of eaAnonymousEmojiPalette) {
     result.push({
@@ -134,13 +127,13 @@ const getCurrentReactions = (
     }
   }
   return result;
-}
+};
 
 const AnonymousEmojiTooltipContent: FC<{
-  emojiOption: EmojiOption,
-  count: number,
-  classes: ClassesType,
-}> = ({emojiOption, count, classes}) => {
+  emojiOption: EmojiOption;
+  count: number;
+  classes: ClassesType;
+}> = ({ emojiOption, count, classes }) => {
   return (
     <div>
       <div>
@@ -155,23 +148,21 @@ const AnonymousEmojiTooltipContent: FC<{
       </div>
     </div>
   );
-}
+};
 
 const joinStringList = (items: string[]) =>
-  items.length > 1
-    ? items.slice(0, -1).join(", ") + ", and " + items[items.length - 1]
-    : items[0];
+  items.length > 1 ? items.slice(0, -1).join(", ") + ", and " + items[items.length - 1] : items[0];
 
 const EmojiTooltipContent: FC<{
-  currentUser: UsersCurrent | null,
-  emojiOption: EmojiOption,
-  isSelected: boolean,
-  reactors?: Record<string, string[]>,
-  classes: ClassesType,
-}> = ({currentUser, emojiOption, isSelected, reactors, classes}) => {
+  currentUser: UsersCurrent | null;
+  emojiOption: EmojiOption;
+  isSelected: boolean;
+  reactors?: Record<string, string[]>;
+  classes: ClassesType;
+}> = ({ currentUser, emojiOption, isSelected, reactors, classes }) => {
   let displayNames = reactors?.[emojiOption.name] ?? [];
   if (currentUser) {
-    const {displayName} = currentUser;
+    const { displayName } = currentUser;
     displayNames = displayNames.filter((name) => name !== displayName);
     if (isSelected) {
       displayNames = ["You", ...displayNames];
@@ -179,12 +170,11 @@ const EmojiTooltipContent: FC<{
   }
   return (
     <div>
-      {displayNames.length > 0 &&
+      {displayNames.length > 0 && (
         <div>
-          {joinStringList(displayNames)}{" "}
-          <span className={classes.tooltipSecondaryText}>reacted with</span>
+          {joinStringList(displayNames)} <span className={classes.tooltipSecondaryText}>reacted with</span>
         </div>
-      }
+      )}
       <div className={classes.tooltipEmojiRow}>
         <span className={classes.tooltipEmoji}>
           <emojiOption.Component />
@@ -193,7 +183,7 @@ const EmojiTooltipContent: FC<{
       </div>
     </div>
   );
-}
+};
 
 export type EAReactableDocument = CommentsList | PostsWithVotes;
 
@@ -202,109 +192,113 @@ export const isEAReactableDocument = (
   _document: CommentVotingComponentProps["document"] | PostVotingComponentProps["document"],
 ): _document is EAReactableDocument => {
   return collection === Posts || collection === Comments;
-}
-
-type EAReactsSectionOptions = {
-  // viewOnly disables all interactivity, including tooltips
-  viewOnly: true,
-  document: {
-    _id: string,
-  },
-  voteProps: {
-    document?: {
-      extendedScore: AnyBecauseHard,
-      currentUserExtendedVote?: AnyBecauseHard,
-    },
-  },
-} | {
-  viewOnly?: false|null,
-  document: EAReactableDocument,
-  voteProps: VotingProps<VoteableTypeClient>,
 };
 
-const EAReactsSection: FC<{
-  large?: boolean,
-  classes: ClassesType,
-} & EAReactsSectionOptions> = ({document, voteProps, large, viewOnly, classes}) => {
+type EAReactsSectionOptions =
+  | {
+      // viewOnly disables all interactivity, including tooltips
+      viewOnly: true;
+      document: {
+        _id: string;
+      };
+      voteProps: {
+        document?: {
+          extendedScore: AnyBecauseHard;
+          currentUserExtendedVote?: AnyBecauseHard;
+        };
+      };
+    }
+  | {
+      viewOnly?: false | null;
+      document: EAReactableDocument;
+      voteProps: VotingProps<VoteableTypeClient>;
+    };
+
+const EAReactsSection: FC<
+  {
+    large?: boolean;
+    classes: ClassesType;
+  } & EAReactsSectionOptions
+> = ({ document, voteProps, large, viewOnly, classes }) => {
   const currentUser = useCurrentUser();
-  const {openDialog} = useDialog();
+  const { openDialog } = useDialog();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [everOpened, setEverOpened] = useState(false);
-  const {captureEvent} = useTracking({
+  const { captureEvent } = useTracking({
     eventType: "emojiMenuClicked",
     eventProps: {
       documentId: document._id,
-      ...('collectionName' in voteProps && {itemType: voteProps.collectionName})
+      ...("collectionName" in voteProps && { itemType: voteProps.collectionName }),
     },
   });
 
-  const onOpenMenu = useCallback((event: MouseEvent) => {
-    captureEvent("emojiMenuClicked", {open: true});
-    setAnchorEl(event.currentTarget as HTMLElement);
-    setEverOpened(true);
-  }, [captureEvent]);
+  const onOpenMenu = useCallback(
+    (event: MouseEvent) => {
+      captureEvent("emojiMenuClicked", { open: true });
+      setAnchorEl(event.currentTarget as HTMLElement);
+      setEverOpened(true);
+    },
+    [captureEvent],
+  );
 
   const onCloseMenu = useCallback(() => {
-    captureEvent("emojiMenuClicked", {open: false});
+    captureEvent("emojiMenuClicked", { open: false });
     setAnchorEl(null);
   }, [captureEvent]);
 
-  const onSelectEmoji = useCallback(async (emojiOption: EmojiOption) => {
-    if (viewOnly) return;
-    
-    if (!currentUser) {
-      openDialog({
-        componentName: "LoginPopup",
-        componentProps: {},
+  const onSelectEmoji = useCallback(
+    async (emojiOption: EmojiOption) => {
+      if (viewOnly) return;
+
+      if (!currentUser) {
+        openDialog({
+          componentName: "LoginPopup",
+          componentProps: {},
+        });
+        return;
+      }
+
+      const extendedVote = {
+        ...voteProps.document.currentUserExtendedVote,
+        [emojiOption.name]: !isEmojiSelected(voteProps.document?.currentUserExtendedVote, emojiOption),
+      };
+      const partner = getEmojiMutuallyExclusivePartner(emojiOption.name);
+      if (partner && extendedVote[emojiOption.name]) {
+        extendedVote[partner] = false;
+      }
+
+      await voteProps.vote({
+        document: voteProps.document,
+        voteType: voteProps.document.currentUserVote ?? "neutral",
+        extendedVote,
+        currentUser,
       });
-      return;
-    }
-
-    const extendedVote = {
-      ...voteProps.document.currentUserExtendedVote,
-      [emojiOption.name]: !isEmojiSelected(voteProps.document?.currentUserExtendedVote, emojiOption),
-    };
-    const partner = getEmojiMutuallyExclusivePartner(emojiOption.name);
-    if (partner && extendedVote[emojiOption.name]) {
-      extendedVote[partner] = false;
-    }
-
-    await voteProps.vote({
-      document: voteProps.document,
-      voteType: voteProps.document.currentUserVote ?? "neutral",
-      extendedVote,
-      currentUser,
-    });
-  }, [currentUser, openDialog, voteProps, viewOnly]);
+    },
+    [currentUser, openDialog, voteProps, viewOnly],
+  );
 
   const reactions = getCurrentReactions(voteProps.document?.extendedScore);
 
-  const {EAEmojiPalette, ForumIcon, LWTooltip} = Components;
+  const { EAEmojiPalette, ForumIcon, LWTooltip } = Components;
   return (
     <>
-      {reactions.map(({emojiOption, anonymous, score}) => {
+      {reactions.map(({ emojiOption, anonymous, score }) => {
         const isSelected = isEmojiSelected(voteProps.document?.currentUserExtendedVote, emojiOption);
         return (
           <LWTooltip
             key={emojiOption.name}
             title={
-              anonymous
-                ? (
-                  <AnonymousEmojiTooltipContent
-                    emojiOption={emojiOption}
-                    count={score}
-                    classes={classes}
-                  />
-                )
-                : (
-                  <EmojiTooltipContent
-                    currentUser={currentUser}
-                    emojiOption={emojiOption}
-                    isSelected={isSelected}
-                    reactors={'emojiReactors' in document ? document.emojiReactors : undefined}
-                    classes={classes}
-                  />
-                )
+              anonymous ? (
+                <AnonymousEmojiTooltipContent emojiOption={emojiOption} count={score} classes={classes} />
+              ) : (
+                <EmojiTooltipContent
+                  currentUser={currentUser}
+                  emojiOption={emojiOption}
+                  isSelected={isSelected}
+                  reactors={"emojiReactors" in document ? document.emojiReactors : undefined}
+                  classes={classes}
+                />
+              )
             }
             placement="top"
             popperClassName={classNames(classes.tooltip, {
@@ -318,7 +312,7 @@ const EAReactsSection: FC<{
               className={classNames(classes.button, {
                 [classes.buttonSelected]: isSelected,
                 [classes.buttonLarge]: large,
-                [classes.buttonViewOnly]: viewOnly
+                [classes.buttonViewOnly]: viewOnly,
               })}
             >
               <div className={classes.emojiPreview}>
@@ -329,25 +323,27 @@ const EAReactsSection: FC<{
           </LWTooltip>
         );
       })}
-      {!viewOnly && <div
-        role="button"
-        onClick={onOpenMenu}
-        className={classNames(classes.button, {[classes.buttonLarge]: large})}
-      >
-        <LWTooltip
-          title="Add reaction"
-          placement="top"
-          popperClassName={classNames(classes.tooltip, classes.addEmojiTooltip)}
+      {!viewOnly && (
+        <div
+          role="button"
+          onClick={onOpenMenu}
+          className={classNames(classes.button, { [classes.buttonLarge]: large })}
         >
-          <ForumIcon
-            icon="AddEmoji"
-            noDefaultStyles
-            className={classNames(classes.addEmojiIcon, {
-              [classes.addEmojiIconLarge]: large,
-            })}
-          />
-        </LWTooltip>
-      </div>}
+          <LWTooltip
+            title="Add reaction"
+            placement="top"
+            popperClassName={classNames(classes.tooltip, classes.addEmojiTooltip)}
+          >
+            <ForumIcon
+              icon="AddEmoji"
+              noDefaultStyles
+              className={classNames(classes.addEmojiIcon, {
+                [classes.addEmojiIconLarge]: large,
+              })}
+            />
+          </LWTooltip>
+        </div>
+      )}
       <Menu
         onClick={onCloseMenu}
         open={Boolean(anchorEl)}
@@ -367,16 +363,12 @@ const EAReactsSection: FC<{
       </Menu>
     </>
   );
-}
+};
 
-const EAReactsSectionComponent = registerComponent(
-  "EAReactsSection",
-  EAReactsSection,
-  {styles},
-);
+const EAReactsSectionComponent = registerComponent("EAReactsSection", EAReactsSection, { styles });
 
 declare global {
   interface ComponentTypes {
-    EAReactsSection: typeof EAReactsSectionComponent
+    EAReactsSection: typeof EAReactsSectionComponent;
   }
 }

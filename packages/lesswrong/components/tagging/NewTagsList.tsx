@@ -1,7 +1,7 @@
-import React from 'react';
-import { useMulti } from '../../lib/crud/withMulti';
-import { taggingNamePluralCapitalSetting } from '../../lib/instanceSettings';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
+import React from "react";
+import { useMulti } from "../../lib/crud/withMulti";
+import { taggingNamePluralCapitalSetting } from "../../lib/instanceSettings";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -14,7 +14,7 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   date: {
     width: 30,
-    marginRight: 8
+    marginRight: 8,
   },
   user: {
     marginRight: 12,
@@ -24,56 +24,58 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   loadMore: {
     marginLeft: 2,
-    marginTop: 6
-  }
-})
+    marginTop: 6,
+  },
+});
 
-const NewTagsList = ({classes, showHeaders = true}:{
-  classes: ClassesType,
-  showHeaders?: boolean
-}) => {
-  const { LoadMore, TagsListItem, FormatDate, MetaInfo, UsersNameDisplay } = Components
+const NewTagsList = ({ classes, showHeaders = true }: { classes: ClassesType; showHeaders?: boolean }) => {
+  const { LoadMore, TagsListItem, FormatDate, MetaInfo, UsersNameDisplay } = Components;
 
   const { results, loadMoreProps } = useMulti({
-    terms: {view:"newTags", limit: 4 },
+    terms: { view: "newTags", limit: 4 },
     collectionName: "Tags",
     fragmentName: "SunshineTagFragment",
     enableTotal: true,
     itemsPerPage: 20,
   });
 
-  return <div className={classes.root}>
-    {showHeaders && <h2>New {taggingNamePluralCapitalSetting.get()}</h2>}
-    <table>
-      <tbody>
-        {results?.map(tag => <tr key={tag._id}>
-          {tag.user && <td className={classes.user}>
-            <MetaInfo>
-              <UsersNameDisplay user={tag.user}/>
-            </MetaInfo>
-          </td>}
-          <td className={classes.tag}>
-            <TagsListItem tag={tag}/>
-          </td>
-          <td>
-            <MetaInfo>
-              <FormatDate date={tag.createdAt}/>
-            </MetaInfo>
-          </td>
-        </tr>)}
-      </tbody>
-    </table>
-    <div className={classes.loadMore}>
-      <LoadMore {...loadMoreProps}/>
+  return (
+    <div className={classes.root}>
+      {showHeaders && <h2>New {taggingNamePluralCapitalSetting.get()}</h2>}
+      <table>
+        <tbody>
+          {results?.map((tag) => (
+            <tr key={tag._id}>
+              {tag.user && (
+                <td className={classes.user}>
+                  <MetaInfo>
+                    <UsersNameDisplay user={tag.user} />
+                  </MetaInfo>
+                </td>
+              )}
+              <td className={classes.tag}>
+                <TagsListItem tag={tag} />
+              </td>
+              <td>
+                <MetaInfo>
+                  <FormatDate date={tag.createdAt} />
+                </MetaInfo>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className={classes.loadMore}>
+        <LoadMore {...loadMoreProps} />
+      </div>
     </div>
-  </div>
-}
+  );
+};
 
-const NewTagsListComponent = registerComponent("NewTagsList", NewTagsList, {styles});
+const NewTagsListComponent = registerComponent("NewTagsList", NewTagsList, { styles });
 
 declare global {
   interface ComponentTypes {
-    NewTagsList: typeof NewTagsListComponent
+    NewTagsList: typeof NewTagsListComponent;
   }
 }
-

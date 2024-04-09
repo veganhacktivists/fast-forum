@@ -1,4 +1,2 @@
-
-const testComments: DbComment[]
-export default testComments
-
+const testComments: DbComment[];
+export default testComments;

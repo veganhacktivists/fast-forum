@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { registerComponent } from '../../lib/vulcan-lib';
-import Button from '@material-ui/core/Button';
-import classNames from 'classnames';
-import { makeCloudinaryImageUrl } from '../common/CloudinaryImage2';
-import { ImageType, useImageUpload } from '../hooks/useImageUpload';
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import { registerComponent } from "../../lib/vulcan-lib";
+import Button from "@material-ui/core/Button";
+import classNames from "classnames";
+import { makeCloudinaryImageUrl } from "../common/CloudinaryImage2";
+import { ImageType, useImageUpload } from "../hooks/useImageUpload";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -14,7 +14,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     },
   },
   buttonRow: {
-    margin: 'auto',
+    margin: "auto",
   },
   button: {
     background: theme.palette.buttons.imageUpload2.background,
@@ -22,7 +22,7 @@ const styles = (theme: ThemeType): JssStyles => ({
       background: theme.palette.buttons.imageUpload2.hoverBackground,
     },
     color: theme.palette.text.alwaysWhite, // text is always against a dark background, even in dark mode
-    textTransform: 'none',
+    textTransform: "none",
     margin: 5,
     fontSize: 14,
     paddingTop: 10,
@@ -30,31 +30,40 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   imageBackground: {
     backgroundColor: theme.palette.grey[25], // fallback to plain background if no image is given
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
+    backgroundSize: "cover",
+    backgroundPosition: "center",
     aspectRatio: 1.91, // TODO support other image types
-    display: 'flex',
+    display: "flex",
   },
 });
 
 const formPreviewSizeByImageType: AnyBecauseTodo = {
   socialPreviewImageId: {
     width: 306,
-    height: 160
+    height: 160,
   },
-}
+};
 
-const ImageUpload2 = ({name, value, updateValue, clearField, label, croppingAspectRatio, placeholderUrl, classes}: {
-  name: string,
-  value: string | null | undefined,
-  updateValue: (value: string) => void,
-  clearField: Function,
-  label: string,
-  croppingAspectRatio?: number,
-  placeholderUrl?: string,
-  classes: ClassesType
+const ImageUpload2 = ({
+  name,
+  value,
+  updateValue,
+  clearField,
+  label,
+  croppingAspectRatio,
+  placeholderUrl,
+  classes,
+}: {
+  name: string;
+  value: string | null | undefined;
+  updateValue: (value: string) => void;
+  clearField: Function;
+  label: string;
+  croppingAspectRatio?: number;
+  placeholderUrl?: string;
+  classes: ClassesType;
 }) => {
-  const {uploadImage, ImageUploadScript} = useImageUpload({
+  const { uploadImage, ImageUploadScript } = useImageUpload({
     imageType: name as ImageType,
     onUploadSuccess: (publicImageId: string) => {
       setImageId(publicImageId);
@@ -68,52 +77,48 @@ const ImageUpload2 = ({name, value, updateValue, clearField, label, croppingAspe
   });
 
   const removeImg = () => {
-    clearField()
-    setImageId(null)
-  }
+    clearField();
+    setImageId(null);
+  };
 
-  const [imageId, setImageId] = useState(value)
+  const [imageId, setImageId] = useState(value);
 
-  const formPreviewSize = formPreviewSizeByImageType[name]
-  if (!formPreviewSize) throw new Error("Unsupported image upload type")
+  const formPreviewSize = formPreviewSizeByImageType[name];
+  if (!formPreviewSize) throw new Error("Unsupported image upload type");
 
-  const imageUrl = imageId ? makeCloudinaryImageUrl(imageId, {
-    c: "fill",
-    dpr: "auto",
-    q: "auto",
-    f: "auto",
-    g: "auto:faces"
-  }) : placeholderUrl
+  const imageUrl = imageId
+    ? makeCloudinaryImageUrl(imageId, {
+        c: "fill",
+        dpr: "auto",
+        q: "auto",
+        f: "auto",
+        g: "auto:faces",
+      })
+    : placeholderUrl;
 
   return (
     <div className={classes.root}>
       <ImageUploadScript />
-      <div
-        className={classes.imageBackground}
-        style={imageUrl ? { backgroundImage: `url(${imageUrl})` } : {}}
-      >
+      <div className={classes.imageBackground} style={imageUrl ? { backgroundImage: `url(${imageUrl})` } : {}}>
         <div className={classes.buttonRow}>
-          <Button
-            onClick={uploadImage}
-            className={classNames("image-upload-button", classes.button)}
-          >
-            {imageId ? `Change` : label }
+          <Button onClick={uploadImage} className={classNames("image-upload-button", classes.button)}>
+            {imageId ? `Change` : label}
           </Button>
-          {imageId &&
+          {imageId && (
             <Button className={classes.button} title="Remove" onClick={removeImg}>
               Remove
             </Button>
-          }
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-const ImageUpload2Component = registerComponent("ImageUpload2", ImageUpload2, {styles});
+const ImageUpload2Component = registerComponent("ImageUpload2", ImageUpload2, { styles });
 
 declare global {
   interface ComponentTypes {
-    ImageUpload2: typeof ImageUpload2Component
+    ImageUpload2: typeof ImageUpload2Component;
   }
 }

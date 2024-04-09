@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-07-27T12:20:27.000Z by 20230727T122027.add_isPostType_field.ts
  * +-- Overall schema hash: d7266200db426f47cd1ba7abcc6a6db7
- *  
+ *
  * @@ -1003,3 +1001,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * --- Schema for "Users", hash: d64da8350def59cbeb640f264a7b09a4
  * +-- Schema for "Users", hash: 6af340dca1e5f32d30449abd73726b6f
  *  CREATE TABLE "Users" (
@@ -22,7 +22,7 @@
  *      "hideMeetupsPoke" bool DEFAULT false,
  * +    "hideHomeRHS" bool DEFAULT false,
  *      "frontpagePostCount" double precision DEFAULT 0,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -36,10 +36,10 @@ export const acceptsSchemaHash = "d7266200db426f47cd1ba7abcc6a6db7";
 import Users from "../../lib/collections/users/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Users, "hideHomeRHS");
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Users, "hideHomeRHS");
-}
+};

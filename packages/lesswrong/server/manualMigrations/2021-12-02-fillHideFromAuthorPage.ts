@@ -1,6 +1,5 @@
-import { fillDefaultValues, registerMigration } from './migrationUtils';
-import Sequences from '../../lib/collections/sequences/collection';
-
+import { fillDefaultValues, registerMigration } from "./migrationUtils";
+import Sequences from "../../lib/collections/sequences/collection";
 
 registerMigration({
   name: "fillHideFromAuthorPage",
@@ -10,6 +9,6 @@ registerMigration({
     await fillDefaultValues({
       collection: Sequences,
       fieldName: "hideFromAuthorPage",
-    });  },
+    });
+  },
 });
-

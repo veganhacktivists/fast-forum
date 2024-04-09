@@ -1,7 +1,7 @@
-import { registerComponent, Components } from '../../../lib/vulcan-lib';
-import React from 'react';
-import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
-import classNames from 'classnames';
+import { registerComponent, Components } from "../../../lib/vulcan-lib";
+import React from "react";
+import QuestionAnswerIcon from "@material-ui/icons/QuestionAnswer";
+import classNames from "classnames";
 
 const styles = (theme: ThemeType): JssStyles => ({
   icon: {
@@ -10,38 +10,39 @@ const styles = (theme: ThemeType): JssStyles => ({
     height: 20,
     marginRight: 8,
     position: "relative",
-    top: 3
+    top: 3,
   },
   smallIcon: {
     width: 15,
     height: 15,
     marginRight: 6,
-    top: 2
-  }
+    top: 2,
+  },
 });
 
-const CommentDiscussionIcon = ({comment, small = false, classes}: {
-  comment: CommentsList,
-  small?: boolean,
-  classes: ClassesType,
+const CommentDiscussionIcon = ({
+  comment,
+  small = false,
+  classes,
+}: {
+  comment: CommentsList;
+  small?: boolean;
+  classes: ClassesType;
 }) => {
-  const { LWTooltip } = Components
-  if (comment.tagCommentType !== "SUBFORUM" || comment.topLevelCommentId) return null
+  const { LWTooltip } = Components;
+  if (comment.tagCommentType !== "SUBFORUM" || comment.topLevelCommentId) return null;
 
   return (
     <LWTooltip title="Discussion">
-      <QuestionAnswerIcon className={classNames(classes.icon, {[classes.smallIcon]: small})} />
+      <QuestionAnswerIcon className={classNames(classes.icon, { [classes.smallIcon]: small })} />
     </LWTooltip>
-  )
-}
+  );
+};
 
-const CommentDiscussionIconComponent = registerComponent(
-  'CommentDiscussionIcon', CommentDiscussionIcon, {styles}
-);
+const CommentDiscussionIconComponent = registerComponent("CommentDiscussionIcon", CommentDiscussionIcon, { styles });
 
 declare global {
   interface ComponentTypes {
-    CommentDiscussionIcon: typeof CommentDiscussionIconComponent,
+    CommentDiscussionIcon: typeof CommentDiscussionIconComponent;
   }
 }
-

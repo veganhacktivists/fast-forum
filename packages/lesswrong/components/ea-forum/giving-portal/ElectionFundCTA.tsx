@@ -28,7 +28,7 @@ const styles = (theme: ThemeType) => ({
     minHeight: 408,
     padding: "24px",
     fontSize: 16,
-    lineHeight: '22px',
+    lineHeight: "22px",
     letterSpacing: "-0.16px",
     fontWeight: 500,
     color: theme.palette.givingPortal.ctaText,
@@ -57,7 +57,7 @@ const styles = (theme: ThemeType) => ({
     gap: "6px",
     width: "100%",
     fontSize: 16,
-    lineHeight: '22px',
+    lineHeight: "22px",
     fontWeight: 600,
     borderRadius: theme.borderRadius.small,
     padding: 16,
@@ -112,44 +112,44 @@ const ElectionFundCTA = ({
   children,
   classes,
 }: {
-  image: ReactNode,
-  title: string,
-  description: string,
-  buttonIcon?: ForumIconName,
-  buttonText: string,
-  href?: string,
-  onButtonClick?: () => void,
-  solidButton?: boolean,
-  disabled?: boolean,
-  children?: ReactNode,
-  classes: ClassesType,
+  image: ReactNode;
+  title: string;
+  description: string;
+  buttonIcon?: ForumIconName;
+  buttonText: string;
+  href?: string;
+  onButtonClick?: () => void;
+  solidButton?: boolean;
+  disabled?: boolean;
+  children?: ReactNode;
+  classes: ClassesType;
 }) => {
-  const {ForumIcon} = Components;
+  const { ForumIcon } = Components;
 
   // Determine the appropriate button component based on the provided props
   let ButtonComponent;
   if (disabled) {
-    ButtonComponent = 'div';
+    ButtonComponent = "div";
   } else if (href) {
     ButtonComponent = Link;
   } else {
-    ButtonComponent = 'button';
+    ButtonComponent = "button";
   }
 
-  const buttonNode = <ButtonComponent
-    to={disabled ? undefined : href}
-    onClick={disabled ? undefined : onButtonClick}
-    className={classNames(classes.button, {
-      [classes.outlineButton]: !solidButton,
-      [classes.solidButton]: solidButton,
-      [classes.buttonDisabled]: disabled,
-    })}
-  >
-    {buttonIcon &&
-      <ForumIcon icon={buttonIcon} className={classes.buttonIcon} />
-    }
-    {buttonText}
-  </ButtonComponent>
+  const buttonNode = (
+    <ButtonComponent
+      to={disabled ? undefined : href}
+      onClick={disabled ? undefined : onButtonClick}
+      className={classNames(classes.button, {
+        [classes.outlineButton]: !solidButton,
+        [classes.solidButton]: solidButton,
+        [classes.buttonDisabled]: disabled,
+      })}
+    >
+      {buttonIcon && <ForumIcon icon={buttonIcon} className={classes.buttonIcon} />}
+      {buttonText}
+    </ButtonComponent>
+  );
 
   return (
     <AnalyticsContext pageSubSectionContext="electionFundCTA">
@@ -158,19 +158,13 @@ const ElectionFundCTA = ({
         <div className={classes.title}>{title}</div>
         <div className={classes.description}>{description}</div>
         <div className={classes.children}>{children}</div>
-        <AnalyticsContext pageElementContext="electionFundCTAButton">
-          {buttonNode}
-        </AnalyticsContext>
+        <AnalyticsContext pageElementContext="electionFundCTAButton">{buttonNode}</AnalyticsContext>
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const ElectionFundCTAComponent = registerComponent(
-  "ElectionFundCTA",
-  ElectionFundCTA,
-  {styles},
-);
+const ElectionFundCTAComponent = registerComponent("ElectionFundCTA", ElectionFundCTA, { styles });
 
 declare global {
   interface ComponentTypes {

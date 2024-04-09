@@ -11,11 +11,11 @@ const PostExcerpt = ({
   hash,
   ...commonExcerptProps
 }: CommonExcerptProps & {
-  post: PostsList | SunshinePostsList,
-  hash?: string | null,
+  post: PostsList | SunshinePostsList;
+  hash?: string | null;
 }) => {
   // Get the post body, accounting for whether or not this is a crosspost
-  const {postContents, loading, error} = usePostContents({
+  const { postContents, loading, error } = usePostContents({
     post: post as PostsList,
     fragmentName: "PostsList",
     skip: !!hash,
@@ -23,26 +23,22 @@ const PostExcerpt = ({
 
   // If a hash is supplied then we need to run a query to get the section
   // of the content starting at the hash, whether of not this is a crosspost
-  const isForeign = post?.fmCrosspost?.isCrosspost &&
-    !post.fmCrosspost.hostedHere &&
-    !!post.fmCrosspost.foreignPostId;
+  const isForeign = post?.fmCrosspost?.isCrosspost && !post.fmCrosspost.hostedHere && !!post.fmCrosspost.foreignPostId;
   const foreignApolloClient = useForeignApolloClient();
-  const {document: postHighlight, loading: loadingHighlight} = useSingle({
+  const { document: postHighlight, loading: loadingHighlight } = useSingle({
     collectionName: "Posts",
     fragmentName: "HighlightWithHash",
     documentId: post?.fmCrosspost?.foreignPostId ?? post?._id,
     skip: !hash && !!post.contents,
     fetchPolicy: "cache-first",
-    extraVariables: {hash: "String"},
-    extraVariablesValues: {hash},
+    extraVariables: { hash: "String" },
+    extraVariablesValues: { hash },
     apolloClient: isForeign ? foreignApolloClient : undefined,
   });
 
-  const {Loading, ContentExcerpt} = Components;
+  const { Loading, ContentExcerpt } = Components;
   if ((loading && !hash) || (loadingHighlight && hash)) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   if (error) {
@@ -51,9 +47,7 @@ const PostExcerpt = ({
   }
 
   const contentHtml =
-    postHighlight?.contents?.htmlHighlightStartingAtHash ||
-    post.customHighlight?.html ||
-    postContents?.htmlHighlight;
+    postHighlight?.contents?.htmlHighlightStartingAtHash || post.customHighlight?.html || postContents?.htmlHighlight;
   if (!contentHtml) {
     return null;
   }
@@ -66,15 +60,12 @@ const PostExcerpt = ({
       {...commonExcerptProps}
     />
   );
-}
+};
 
-const PostExcerptComponent = registerComponent(
-  "PostExcerpt",
-  PostExcerpt,
-);
+const PostExcerptComponent = registerComponent("PostExcerpt", PostExcerpt);
 
 declare global {
   interface ComponentTypes {
-    PostExcerpt: typeof PostExcerptComponent,
+    PostExcerpt: typeof PostExcerptComponent;
   }
 }

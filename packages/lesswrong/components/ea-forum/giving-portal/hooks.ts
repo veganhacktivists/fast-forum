@@ -10,15 +10,15 @@ import { useCookiesWithConsent } from "../../hooks/useCookiesWithConsent";
 import { CLIENT_ID_COOKIE } from "../../../lib/cookies/cookies";
 
 export type ElectionAmountRaised = {
-  raisedForElectionFund: number,
-  electionFundTarget: number,
-  totalRaised: number,
-  totalTarget: number,
-}
+  raisedForElectionFund: number;
+  electionFundTarget: number;
+  totalRaised: number;
+  totalTarget: number;
+};
 
 export type ElectionAmountRaisedQueryResult = {
   ElectionAmountRaised: ElectionAmountRaised;
-}
+};
 
 export const useElectionCandidates = (
   sortBy: ElectionCandidatesSort | "random" = "mostPreVoted",
@@ -28,7 +28,7 @@ export const useElectionCandidates = (
   const [cookies] = useCookiesWithConsent([CLIENT_ID_COOKIE]);
   const clientId = cookies[CLIENT_ID_COOKIE];
 
-  const {results, ...retVal} = useMulti({
+  const { results, ...retVal } = useMulti({
     collectionName: "ElectionCandidates",
     fragmentName: "ElectionCandidateBasicInfo",
     terms: {
@@ -51,23 +51,26 @@ export const useElectionCandidates = (
     results: resultsCopy,
     ...retVal,
   };
-}
+};
 
 export const useDonationOpportunities = useElectionCandidates;
 
 export const useAmountRaised = (electionName: string) => {
-  const { data, loading, error } = useQuery<ElectionAmountRaisedQueryResult>(gql`
-    query ElectionAmountRaised($electionName: String!) {
-      ElectionAmountRaised(electionName: $electionName) {
-        raisedForElectionFund
-        electionFundTarget
-        totalRaised
-        totalTarget
+  const { data, loading, error } = useQuery<ElectionAmountRaisedQueryResult>(
+    gql`
+      query ElectionAmountRaised($electionName: String!) {
+        ElectionAmountRaised(electionName: $electionName) {
+          raisedForElectionFund
+          electionFundTarget
+          totalRaised
+          totalTarget
+        }
       }
-    }
-  `, {
-    variables: { electionName },
-  });
+    `,
+    {
+      variables: { electionName },
+    },
+  );
 
   return {
     data: data?.ElectionAmountRaised ?? {
@@ -77,33 +80,35 @@ export const useAmountRaised = (electionName: string) => {
       totalTarget: 0,
     },
     loading,
-    error
+    error,
   };
-}
+};
 
 export const useIsGivingSeason = () => {
   const now = useCurrentTime();
-  return isEAForum && moment.utc(timelineSpec.start).isBefore(now) &&
-    moment.utc("2024-01-02").isAfter(now);
-}
+  return isEAForum && moment.utc(timelineSpec.start).isBefore(now) && moment.utc("2024-01-02").isAfter(now);
+};
 
 export const useShowTimeline = () => {
   const currentTime = useCurrentTime();
   return moment(currentTime).isBefore(moment.utc(showTimelineUntil));
-}
+};
 
 export const useSubmittedVoteCount = (electionName: string) => {
-  const { data, loading, error } = useQuery<{SubmittedVoteCount: number}>(gql`
-    query SubmittedVoteCount($electionName: String!) {
-      SubmittedVoteCount(electionName: $electionName)
-    }
-  `, {
-    variables: { electionName },
-  });
+  const { data, loading, error } = useQuery<{ SubmittedVoteCount: number }>(
+    gql`
+      query SubmittedVoteCount($electionName: String!) {
+        SubmittedVoteCount(electionName: $electionName)
+      }
+    `,
+    {
+      variables: { electionName },
+    },
+  );
 
   return {
     submittedVoteCount: data?.SubmittedVoteCount,
     loading,
-    error
+    error,
   };
-}
+};

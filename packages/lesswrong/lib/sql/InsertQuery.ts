@@ -1,27 +1,30 @@
 import Query, { Atom } from "./Query";
 import Table from "./Table";
 import { DefaultValueType, Type } from "./Type";
-import { randomId } from '../random';
+import { randomId } from "../random";
 
-export type InsertQueryData<T> = T & Partial<{
-  $max: Partial<T>,
-  $min: Partial<T>,
-  $push: Partial<T>,
-}>;
+export type InsertQueryData<T> = T &
+  Partial<{
+    $max: Partial<T>;
+    $min: Partial<T>;
+    $push: Partial<T>;
+  }>;
 
 export type ConflictStrategy = "error" | "ignore" | "upsert";
 
 type InsertSqlBaseOptions = Partial<{
-  returnInserted: boolean,
-}>
+  returnInserted: boolean;
+}>;
 
-export type InsertSqlConflictOptions<T extends DbObject> = Partial<{
-  conflictStrategy: Omit<ConflictStrategy, "upsert">,
-  upsertSelector: never,
-}> | {
-  conflictStrategy: "upsert",
-  upsertSelector?: MongoSelector<T>,
-}
+export type InsertSqlConflictOptions<T extends DbObject> =
+  | Partial<{
+      conflictStrategy: Omit<ConflictStrategy, "upsert">;
+      upsertSelector: never;
+    }>
+  | {
+      conflictStrategy: "upsert";
+      upsertSelector?: MongoSelector<T>;
+    };
 
 export type InsertSqlOptions<T extends DbObject> = InsertSqlBaseOptions & InsertSqlConflictOptions<T>;
 
@@ -63,7 +66,7 @@ class InsertQuery<T extends DbObject> extends Query<T> {
     super(table, [`INSERT INTO "${table.getName()}"`]);
     data = Array.isArray(data) ? data : [data];
     if (data.length === 1 && sqlOptions?.upsertSelector) {
-      data[0] = {...data[0], ...sqlOptions?.upsertSelector};
+      data[0] = { ...data[0], ...sqlOptions?.upsertSelector };
     }
     this.appendValuesList(data);
 
@@ -151,17 +154,23 @@ class InsertQuery<T extends DbObject> extends Query<T> {
     let result: Atom<T>[] = ["ON CONFLICT ("];
 
     if (selector) {
-      result.push(Object.keys(selector).map((field) => this.getConflictField(field)).join(","));
+      result.push(
+        Object.keys(selector)
+          .map((field) => this.getConflictField(field))
+          .join(","),
+      );
     } else {
       result.push("_id");
     }
 
     result.push(") DO UPDATE SET");
 
-    const values = Object.keys(data).flatMap((key) => {
-      const compiled = this.compileUpsertValue(key, (data as AnyBecauseTodo)[key]);
-      return compiled.length ? [",", ...compiled] : [];
-    }).slice(1);
+    const values = Object.keys(data)
+      .flatMap((key) => {
+        const compiled = this.compileUpsertValue(key, (data as AnyBecauseTodo)[key]);
+        return compiled.length ? [",", ...compiled] : [];
+      })
+      .slice(1);
     result = result.concat(values);
 
     return result;
@@ -196,9 +205,7 @@ class InsertQuery<T extends DbObject> extends Query<T> {
     const resolved = this.resolveFieldName(fieldName);
     const type = this.table.getField(fieldName);
     const coalesceValue = type?.getIndexCoalesceValue();
-    return coalesceValue
-      ? `COALESCE(${resolved}, ${coalesceValue})`
-      : resolved;
+    return coalesceValue ? `COALESCE(${resolved}, ${coalesceValue})` : resolved;
   }
 }
 

@@ -1,38 +1,37 @@
-import schema from './schema';
-import { userOwns, userCanDo } from '../../vulcan-users/permissions';
-import { createCollection } from '../../vulcan-lib';
-import { addUniversalFields, getDefaultResolvers } from '../../collectionUtils'
-import { getDefaultMutations, MutationOptions } from '../../vulcan-core/default_mutations';
+import schema from "./schema";
+import { userOwns, userCanDo } from "../../vulcan-users/permissions";
+import { createCollection } from "../../vulcan-lib";
+import { addUniversalFields, getDefaultResolvers } from "../../collectionUtils";
+import { getDefaultMutations, MutationOptions } from "../../vulcan-core/default_mutations";
 
 const options: MutationOptions<DbLWEvent> = {
-  newCheck: (user: DbUser|null, document: DbLWEvent|null) => {
+  newCheck: (user: DbUser | null, document: DbLWEvent | null) => {
     if (!user || !document) return false;
-    return userOwns(user, document) ? userCanDo(user, 'events.new.own') : userCanDo(user, `events.new.all`)
+    return userOwns(user, document) ? userCanDo(user, "events.new.own") : userCanDo(user, `events.new.all`);
   },
 
-  editCheck: (user: DbUser|null, document: DbLWEvent|null) => {
+  editCheck: (user: DbUser | null, document: DbLWEvent | null) => {
     if (!user || !document) return false;
-    return userCanDo(user, `events.edit.all`)
+    return userCanDo(user, `events.edit.all`);
   },
 
-  removeCheck: (user: DbUser|null, document: DbLWEvent|null) => {
+  removeCheck: (user: DbUser | null, document: DbLWEvent | null) => {
     if (!user || !document) return false;
-    return userCanDo(user, `events.remove.all`)
+    return userCanDo(user, `events.remove.all`);
   },
-}
-
+};
 
 export const LWEvents = createCollection({
-  collectionName: 'LWEvents',
-  typeName: 'LWEvent',
+  collectionName: "LWEvents",
+  typeName: "LWEvent",
   schema,
-  resolvers: getDefaultResolvers('LWEvents'),
-  mutations: getDefaultMutations('LWEvents', options),
+  resolvers: getDefaultResolvers("LWEvents"),
+  mutations: getDefaultMutations("LWEvents", options),
 });
 
 addUniversalFields({
   collection: LWEvents,
-  createdAtOptions: {canRead: ['members']},
+  createdAtOptions: { canRead: ["members"] },
 });
 
 export default LWEvents;

@@ -6,7 +6,7 @@
 class CreateExtensionQuery {
   constructor(private extensionName: string) {}
 
-  compile(): {sql: string, args: any[]} {
+  compile(): { sql: string; args: any[] } {
     return {
       sql: `CREATE EXTENSION IF NOT EXISTS "${this.extensionName}" CASCADE`,
       args: [],

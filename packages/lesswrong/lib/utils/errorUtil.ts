@@ -1,6 +1,6 @@
-import type { ApolloError } from '@apollo/client';
+import type { ApolloError } from "@apollo/client";
 
-export function getGraphQLErrorID(error: any): string|null {
+export function getGraphQLErrorID(error: any): string | null {
   if (!error) {
     return null;
   } else if (error.id) {
@@ -9,11 +9,11 @@ export function getGraphQLErrorID(error: any): string|null {
     try {
       const parsed = JSON.parse(error.message);
       return getGraphQLErrorID(parsed);
-    } catch(e) {
+    } catch (e) {
       // It wasn't JSON
     }
   }
-  
+
   return null;
 }
 
@@ -22,9 +22,9 @@ export function getGraphQLErrorMessage(error: any): string {
 }
 
 export function isMissingDocumentError(error: ApolloError): boolean {
-  return (error && error.message==='app.missing_document');
+  return error && error.message === "app.missing_document";
 }
 
 export function isOperationNotAllowedError(error: ApolloError): boolean {
-  return (error && error.message==='app.operation_not_allowed');
+  return error && error.message === "app.operation_not_allowed";
 }

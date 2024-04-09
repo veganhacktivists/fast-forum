@@ -1,7 +1,7 @@
-import { schemaDefaultValue, foreignKeyField } from '../../utils/schemaUtils'
-import SimpleSchema from 'simpl-schema'
+import { schemaDefaultValue, foreignKeyField } from "../../utils/schemaUtils";
+import SimpleSchema from "simpl-schema";
 
-export const DEFAULT_QUALITATIVE_VOTE = 4
+export const DEFAULT_QUALITATIVE_VOTE = 4;
 
 const schema: SchemaType<"ReviewVotes"> = {
   userId: {
@@ -12,8 +12,8 @@ const schema: SchemaType<"ReviewVotes"> = {
       type: "User",
       nullable: true,
     }),
-    onCreate: ({currentUser}) => currentUser!._id,
-    canRead: ['guests'],
+    onCreate: ({ currentUser }) => currentUser!._id,
+    canRead: ["guests"],
     optional: true,
     nullable: false,
   },
@@ -25,43 +25,43 @@ const schema: SchemaType<"ReviewVotes"> = {
       type: "Post",
       nullable: true,
     }),
-    canRead: ['guests'],
+    canRead: ["guests"],
     nullable: false,
   },
   qualitativeScore: {
-    type: SimpleSchema.Integer, 
-    canRead: ['guests'],
+    type: SimpleSchema.Integer,
+    canRead: ["guests"],
     optional: true,
-    ...schemaDefaultValue(DEFAULT_QUALITATIVE_VOTE)
+    ...schemaDefaultValue(DEFAULT_QUALITATIVE_VOTE),
   },
   quadraticScore: {
-    type: SimpleSchema.Integer, 
-    canRead: ['guests'],
+    type: SimpleSchema.Integer,
+    canRead: ["guests"],
     optional: true,
-    ...schemaDefaultValue(0)
+    ...schemaDefaultValue(0),
   },
   comment: {
     type: String,
-    canRead: ['guests'],
-    optional: true
+    canRead: ["guests"],
+    optional: true,
   },
   year: {
     type: String,
-    canRead: ['guests'],
-    ...schemaDefaultValue("2018")
+    canRead: ["guests"],
+    ...schemaDefaultValue("2018"),
   },
   dummy: {
     type: Boolean,
-    canRead: ['guests'],
-    ...schemaDefaultValue(false)
+    canRead: ["guests"],
+    ...schemaDefaultValue(false),
   },
   reactions: {
     type: Array,
-    canRead: ['guests'],
+    canRead: ["guests"],
   },
-  'reactions.$': {
+  "reactions.$": {
     type: String,
-    optional: true
+    optional: true,
   },
 };
 

@@ -1,27 +1,29 @@
-import React from 'react';
-import { registerComponent } from '../../lib/vulcan-lib';
-import classNames from 'classnames'
+import React from "react";
+import { registerComponent } from "../../lib/vulcan-lib";
+import classNames from "classnames";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
-    marginLeft: theme.spacing.unit*2.5
-  }
-})
+    marginLeft: theme.spacing.unit * 2.5,
+  },
+});
 
-const SubSection = ({children, classes, className}: {
-  children?: React.ReactNode,
-  classes: ClassesType,
-  className?: string,
+const SubSection = ({
+  children,
+  classes,
+  className,
+}: {
+  children?: React.ReactNode;
+  classes: ClassesType;
+  className?: string;
 }) => {
-  return <div className={classNames(classes.root, className)}>
-    {children}
-  </div>
-}
+  return <div className={classNames(classes.root, className)}>{children}</div>;
+};
 
-const SubSectionComponent = registerComponent('SubSection', SubSection, {styles});
+const SubSectionComponent = registerComponent("SubSection", SubSection, { styles });
 
 declare global {
   interface ComponentTypes {
-    SubSection: typeof SubSectionComponent
+    SubSection: typeof SubSectionComponent;
   }
 }

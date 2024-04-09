@@ -84,7 +84,7 @@ const schema: SchemaType<"ElectionVotes"> = {
         return newDocument.submittedAt ? new Date() : null;
       }
       return oldDocument.submittedAt;
-    }
+    },
   },
   /**
    * Json blob storing the answers to the questions in the submission form,
@@ -133,7 +133,7 @@ const schema: SchemaType<"ElectionVotes"> = {
     canRead: [userOwns, "sunshineRegiment", "admins"],
     canCreate: ["members"],
     canUpdate: [userOwns, "sunshineRegiment", "admins"],
-  }
+  },
 };
 
 export default schema;

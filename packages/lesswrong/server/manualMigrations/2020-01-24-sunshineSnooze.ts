@@ -1,6 +1,6 @@
-import { registerMigration, fillDefaultValues } from './migrationUtils';
+import { registerMigration, fillDefaultValues } from "./migrationUtils";
 
-import { Users } from '../../lib/collections/users/collection';
+import { Users } from "../../lib/collections/users/collection";
 
 registerMigration({
   name: "setSunshineSnoozeValues",
@@ -9,11 +9,11 @@ registerMigration({
   action: async () => {
     await fillDefaultValues({
       collection: Users,
-      fieldName: "sunshineSnoozed"
+      fieldName: "sunshineSnoozed",
     });
     await fillDefaultValues({
       collection: Users,
-      fieldName: "needsReview"
-    })
-  }
-})
+      fieldName: "needsReview",
+    });
+  },
+});

@@ -1,9 +1,9 @@
-import React from 'react';
-import { AnalyticsContext } from '../../lib/analyticsEvents';
-import { registerComponent } from '../../lib/vulcan-lib';
-import { useCommentBox } from '../hooks/useCommentBox';
-import { useDialog } from '../common/withDialog';
-import { useCurrentUser } from '../common/withUser';
+import React from "react";
+import { AnalyticsContext } from "../../lib/analyticsEvents";
+import { registerComponent } from "../../lib/vulcan-lib";
+import { useCommentBox } from "../hooks/useCommentBox";
+import { useDialog } from "../common/withDialog";
+import { useCurrentUser } from "../common/withUser";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -12,19 +12,24 @@ const styles = (theme: ThemeType): JssStyles => ({
     fontSize: "1rem",
     color: theme.palette.lwTertiary.main,
     marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit*1.5,
+    marginRight: theme.spacing.unit * 1.5,
     cursor: "pointer",
-    '&:hover': {
-      opacity: .8
-    }
-  }
-})
+    "&:hover": {
+      opacity: 0.8,
+    },
+  },
+});
 
-const ReviewPostButton = ({classes, post, reviewMessage="Review", year}: {
-  classes: ClassesType,
-  post: PostsBase,
-  reviewMessage?: any,
-  year: string
+const ReviewPostButton = ({
+  classes,
+  post,
+  reviewMessage = "Review",
+  year,
+}: {
+  classes: ClassesType;
+  post: PostsBase;
+  reviewMessage?: any;
+  year: string;
 }) => {
   const currentUser = useCurrentUser();
   const { openCommentBox } = useCommentBox();
@@ -35,16 +40,16 @@ const ReviewPostButton = ({classes, post, reviewMessage="Review", year}: {
       openCommentBox({
         componentName: "ReviewPostForm",
         componentProps: {
-          post: post
-        }
+          post: post,
+        },
       });
     } else {
       openDialog({
         componentName: "LoginPopup",
-        componentProps: {}
+        componentProps: {},
       });
     }
-  }
+  };
 
   return (
     <AnalyticsContext pageElementContext="reviewPostButton">
@@ -52,14 +57,13 @@ const ReviewPostButton = ({classes, post, reviewMessage="Review", year}: {
         {reviewMessage}
       </span>
     </AnalyticsContext>
-  )
-}
+  );
+};
 
-const ReviewPostButtonComponent = registerComponent('ReviewPostButton', ReviewPostButton, {styles});
+const ReviewPostButtonComponent = registerComponent("ReviewPostButton", ReviewPostButton, { styles });
 
 declare global {
   interface ComponentTypes {
-    ReviewPostButton: typeof ReviewPostButtonComponent
+    ReviewPostButton: typeof ReviewPostButtonComponent;
   }
 }
-

@@ -15,7 +15,7 @@ const givingSeasonResolvers = {
   Query: {
     GivingSeasonHearts: async (
       _root: void,
-      {electionName}: {electionName: string},
+      { electionName }: { electionName: string },
       context: ResolverContext,
     ): Promise<GivingSeasonHeart[]> => {
       if (electionName !== eaGivingSeason23ElectionName) {
@@ -27,11 +27,16 @@ const givingSeasonResolvers = {
   Mutation: {
     AddGivingSeasonHeart: async (
       _root: void,
-      {electionName, x, y, theta}: {
-        electionName: string,
-        x: number,
-        y: number,
-        theta: number,
+      {
+        electionName,
+        x,
+        y,
+        theta,
+      }: {
+        electionName: string;
+        x: number;
+        y: number;
+        theta: number;
       },
       context: ResolverContext,
     ): Promise<GivingSeasonHeart[]> => {
@@ -42,35 +47,28 @@ const givingSeasonResolvers = {
         throw new Error("Permission denied");
       }
       if (
-        typeof x !== "number" || x < 0 || x > 1 ||
-        typeof y !== "number" || y < 0 || y > 1 ||
-        typeof theta !== "number" || theta < -25 || theta > 25
+        typeof x !== "number" ||
+        x < 0 ||
+        x > 1 ||
+        typeof y !== "number" ||
+        y < 0 ||
+        y > 1 ||
+        typeof theta !== "number" ||
+        theta < -25 ||
+        theta > 25
       ) {
-        throw new Error(`Invalid parameters: ${{x, y, theta}}`);
+        throw new Error(`Invalid parameters: ${{ x, y, theta }}`);
       }
-      return context.repos.databaseMetadata.addGivingSeasonHeart(
-        electionName,
-        context.currentUser._id,
-        x,
-        y,
-        theta,
-      );
+      return context.repos.databaseMetadata.addGivingSeasonHeart(electionName, context.currentUser._id, x, y, theta);
     },
-    RemoveGivingSeasonHeart: (
-      _root: void,
-      {electionName}: {electionName: string},
-      context: ResolverContext,
-    ) => {
+    RemoveGivingSeasonHeart: (_root: void, { electionName }: { electionName: string }, context: ResolverContext) => {
       if (electionName !== eaGivingSeason23ElectionName) {
         throw new Error(`Invalid election name: ${electionName}`);
       }
       if (!context.currentUser) {
         throw new Error("Permission denied");
       }
-      return context.repos.databaseMetadata.removeGivingSeasonHeart(
-        electionName,
-        context.currentUser._id,
-      );
+      return context.repos.databaseMetadata.removeGivingSeasonHeart(electionName, context.currentUser._id);
     },
   },
 };

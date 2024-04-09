@@ -1,16 +1,16 @@
-import { addGraphQLSchema } from './vulcan-lib/graphql';
-import { RateLimiter } from './rateLimiter';
-import React, { useContext, useEffect, useState, useRef, useCallback, ReactNode } from 'react'
-import { hookToHoc } from './hocUtils'
-import { isClient, isServer, isDevelopment, isAnyTest } from './executionEnvironment';
-import { ColorHash } from './vendor/colorHash';
-import { DatabasePublicSetting } from './publicSettings';
-import { getPublicSettingsLoaded } from './settingsCache';
-import { throttle } from 'underscore';
-import moment from 'moment';
-import { Globals } from './vulcan-lib/config';
+import { addGraphQLSchema } from "./vulcan-lib/graphql";
+import { RateLimiter } from "./rateLimiter";
+import React, { useContext, useEffect, useState, useRef, useCallback, ReactNode } from "react";
+import { hookToHoc } from "./hocUtils";
+import { isClient, isServer, isDevelopment, isAnyTest } from "./executionEnvironment";
+import { ColorHash } from "./vendor/colorHash";
+import { DatabasePublicSetting } from "./publicSettings";
+import { getPublicSettingsLoaded } from "./settingsCache";
+import { throttle } from "underscore";
+import moment from "moment";
+import { Globals } from "./vulcan-lib/config";
 
-const showAnalyticsDebug = new DatabasePublicSetting<"never"|"dev"|"always">("showAnalyticsDebug", "dev");
+const showAnalyticsDebug = new DatabasePublicSetting<"never" | "dev" | "always">("showAnalyticsDebug", "dev");
 const flushIntervalSetting = new DatabasePublicSetting<number>("analyticsFlushInterval", 1000);
 
 addGraphQLSchema(`
@@ -38,25 +38,21 @@ export const AnalyticsUtil: any = {
   // side only, filled in in analyticsWriter.js; null on the client. If no
   // analytics database is configured, does nothing.
   serverWriteEvent: null,
-  
+
   // serverPendingEvents: Analytics events that were recorded during startup
   // before we were ready to write them to the analytics DB.
   serverPendingEvents: [],
 };
 
 function getShowAnalyticsDebug() {
-  if (isAnyTest)
-    return false;
+  if (isAnyTest) return false;
   const debug = getPublicSettingsLoaded() ? showAnalyticsDebug.get() : "dev";
-  if (debug==="always")
-    return true;
-  else if (debug==="dev")
-    return isDevelopment;
-  else
-    return false;
+  if (debug === "always") return true;
+  else if (debug === "dev") return isDevelopment;
+  else return false;
 }
 
-export function captureEvent(eventType: string, eventProps?: Record<string,any>, suppressConsoleLog = false) {
+export function captureEvent(eventType: string, eventProps?: Record<string, any>, suppressConsoleLog = false) {
   try {
     if (isServer) {
       // If run from the server, we can run this immediately except for a few
@@ -65,9 +61,9 @@ export function captureEvent(eventType: string, eventProps?: Record<string,any>,
         type: eventType,
         timestamp: new Date(),
         props: {
-          ...eventProps
-        }
-      }
+          ...eventProps,
+        },
+      };
       if (!suppressConsoleLog && getShowAnalyticsDebug()) {
         serverConsoleLogAnalyticsEvent(event);
       }
@@ -80,7 +76,9 @@ export function captureEvent(eventType: string, eventProps?: Record<string,any>,
           // postgres connection is established, so report an error if there's a
           // ton of stuff in this array
           // eslint-disable-next-line no-console
-          console.log(`Possible memory leak: AnalyticsUtil.serverPendingEvents.length=${AnalyticsUtil.serverPendingEvents.length}`);
+          console.log(
+            `Possible memory leak: AnalyticsUtil.serverPendingEvents.length=${AnalyticsUtil.serverPendingEvents.length}`,
+          );
         }
       }
     } else if (isClient) {
@@ -96,7 +94,7 @@ export function captureEvent(eventType: string, eventProps?: Record<string,any>,
       throttledStoreEvent(event);
       throttledFlushClientEvents();
     }
-  } catch(e) {
+  } catch (e) {
     // eslint-disable-next-line no-console
     console.error("Error while capturing analytics event: ", e); //eslint-disable-line
   }
@@ -107,41 +105,41 @@ type TrackingContext = Record<string, unknown>;
 const ReactTrackingContext = React.createContext<TrackingContext>({});
 
 export type AnalyticsProps = {
-  pageContext?: string,
-  pageSectionContext?: string,
-  pageSubSectionContext?: string,
-  pageElementContext?: string,
-  pageElementSubContext?: string,
-  reviewYear?: string,
-  path?: string,
-  resourceName?: string,
-  resourceUrl?: string,
-  chapter?: string,
-  documentSlug?: string,
-  postId?: string,
-  sequenceId?: string,
-  commentId?: string,
-  tagId?: string,
-  tagName?: string,
-  tagSlug?: string,
-  userIdDisplayed?: string,
-  hoverPreviewType?: string,
-  sortedBy?: string,
-  branch?: string,
-  siteEvent?: string,
-  href?: string,
-  limit?: number,
-  capturePostItemOnMount?: boolean,
-  singleLineComment?: boolean,
-  onsite?: boolean,
-  terms?: PostsViewTerms,
+  pageContext?: string;
+  pageSectionContext?: string;
+  pageSubSectionContext?: string;
+  pageElementContext?: string;
+  pageElementSubContext?: string;
+  reviewYear?: string;
+  path?: string;
+  resourceName?: string;
+  resourceUrl?: string;
+  chapter?: string;
+  documentSlug?: string;
+  postId?: string;
+  sequenceId?: string;
+  commentId?: string;
+  tagId?: string;
+  tagName?: string;
+  tagSlug?: string;
+  userIdDisplayed?: string;
+  hoverPreviewType?: string;
+  sortedBy?: string;
+  branch?: string;
+  siteEvent?: string;
+  href?: string;
+  limit?: number;
+  capturePostItemOnMount?: boolean;
+  singleLineComment?: boolean;
+  onsite?: boolean;
+  terms?: PostsViewTerms;
   /** @deprecated Use `pageSectionContext` instead */
-  listContext?: string,
+  listContext?: string;
   /** @deprecated Use `pageSectionContext` instead */
-  pageSection?: "karmaChangeNotifer",
+  pageSection?: "karmaChangeNotifer";
   /** @deprecated Use `pageSubSectionContext` instead */
-  pageSubsectionContext?: "latestReview",
-}
+  pageSubsectionContext?: "latestReview";
+};
 
 /**
 HOW TO USE ANALYTICS CONTEXT WRAPPER COMPONENTS
@@ -195,24 +193,24 @@ will likely have to add tracking manually with a captureEvent call. (Search code
 The best way to ensure you are tracking correctly with is to look at the logs
 in the client or server (ensure getShowAnalyticsDebug is returning true).
 */
-export const AnalyticsContext = ({children, ...props}: AnalyticsProps & {
-  children: ReactNode,
+export const AnalyticsContext = ({
+  children,
+  ...props
+}: AnalyticsProps & {
+  children: ReactNode;
 }) => {
-  const existingContextData = useContext(ReactTrackingContext)
+  const existingContextData = useContext(ReactTrackingContext);
 
   // Create a child context, which is the parent context plus the provided props
   // merged on top of it. But create it in a referentially stable way: reuse
   // the same object, so that changes never cause child components to rerender.
   // (As long as they captured the context in the obvious way, they'll still get
   // the newest values of these props when they actually log an event.)
-  const newContextData = useRef<TrackingContext>({...existingContextData});
-  for (let key of Object.keys(props))
-    newContextData.current[key] = props[key as keyof typeof props];
+  const newContextData = useRef<TrackingContext>({ ...existingContextData });
+  for (let key of Object.keys(props)) newContextData.current[key] = props[key as keyof typeof props];
 
-  return <ReactTrackingContext.Provider value={newContextData.current}>
-    {children}
-  </ReactTrackingContext.Provider>
-}
+  return <ReactTrackingContext.Provider value={newContextData.current}>{children}</ReactTrackingContext.Provider>;
+};
 
 // An empty object, used as an argument default value. If the argument default
 // value were set to {} in the usual way, it would be a new instance of {} each
@@ -220,79 +218,95 @@ export const AnalyticsContext = ({children, ...props}: AnalyticsProps & {
 // useCallback return the same thing each tie.
 const emptyEventProps = {} as any;
 
-export function useTracking({eventType="unnamed", eventProps=emptyEventProps}: {
-  eventType?: string,
-  eventProps?: any,
-}={}) {
-  const trackingContext = useContext(ReactTrackingContext)
+export function useTracking({
+  eventType = "unnamed",
+  eventProps = emptyEventProps,
+}: {
+  eventType?: string;
+  eventProps?: any;
+} = {}) {
+  const trackingContext = useContext(ReactTrackingContext);
 
-  const track = useCallback((type?: string|undefined, trackingData?: Record<string,any>) => {
-    captureEvent(type || eventType, {
-      ...trackingContext,
-      ...eventProps,
-      ...trackingData
-    })
-  }, [trackingContext, eventProps, eventType])
-  return {captureEvent: track}
+  const track = useCallback(
+    (type?: string | undefined, trackingData?: Record<string, any>) => {
+      captureEvent(type || eventType, {
+        ...trackingContext,
+        ...eventProps,
+        ...trackingData,
+      });
+    },
+    [trackingContext, eventProps, eventType],
+  );
+  return { captureEvent: track };
 }
 
-export const withTracking = hookToHoc(useTracking)
+export const withTracking = hookToHoc(useTracking);
 
-export function useOnMountTracking<T>({eventType="unnamed", eventProps=emptyEventProps, captureOnMount, skip=false}: {
-  eventType?: string,
-  eventProps?: T,
-  captureOnMount?: boolean | ((eventProps: T) => boolean),
-  skip?: boolean
-}={}) {
-  const trackingContext = useContext(ReactTrackingContext)
+export function useOnMountTracking<T>({
+  eventType = "unnamed",
+  eventProps = emptyEventProps,
+  captureOnMount,
+  skip = false,
+}: {
+  eventType?: string;
+  eventProps?: T;
+  captureOnMount?: boolean | ((eventProps: T) => boolean);
+  skip?: boolean;
+} = {}) {
+  const trackingContext = useContext(ReactTrackingContext);
   useEffect(() => {
-    const eventData: AnyBecauseTodo = {...trackingContext, ...eventProps}
+    const eventData: AnyBecauseTodo = { ...trackingContext, ...eventProps };
     if (typeof captureOnMount === "function") {
-      !skip && captureOnMount(eventData) && captureEvent(`${eventType}Mounted`, eventData)
+      !skip && captureOnMount(eventData) && captureEvent(`${eventType}Mounted`, eventData);
     } else if (!!captureOnMount) {
-      !skip && captureEvent(`${eventType}Mounted`, eventData)
+      !skip && captureEvent(`${eventType}Mounted`, eventData);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [skip])
+  }, [skip]);
 
-  const track = useCallback((type?: string|undefined, trackingData?: Record<string,any>) => {
-    captureEvent(type || eventType, {
-      ...trackingContext,
-      ...eventProps,
-      ...trackingData
-    })
-  }, [trackingContext, eventProps, eventType])
-  return {captureEvent: track}
+  const track = useCallback(
+    (type?: string | undefined, trackingData?: Record<string, any>) => {
+      captureEvent(type || eventType, {
+        ...trackingContext,
+        ...eventProps,
+        ...trackingData,
+      });
+    },
+    [trackingContext, eventProps, eventType],
+  );
+  return { captureEvent: track };
 }
 
-export function useIsInView<T extends HTMLElement>({rootMargin='0px', threshold=0}={}) {
-  const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null)
-  const [node, setNode] = useState<T | null>(null)
+export function useIsInView<T extends HTMLElement>({ rootMargin = "0px", threshold = 0 } = {}) {
+  const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null);
+  const [node, setNode] = useState<T | null>(null);
 
-  const observer = useRef<IntersectionObserver | null>(null)
+  const observer = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    if (!window.IntersectionObserver) return
+    if (!window.IntersectionObserver) return;
 
-    if (observer.current && node) observer.current.disconnect()
+    if (observer.current && node) observer.current.disconnect();
 
-    observer.current = new window.IntersectionObserver(([ entry ]) => {
-      setEntry(entry)
-    }, {
-      rootMargin,
-      threshold
-    })
+    observer.current = new window.IntersectionObserver(
+      ([entry]) => {
+        setEntry(entry);
+      },
+      {
+        rootMargin,
+        threshold,
+      },
+    );
 
-    const { current: currentObserver } = observer
+    const { current: currentObserver } = observer;
 
-    if (node) currentObserver.observe(node)
+    if (node) currentObserver.observe(node);
 
-    return () => currentObserver.disconnect()
-  }, [node, rootMargin, threshold])
+    return () => currentObserver.disconnect();
+  }, [node, rootMargin, threshold]);
 
-  return { setNode, entry, node }
+  return { setNode, entry, node };
 }
-
 
 // Analytics events have two rate limits, one denominated in events per second,
 // the other denominated in uncompressed kilobytes per second. Each of these
@@ -318,19 +332,19 @@ const throttledStoreEvent = (event: AnyBecauseTodo) => {
       eventCount: new RateLimiter({
         burstLimit: burstLimitEventCount,
         steadyStateLimit: rateLimitEventsPerSec,
-        timestamp: now
+        timestamp: now,
       }),
       eventBandwidth: new RateLimiter({
-        burstLimit: burstLimitKB*1024,
-        steadyStateLimit: rateLimitKBps*1024,
-        timestamp: now
+        burstLimit: burstLimitKB * 1024,
+        steadyStateLimit: rateLimitKBps * 1024,
+        timestamp: now,
       }),
       exceeded: throttle(() => {
         pendingAnalyticsEvents.push({
           type: "rateLimitExceeded",
           timestamp: now,
           props: {
-            originalType: eventType
+            originalType: eventType,
           },
         });
       }, rateLimitEventIntervalMs),
@@ -340,9 +354,7 @@ const throttledStoreEvent = (event: AnyBecauseTodo) => {
   limiters.eventCount.advanceTime(now);
   limiters.eventBandwidth.advanceTime(now);
 
-  if (limiters.eventCount.canConsumeResource(1)
-    && limiters.eventBandwidth.canConsumeResource(eventSize))
-  {
+  if (limiters.eventCount.canConsumeResource(1) && limiters.eventBandwidth.canConsumeResource(eventSize)) {
     if (getShowAnalyticsDebug()) {
       browserConsoleLogAnalyticsEvent(event, false);
     }
@@ -366,7 +378,7 @@ function browserConsoleLogAnalyticsEvent(event: any, rateLimitExceeded: boolean)
   if (rateLimitExceeded) {
     c.groupCollapsed(`%cRate limit exceeded: ${event.type}`, "color:#c00000");
   } else {
-    const color = new ColorHash({lightness: 0.5}).hex(event.type);
+    const color = new ColorHash({ lightness: 0.5 }).hex(event.type);
     c.groupCollapsed(`Analytics: %c${event.type}`, `color:${color}`);
   }
   for (let fieldName of Object.keys(event.props)) {
@@ -375,18 +387,18 @@ function browserConsoleLogAnalyticsEvent(event: any, rateLimitExceeded: boolean)
   // Timestamp recorded on the server will differ. Obviously in part because of
   // the latency of the network, but also because we have a queue that we only
   // flush max once/second. And something something skew.
-  c.log('[[time of day]]', moment().format('HH:mm:ss.SSS'));
+  c.log("[[time of day]]", moment().format("HH:mm:ss.SSS"));
   c.groupEnd();
 }
 
 function serverConsoleLogAnalyticsEvent(event: any) {
-  const [r,g,b] = new ColorHash({lightness: 0.5}).rgb(event.type);
+  const [r, g, b] = new ColorHash({ lightness: 0.5 }).rgb(event.type);
   const colorEscapeSeq = `\x1b[38;2;0;${r};${g};${b}m`;
-  const endColorEscapeSeq = '\x1b[0m';
+  const endColorEscapeSeq = "\x1b[0m";
   // eslint-disable-next-line no-console
   console.log(`Analytics event: ${colorEscapeSeq}${event.type}${endColorEscapeSeq}`, {
     ...event.props,
-    '[[time of day]]': moment().format('HH:mm:ss.SSS')
+    "[[time of day]]": moment().format("HH:mm:ss.SSS"),
   });
 }
 
@@ -395,24 +407,24 @@ Globals.captureEvent = captureEvent;
 let pendingAnalyticsEvents: Array<any> = [];
 
 function flushClientEvents() {
-  if (!AnalyticsUtil.clientWriteEvents)
-    return;
-  if (!pendingAnalyticsEvents.length)
-    return;
+  if (!AnalyticsUtil.clientWriteEvents) return;
+  if (!pendingAnalyticsEvents.length) return;
 
   const eventsToWrite = pendingAnalyticsEvents;
   pendingAnalyticsEvents = [];
-  AnalyticsUtil.clientWriteEvents(eventsToWrite.map(event => ({
-    ...(isClient ? AnalyticsUtil.clientContextVars : null),
-    ...event
-  })));
+  AnalyticsUtil.clientWriteEvents(
+    eventsToWrite.map((event) => ({
+      ...(isClient ? AnalyticsUtil.clientContextVars : null),
+      ...event,
+    })),
+  );
 }
 
-let lastFlushedAt: Date|null = null;
+let lastFlushedAt: Date | null = null;
 function throttledFlushClientEvents() {
   const flushInterval: number = flushIntervalSetting.get();
   const now = new Date();
-  if(!lastFlushedAt || now.getTime()-lastFlushedAt.getTime() > flushInterval) {
+  if (!lastFlushedAt || now.getTime() - lastFlushedAt.getTime() > flushInterval) {
     lastFlushedAt = now;
     flushClientEvents();
   }

@@ -1,7 +1,7 @@
-import { getCollectionHooks } from '../mutationCallbacks';
+import { getCollectionHooks } from "../mutationCallbacks";
 
 getCollectionHooks("RSSFeeds").newSync.add(async function populateRawFeed(feed) {
-  const feedparser = require('feedparser-promised');
+  const feedparser = require("feedparser-promised");
   const url = feed.url;
   const currentPosts = await feedparser.parse(url);
   feed.rawFeed = currentPosts;

@@ -1,8 +1,8 @@
-import { useCallback } from 'react';
-import { useMutation, gql } from '@apollo/client';
-import type { ApolloError } from '@apollo/client';
-import { getCollection, extractFragmentInfo } from '../vulcan-lib';
-import { updateCacheAfterUpdate } from './cacheUpdates';
+import { useCallback } from "react";
+import { useMutation, gql } from "@apollo/client";
+import type { ApolloError } from "@apollo/client";
+import { getCollection, extractFragmentInfo } from "../vulcan-lib";
+import { updateCacheAfterUpdate } from "./cacheUpdates";
 
 // Update mutation query used on the client
 //
@@ -16,12 +16,16 @@ import { updateCacheAfterUpdate } from './cacheUpdates';
 //     __typename
 //   }
 // }
-const updateClientTemplate = ({ typeName, fragmentName, extraVariablesString }: {
-  typeName: string,
-  fragmentName: string,
-  extraVariablesString?: string,
+const updateClientTemplate = ({
+  typeName,
+  fragmentName,
+  extraVariablesString,
+}: {
+  typeName: string;
+  fragmentName: string;
+  extraVariablesString?: string;
 }) =>
-`mutation update${typeName}($selector: ${typeName}SelectorUniqueInput!, $data: Update${typeName}DataInput!, ${extraVariablesString || ''}) {
+  `mutation update${typeName}($selector: ${typeName}SelectorUniqueInput!, $data: Update${typeName}DataInput!, ${extraVariablesString || ""}) {
   update${typeName}(selector: $selector, data: $data) {
     data {
       ...${fragmentName}
@@ -30,8 +34,8 @@ const updateClientTemplate = ({ typeName, fragmentName, extraVariablesString }: 
 }`;
 
 type FragmentOrFragmentName =
-   {fragment: any, fragmentName?: never}
-  |{fragment?: never, fragmentName: FragmentName}
+  | { fragment: any; fragmentName?: never }
+  | { fragment?: never; fragmentName: FragmentName };
 
 /**
  * HoC that returns a function which updates an object, given its ID and some
@@ -55,19 +59,24 @@ type FragmentOrFragmentName =
  * the client-side cache; the selected fragment should have fields that are a
  * superset of fields used in the queries that you want to be updated.
  */
-export const useUpdate = <CollectionName extends CollectionNameString>(options: FragmentOrFragmentName & {
-  collectionName: CollectionName,
-  skipCacheUpdate?: boolean,
-}): {
+export const useUpdate = <CollectionName extends CollectionNameString>(
+  options: FragmentOrFragmentName & {
+    collectionName: CollectionName;
+    skipCacheUpdate?: boolean;
+  },
+): {
   /** Set a field to `null` to delete it */
-  mutate: WithUpdateFunction<CollectionName>,
-  loading: boolean,
-  error: ApolloError|undefined,
-  called: boolean,
-  data: ObjectsByCollectionName[CollectionName],
-}=> {
+  mutate: WithUpdateFunction<CollectionName>;
+  loading: boolean;
+  error: ApolloError | undefined;
+  called: boolean;
+  data: ObjectsByCollectionName[CollectionName];
+} => {
   const collection = getCollection(options.collectionName);
-  const {fragmentName, fragment} = extractFragmentInfo({fragmentName: options.fragmentName, fragment: options.fragment}, options.collectionName);
+  const { fragmentName, fragment } = extractFragmentInfo(
+    { fragmentName: options.fragmentName, fragment: options.fragment },
+    options.collectionName,
+  );
 
   const typeName = collection.options.typeName;
   const query = gql`
@@ -75,16 +84,23 @@ export const useUpdate = <CollectionName extends CollectionNameString>(options: 
     ${fragment}
   `;
 
-  const [mutate, {loading, error, called, data}] = useMutation(query);
-  const wrappedMutate = useCallback(({selector, data, ...extraVariables}: {
-    selector: MongoSelector<ObjectsByCollectionName[CollectionName]>,
-    data: Partial<ObjectsByCollectionName[CollectionName]>,
-    extraVariables?: any,
-  }) => {
-    return mutate({
-      variables: { selector, data, ...extraVariables },
-      update: options.skipCacheUpdate ? undefined : updateCacheAfterUpdate(typeName)
-    })
-  }, [mutate, typeName, options.skipCacheUpdate]);
-  return {mutate: wrappedMutate, loading, error, called, data};
-}
+  const [mutate, { loading, error, called, data }] = useMutation(query);
+  const wrappedMutate = useCallback(
+    ({
+      selector,
+      data,
+      ...extraVariables
+    }: {
+      selector: MongoSelector<ObjectsByCollectionName[CollectionName]>;
+      data: Partial<ObjectsByCollectionName[CollectionName]>;
+      extraVariables?: any;
+    }) => {
+      return mutate({
+        variables: { selector, data, ...extraVariables },
+        update: options.skipCacheUpdate ? undefined : updateCacheAfterUpdate(typeName),
+      });
+    },
+    [mutate, typeName, options.skipCacheUpdate],
+  );
+  return { mutate: wrappedMutate, loading, error, called, data };
+};

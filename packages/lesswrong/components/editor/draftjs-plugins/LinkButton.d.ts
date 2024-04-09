@@ -1,3 +1,2 @@
-
-const LinkButton: AnyBecauseTodo
-export default LinkButton
+const LinkButton: AnyBecauseTodo;
+export default LinkButton;

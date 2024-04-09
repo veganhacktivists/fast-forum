@@ -1,6 +1,6 @@
-import { createCollection } from '../../vulcan-lib';
-import { addUniversalFields } from '../../collectionUtils'
-import { ensureIndex } from '../../collectionIndexUtils';
+import { createCollection } from "../../vulcan-lib";
+import { addUniversalFields } from "../../collectionUtils";
+import { ensureIndex } from "../../collectionIndexUtils";
 
 const schema: SchemaType<"Images"> = {
   originalUrl: {
@@ -19,10 +19,9 @@ export const Images: ImagesCollection = createCollection({
   typeName: "Images",
   schema,
 });
-addUniversalFields({collection: Images});
+addUniversalFields({ collection: Images });
 
-ensureIndex(Images, {originalUrl: 1});
-ensureIndex(Images, {cdnHostedUrl: 1});
+ensureIndex(Images, { originalUrl: 1 });
+ensureIndex(Images, { cdnHostedUrl: 1 });
 
 export default Images;
-

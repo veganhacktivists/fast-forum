@@ -1,32 +1,34 @@
-import React, { PureComponent } from 'react';
-import { registerComponent } from '../../lib/vulcan-lib';
-import { withUpdateCurrentUser, WithUpdateCurrentUserProps } from '../hooks/useUpdateCurrentUser';
-import { userEmailAddressIsVerified } from '../../lib/collections/users/helpers';
-import Button from '@material-ui/core/Button';
-import withUser from '../common/withUser';
-import withErrorBoundary from '../common/withErrorBoundary';
+import React, { PureComponent } from "react";
+import { registerComponent } from "../../lib/vulcan-lib";
+import { withUpdateCurrentUser, WithUpdateCurrentUserProps } from "../hooks/useUpdateCurrentUser";
+import { userEmailAddressIsVerified } from "../../lib/collections/users/helpers";
+import Button from "@material-ui/core/Button";
+import withUser from "../common/withUser";
+import withErrorBoundary from "../common/withErrorBoundary";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     ...theme.typography.body2,
-    marginLeft: theme.spacing.unit
+    marginLeft: theme.spacing.unit,
   },
   verifyEmailButton: {
-    marginTop: theme.spacing.unit
-  }
+    marginTop: theme.spacing.unit,
+  },
 });
 
 interface ExternalProps {
-  resend?: boolean,
+  resend?: boolean;
 }
-interface UsersEmailVerificationProps extends ExternalProps, WithUserProps, WithUpdateCurrentUserProps, WithStylesProps {
-}
+interface UsersEmailVerificationProps
+  extends ExternalProps,
+    WithUserProps,
+    WithUpdateCurrentUserProps,
+    WithStylesProps {}
 interface UsersEmailVerificationState {
-  emailSent: boolean,
+  emailSent: boolean;
 }
 
-class UsersEmailVerification extends PureComponent<UsersEmailVerificationProps,UsersEmailVerificationState>
-{
+class UsersEmailVerification extends PureComponent<UsersEmailVerificationProps, UsersEmailVerificationState> {
   constructor(props: UsersEmailVerificationProps) {
     super(props);
     this.state = {
@@ -38,38 +40,31 @@ class UsersEmailVerification extends PureComponent<UsersEmailVerificationProps,U
     const { updateCurrentUser, currentUser } = this.props;
     if (!currentUser) return;
     void updateCurrentUser({
-      whenConfirmationEmailSent: new Date()
+      whenConfirmationEmailSent: new Date(),
     });
     this.setState({
-      emailSent: true
+      emailSent: true,
     });
   }
 
   render() {
-    let { resend=false, currentUser, classes } = this.props;
-    
-    if(userEmailAddressIsVerified(currentUser)) {
-      return (
-        <div className={classes.root}>
-          Your email address is verified.
-        </div>
-      );
-    } else if(this.state.emailSent) {
-      return (
-        <div className={classes.root}>
-          Check your email for a confirmation link.
-        </div>
-      );
+    let { resend = false, currentUser, classes } = this.props;
+
+    if (userEmailAddressIsVerified(currentUser)) {
+      return <div className={classes.root}>Your email address is verified.</div>;
+    } else if (this.state.emailSent) {
+      return <div className={classes.root}>Check your email for a confirmation link.</div>;
     } else {
       return (
         <div className={classes.root}>
           <div>You need to verify your email address to enable email notifications.</div>
-          <Button color="secondary" variant="outlined"
+          <Button
+            color="secondary"
+            variant="outlined"
             className={classes.verifyEmailButton}
             onClick={() => this.sendConfirmationEmail()}
           >
-            {resend ? "Resend Confirmation Email"
-                    : "Send Confirmation Email"}
+            {resend ? "Resend Confirmation Email" : "Send Confirmation Email"}
           </Button>
         </div>
       );
@@ -77,18 +72,17 @@ class UsersEmailVerification extends PureComponent<UsersEmailVerificationProps,U
   }
 }
 
-
-const UsersEmailVerificationComponent = registerComponent<ExternalProps>('UsersEmailVerification', UsersEmailVerification, {
-  styles,
-  hocs: [
-    withErrorBoundary,
-    withUser,
-    withUpdateCurrentUser,
-  ]
-});
+const UsersEmailVerificationComponent = registerComponent<ExternalProps>(
+  "UsersEmailVerification",
+  UsersEmailVerification,
+  {
+    styles,
+    hocs: [withErrorBoundary, withUser, withUpdateCurrentUser],
+  },
+);
 
 declare global {
   interface ComponentTypes {
-    UsersEmailVerification: typeof UsersEmailVerificationComponent
+    UsersEmailVerification: typeof UsersEmailVerificationComponent;
   }
 }

@@ -11,7 +11,10 @@ export const defaultConfig = {
 
 export function getSelectedMathModelWidget( selection ) {
 	const selectedElement = selection.getSelectedElement();
-	if ( selectedElement && ( selectedElement.is( 'element', 'mathtex' ) || selectedElement.is( 'element', 'mathtex-display' ) ) ) {
+	if (
+		selectedElement &&
+		( selectedElement.is( "element", 'mathtex') || selectedElement.is( "element", 'mathtex-display') )
+	) {
 		return selectedElement;
 	}
 	return null;
@@ -19,7 +22,7 @@ export function getSelectedMathModelWidget( selection ) {
 
 // Simple MathJax 3 version check
 export function isMathJaxVersion3( version ) {
-	return version && typeof version === 'string' && version.split( '.' ).length === 3 && version.split( '.' )[ 0 ] === '3';
+	return version && typeof version === 'string' && version.split( "." ).length === 3 && version.split( "." )[ 0 ] === '3';
 }
 
 // Check if equation has delimiters
@@ -37,8 +40,8 @@ export function extractDelimiters( equation ) {
 	equation = equation.trim();
 
 	// Remove delimiters (e.g. \( \) or \[ \])
-	const hasInlineDelimiters = equation.includes( '\\(' ) && equation.includes( '\\)' );
-	const hasDisplayDelimiters = equation.includes( '\\[' ) && equation.includes( '\\]' );
+	const hasInlineDelimiters = equation.includes( "\\(" ) && equation.includes( "\\)" );
+	const hasDisplayDelimiters = equation.includes( "\\[" ) && equation.includes( "\\]" );
 	if ( hasInlineDelimiters || hasDisplayDelimiters ) {
 		equation = equation.substring( 2, equation.length - 2 ).trim();
 	}
@@ -50,21 +53,37 @@ export function extractDelimiters( equation ) {
 }
 
 async function wait( seconds ) {
-	return new Promise( resolve => {
+	return new Promise( ( resolve ) => {
 		setTimeout( resolve, seconds );
 	} );
 }
 
 const MAX_MATHJAX_WAITING_PERIODS = 10;
 const MATHJAX_WAITING_PERIOD_LENGTH = 300;
-export async function renderEquation( equation, element, engine = 'mathjax', display = false, preview = false, previewUid, pastAttempts = 0 ) {
+export async function renderEquation(
+	equation,
+	element,
+	engine = 'mathjax',
+	display = false,
+	preview = false,
+	previewUid,
+	pastAttempts = 0
+) {
 	if ( pastAttempts > MAX_MATHJAX_WAITING_PERIODS ) {
-		console.warn( `MathJax still not loaded, even after waiting ${ MATHJAX_WAITING_PERIOD_LENGTH }ms ${ MAX_MATHJAX_WAITING_PERIODS } times` );
+		console.warn(
+			`MathJax still not loaded, even after waiting ${ MATHJAX_WAITING_PERIOD_LENGTH }ms ${ MAX_MATHJAX_WAITING_PERIODS } times`,
+		);
 		return;
 	}
-	if ( typeof MathJax === 'undefined' || !isMathJaxVersion3( MathJax.version ) || MathJax.tex2chtmlPromise === undefined ) {
+	if (
+		typeof MathJax === 'undefined' ||
+		!isMathJaxVersion3( MathJax.version ) ||
+		MathJax.tex2chtmlPromise === undefined
+	) {
 		element.innerText = equation;
-		console.warn( `math-tex-typesetting-missing: Missing the mathematical typesetting engine (${ engine }) for tex. Waiting for ${ MATHJAX_WAITING_PERIOD_LENGTH } then trying again.` );
+		console.warn(
+			`math-tex-typesetting-missing: Missing the mathematical typesetting engine (${ engine }) for tex. Waiting for ${ MATHJAX_WAITING_PERIOD_LENGTH } then trying again.`,
+		);
 		await wait( MATHJAX_WAITING_PERIOD_LENGTH );
 		await renderEquation( equation, element, engine, display, preview, previewUid, pastAttempts + 1 );
 	} else {
@@ -81,7 +100,7 @@ async function renderMathJax3( equation, element, display, isolateStyles ) {
 	let renderNode = element;
 	if ( isolateStyles ) {
 		if ( !element.attachShadow ) {
-			throw Error( 'Rendering MathJax with isolateStyles requires support for Shadow DOM' );
+			throw Error( "Rendering MathJax with isolateStyles requires support for Shadow DOM" );
 		}
 		if ( !element.shadowRoot ) {
 			element.attachShadow( { mode: 'open' } );
@@ -96,7 +115,7 @@ async function renderMathJax3( equation, element, display, isolateStyles ) {
 	upsertNthChild( renderNode, node, 0 );
 
 	if ( !isolateStyles ) {
-		const sheet = document.querySelector( '#MJX-CHTML-styles' );
+		const sheet = document.querySelector( "#MJX-CHTML-styles" );
 		const newSheet = MathJax.chtmlStylesheet();
 		if ( !sheet ) {
 			document.head.appendChild( newSheet );
@@ -106,8 +125,9 @@ async function renderMathJax3( equation, element, display, isolateStyles ) {
 		}
 	}
 
-	if ( isolateStyles ) { // If we isolate the styles, append another style tag with our overwritten styles
-		const styleNode = document.createElement( 'style' );
+	if ( isolateStyles ) {
+		// If we isolate the styles, append another style tag with our overwritten styles
+		const styleNode = document.createElement( "style" );
 		styleNode.innerHTML = `
 			mjx-math {
 				font-size: 22px;
@@ -133,7 +153,7 @@ function upsertNthChild( element, child, n ) {
 
 export function resizeInputElement( element ) {
 	const lines = element.value.split( /\n/ );
-	const maxLines = Math.max( ...lines.map( line => line.length ) );
+	const maxLines = Math.max( ...lines.map( ( line ) => line.length ) );
 	element.cols = maxLines || 1;
 	element.rows = lines.length || 1;
 }

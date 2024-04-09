@@ -1,9 +1,9 @@
-import React from 'react';
-import { commentIsHidden } from '../../lib/collections/comments/helpers';
-import { postGetPageUrl } from '../../lib/collections/posts/helpers';
-import { useSingle } from '../../lib/crud/withSingle';
-import { isLWorAF } from '../../lib/instanceSettings';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
+import React from "react";
+import { commentIsHidden } from "../../lib/collections/comments/helpers";
+import { postGetPageUrl } from "../../lib/collections/posts/helpers";
+import { useSingle } from "../../lib/crud/withSingle";
+import { isLWorAF } from "../../lib/instanceSettings";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -16,64 +16,77 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   permalinkLabel: {
     color: theme.palette.grey[600],
-    marginBottom: theme.spacing.unit*2,
+    marginBottom: theme.spacing.unit * 2,
     marginLeft: 10,
-    [theme.breakpoints.down('md')]: {
-      marginTop: theme.spacing.unit*2
-    }
+    [theme.breakpoints.down("md")]: {
+      marginTop: theme.spacing.unit * 2,
+    },
   },
   seeInContext: {
     textAlign: "right",
     color: theme.palette.lwTertiary.main,
-    marginRight: 10
+    marginRight: 10,
   },
-})
+});
 
 const getCommentDescription = (comment: CommentWithRepliesFragment) => {
-  if (comment.deleted) return '[Comment deleted]'
+  if (comment.deleted) return "[Comment deleted]";
 
-  return `Comment ${comment.user ? 
-    `by ${comment.user.displayName} ` : 
-    ''
-  }- ${comment.contents?.plaintextMainText}`
-}
+  return `Comment ${comment.user ? `by ${comment.user.displayName} ` : ""}- ${comment.contents?.plaintextMainText}`;
+};
 
-const CommentPermalink = ({ documentId, post, classes }: {
-  documentId: string,
-  post?: PostsDetails,
-  classes: ClassesType,
+const CommentPermalink = ({
+  documentId,
+  post,
+  classes,
+}: {
+  documentId: string;
+  post?: PostsDetails;
+  classes: ClassesType;
 }) => {
-  const { document: comment, data, loading, error } = useSingle({
+  const {
+    document: comment,
+    data,
+    loading,
+    error,
+  } = useSingle({
     documentId,
     collectionName: "Comments",
-    fragmentName: 'CommentWithRepliesFragment',
+    fragmentName: "CommentWithRepliesFragment",
   });
   const refetch = data?.refetch;
   const { Loading, Divider, CommentOnPostWithReplies, HeadTags, CommentWithReplies } = Components;
 
-  if (error || (!comment && !loading)) return <div>Comment not found</div>
-  
-  if (loading) return <Loading />
+  if (error || (!comment && !loading)) return <div>Comment not found</div>;
 
-  if (!comment) {return null}
+  if (loading) return <Loading />;
 
-  if (!documentId) return null
-  
+  if (!comment) {
+    return null;
+  }
+
+  if (!documentId) return null;
+
   // if the site is currently hiding comments by unreviewed authors, check if we need to hide this comment
-  if (commentIsHidden(comment) && !comment.rejected) return <div className={classes.root}>
-    <div className={classes.permalinkLabel}>
-      Comment Permalink 
-      <p>Error: Sorry, this comment is hidden</p>
-    </div>
-    {isLWorAF && <div className={classes.dividerMargins}>
-      <Divider />
-    </div>}
-  </div>
+  if (commentIsHidden(comment) && !comment.rejected)
+    return (
+      <div className={classes.root}>
+        <div className={classes.permalinkLabel}>
+          Comment Permalink
+          <p>Error: Sorry, this comment is hidden</p>
+        </div>
+        {isLWorAF && (
+          <div className={classes.dividerMargins}>
+            <Divider />
+          </div>
+        )}
+      </div>
+    );
 
-  const ogUrl = post ? postGetPageUrl(post, true) : undefined // open graph
-  const canonicalUrl = post ? post.canonicalSource || ogUrl : undefined
+  const ogUrl = post ? postGetPageUrl(post, true) : undefined; // open graph
+  const canonicalUrl = post ? post.canonicalSource || ogUrl : undefined;
   // For imageless posts this will be an empty string
-  const socialPreviewImageUrl = post ? post.socialPreviewData?.imageUrl : undefined
+  const socialPreviewImageUrl = post ? post.socialPreviewData?.imageUrl : undefined;
 
   const commentNodeProps = {
     treeOptions: {
@@ -82,7 +95,7 @@ const CommentPermalink = ({ documentId, post, classes }: {
     },
     forceUnTruncated: true,
     forceUnCollapsed: true,
-    noAutoScroll: true
+    noAutoScroll: true,
   };
 
   // NB: classes.root is not in the above styles, but is used by eaTheme
@@ -116,18 +129,19 @@ const CommentPermalink = ({ documentId, post, classes }: {
           <a href={`#${documentId}`}>See in context</a>
         </div>
       </div>
-      {isLWorAF && <div className={classes.dividerMargins}>
-        <Divider />
-      </div>}
+      {isLWorAF && (
+        <div className={classes.dividerMargins}>
+          <Divider />
+        </div>
+      )}
     </div>
   );
-}
+};
 
 const CommentPermalinkComponent = registerComponent("CommentPermalink", CommentPermalink, { styles });
 
-
 declare global {
   interface ComponentTypes {
-    CommentPermalink: typeof CommentPermalinkComponent,
+    CommentPermalink: typeof CommentPermalinkComponent;
   }
 }

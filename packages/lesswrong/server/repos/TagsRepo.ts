@@ -34,30 +34,37 @@ class TagsRepo extends AbstractRepo<"Tags"> {
   }
 
   getSearchDocumentById(id: string): Promise<SearchTag> {
-    return this.getRawDb().one(`
+    return this.getRawDb().one(
+      `
       -- TagsRepo.getSearchDocumentById
       ${this.getSearchDocumentQuery()}
       WHERE t."_id" = $1
-    `, [id]);
+    `,
+      [id],
+    );
   }
 
   getSearchDocuments(limit: number, offset: number): Promise<SearchTag[]> {
-    return this.getRawDb().any(`
+    return this.getRawDb().any(
+      `
       -- TagsRepo.getSearchDocuments
       ${this.getSearchDocumentQuery()}
       ORDER BY t."createdAt" DESC
       LIMIT $1
       OFFSET $2
-    `, [limit, offset]);
+    `,
+      [limit, offset],
+    );
   }
 
   async countSearchDocuments(): Promise<number> {
-    const {count} = await this.getRawDb().one(`SELECT COUNT(*) FROM "Tags"`);
+    const { count } = await this.getRawDb().one(`SELECT COUNT(*) FROM "Tags"`);
     return count;
   }
 
   async getUserTopTags(userId: string, limit = 15): Promise<TagWithCommentCount[]> {
-    const tags = await this.getRawDb().any(`
+    const tags = await this.getRawDb().any(
+      `
       -- TagsRepo.getUserTopTags
       SELECT
         t.*,
@@ -81,16 +88,17 @@ class TagsRepo extends AbstractRepo<"Tags"> {
       GROUP BY t._id
       ORDER BY "commentCount" DESC
       LIMIT $2
-    `, [userId, limit]);
-    return tags.map(tag => {
-      const {commentCount, ...rest} = tag;
-      return ({
+    `,
+      [userId, limit],
+    );
+    return tags.map((tag) => {
+      const { commentCount, ...rest } = tag;
+      return {
         tag: rest,
-        commentCount
-      })
-    })
+        commentCount,
+      };
+    });
   }
-
 }
 
 recordPerfMetrics(TagsRepo);

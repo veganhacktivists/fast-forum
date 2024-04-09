@@ -6,7 +6,7 @@ import { useCurrentUser } from "../../common/withUser";
 import qs from "qs";
 import { preferredHeadingCase } from "../../../themes/forumTheme";
 
-const DuplicateEventDropdownItem = ({post}: {post: PostsBase}) => {
+const DuplicateEventDropdownItem = ({ post }: { post: PostsBase }) => {
   const currentUser = useCurrentUser();
   const isEditor = canUserEditPostMetadata(currentUser, post);
   if (!isEditor || !post.isEvent) {
@@ -14,27 +14,18 @@ const DuplicateEventDropdownItem = ({post}: {post: PostsBase}) => {
   }
 
   const link = {
-    pathname:'/newPost',
-    search:`?${qs.stringify({eventForm: post.isEvent, templateId: post._id})}`,
+    pathname: "/newPost",
+    search: `?${qs.stringify({ eventForm: post.isEvent, templateId: post._id })}`,
   };
 
-  const {DropdownItem} = Components;
-  return (
-    <DropdownItem
-      title={preferredHeadingCase("Duplicate Event")}
-      to={link}
-      icon="Edit"
-    />
-  );
-}
+  const { DropdownItem } = Components;
+  return <DropdownItem title={preferredHeadingCase("Duplicate Event")} to={link} icon="Edit" />;
+};
 
-const DuplicateEventDropdownItemComponent = registerComponent(
-  "DuplicateEventDropdownItem",
-  DuplicateEventDropdownItem,
-);
+const DuplicateEventDropdownItemComponent = registerComponent("DuplicateEventDropdownItem", DuplicateEventDropdownItem);
 
 declare global {
   interface ComponentTypes {
-    DuplicateEventDropdownItem: typeof DuplicateEventDropdownItemComponent
+    DuplicateEventDropdownItem: typeof DuplicateEventDropdownItemComponent;
   }
 }

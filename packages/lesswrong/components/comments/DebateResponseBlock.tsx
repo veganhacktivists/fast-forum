@@ -1,22 +1,22 @@
-import React from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
+import React from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
 
 const styles = (theme: ThemeType): JssStyles => ({
   divider: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     borderTop: theme.palette.border.normal,
     height: 0,
-    position: 'relative',
-    marginBottom: '16px'
+    position: "relative",
+    marginBottom: "16px",
   },
   dividerLabel: {
-    width: 'fit-content',
+    width: "fit-content",
     paddingLeft: 6,
     paddingRight: 6,
     background: theme.palette.background.pageActiveAreaBackground,
-    ...theme.typography.subheading
+    ...theme.typography.subheading,
   },
 });
 
@@ -25,36 +25,51 @@ export interface DebateResponseWithReplies {
   replies: CommentsList[];
 }
 
-export const DebateResponseBlock = ({ responses, post, orderedParticipantList, daySeparator, classes }: {
-  responses: DebateResponseWithReplies[],
-  post: PostsWithNavigation | PostsWithNavigationAndRevision,
-  orderedParticipantList: string[],
-  daySeparator?: string,
-  classes: ClassesType,
+export const DebateResponseBlock = ({
+  responses,
+  post,
+  orderedParticipantList,
+  daySeparator,
+  classes,
+}: {
+  responses: DebateResponseWithReplies[];
+  post: PostsWithNavigation | PostsWithNavigationAndRevision;
+  orderedParticipantList: string[];
+  daySeparator?: string;
+  classes: ClassesType;
 }) => {
   const { DebateResponse } = Components;
 
-  return <div>
-    {daySeparator && <div className={classes.divider}>
-      <span className={classes.dividerLabel}>{daySeparator}</span>
-    </div>}
-    {responses.map(({ comment, replies }, idx) => <DebateResponse 
-      key={`debateBlock${comment._id}`}
-      comment={comment} 
-      replies={replies} 
-      idx={idx} 
-      responseCount={responses.length} 
-      orderedParticipantList={orderedParticipantList}
-      responses={responses}
-      post={post}
-     />)}
-  </div>;
-}
+  return (
+    <div>
+      {daySeparator && (
+        <div className={classes.divider}>
+          <span className={classes.dividerLabel}>{daySeparator}</span>
+        </div>
+      )}
+      {responses.map(({ comment, replies }, idx) => (
+        <DebateResponse
+          key={`debateBlock${comment._id}`}
+          comment={comment}
+          replies={replies}
+          idx={idx}
+          responseCount={responses.length}
+          orderedParticipantList={orderedParticipantList}
+          responses={responses}
+          post={post}
+        />
+      ))}
+    </div>
+  );
+};
 
-const DebateResponseBlockComponent = registerComponent('DebateResponseBlock', DebateResponseBlock, {styles, stylePriority: 200});
+const DebateResponseBlockComponent = registerComponent("DebateResponseBlock", DebateResponseBlock, {
+  styles,
+  stylePriority: 200,
+});
 
 declare global {
   interface ComponentTypes {
-    DebateResponseBlock: typeof DebateResponseBlockComponent
+    DebateResponseBlock: typeof DebateResponseBlockComponent;
   }
 }

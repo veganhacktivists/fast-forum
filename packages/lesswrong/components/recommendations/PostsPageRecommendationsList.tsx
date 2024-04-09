@@ -35,7 +35,7 @@ const styles = (theme: ThemeType) => ({
       // make it a bit taller
       minHeight: 60 * COUNT,
     },
-  }
+  },
 });
 
 const PostsPageRecommendationsList = ({
@@ -46,12 +46,12 @@ const PostsPageRecommendationsList = ({
   forceLoggedOutView,
   classes,
 }: {
-  title?: string,
-  strategy?: RecommendationStrategyName,
-  bias?: number,
-  features?: WeightedFeature[],
-  forceLoggedOutView?: boolean,
-  classes: ClassesType,
+  title?: string;
+  strategy?: RecommendationStrategyName;
+  bias?: number;
+  features?: WeightedFeature[];
+  forceLoggedOutView?: boolean;
+  classes: ClassesType;
 }) => {
   const post = usePostsPageContext();
   if (!post) {
@@ -70,7 +70,7 @@ const PostsPageRecommendationsList = ({
     count: COUNT,
   };
 
-  const {SectionTitle, RecommendationsList, PostsPageRecommendationItem, PostsLoading} = Components;
+  const { SectionTitle, RecommendationsList, PostsPageRecommendationItem, PostsLoading } = Components;
 
   const loadingFallback = (
     <div className={classes.listWrapper}>
@@ -85,33 +85,28 @@ const PostsPageRecommendationsList = ({
         <RecommendationsList
           algorithm={recommendationsAlgorithm}
           loadingFallback={loadingFallback}
-          ListItem={
-            (props: {
-              post: PostsListWithVotesAndSequence,
-              translucentBackground?: boolean,
-            }) => (
-              <PostsPageRecommendationItem
-                {...props}
-                translucentBackground
-                className={classes.item}
-                disableAnalytics={forceLoggedOutView}
-              />
-            )
-          }
+          ListItem={(props: { post: PostsListWithVotesAndSequence; translucentBackground?: boolean }) => (
+            <PostsPageRecommendationItem
+              {...props}
+              translucentBackground
+              className={classes.item}
+              disableAnalytics={forceLoggedOutView}
+            />
+          )}
         />
       </NoSSR>
     </div>
   );
-}
+};
 
 const PostsPageRecommendationsListComponent = registerComponent(
   "PostsPageRecommendationsList",
   PostsPageRecommendationsList,
-  {styles},
+  { styles },
 );
 
 declare global {
   interface ComponentTypes {
-    PostsPageRecommendationsList: typeof PostsPageRecommendationsListComponent
+    PostsPageRecommendationsList: typeof PostsPageRecommendationsListComponent;
   }
 }

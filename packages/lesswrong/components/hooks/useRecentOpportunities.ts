@@ -15,28 +15,28 @@ const subscribedTags: string[] = [
   "ihpwNfh2ZxR4ZHaAK", // Prizes and contests
 ];
 
-export const useRecentOpportunities =<
-  FragmentTypeName extends keyof FragmentTypes
-> ({
+export const useRecentOpportunities = <FragmentTypeName extends keyof FragmentTypes>({
   fragmentName,
   limit = 3,
   maxAgeInDays = 7,
 }: {
-  fragmentName: FragmentTypeName,
-  limit?: number,
-  maxAgeInDays?: number,
+  fragmentName: FragmentTypeName;
+  limit?: number;
+  maxAgeInDays?: number;
 }): UseMultiResult<FragmentTypeName> => {
-  const {timezone} = useTimezone();
+  const { timezone } = useTimezone();
   const now = moment().tz(timezone);
   const dateCutoff = now.subtract(maxAgeInDays, "days").format("YYYY-MM-DD");
   return useMulti<FragmentTypeName, "Posts">({
     collectionName: "Posts",
     terms: {
       view: "magic",
-      filterSettings: {tags: [
-        ...requiredTags.map((tagId) => ({tagId, filterMode: "Required"})),
-        ...subscribedTags.map((tagId) => ({tagId, filterMode: "Subscribed"})),
-      ]},
+      filterSettings: {
+        tags: [
+          ...requiredTags.map((tagId) => ({ tagId, filterMode: "Required" })),
+          ...subscribedTags.map((tagId) => ({ tagId, filterMode: "Subscribed" })),
+        ],
+      },
       after: dateCutoff,
       limit,
     },
@@ -44,4 +44,4 @@ export const useRecentOpportunities =<
     enableTotal: false,
     fetchPolicy: "cache-and-network",
   });
-}
+};

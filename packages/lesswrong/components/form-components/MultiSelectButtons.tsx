@@ -1,10 +1,10 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { registerComponent } from '../../lib/vulcan-lib';
-import Button from '@material-ui/core/Button';
-import classnames from 'classnames';
-import * as _ from 'underscore';
-import { isFriendlyUI } from '../../themes/forumTheme';
+import React from "react";
+import PropTypes from "prop-types";
+import { registerComponent } from "../../lib/vulcan-lib";
+import Button from "@material-ui/core/Button";
+import classnames from "classnames";
+import * as _ from "underscore";
+import { isFriendlyUI } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   button: {
@@ -37,52 +37,61 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const MultiSelectButtons = ({ value, label, options, path, classes }: FormComponentProps<string> & {
-  options: Array<{ value: string; label?: string }>;
-  classes: ClassesType;
-}, context: any) => {
-  const handleClick = (option: string) => {    
+const MultiSelectButtons = (
+  {
+    value,
+    label,
+    options,
+    path,
+    classes,
+  }: FormComponentProps<string> & {
+    options: Array<{ value: string; label?: string }>;
+    classes: ClassesType;
+  },
+  context: any,
+) => {
+  const handleClick = (option: string) => {
     if (value && value.includes(option)) {
       context.updateCurrentValues({
-        [path]: _.without(value, option)
-      })
+        [path]: _.without(value, option),
+      });
     } else {
       context.updateCurrentValues({
-        [path]: [...value, option]
-      })
+        [path]: [...value, option],
+      });
     }
-  }
+  };
 
-  return <div className="multi-select-buttons">
-    {label && <label className="multi-select-buttons-label">{label}</label>}
-    {options.map((option) => {
-      const selected = value && value.includes(option.value);
-      return <Button
-        className={classnames(
-          "multi-select-buttons-button",
-          classes.button,
-          {
-            [classes.selected]: selected,
-            [classes.notSelected]: !selected,
-          }
-        )}
-        onClick={() => handleClick(option.value)}
-        key={option.value}
-      >
-        {option.label || option.value}
-      </Button>
-    })}
-  </div>
-}
+  return (
+    <div className="multi-select-buttons">
+      {label && <label className="multi-select-buttons-label">{label}</label>}
+      {options.map((option) => {
+        const selected = value && value.includes(option.value);
+        return (
+          <Button
+            className={classnames("multi-select-buttons-button", classes.button, {
+              [classes.selected]: selected,
+              [classes.notSelected]: !selected,
+            })}
+            onClick={() => handleClick(option.value)}
+            key={option.value}
+          >
+            {option.label || option.value}
+          </Button>
+        );
+      })}
+    </div>
+  );
+};
 
 (MultiSelectButtons as any).contextTypes = {
   updateCurrentValues: PropTypes.func,
 };
 
-const MultiSelectButtonsComponent = registerComponent("MultiSelectButtons", MultiSelectButtons, {styles});
+const MultiSelectButtonsComponent = registerComponent("MultiSelectButtons", MultiSelectButtons, { styles });
 
 declare global {
   interface ComponentTypes {
-    MultiSelectButtons: typeof MultiSelectButtonsComponent
+    MultiSelectButtons: typeof MultiSelectButtonsComponent;
   }
 }

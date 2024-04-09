@@ -171,7 +171,9 @@ describe("SQL Type", () => {
         expect(new DefaultValueType(new IntType(), 3).toString()).toBe("INTEGER DEFAULT 3");
       });
       it("floats", () => {
-        expect(new DefaultValueType(new FloatType(), 3.14159265).toString()).toBe("DOUBLE PRECISION DEFAULT 3.14159265");
+        expect(new DefaultValueType(new FloatType(), 3.14159265).toString()).toBe(
+          "DOUBLE PRECISION DEFAULT 3.14159265",
+        );
       });
       it("dates", () => {
         const now = new Date();
@@ -179,10 +181,14 @@ describe("SQL Type", () => {
       });
       it("unix epochs", () => {
         const now = new Date();
-        expect(new DefaultValueType(new DateType(), now.getTime()).toString()).toBe(`TIMESTAMPTZ DEFAULT ${now.getTime()}`);
+        expect(new DefaultValueType(new DateType(), now.getTime()).toString()).toBe(
+          `TIMESTAMPTZ DEFAULT ${now.getTime()}`,
+        );
       });
       it("current_timestamp", () => {
-        expect(new DefaultValueType(new DateType(), 'CURRENT_TIMESTAMP').toString()).toBe(`TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP`);
+        expect(new DefaultValueType(new DateType(), "CURRENT_TIMESTAMP").toString()).toBe(
+          `TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP`,
+        );
       });
       it("JSON", () => {
         const now = new Date();
@@ -197,7 +203,9 @@ describe("SQL Type", () => {
         expect(new DefaultValueType(new JsonType(), data).toString()).toBe(`JSONB DEFAULT '${expectedValue}'::JSONB`);
       });
       it("empty arrays", () => {
-        expect(new DefaultValueType(new ArrayType(new StringType()), []).toString()).toBe(`TEXT[] DEFAULT '{}'::TEXT[]`);
+        expect(new DefaultValueType(new ArrayType(new StringType()), []).toString()).toBe(
+          `TEXT[] DEFAULT '{}'::TEXT[]`,
+        );
       });
       it("non-empty arrays", () => {
         const value = ["hello", "world"];
@@ -205,7 +213,10 @@ describe("SQL Type", () => {
         expect(new DefaultValueType(new ArrayType(new StringType()), value).toString()).toBe(expected);
       });
       it("multi-dimensional arrays", () => {
-        const value = [["hello", "world"], ["foo", "bar"]];
+        const value = [
+          ["hello", "world"],
+          ["foo", "bar"],
+        ];
         const expected = `TEXT[][] DEFAULT '{{''hello'',''world''},{''foo'',''bar''}}'::TEXT[][]`;
         expect(new DefaultValueType(new ArrayType(new ArrayType(new StringType())), value).toString()).toBe(expected);
       });

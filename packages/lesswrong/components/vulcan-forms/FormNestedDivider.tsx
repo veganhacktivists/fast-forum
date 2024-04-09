@@ -1,15 +1,12 @@
-import React from 'react';
-import { registerComponent } from '../../lib/vulcan-lib';
+import React from "react";
+import { registerComponent } from "../../lib/vulcan-lib";
 
-const FormNestedDivider = ({ label, addItem }: {
-  label?: string
-  addItem: ()=>void
-}) => <div/>;
+const FormNestedDivider = ({ label, addItem }: { label?: string; addItem: () => void }) => <div />;
 
-const FormNestedDividerComponent = registerComponent('FormNestedDivider', FormNestedDivider);
+const FormNestedDividerComponent = registerComponent("FormNestedDivider", FormNestedDivider);
 
 declare global {
   interface ComponentTypes {
-    FormNestedDivider: typeof FormNestedDividerComponent
+    FormNestedDivider: typeof FormNestedDividerComponent;
   }
 }

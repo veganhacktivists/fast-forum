@@ -17,15 +17,15 @@ export default class Spoilers extends Plugin {
 
 	init() {
 		this._defineSchema();
-        this._defineConverters();
+		this._defineConverters();
 
-        this.editor.commands.add( 'spoiler', new SpoilerBlockCommand( this.editor ) );
-    }
+		this.editor.commands.add("spoiler", new SpoilerBlockCommand(this.editor));
+	}
 
-    afterInit(){
-        this._addCodeBlockAutoformats();
-        const editor = this.editor;
-		const command = editor.commands.get( 'spoiler' );
+	afterInit() {
+		this._addCodeBlockAutoformats();
+		const editor = this.editor;
+		const command = editor.commands.get( "spoiler" );
 
 		// Overwrite default Enter key behavior.
 		// If Enter key is pressed with selection collapsed in empty block inside a quote, break the quote.
@@ -37,15 +37,15 @@ export default class Spoilers extends Plugin {
 			const positionParent = doc.selection.getLastPosition().parent;
 
 			if ( doc.selection.isCollapsed && positionParent.isEmpty && command.value ) {
-				this.editor.execute( 'spoiler' );
+				this.editor.execute( "spoiler" );
 				this.editor.editing.view.scrollToTheSelection();
 
 				data.preventDefault();
 				evt.stop();
 			}
 		} );
-    }    
-   
+	}
+
 	/**
 	 * Adds autoformatting related to {@link module:code-block/codeblock~CodeBlock}.
 	 *
@@ -55,48 +55,47 @@ export default class Spoilers extends Plugin {
 	 * @private
 	 */
 	_addCodeBlockAutoformats() {
-		if ( this.editor.commands.get( 'spoiler' ) ) {
-			blockAutoformatEditing( this.editor, this, /^>!$/, 'spoiler' );
+		if ( this.editor.commands.get( "spoiler" ) ) {
+			blockAutoformatEditing( this.editor, this, /^>!$/, 'spoiler');
 		}
 	}
 
 	_defineSchema() {
 		const schema = this.editor.model.schema;
 
-		schema.register( 'spoiler', {
-            allowWhere: '$block',
-            allowContentOf: '$root'
+		schema.register( "spoiler", {
+			allowWhere: "$block",
+			allowContentOf: "$root",
 		} );
 	}
 
 	_defineConverters() {
 		const conversion = this.editor.conversion;
-		conversion.for( 'upcast' ).elementToElement( {
-            model: 'spoiler',
-            view: {
-                name: 'div',
-                classes: 'spoilers'
-            }
-        } );
-        conversion.for( 'dataDowncast' ).elementToElement( {
-            model: 'spoiler',
-            view: {
-                name: 'div',
-                classes: 'spoilers'
-            }
-        } );
-        conversion.for( 'editingDowncast' ).elementToElement( {
-            model: 'spoiler',
-            view: ( modelElement, { writer: viewWriter } ) => {
-                // Note: You use a more specialized createEditableElement() method here.
-                const div = viewWriter.createEditableElement( 'div', { class: 'spoilers' } );
+		conversion.for( "upcast" ).elementToElement( {
+			model: "spoiler",
+			view: {
+				name: "div",
+				classes: "spoilers",
+			},
+		});
+		conversion.for("dataDowncast").elementToElement({
+			model: "spoiler",
+			view: {
+				name: "div",
+				classes: "spoilers",
+			},
+		});
+		conversion.for("editingDowncast").elementToElement({
+			model: "spoiler",
+			view: (modelElement, { writer: viewWriter }) => {
+				// Note: You use a more specialized createEditableElement() method here.
+				const div = viewWriter.createEditableElement("div", { class: "spoilers" });
 
-                return toWidgetEditable( div, viewWriter );
-            }
-        } );
+				return toWidgetEditable(div, viewWriter);
+			},
+		});
 	}
 }
-
 
 // Based on @ckeditor/ckeditor5-block-quote/src/blockquote/src/blockquotecommand
 class SpoilerBlockCommand extends Command {
@@ -133,13 +132,13 @@ class SpoilerBlockCommand extends Command {
 
 		const blocks = Array.from( selection.getSelectedBlocks() );
 
-		const value = ( options.forceValue === undefined ) ? !this.value : options.forceValue;
+		const value = options.forceValue === undefined ? !this.value : options.forceValue;
 
-		model.change( writer => {
+		model.change( ( writer ) => {
 			if ( !value ) {
 				this._removeSpoiler( writer, blocks.filter( findSpoiler ) );
 			} else {
-				const blocksToSpoiler = blocks.filter( block => {
+				const blocksToSpoiler = blocks.filter( ( block ) => {
 					// Already quoted blocks needs to be considered while quoting too
 					// in order to reuse their <bQ> elements.
 					return findSpoiler( block ) || checkCanBeSpoiler( schema, block );
@@ -201,34 +200,36 @@ class SpoilerBlockCommand extends Command {
 	 */
 	_removeSpoiler( writer, blocks ) {
 		// Unquote all groups of block. Iterate in the reverse order to not break following ranges.
-		getRangesOfBlockGroups( writer, blocks ).reverse().forEach( groupRange => {
-			if ( groupRange.start.isAtStart && groupRange.end.isAtEnd ) {
-				writer.unwrap( groupRange.start.parent );
+		getRangesOfBlockGroups( writer, blocks )
+			.reverse()
+			.forEach( ( groupRange ) => {
+				if ( groupRange.start.isAtStart && groupRange.end.isAtEnd ) {
+					writer.unwrap( groupRange.start.parent );
 
-				return;
-			}
+					return;
+				}
 
-			// The group of blocks are at the beginning of an <bQ> so let's move them left (out of the <bQ>).
-			if ( groupRange.start.isAtStart ) {
-				const positionBefore = writer.createPositionBefore( groupRange.start.parent );
+				// The group of blocks are at the beginning of an <bQ> so let's move them left (out of the <bQ>).
+				if ( groupRange.start.isAtStart ) {
+					const positionBefore = writer.createPositionBefore( groupRange.start.parent );
 
-				writer.move( groupRange, positionBefore );
+					writer.move( groupRange, positionBefore );
 
-				return;
-			}
+					return;
+				}
 
-			// The blocks are in the middle of an <bQ> so we need to split the <bQ> after the last block
-			// so we move the items there.
-			if ( !groupRange.end.isAtEnd ) {
-				writer.split( groupRange.end );
-			}
+				// The blocks are in the middle of an <bQ> so we need to split the <bQ> after the last block
+				// so we move the items there.
+				if ( !groupRange.end.isAtEnd ) {
+					writer.split( groupRange.end );
+				}
 
-			// Now we are sure that groupRange.end.isAtEnd is true, so let's move the blocks right.
+				// Now we are sure that groupRange.end.isAtEnd is true, so let's move the blocks right.
 
-			const positionAfter = writer.createPositionAfter( groupRange.end.parent );
+				const positionAfter = writer.createPositionAfter( groupRange.end.parent );
 
-			writer.move( groupRange, positionAfter );
-		} );
+				writer.move( groupRange, positionAfter );
+			} );
 	}
 
 	/**
@@ -242,17 +243,19 @@ class SpoilerBlockCommand extends Command {
 		const spoilersToMerge = [];
 
 		// Quote all groups of block. Iterate in the reverse order to not break following ranges.
-		getRangesOfBlockGroups( writer, blocks ).reverse().forEach( groupRange => {
-			let spoiler = findSpoiler( groupRange.start );
+		getRangesOfBlockGroups( writer, blocks )
+			.reverse()
+			.forEach( ( groupRange ) => {
+				let spoiler = findSpoiler( groupRange.start );
 
-			if ( !spoiler ) {
-				spoiler = writer.createElement( 'spoiler' );
+				if ( !spoiler ) {
+					spoiler = writer.createElement( "spoiler" );
 
-				writer.wrap( groupRange, spoiler );
-			}
+					writer.wrap( groupRange, spoiler );
+				}
 
-			spoilersToMerge.push( spoiler );
-		} );
+				spoilersToMerge.push( spoiler );
+			} );
 
 		// Merge subsequent <bQ> elements. Reverse the order again because this time we want to go through
 		// the <bQ> elements in the source order (due to how merge works – it moves the right element's content
@@ -309,8 +312,8 @@ function getRangesOfBlockGroups( writer, blocks ) {
 // Checks whether <bQ> can wrap the block.
 function checkCanBeSpoiler( schema, block ) {
 	// TMP will be replaced with schema.checkWrap().
-	const isBQAllowed = schema.checkChild( block.parent, 'spoiler' );
-	const isBlockAllowedInBQ = schema.checkChild( [ '$root', 'spoiler' ], block );
+	const isBQAllowed = schema.checkChild( block.parent, 'spoiler');
+	const isBlockAllowedInBQ = schema.checkChild( [ "$root", 'spoiler'], block );
 
 	return isBQAllowed && isBlockAllowedInBQ;
 }

@@ -6,7 +6,7 @@ import { useCurrentUser } from "../../common/withUser";
 import { userCanDo, userOwns } from "../../../lib/vulcan-users/permissions";
 import { preferredHeadingCase } from "../../../themes/forumTheme";
 
-const ShortformFrontpageDropdownItem = ({comment}: {comment: CommentsList}) => {
+const ShortformFrontpageDropdownItem = ({ comment }: { comment: CommentsList }) => {
   const currentUser = useCurrentUser();
   const { mutate: updateComment } = useUpdate({
     collectionName: "Comments",
@@ -16,8 +16,8 @@ const ShortformFrontpageDropdownItem = ({comment}: {comment: CommentsList}) => {
   const handleChange = useCallback(
     (value: boolean) => () => {
       void updateComment({
-        selector: {_id: comment._id},
-        data: {shortformFrontpage: value},
+        selector: { _id: comment._id },
+        data: { shortformFrontpage: value },
       });
     },
     [updateComment, comment._id],
@@ -31,21 +31,15 @@ const ShortformFrontpageDropdownItem = ({comment}: {comment: CommentsList}) => {
     return null;
   }
 
-  const title = comment.shortformFrontpage
-    ? "Remove from Frontpage"
-    : "Allow on Frontpage";
+  const title = comment.shortformFrontpage ? "Remove from Frontpage" : "Allow on Frontpage";
 
-  const {DropdownItem} = Components;
-  return (
-    <DropdownItem
-      title={preferredHeadingCase(title)}
-      onClick={handleChange(!comment.shortformFrontpage)}
-    />
-  );
+  const { DropdownItem } = Components;
+  return <DropdownItem title={preferredHeadingCase(title)} onClick={handleChange(!comment.shortformFrontpage)} />;
 };
 
 const ShortformFrontpageDropdownItemComponent = registerComponent(
-  "ShortformFrontpageDropdownItem", ShortformFrontpageDropdownItem,
+  "ShortformFrontpageDropdownItem",
+  ShortformFrontpageDropdownItem,
 );
 
 declare global {

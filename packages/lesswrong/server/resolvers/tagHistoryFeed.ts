@@ -1,9 +1,9 @@
-import { Comments } from '../../lib/collections/comments/collection';
-import { Tags } from '../../lib/collections/tags/collection';
-import { TagRels } from '../../lib/collections/tagRels/collection';
-import { Revisions } from '../../lib/collections/revisions/collection';
-import { accessFilterSingle } from '../../lib/utils/schemaUtils';
-import { defineFeedResolver, mergeFeedQueries, fixedResultSubquery, viewBasedSubquery } from '../utils/feedUtil';
+import { Comments } from "../../lib/collections/comments/collection";
+import { Tags } from "../../lib/collections/tags/collection";
+import { TagRels } from "../../lib/collections/tagRels/collection";
+import { Revisions } from "../../lib/collections/revisions/collection";
+import { accessFilterSingle } from "../../lib/utils/schemaUtils";
+import { defineFeedResolver, mergeFeedQueries, fixedResultSubquery, viewBasedSubquery } from "../utils/feedUtil";
 
 defineFeedResolver<Date>({
   name: "TagHistoryFeed",
@@ -15,24 +15,32 @@ defineFeedResolver<Date>({
     tagRevision: Revision
     tagDiscussionComment: Comment
   `,
-  resolver: async ({limit=50, cutoff, offset, args, context}: {
-    limit?: number,
-    cutoff?: Date,
-    offset?: number,
-    args: {tagId: string},
-    context: ResolverContext
+  resolver: async ({
+    limit = 50,
+    cutoff,
+    offset,
+    args,
+    context,
+  }: {
+    limit?: number;
+    cutoff?: Date;
+    offset?: number;
+    args: { tagId: string };
+    context: ResolverContext;
   }) => {
-    const {tagId} = args;
-    const {currentUser} = context;
-    
-    const tagRaw = await Tags.findOne({_id: tagId});
+    const { tagId } = args;
+    const { currentUser } = context;
+
+    const tagRaw = await Tags.findOne({ _id: tagId });
     const tag = await accessFilterSingle(currentUser, Tags, tagRaw, context);
     if (!tag) throw new Error("Tag not found");
-    
-    type SortKeyType = Date
-    
+
+    type SortKeyType = Date;
+
     const result = await mergeFeedQueries<SortKeyType>({
-      limit, cutoff, offset,
+      limit,
+      cutoff,
+      offset,
       subqueries: [
         // Tag creation
         fixedResultSubquery({
@@ -46,7 +54,7 @@ defineFeedResolver<Date>({
           collection: TagRels,
           sortField: "createdAt",
           context,
-          selector: {tagId},
+          selector: { tagId },
         }),
         // Tag revisions
         viewBasedSubquery({
@@ -58,14 +66,17 @@ defineFeedResolver<Date>({
             documentId: tagId,
             collectionName: "Tags",
             fieldName: "description",
-            
+
             // Exclude no-change revisions (sometimes produced as a byproduct of
             // imports, metadata changes, etc)
-            $or: [{
-              "changeMetrics.added": {$gt: 0},
-            }, {
-              "changeMetrics.removed": {$gt: 0},
-            }]
+            $or: [
+              {
+                "changeMetrics.added": { $gt: 0 },
+              },
+              {
+                "changeMetrics.removed": { $gt: 0 },
+              },
+            ],
           },
         }),
         // Tag discussion comments
@@ -83,6 +94,5 @@ defineFeedResolver<Date>({
       ],
     });
     return result;
-  }
+  },
 });
-

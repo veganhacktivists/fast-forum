@@ -11,9 +11,9 @@ import { featureRegistry } from "./Feature";
  */
 class FeatureStrategy extends RecommendationStrategy {
   async recommend(
-    currentUser: DbUser|null,
+    currentUser: DbUser | null,
     count: number,
-    {postId, features}: StrategySpecification,
+    { postId, features }: StrategySpecification,
   ): Promise<RecommendationResult> {
     if (!features) {
       throw new Error("No features supplied to FeatureStrategy");
@@ -31,7 +31,7 @@ class FeatureStrategy extends RecommendationStrategy {
     let score = "";
     let args = {};
 
-    for (const {feature: featureName, weight} of features) {
+    for (const { feature: featureName, weight } of features) {
       if (weight === 0) {
         continue;
       }
@@ -40,10 +40,11 @@ class FeatureStrategy extends RecommendationStrategy {
       filters += ` ${feature.getFilter()}`;
       const weightName = `${featureName}Weight`;
       score += ` + ($(${weightName}) * (${feature.getScore()}))`;
-      args = {...args, ...feature.getArgs(), [weightName]: weight};
+      args = { ...args, ...feature.getArgs(), [weightName]: weight };
     }
 
-    const posts = await db.any(`
+    const posts = await db.any(
+      `
       SELECT p.*
       FROM (
         SELECT p.*
@@ -63,17 +64,19 @@ class FeatureStrategy extends RecommendationStrategy {
       ${recommendedFilter.join}
       WHERE ${recommendedFilter.filter} 1=1
       LIMIT $(count)
-    `, {
-      ...readFilter.args,
-      ...recommendedFilter.args,
-      ...postFilter.args,
-      ...tagFilter.args,
-      ...args,
-      postId,
-      count,
-    });
+    `,
+      {
+        ...readFilter.args,
+        ...recommendedFilter.args,
+        ...postFilter.args,
+        ...tagFilter.args,
+        ...args,
+        postId,
+        count,
+      },
+    );
 
-    return {posts, settings: {postId, features}};
+    return { posts, settings: { postId, features } };
   }
 }
 

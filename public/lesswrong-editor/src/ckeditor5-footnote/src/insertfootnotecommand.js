@@ -16,7 +16,7 @@ export default class InsertFootnoteCommand extends Command {
 	 * @param {{footnoteIndex?: number}} props
 	 */
 	execute({ footnoteIndex } = { footnoteIndex: 0 }) {
-		this.editor.model.enqueueChange(modelWriter => {
+		this.editor.model.enqueueChange((modelWriter) => {
 			const doc = this.editor.model.document;
 			const rootElement = doc.getRoot();
 			if (!rootElement) {
@@ -24,22 +24,28 @@ export default class InsertFootnoteCommand extends Command {
 			}
 			const footnoteSection = this._getFootnoteSection(modelWriter, rootElement);
 			let index, id;
-			if(footnoteIndex === 0) {
+			if (footnoteIndex === 0) {
 				index = `${footnoteSection.maxOffset + 1}`;
 				id = Math.random().toString(36).slice(2);
 			} else {
 				index = `${footnoteIndex}`;
-				const matchingFootnote = modelQueryElement(this.editor, footnoteSection, element =>
-					element.is('element', ELEMENTS.footnoteItem) &&
-					element.getAttribute(ATTRIBUTES.footnoteIndex) === index
+				const matchingFootnote = modelQueryElement(
+					this.editor,
+					footnoteSection,
+					(element) =>
+						element.is("element", ELEMENTS.footnoteItem) &&
+						element.getAttribute( ATTRIBUTES.footnoteIndex ) === index
 				);
 				id = matchingFootnote && matchingFootnote.getAttribute(ATTRIBUTES.footnoteId);
 			}
-			if(!id || !index) {
+			if (!id || !index) {
 				return;
 			}
 			modelWriter.setSelection(doc.selection.getLastPosition());
-			const footnoteReference = modelWriter.createElement(ELEMENTS.footnoteReference, { [ATTRIBUTES.footnoteId]: id, [ATTRIBUTES.footnoteIndex]: index });
+			const footnoteReference = modelWriter.createElement(ELEMENTS.footnoteReference, {
+				[ ATTRIBUTES.footnoteId ]: id,
+				[ ATTRIBUTES.footnoteIndex ]: index
+			} );
 			this.editor.model.insertContent(footnoteReference);
 			modelWriter.setSelection(footnoteReference, 'after');
 			// if referencing an existing footnote
@@ -48,14 +54,22 @@ export default class InsertFootnoteCommand extends Command {
 			}
 
 			const footnoteContent = modelWriter.createElement(ELEMENTS.footnoteContent);
-			const footnoteItem = modelWriter.createElement(ELEMENTS.footnoteItem, { [ATTRIBUTES.footnoteId]: id, [ATTRIBUTES.footnoteIndex]: index });
-			const footnoteBackLink = modelWriter.createElement(ELEMENTS.footnoteBackLink, { [ATTRIBUTES.footnoteId]: id });
-			const p = modelWriter.createElement('paragraph');
+			const footnoteItem = modelWriter.createElement(ELEMENTS.footnoteItem, {
+				[ ATTRIBUTES.footnoteId ]: id,
+				[ ATTRIBUTES.footnoteIndex ]: index
+			} );
+			const footnoteBackLink = modelWriter.createElement(ELEMENTS.footnoteBackLink, {
+				[ ATTRIBUTES.footnoteId ]: id
+			} );
+			const p = modelWriter.createElement("paragraph");
 			modelWriter.append(p, footnoteContent);
 			modelWriter.append(footnoteContent, footnoteItem);
 			modelWriter.insert(footnoteBackLink, footnoteItem, 0);
 
-			this.editor.model.insertContent(footnoteItem, modelWriter.createPositionAt(footnoteSection, footnoteSection.maxOffset));
+			this.editor.model.insertContent(
+				footnoteItem,
+				modelWriter.createPositionAt(footnoteSection, footnoteSection.maxOffset),
+			);
 		});
 	}
 
@@ -77,14 +91,17 @@ export default class InsertFootnoteCommand extends Command {
 	 * @returns {ModelElement}
 	 */
 	_getFootnoteSection(writer, rootElement) {
-		const footnoteSection = modelQueryElement(this.editor, rootElement, element =>  element.is('element', ELEMENTS.footnoteSection));
-		if(footnoteSection) {
+		const footnoteSection = modelQueryElement(this.editor, rootElement, element =>
+			element.is( "element", ELEMENTS.footnoteSection ),
+		);
+		if (footnoteSection) {
 			return footnoteSection;
 		}
-		const newFootnoteSection = writer.createElement(
-			ELEMENTS.footnoteSection,
+		const newFootnoteSection = writer.createElement( ELEMENTS.footnoteSection );
+		this.editor.model.insertContent(
+			newFootnoteSection,
+			writer.createPositionAt(rootElement, rootElement.maxOffset),
 		);
-		this.editor.model.insertContent(newFootnoteSection, writer.createPositionAt(rootElement, rootElement.maxOffset));
 		return newFootnoteSection;
 	}
 }

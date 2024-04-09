@@ -8,20 +8,20 @@ import moment from "moment";
 export type ExpandedFrontpageSections = NonNullable<DbUser["expandedFrontpageSections"]>;
 export type ExpandedFrontpageSection = keyof ExpandedFrontpageSections;
 export type DefaultExpandedType =
-  "all" |
-  "none" |
-  "loggedIn" |
-  "loggedOut" |
-  ((currentUser: UsersCurrent | null) => boolean);
+  | "all"
+  | "none"
+  | "loggedIn"
+  | "loggedOut"
+  | ((currentUser: UsersCurrent | null) => boolean);
 
 export type UseExpandedFrontpageSectionProps = {
-  section: ExpandedFrontpageSection,
-  defaultExpanded: DefaultExpandedType,
-  onExpandEvent?: string,
-  onCollapseEvent?: string,
-  cookieName: string,
-  forceSetCookieIfUndefined?: boolean,
-}
+  section: ExpandedFrontpageSection;
+  defaultExpanded: DefaultExpandedType;
+  onExpandEvent?: string;
+  onCollapseEvent?: string;
+  cookieName: string;
+  forceSetCookieIfUndefined?: boolean;
+};
 
 const expandFrontpageSectionMutation = gql`
   mutation UserExpandFrontpageSection($section: String!, $expanded: Boolean!) {
@@ -29,24 +29,21 @@ const expandFrontpageSectionMutation = gql`
   }
 `;
 
-const isDefaultExpanded = (
-  currentUser: UsersCurrent | null,
-  defaultExpanded: DefaultExpandedType,
-): boolean => {
+const isDefaultExpanded = (currentUser: UsersCurrent | null, defaultExpanded: DefaultExpandedType): boolean => {
   if (typeof defaultExpanded === "function") {
     return defaultExpanded(currentUser);
   }
   switch (defaultExpanded) {
-  case "none":
+    case "none":
       return false;
-  case "all":
+    case "all":
       return true;
-  case "loggedIn":
+    case "loggedIn":
       return !!currentUser;
-  case "loggedOut":
+    case "loggedOut":
       return !currentUser;
   }
-}
+};
 
 const isInitialExpanded = (
   section: ExpandedFrontpageSection,
@@ -63,7 +60,7 @@ const isInitialExpanded = (
     return userExpand;
   }
   return isDefaultExpanded(currentUser, defaultExpanded);
-}
+};
 
 export const useExpandedFrontpageSection = ({
   section,
@@ -74,23 +71,23 @@ export const useExpandedFrontpageSection = ({
   forceSetCookieIfUndefined,
 }: UseExpandedFrontpageSectionProps) => {
   const currentUser = useCurrentUser();
-  const [expandFrontpageSection] = useMutation(
-    expandFrontpageSectionMutation,
-    {errorPolicy: "all"},
-  );
-  const {captureEvent} = useTracking();
+  const [expandFrontpageSection] = useMutation(expandFrontpageSectionMutation, { errorPolicy: "all" });
+  const { captureEvent } = useTracking();
   const [cookies, setCookie] = useCookiesWithConsent([cookieName]);
-  const [expanded, setExpanded] = useState(
-    () => isInitialExpanded(section, defaultExpanded, currentUser, cookies, cookieName),
+  const [expanded, setExpanded] = useState(() =>
+    isInitialExpanded(section, defaultExpanded, currentUser, cookies, cookieName),
   );
 
-  const saveToCookie = useCallback((value: boolean) => {
-    if (cookieName) {
-      setCookie(cookieName, String(value), {
-        expires: moment().add(10, "years").toDate(),
-      });
-    }
-  }, [setCookie, cookieName]);
+  const saveToCookie = useCallback(
+    (value: boolean) => {
+      if (cookieName) {
+        setCookie(cookieName, String(value), {
+          expires: moment().add(10, "years").toDate(),
+        });
+      }
+    },
+    [setCookie, cookieName],
+  );
 
   const toggleExpanded = useCallback(() => {
     const newExpanded = !expanded;
@@ -129,4 +126,4 @@ export const useExpandedFrontpageSection = ({
     expanded,
     toggleExpanded,
   };
-}
+};

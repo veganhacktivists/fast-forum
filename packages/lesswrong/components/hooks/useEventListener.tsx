@@ -1,7 +1,10 @@
-import { useEffect, useRef } from 'react';
-import { isClient } from '../../lib/executionEnvironment';
+import { useEffect, useRef } from "react";
+import { isClient } from "../../lib/executionEnvironment";
 
-export function useEventListener<K extends keyof WindowEventMap, H extends (ev: WindowEventMap[K]) => any>(eventName: K, handler: H){
+export function useEventListener<K extends keyof WindowEventMap, H extends (ev: WindowEventMap[K]) => any>(
+  eventName: K,
+  handler: H,
+) {
   // Create a ref that stores handler
   const savedHandler = useRef<H | null>(null);
 
@@ -16,7 +19,6 @@ export function useEventListener<K extends keyof WindowEventMap, H extends (ev: 
   useEffect(
     () => {
       if (isClient) {
-
         // eslint-disable-next-line no-console
         if (!window.addEventListener) console.log("Error: eventListener not available");
 
@@ -32,6 +34,6 @@ export function useEventListener<K extends keyof WindowEventMap, H extends (ev: 
         };
       }
     },
-    [eventName] // Re-run if eventName or element changes
+    [eventName], // Re-run if eventName or element changes
   );
 }

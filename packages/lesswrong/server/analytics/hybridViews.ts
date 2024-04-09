@@ -53,7 +53,7 @@ type HybridViewParams = {
    * all in the analytics DB, but this would work in the main DB as well.
    */
   viewSqlClient?: RawSqlClient;
-}
+};
 
 export class HybridView {
   protected queryGenerator: (after: Date, materialized: boolean) => string;
@@ -63,12 +63,7 @@ export class HybridView {
   private viewSqlClient: RawSqlClient | SqlClient;
   private matViewName: string;
 
-  constructor({
-    identifier,
-    queryGenerator,
-    indexQueryGenerators,
-    viewSqlClient,
-  }: HybridViewParams) {
+  constructor({ identifier, queryGenerator, indexQueryGenerators, viewSqlClient }: HybridViewParams) {
     const viewSqlClientToUse = viewSqlClient ?? getSqlClient();
 
     if (!viewSqlClientToUse) throw new Error("Unable to connect to database");
@@ -100,7 +95,7 @@ export class HybridView {
 
   async refreshInProgress() {
     // Check if materialized view refresh is in progress
-    return this.viewSqlClient.oneOrNone<{duration: string}>(`
+    return this.viewSqlClient.oneOrNone<{ duration: string }>(`
       -- HybridView.refreshInProgress
       SELECT
         now() - pg_stat_activity.query_start AS duration
@@ -113,7 +108,7 @@ export class HybridView {
 
   async createInProgress() {
     // Check if materialized view creation is in progress
-    return this.viewSqlClient.oneOrNone<{duration: string}>(`
+    return this.viewSqlClient.oneOrNone<{ duration: string }>(`
       -- HybridView.createInProgress
       SELECT
         pid,
@@ -129,7 +124,7 @@ export class HybridView {
   async dropOldVersions() {
     // Drop older versions of this view, if this fails just continue
     try {
-      const olderViews = await this.viewSqlClient.manyOrNone<{matviewname: string}>(`
+      const olderViews = await this.viewSqlClient.manyOrNone<{ matviewname: string }>(`
         -- HybridView.dropOldVersions
         SELECT matviewname FROM pg_matviews WHERE matviewname LIKE 'hv_${this.identifier}_%' AND matviewname <> '${this.matViewName}'
       `);
@@ -158,7 +153,7 @@ export class HybridView {
 
     // Create the materialized view, filtering by a date in the distant past to include all rows
     await this.viewSqlClient.none(
-      `CREATE MATERIALIZED VIEW "${this.matViewName}" AS (${this.queryGenerator(new Date(0), true)})`
+      `CREATE MATERIALIZED VIEW "${this.matViewName}" AS (${this.queryGenerator(new Date(0), true)})`,
     );
 
     // TODO add something like this back in
@@ -190,14 +185,16 @@ export class HybridView {
       await this.ensureIndexes();
       return;
     }
-    
+
     if (!(await this.refreshInProgress())) {
       await this.ensureIndexes();
       try {
         await this.viewSqlClient.none(`REFRESH MATERIALIZED VIEW CONCURRENTLY "${this.matViewName}"`);
       } catch (e) {
         // eslint-disable-next-line no-console
-        console.error(`Failed to refresh materialized view "${this.matViewName}". This may be because there is no unique index, which is required to refresh "CONCURRENTLY" (i.e. without locking the view from reads)`);
+        console.error(
+          `Failed to refresh materialized view "${this.matViewName}". This may be because there is no unique index, which is required to refresh "CONCURRENTLY" (i.e. without locking the view from reads)`,
+        );
         throw e;
       }
       return;
@@ -215,7 +212,7 @@ export class HybridView {
      */
     const getCrossoverTime = async () => {
       try {
-        const res = await this.viewSqlClient.oneOrNone<{window_end: string}>(`
+        const res = await this.viewSqlClient.oneOrNone<{ window_end: string }>(`
           -- HybridView.virtualTable.getCrossoverTime
           SELECT window_end::text
           FROM (

@@ -1,4 +1,4 @@
-import { foreignKeyField } from '../../utils/schemaUtils'
+import { foreignKeyField } from "../../utils/schemaUtils";
 
 const schema: SchemaType<"PostRelations"> = {
   type: {
@@ -6,9 +6,9 @@ const schema: SchemaType<"PostRelations"> = {
     type: String,
     optional: true,
     nullable: false,
-    canRead: ['guests'],
-    canCreate: ['members'],
-    canUpdate: ['members'],
+    canRead: ["guests"],
+    canCreate: ["members"],
+    canUpdate: ["members"],
   },
   sourcePostId: {
     ...foreignKeyField({
@@ -16,11 +16,11 @@ const schema: SchemaType<"PostRelations"> = {
       resolverName: "sourcePost",
       collectionName: "Posts",
       type: "Post",
-      nullable: true
+      nullable: true,
     }),
     nullable: false,
-    canRead: ['guests'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canCreate: ["members"],
   },
   targetPostId: {
     ...foreignKeyField({
@@ -28,19 +28,19 @@ const schema: SchemaType<"PostRelations"> = {
       resolverName: "targetPost",
       collectionName: "Posts",
       type: "Post",
-      nullable: true
+      nullable: true,
     }),
     nullable: false,
-    canRead: ['guests'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canCreate: ["members"],
   },
   order: {
     type: Number,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['admins'],
-    canCreate: ['admins'],
-  }
+    canRead: ["guests"],
+    canUpdate: ["admins"],
+    canCreate: ["admins"],
+  },
 };
 
 export default schema;

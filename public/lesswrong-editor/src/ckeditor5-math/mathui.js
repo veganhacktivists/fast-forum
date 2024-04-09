@@ -56,7 +56,7 @@ export default class MathUI extends Plugin {
 
 	_showUI() {
 		const editor = this.editor;
-		const mathCommand = editor.commands.get( 'math' );
+		const mathCommand = editor.commands.get( "math" );
 
 		if ( !mathCommand.isEnabled ) {
 			return;
@@ -67,32 +67,40 @@ export default class MathUI extends Plugin {
 		const selection = editor.model.document.selection;
 		const range = selection.getFirstRange();
 		const selectedItems = range.getItems();
-		const concatenatedSelection = Array.from( selectedItems ).map( item => item.data ? item.data : '' ).join( '' );
+		const concatenatedSelection = Array.from( selectedItems )
+			.map( ( item ) => ( item.data ? item.data : '') )
+			.join( "" );
 		if ( concatenatedSelection && concatenatedSelection.length ) {
 			mathCommand.value = concatenatedSelection;
 		}
 
 		this._addFormView();
 
-		this._balloon.showStack( 'main' );
+		this._balloon.showStack( "main" );
 	}
 
 	_createFormView() {
 		const editor = this.editor;
-		const mathCommand = editor.commands.get( 'math' );
+		const mathCommand = editor.commands.get( "math" );
 
-		const mathConfig = Object.assign( defaultConfig, this.editor.config.get( 'math' ) );
+		const mathConfig = Object.assign( defaultConfig, this.editor.config.get( "math" ) );
 
 		const formView = new MainFormView( editor.locale, mathConfig.engine, mathConfig.enablePreview, this._previewUid );
 
-		formView.mathInputView.bind( 'value' ).to( mathCommand, 'value' );
+		formView.mathInputView.bind( "value" ).to( mathCommand, 'value');
 
 		// Form elements should be read-only when corresponding commands are disabled.
-		formView.mathInputView.bind( 'isReadOnly' ).to( mathCommand, 'isEnabled', value => !value );
+		formView.mathInputView.bind( "isReadOnly" ).to( mathCommand, 'isEnabled', value => !value );
 
 		// Listen to submit button click
 		this.listenTo( formView, 'submit', () => {
-			editor.execute( 'math', formView.equation, mathCommand.display, mathConfig.outputType, mathConfig.forceOutputType );
+			editor.execute(
+				'math',
+				formView.equation,
+				mathCommand.display,
+				mathConfig.outputType,
+				mathConfig.forceOutputType
+			);
 			this._closeFormView();
 		} );
 
@@ -102,19 +110,23 @@ export default class MathUI extends Plugin {
 		} );
 
 		// Close plugin ui, if esc is pressed (while ui is focused)
-		formView.keystrokes.set( 'esc', ( data, cancel ) => {
-			this.formView.fire( 'submit' );
+		formView.keystrokes.set( "esc", ( data, cancel ) => {
+			this.formView.fire( "submit" );
 			this._closeFormView();
 		} );
 
 		// Close plugin ui, if Tab is pressed (while ui is focused)
-		formView.keystrokes.set( 'tab', ( data, cancel ) => {
-			this.formView.fire( 'submit' );
-			this._closeFormView();
-		}, { priority: 'high' } );
+		formView.keystrokes.set(
+			'tab',
+			( data, cancel ) => {
+				this.formView.fire( "submit" );
+				this._closeFormView();
+			},
+			{ priority: 'high' }
+		);
 
-		formView.keystrokes.set( 'Enter', ( data, cancel ) => {
-			this.formView.fire( 'submit' );
+		formView.keystrokes.set( "Enter", ( data, cancel ) => {
+			this.formView.fire( "submit" );
 			this._closeFormView();
 		});
 
@@ -131,12 +143,12 @@ export default class MathUI extends Plugin {
 		}
 
 		const editor = this.editor;
-		const mathCommand = editor.commands.get( 'math' );
+		const mathCommand = editor.commands.get( "math" );
 
 		this._balloon.add( {
 			view: this.formView,
 			position: this._getBalloonPositionData(),
-			balloonClassName: 'ck-math-balloon'
+			balloonClassName: 'ck-math-balloon',
 		} );
 
 		if ( this._balloon.visibleView === this.formView ) {
@@ -158,8 +170,8 @@ export default class MathUI extends Plugin {
 
 		const editor = this.editor;
 
-		this.stopListening( editor.ui, 'update' );
-		this.stopListening( this._balloon, 'change:visibleView' );
+		this.stopListening( editor.ui, 'update');
+		this.stopListening( this._balloon, 'change:visibleView');
 
 		editor.editing.view.focus();
 
@@ -168,7 +180,7 @@ export default class MathUI extends Plugin {
 	}
 
 	_closeFormView() {
-		const mathCommand = this.editor.commands.get( 'math' );
+		const mathCommand = this.editor.commands.get( "math" );
 		if ( mathCommand.value !== undefined ) {
 			this._removeFormView();
 		} else {
@@ -199,7 +211,7 @@ export default class MathUI extends Plugin {
 
 	_createToolbarMathButton() {
 		const editor = this.editor;
-		const mathCommand = editor.commands.get( 'math' );
+		const mathCommand = editor.commands.get( "math" );
 		const t = editor.t;
 
 		// Handle the `Ctrl+4` keystroke and show the panel.
@@ -222,34 +234,34 @@ export default class MathUI extends Plugin {
 			}
 		} );
 
-		this.editor.ui.componentFactory.add( 'math', locale => {
+		this.editor.ui.componentFactory.add( "math", locale => {
 			const button = new ButtonView( locale );
 
 			button.isEnabled = true;
-			button.label = t( 'Insert math' );
+			button.label = t( "Insert math" );
 			button.icon = mathIcon;
 			button.keystroke = mathKeystroke;
 			button.tooltip = true;
 			button.isToggleable = true;
 
-			button.bind( 'isEnabled' ).to( mathCommand, 'isEnabled' );
+			button.bind( "isEnabled" ).to( mathCommand, 'isEnabled');
 
 			this.listenTo( button, 'execute', () => this._showUI() );
 
 			return button;
 		} );
 
-		this.editor.ui.componentFactory.add( 'mathDisplay', locale => {
+		this.editor.ui.componentFactory.add( "mathDisplay", locale => {
 			const button = new ButtonView( locale );
 
 			button.isEnabled = true;
-			button.label = t( 'Insert display math block' );
+			button.label = t( "Insert display math block" );
 			button.icon = mathIcon;
 			button.keystroke = mathDisplayKeystroke;
 			button.tooltip = true;
 			button.isToggleable = true;
 
-			button.bind( 'isEnabled' ).to( mathCommand, 'isEnabled' );
+			button.bind( "isEnabled" ).to( mathCommand, 'isEnabled');
 
 			this.listenTo( button, 'execute', () => {
 				mathCommand.display = true;
@@ -282,7 +294,7 @@ export default class MathUI extends Plugin {
 			emitter: this.formView,
 			activator: () => this._isFormInPanel,
 			contextElements: [ this._balloon.view.element ],
-			callback: () => this.formView.fire( 'submit' )
+			callback: () => this.formView.fire( "submit" ),
 		} );
 	}
 

@@ -1,9 +1,9 @@
-import React from 'react';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
-import classNames from 'classnames';
-import { votingPortalStyles } from './styles';
-import { Link } from '../../../lib/reactRouterWrapper';
-import { useMessages } from '../../common/withMessages';
+import React from "react";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
+import classNames from "classnames";
+import { votingPortalStyles } from "./styles";
+import { Link } from "../../../lib/reactRouterWrapper";
+import { useMessages } from "../../common/withMessages";
 
 const styles = (theme: ThemeType) => ({
   ...votingPortalStyles(theme),
@@ -68,31 +68,31 @@ const styles = (theme: ThemeType) => ({
   },
   tooltipPopper: {
     marginBottom: 8,
-  }
+  },
 });
 
 export const VotingPortalFooter = ({
-  leftText="Previous step",
+  leftText = "Previous step",
   leftHref,
   middleNode,
-  buttonText="Continue",
+  buttonText = "Continue",
   buttonTooltip,
-  arrow=true,
+  arrow = true,
   buttonProps,
   electionVote,
   updateVote,
   classes,
 }: {
-  leftText?: string,
-  leftHref: string,
-  middleNode: React.ReactNode,
-  buttonText?: string,
-  buttonTooltip?: string,
-  arrow?: boolean,
-  buttonProps: React.ButtonHTMLAttributes<HTMLButtonElement>,
-  electionVote: ElectionVoteInfo,
-  updateVote: (newVote: NullablePartial<DbElectionVote>) => Promise<void>,
-  classes: ClassesType<typeof styles>,
+  leftText?: string;
+  leftHref: string;
+  middleNode: React.ReactNode;
+  buttonText?: string;
+  buttonTooltip?: string;
+  arrow?: boolean;
+  buttonProps: React.ButtonHTMLAttributes<HTMLButtonElement>;
+  electionVote: ElectionVoteInfo;
+  updateVote: (newVote: NullablePartial<DbElectionVote>) => Promise<void>;
+  classes: ClassesType<typeof styles>;
 }) => {
   const { ForumIcon, LWTooltip } = Components;
   const { flash } = useMessages();
@@ -107,12 +107,16 @@ export const VotingPortalFooter = ({
     </>
   );
 
-  const buttonDisplayTooltip = hasSubmitted ? "After you unsubmit you can edit your answers. You must then resubmit for your vote to be counted" : buttonTooltip;
+  const buttonDisplayTooltip = hasSubmitted
+    ? "After you unsubmit you can edit your answers. You must then resubmit for your vote to be counted"
+    : buttonTooltip;
 
-  const onClick = hasSubmitted ? async () => {
-    await updateVote({ submittedAt: null });
-    flash("Your vote has been unsubmitted, you can now edit and resubmit it");
-  } : buttonProps.onClick;
+  const onClick = hasSubmitted
+    ? async () => {
+        await updateVote({ submittedAt: null });
+        flash("Your vote has been unsubmitted, you can now edit and resubmit it");
+      }
+    : buttonProps.onClick;
 
   return (
     <div className={classes.footer}>
@@ -143,12 +147,12 @@ export const VotingPortalFooter = ({
       </div>
     </div>
   );
-}
+};
 
-const VotingPortalFooterComponent = registerComponent('VotingPortalFooter', VotingPortalFooter, {styles});
+const VotingPortalFooterComponent = registerComponent("VotingPortalFooter", VotingPortalFooter, { styles });
 
 declare global {
   interface ComponentTypes {
-    VotingPortalFooter: typeof VotingPortalFooterComponent
+    VotingPortalFooter: typeof VotingPortalFooterComponent;
   }
 }

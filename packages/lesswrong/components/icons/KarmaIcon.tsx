@@ -1,46 +1,45 @@
-import React from 'react';
-import { registerComponent } from '../../lib/vulcan-lib';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import classNames from 'classnames';
+import React from "react";
+import { registerComponent } from "../../lib/vulcan-lib";
+import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+import classNames from "classnames";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     position: "relative",
     width: "1em",
     height: "1em",
-    display: "inline-block"
+    display: "inline-block",
   },
   bigArrow: {
     position: "absolute",
     top: "-.285em",
     left: "-.255em",
     fontSize: "2em",
-    color: "inherit"
+    color: "inherit",
   },
   smallArrow: {
     position: "absolute",
     top: "-.04em",
     left: "-.186em",
     color: "inherit",
-    fontSize: "1.52em"
-  }
-})
+    fontSize: "1.52em",
+  },
+});
 
 // this is currently unused, but will hopefully be used someday after we reflect on it a bit more.
-const KarmaIcon = ({classes, className}: {
-  classes: ClassesType,
-  className?: string,
-}) => {
-  return <span className={classNames(classes.root, className)}>
-      <KeyboardArrowUpIcon className={classes.bigArrow}/>
-      <KeyboardArrowUpIcon className={classes.smallArrow}/>
+const KarmaIcon = ({ classes, className }: { classes: ClassesType; className?: string }) => {
+  return (
+    <span className={classNames(classes.root, className)}>
+      <KeyboardArrowUpIcon className={classes.bigArrow} />
+      <KeyboardArrowUpIcon className={classes.smallArrow} />
     </span>
-}
+  );
+};
 
-const KarmaIconComponent = registerComponent('KarmaIcon', KarmaIcon, {styles});
+const KarmaIconComponent = registerComponent("KarmaIcon", KarmaIcon, { styles });
 
 declare global {
   interface ComponentTypes {
-    KarmaIcon: typeof KarmaIconComponent
+    KarmaIcon: typeof KarmaIconComponent;
   }
 }

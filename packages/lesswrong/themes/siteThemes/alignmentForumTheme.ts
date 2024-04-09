@@ -1,24 +1,23 @@
-
 const sansSerifStack = [
-  'GreekFallback', // Ensures that greek letters render consistently
+  "GreekFallback", // Ensures that greek letters render consistently
   '"freight-sans-pro"',
-  'Frutiger',
+  "Frutiger",
   '"Frutiger Linotype"',
-  'Univers',
-  'Calibri',
+  "Univers",
+  "Calibri",
   '"Gill Sans"',
   '"Gill Sans MT"',
   "Myriad Pro",
-  'Myriad',
+  "Myriad",
   '"Liberation Sans"',
   '"Nimbus Sans L"',
-  'Tahoma',
-  'Geneva',
+  "Tahoma",
+  "Geneva",
   '"Helvetica Neue"',
-  'Helvetica',
-  'Arial',
-  'sans-serif'
-].join(',')
+  "Helvetica",
+  "Arial",
+  "sans-serif",
+].join(",");
 
 export const alignmentForumTheme: SiteThemeSpecification = {
   shadePalette: {
@@ -29,9 +28,9 @@ export const alignmentForumTheme: SiteThemeSpecification = {
   },
   componentPalette: (shadePalette: ThemeShadePalette) => ({
     primary: {
-      main: shadePalette.type === "dark" ? "#7581d1": "#3f51b5",
-      dark: shadePalette.type === "dark" ? "#7986cb": "#303f9f",
-      light: shadePalette.type === "dark" ? "#5968c9": "#7986cb",
+      main: shadePalette.type === "dark" ? "#7581d1" : "#3f51b5",
+      dark: shadePalette.type === "dark" ? "#7986cb" : "#303f9f",
+      light: shadePalette.type === "dark" ? "#5968c9" : "#7986cb",
       contrastText: shadePalette.grey[0],
     },
     secondary: {
@@ -42,14 +41,14 @@ export const alignmentForumTheme: SiteThemeSpecification = {
     },
     review: {
       activeProgress: "rgba(63,81,181, .5)",
-      progressBar: "rgba(63,81,181, 1)"
+      progressBar: "rgba(63,81,181, 1)",
     },
     lwTertiary: {
-      main:  shadePalette.type === "dark" ? "#7799a4" : "#607e88",
-      dark:  shadePalette.type === "dark" ? "#7799a4" : "#607e88",
+      main: shadePalette.type === "dark" ? "#7799a4" : "#607e88",
+      dark: shadePalette.type === "dark" ? "#7799a4" : "#607e88",
     },
     error: {
-      main: '#bf360c',
+      main: "#bf360c",
     },
     background: {
       default: shadePalette.grey[60],
@@ -72,16 +71,16 @@ export const alignmentForumTheme: SiteThemeSpecification = {
       },
       errorStyle: {
         color: palette.error!.main!,
-        fontFamily: sansSerifStack
+        fontFamily: sansSerifStack,
       },
       title: {
         fontWeight: 500,
       },
       display2: {
-        fontWeight: 500
+        fontWeight: 500,
       },
       display3: {
-        fontWeight: 500
+        fontWeight: 500,
       },
       uiSecondary: {
         fontFamily: sansSerifStack,
@@ -90,23 +89,23 @@ export const alignmentForumTheme: SiteThemeSpecification = {
     overrides: {
       Header: {
         titleLink: {
-          top: 0
-        }
+          top: 0,
+        },
       },
       MuiTooltip: {
         tooltip: {
-          fontSize: "1rem"
-        }
+          fontSize: "1rem",
+        },
       },
       PostsVoteDefault: {
         voteScores: {
           fontVariantNumeric: "lining-nums",
-        }
+        },
       },
       SectionTitle: {
         leftDivider: {
           width: 18,
-          marginTop: 4
+          marginTop: 4,
         },
         rightDivider: {
           marginTop: 4,
@@ -115,20 +114,20 @@ export const alignmentForumTheme: SiteThemeSpecification = {
         tailDivider: {
           marginTop: 4,
           width: 24,
-        }
+        },
       },
       SectionButton: {
         root: {
           marginTop: 4,
           fontWeight: 500,
-        }
+        },
       },
       LoadMore: {
         root: {
           fontWeight: 500,
-        }
-      }
-    }
+        },
+      },
+    },
   }),
 };
 

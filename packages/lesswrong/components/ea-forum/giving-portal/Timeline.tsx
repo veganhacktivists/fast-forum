@@ -49,7 +49,7 @@ const styles = (theme: ThemeType) => ({
     width: MARKER_SIZE,
     height: MARKER_SIZE,
     position: "absolute",
-    top: HEIGHT - (MARKER_SIZE / 2),
+    top: HEIGHT - MARKER_SIZE / 2,
     left: `calc(50% - ${MARKER_SIZE / 2}px)`,
     zIndex: 6,
   },
@@ -80,10 +80,10 @@ const styles = (theme: ThemeType) => ({
     `,
   },
   voteLink: {
-    cursor: 'pointer',
-    '&:hover': {
+    cursor: "pointer",
+    "&:hover": {
       opacity: 0.5,
-    }
+    },
   },
   spanDate: {
     width: "100%",
@@ -100,8 +100,7 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const defaultDivisionToPercent = (division: number, divisions: number) =>
-  (division / divisions) * 100;
+const defaultDivisionToPercent = (division: number, divisions: number) => (division / divisions) * 100;
 
 const formatSpanDates = (startDate: Date, endDate: Date) => {
   const start = moment.utc(startDate);
@@ -109,7 +108,7 @@ const formatSpanDates = (startDate: Date, endDate: Date) => {
   const startFormat = start.year() !== end.year() ? "MMM D YYYY" : "MMM D";
   const endFormat = start.month() !== end.month() ? "MMM D" : "D";
   return `${start.format(startFormat)} – ${end.format(endFormat)}`;
-}
+};
 
 const Timeline = ({
   start,
@@ -120,12 +119,11 @@ const Timeline = ({
   className,
   classes,
 }: TimelineSpec & {
-  className?: string,
-  classes: ClassesType,
+  className?: string;
+  classes: ClassesType;
 }) => {
   const currentDate = useCurrentTime();
-  const showCurrentDate = currentDate.getTime() > start.getTime() &&
-    currentDate.getTime() < end.getTime();
+  const showCurrentDate = currentDate.getTime() > start.getTime() && currentDate.getTime() < end.getTime();
 
   const startMoment = moment.utc(start);
   const endMoment = moment.utc(end);
@@ -136,16 +134,11 @@ const Timeline = ({
     const division = dateMoment.diff(startMoment, "days");
     const percent = divisionToPercent(division, divisions);
     return percent < 0 ? 0 : percent > 100 ? 100 : percent;
-  }
+  };
 
   const positionDate = (date: Date) => {
     const percent = getDatePercent(date);
-    const textAlign: "left" | "right" | undefined =
-      percent < 5
-        ? "left"
-        : percent > 95
-          ? "right"
-          : undefined;
+    const textAlign: "left" | "right" | undefined = percent < 5 ? "left" : percent > 95 ? "right" : undefined;
     return {
       className: classes.date,
       style: {
@@ -161,7 +154,7 @@ const Timeline = ({
         `,
       },
     };
-  }
+  };
 
   const positionDateMarker = (date: Date) => ({
     className: classes.dateMarker,
@@ -170,24 +163,19 @@ const Timeline = ({
     },
   });
 
-  const positionSpan = (
-    start: Date,
-    end: Date,
-    consecutive?: boolean,
-    hatched?: boolean,
-  ) => {
+  const positionSpan = (start: Date, end: Date, consecutive?: boolean, hatched?: boolean) => {
     const startPercent = getDatePercent(start);
     const endPercent = getDatePercent(end);
     const endOffset = consecutive ? 1 : 0;
     const width = Math.max(endPercent - startPercent - endOffset, 2);
     return {
-      className: classNames(classes.span, {[classes.spanHatched]: hatched}),
+      className: classNames(classes.span, { [classes.spanHatched]: hatched }),
       style: {
         left: `${startPercent}%`,
         width: `${width}%`,
       },
     };
-  }
+  };
 
   return (
     <div className={classNames(classes.root, className)}>
@@ -199,13 +187,11 @@ const Timeline = ({
           <div {...positionDateMarker(date)} />
         </Fragment>
       ))}
-      {spans.map(({start, end, description, href, consecutive, hideDates, hatched}) => (
+      {spans.map(({ start, end, description, href, consecutive, hideDates, hatched }) => (
         <div {...positionSpan(start, end, consecutive, hatched)} key={description}>
           {href ? <Link to={href}>{description}</Link> : description}
           {!hideDates && (
-            <div className={classNames(classes.date, classes.spanDate)}>
-              {formatSpanDates(start, end)}
-              </div>
+            <div className={classNames(classes.date, classes.spanDate)}>{formatSpanDates(start, end)}</div>
           )}
         </div>
       ))}
@@ -214,13 +200,9 @@ const Timeline = ({
       )}
     </div>
   );
-}
+};
 
-const TimelineComponent = registerComponent(
-  "Timeline",
-  Timeline,
-  {styles, stylePriority: -1},
-);
+const TimelineComponent = registerComponent("Timeline", Timeline, { styles, stylePriority: -1 });
 
 declare global {
   interface ComponentTypes {

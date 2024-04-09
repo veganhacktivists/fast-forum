@@ -1,17 +1,17 @@
-import React, { ErrorInfo } from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import { configureScope, captureException }from '@sentry/core';
-import { withLocation } from '../../lib/routeUtil';
+import React, { ErrorInfo } from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import { configureScope, captureException } from "@sentry/core";
+import { withLocation } from "../../lib/routeUtil";
 
 interface ErrorBoundaryExternalProps {
-  children: React.ReactNode,
+  children: React.ReactNode;
 }
 
 interface ErrorBoundaryProps extends ErrorBoundaryExternalProps, WithLocationProps {}
 
 interface ErrorBoundaryState {
-  error: string | false,
-  errorLocation?: string,
+  error: string | false;
+  errorLocation?: string;
 }
 
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
@@ -20,12 +20,9 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     this.state = { error: false };
   }
 
-  static getDerivedStateFromProps(
-    props: ErrorBoundaryProps,
-    state: ErrorBoundaryState,
-  ) {
+  static getDerivedStateFromProps(props: ErrorBoundaryProps, state: ErrorBoundaryState) {
     if (state.error && state.errorLocation !== props.location.url) {
-      return {error: false};
+      return { error: false };
     }
     return null;
   }
@@ -35,7 +32,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       error: error.toString(),
       errorLocation: this.props.location.url,
     });
-    configureScope(scope => {
+    configureScope((scope) => {
       Object.keys(info).forEach((key: keyof ErrorInfo) => {
         scope.setExtra(key, info[key]);
       });
@@ -45,23 +42,19 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
   render() {
     if (this.state.error) {
-      return <Components.ErrorMessage message={this.state.error}/>
+      return <Components.ErrorMessage message={this.state.error} />;
     }
-    if (this.props.children)
-      return this.props.children;
-    else
-      return null;
+    if (this.props.children) return this.props.children;
+    else return null;
   }
 }
 
-const ErrorBoundaryComponent = registerComponent<ErrorBoundaryExternalProps>(
-  "ErrorBoundary",
-  ErrorBoundary,
-  {hocs: [withLocation]},
-);
+const ErrorBoundaryComponent = registerComponent<ErrorBoundaryExternalProps>("ErrorBoundary", ErrorBoundary, {
+  hocs: [withLocation],
+});
 
 declare global {
   interface ComponentTypes {
-    ErrorBoundary: typeof ErrorBoundaryComponent
+    ErrorBoundary: typeof ErrorBoundaryComponent;
   }
 }

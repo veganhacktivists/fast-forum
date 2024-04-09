@@ -1,20 +1,20 @@
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import React from 'react';
-import { useLocation } from '../../lib/routeUtil';
-import qs from 'qs'
-import * as _ from 'underscore';
-import type { Option } from '../common/InlineSelect';
-import { getCommentViewOptions } from '../../lib/commentViewOptions';
-import { useNavigate } from '../../lib/reactRouterWrapper';
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import React from "react";
+import { useLocation } from "../../lib/routeUtil";
+import qs from "qs";
+import * as _ from "underscore";
+import type { Option } from "../common/InlineSelect";
+import { getCommentViewOptions } from "../../lib/commentViewOptions";
+import { useNavigate } from "../../lib/reactRouterWrapper";
 
 const viewOptions = getCommentViewOptions();
 
 const sortOrder = [
-  'postCommentsTop',
-  'postCommentsMagic',
-  'postCommentsNew',
-  'postCommentsOld',
-  'postCommentsRecentReplies'
+  "postCommentsTop",
+  "postCommentsMagic",
+  "postCommentsNew",
+  "postCommentsOld",
+  "postCommentsRecentReplies",
 ];
 
 viewOptions.sort((a, b) => sortOrder.indexOf(a.value) - sortOrder.indexOf(b.value));
@@ -24,15 +24,12 @@ const sortingNames = viewOptions.reduce((sortingName: Record<string, string>, vi
   return sortingName;
 }, {});
 
-const AnswersSorting = ({ post, classes }: {
-  post?: PostsList,
-  classes: ClassesType,
-}) => {
+const AnswersSorting = ({ post, classes }: { post?: PostsList; classes: ClassesType }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { query } = location;
-  
-  const {InlineSelect} = Components;
+
+  const { InlineSelect } = Components;
 
   const handleSortingClick = (opt: Option) => {
     const sorting = opt.value;
@@ -44,19 +41,19 @@ const AnswersSorting = ({ post, classes }: {
 
   const sortings = [...Object.keys(sortingNames)] as (keyof typeof sortingNames)[];
   const currentSorting = query?.answersSorting || "top";
-  
-  const viewOptions: Array<Option> = sortings.map((view) => {
-    return {value: view, label: sortingNames[view] || view}
-  })
-  const selectedOption = viewOptions.find((option) => option.value === currentSorting) || viewOptions[0]
 
-  return <InlineSelect options={viewOptions} selected={selectedOption} handleSelect={handleSortingClick}/>
+  const viewOptions: Array<Option> = sortings.map((view) => {
+    return { value: view, label: sortingNames[view] || view };
+  });
+  const selectedOption = viewOptions.find((option) => option.value === currentSorting) || viewOptions[0];
+
+  return <InlineSelect options={viewOptions} selected={selectedOption} handleSelect={handleSortingClick} />;
 };
 
-const AnswersSortingComponent = registerComponent('AnswersSorting', AnswersSorting);
+const AnswersSortingComponent = registerComponent("AnswersSorting", AnswersSorting);
 
 declare global {
   interface ComponentTypes {
-    AnswersSorting: typeof AnswersSortingComponent,
+    AnswersSorting: typeof AnswersSortingComponent;
   }
 }

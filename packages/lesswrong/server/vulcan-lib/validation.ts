@@ -1,17 +1,20 @@
-import pickBy from 'lodash/pickBy';
-import mapValues from 'lodash/mapValues';
-import { userCanCreateField, userCanUpdateField } from '../../lib/vulcan-users/permissions';
-import { getSchema, getSimpleSchema } from '../../lib/utils/getSchema';
-import * as _ from 'underscore';
+import pickBy from "lodash/pickBy";
+import mapValues from "lodash/mapValues";
+import { userCanCreateField, userCanUpdateField } from "../../lib/vulcan-users/permissions";
+import { getSchema, getSimpleSchema } from "../../lib/utils/getSchema";
+import * as _ from "underscore";
 
 interface SimpleSchemaValidationError {
   type: string;
   [key: string]: number | string;
 }
 
-export const dataToModifier = <T extends DbObject>(data: Partial<DbInsertion<T>>): MongoModifier<DbInsertion<T>> => ({ 
-  $set: pickBy(data, f => f !== null), 
-  $unset: mapValues(pickBy(data, f => f === null), () => true),
+export const dataToModifier = <T extends DbObject>(data: Partial<DbInsertion<T>>): MongoModifier<DbInsertion<T>> => ({
+  $set: pickBy(data, (f) => f !== null),
+  $unset: mapValues(
+    pickBy(data, (f) => f === null),
+    () => true,
+  ),
 });
 
 export const modifierToData = <T extends DbObject>(modifier: MongoModifier<T>): any => ({
@@ -38,13 +41,13 @@ export const validateDocument = <N extends CollectionNameString>(
   let validationErrors: Array<any> = [];
 
   // Check validity of inserted document
-  Object.keys(document).forEach(fieldName => {
+  Object.keys(document).forEach((fieldName) => {
     const fieldSchema = schema[fieldName];
 
     // 1. check that the current user has permission to insert each field
     if (!fieldSchema || !userCanCreateField(currentUser, fieldSchema)) {
       validationErrors.push({
-        id: 'errors.disallowed_property_detected',
+        id: "errors.disallowed_property_detected",
         properties: { name: fieldName },
       });
     }
@@ -59,8 +62,8 @@ export const validateDocument = <N extends CollectionNameString>(
     errors.forEach((error: SimpleSchemaValidationError) => {
       // eslint-disable-next-line no-console
       // console.log(error);
-      if (error.type.includes('intlError')) {
-        const intlError = JSON.parse(error.type.replace('intlError|', ''));
+      if (error.type.includes("intlError")) {
+        const intlError = JSON.parse(error.type.replace("intlError|", ""));
         validationErrors = validationErrors.concat(intlError);
       } else {
         validationErrors.push({
@@ -102,11 +105,11 @@ export const validateModifier = <N extends CollectionNameString>(
 
   // 1. check that the current user has permission to edit each field
   const modifiedProperties = _.keys(set).concat(_.keys(unset));
-  modifiedProperties.forEach(function(fieldName) {
+  modifiedProperties.forEach(function (fieldName) {
     var field = schema[fieldName];
     if (!field || !userCanUpdateField(currentUser, field, document)) {
       validationErrors.push({
-        id: 'errors.disallowed_property_detected',
+        id: "errors.disallowed_property_detected",
         properties: { name: fieldName },
       });
     }
@@ -121,8 +124,8 @@ export const validateModifier = <N extends CollectionNameString>(
     errors.forEach((error: SimpleSchemaValidationError) => {
       // eslint-disable-next-line no-console
       // console.log(error);
-      if (error.type.includes('intlError')) {
-        validationErrors = validationErrors.concat(JSON.parse(error.type.replace('intlError|', '')));
+      if (error.type.includes("intlError")) {
+        validationErrors = validationErrors.concat(JSON.parse(error.type.replace("intlError|", "")));
       } else {
         validationErrors.push({
           id: `errors.${error.type}`,

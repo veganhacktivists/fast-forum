@@ -1,10 +1,13 @@
 import { useMulti } from "../../lib/crud/withMulti";
 
-export const useCurrentFrontpageSpotlight = <FragmentTypeName extends FragmentTypesByCollection["Spotlights"]>({fragmentName, skip}: {
-  fragmentName: FragmentTypeName,
-  skip?: boolean,
+export const useCurrentFrontpageSpotlight = <FragmentTypeName extends FragmentTypesByCollection["Spotlights"]>({
+  fragmentName,
+  skip,
+}: {
+  fragmentName: FragmentTypeName;
+  skip?: boolean;
 }): FragmentTypes[FragmentTypeName] | undefined => {
-  const {results: currentSpotlightResults} = useMulti({
+  const { results: currentSpotlightResults } = useMulti({
     collectionName: "Spotlights",
     fragmentName: fragmentName,
     terms: {
@@ -14,4 +17,4 @@ export const useCurrentFrontpageSpotlight = <FragmentTypeName extends FragmentTy
     skip,
   });
   return currentSpotlightResults?.[0];
-}
+};

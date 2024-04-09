@@ -1,7 +1,7 @@
-import React from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import classNames from 'classnames';
-import { Link } from '../../lib/reactRouterWrapper';
+import React from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import classNames from "classnames";
+import { Link } from "../../lib/reactRouterWrapper";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -36,41 +36,54 @@ const styles = (theme: ThemeType): JssStyles => ({
 // described in https://www.sarasoueidan.com/blog/nested-links/, we make the
 // card background and card contents siblings rather than nested, then use
 // z-index to control which is clickable.
-const LinkCard = ({children, to, tooltip, className, classes, onClick, clickable}: {
-  children?: React.ReactNode,
-  to: string,
-  tooltip?: any,
-  className?: string,
-  classes: ClassesType,
-  onClick?: any,
-  clickable?: boolean
+const LinkCard = ({
+  children,
+  to,
+  tooltip,
+  className,
+  classes,
+  onClick,
+  clickable,
+}: {
+  children?: React.ReactNode;
+  to: string;
+  tooltip?: any;
+  className?: string;
+  classes: ClassesType;
+  onClick?: any;
+  clickable?: boolean;
 }) => {
-  const { LWTooltip } = Components
+  const { LWTooltip } = Components;
   const card = (
     <div className={classNames(className, classes.root)}>
-      <div className={classes.background}>
-        {onClick ? <a onClick={onClick}/> : <Link to={to} />}
-      </div>
+      <div className={classes.background}>{onClick ? <a onClick={onClick} /> : <Link to={to} />}</div>
       {children}
     </div>
   );
-  
+
   if (tooltip) {
-    return <LWTooltip className={classNames(className, classes.root)} title={tooltip} placement="bottom-start" tooltip={false} inlineBlock={false} clickable={clickable} flip={false}>
-      {card}
-    </LWTooltip>;
+    return (
+      <LWTooltip
+        className={classNames(className, classes.root)}
+        title={tooltip}
+        placement="bottom-start"
+        tooltip={false}
+        inlineBlock={false}
+        clickable={clickable}
+        flip={false}
+      >
+        {card}
+      </LWTooltip>
+    );
   } else {
-    return <div className={classNames(className, classes.root)}>
-      {card}
-      </div>
+    return <div className={classNames(className, classes.root)}>{card}</div>;
   }
-}
+};
 
-
-const LinkCardComponent = registerComponent("LinkCard", LinkCard, {styles});
+const LinkCardComponent = registerComponent("LinkCard", LinkCard, { styles });
 
 declare global {
   interface ComponentTypes {
-    LinkCard: typeof LinkCardComponent
+    LinkCard: typeof LinkCardComponent;
   }
 }

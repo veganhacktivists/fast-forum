@@ -1,12 +1,19 @@
-import React from 'react';
-import { EmojiReactName, getNormalizedReactionsListFromVoteProps, NamesAttachedReactionsList, QuoteLocator, UserReactInfo, VoteOnReactionType } from '../../../lib/voting/namesAttachedReactions';
-import { registerComponent, Components } from '../../../lib/vulcan-lib';
-import { useNamesAttachedReactionsVoting } from './NamesAttachedReactionsVoteOnComment';
-import filter from 'lodash/filter';
-import uniq from 'lodash/uniq';
-import sumBy from 'lodash/sumBy';
-import type { VotingProps } from '../votingProps';
-import { ContentItemBody } from '../../common/ContentItemBody';
+import React from "react";
+import {
+  EmojiReactName,
+  getNormalizedReactionsListFromVoteProps,
+  NamesAttachedReactionsList,
+  QuoteLocator,
+  UserReactInfo,
+  VoteOnReactionType,
+} from "../../../lib/voting/namesAttachedReactions";
+import { registerComponent, Components } from "../../../lib/vulcan-lib";
+import { useNamesAttachedReactionsVoting } from "./NamesAttachedReactionsVoteOnComment";
+import filter from "lodash/filter";
+import uniq from "lodash/uniq";
+import sumBy from "lodash/sumBy";
+import type { VotingProps } from "../votingProps";
+import { ContentItemBody } from "../../common/ContentItemBody";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -18,19 +25,19 @@ const styles = (theme: ThemeType): JssStyles => ({
     paddingBottom: 8,
     paddingLeft: 12,
     paddingRight: 8,
-    '&:hover': {
+    "&:hover": {
       background: theme.palette.panelBackground.darken04,
-    }
+    },
   },
   tinyQuoteRow: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     position: "relative",
-    '&:hover $tinyQuoteReactToggle': {
+    "&:hover $tinyQuoteReactToggle": {
       opacity: 1,
-      color: theme.palette.grey[900]
-    }
+      color: theme.palette.grey[900],
+    },
   },
   tinyQuoteWrapper: {
     overflow: "hidden",
@@ -39,7 +46,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     maxWidth: 205,
   },
   tinyQuote: {
-    textOverflow: "ellipsis", 
+    textOverflow: "ellipsis",
     marginBottom: 6,
     overflow: "hidden",
     maxHeight: "2em",
@@ -49,75 +56,86 @@ const styles = (theme: ThemeType): JssStyles => ({
     top: 2,
     padding: 6,
     cursor: "pointer",
-    opacity: .2,
+    opacity: 0.2,
     fontWeight: 600,
-    '&&:hover': {
-      opacity: .5
-    }
+    "&&:hover": {
+      opacity: 0.5,
+    },
   },
   usersWhoQuoted: {
     fontSize: 12,
-    color: theme.palette.grey[500]
-  }
+    color: theme.palette.grey[500],
+  },
 });
 
-const ReactionQuotesHoverInfo = ({react, quote, voteProps, commentBodyRef, classes}:{
-  react: EmojiReactName,
-  quote: QuoteLocator,
-  voteProps: VotingProps<VoteableTypeClient>,
-  commentBodyRef?: React.RefObject<ContentItemBody>|null,
-  classes: ClassesType
+const ReactionQuotesHoverInfo = ({
+  react,
+  quote,
+  voteProps,
+  commentBodyRef,
+  classes,
+}: {
+  react: EmojiReactName;
+  quote: QuoteLocator;
+  voteProps: VotingProps<VoteableTypeClient>;
+  commentBodyRef?: React.RefObject<ContentItemBody> | null;
+  classes: ClassesType;
 }) => {
   const { ReactOrAntireactVote, UsersWhoReacted } = Components;
   const normalizedReactions = getNormalizedReactionsListFromVoteProps(voteProps);
 
   const reactionsOfType: UserReactInfo[] = normalizedReactions?.reacts?.[react] ?? [];
-  const reactionsToQuote = reactionsOfType.filter(r => r.quotes?.[0] === quote);
+  const reactionsToQuote = reactionsOfType.filter((r) => r.quotes?.[0] === quote);
 
   const { getCurrentUserReactionVote, setCurrentUserReaction } = useNamesAttachedReactionsVoting(voteProps);
 
-  function handleHoverQuote (quote: string) {
+  function handleHoverQuote(quote: string) {
     // TODO
   }
 
-  function handleLeaveQuote () {
+  function handleLeaveQuote() {
     // TODO
   }
 
-  if (!reactionsToQuote.length) return null
+  if (!reactionsToQuote.length) return null;
 
-  const netQuoteReactionCount = sumBy(reactionsToQuote, (reaction) => reaction.reactType==="disagreed"?-1:1)
-  const setCurrentUserQuoteReaction = (reactionName: EmojiReactName, reaction: VoteOnReactionType) => setCurrentUserReaction(reactionName, reaction, quote);
+  const netQuoteReactionCount = sumBy(reactionsToQuote, (reaction) => (reaction.reactType === "disagreed" ? -1 : 1));
+  const setCurrentUserQuoteReaction = (reactionName: EmojiReactName, reaction: VoteOnReactionType) =>
+    setCurrentUserReaction(reactionName, reaction, quote);
 
-  return <div className={classes.root}>
-    <div key={quote} className={classes.quote}>
-      <div className={classes.tinyQuoteRow} onMouseEnter={() => handleHoverQuote(quote)} onMouseLeave={() => handleLeaveQuote()}>
-        <div className={classes.tinyQuoteWrapper}>
-          <div className={classes.tinyQuote}>
-            {quote.trim()}
+  return (
+    <div className={classes.root}>
+      <div key={quote} className={classes.quote}>
+        <div
+          className={classes.tinyQuoteRow}
+          onMouseEnter={() => handleHoverQuote(quote)}
+          onMouseLeave={() => handleLeaveQuote()}
+        >
+          <div className={classes.tinyQuoteWrapper}>
+            <div className={classes.tinyQuote}>{quote.trim()}</div>
+            <div className={classes.usersWhoQuoted}>
+              <UsersWhoReacted reactions={reactionsToQuote} />
+            </div>
           </div>
-          <div className={classes.usersWhoQuoted}>
-            <UsersWhoReacted reactions={reactionsToQuote} />
-          </div>
+          <ReactOrAntireactVote
+            reactionName={react}
+            currentUserReaction={getCurrentUserReactionVote(react, quote)}
+            netReactionCount={netQuoteReactionCount}
+            quote={quote}
+            setCurrentUserReaction={setCurrentUserQuoteReaction}
+          />
         </div>
-        <ReactOrAntireactVote
-          reactionName={react}
-          currentUserReaction={getCurrentUserReactionVote(react, quote)}
-          netReactionCount={netQuoteReactionCount}
-          quote={quote}
-          setCurrentUserReaction={setCurrentUserQuoteReaction}
-        />
       </div>
     </div>
-  </div>
-}
+  );
+};
 
-
-const ReactionQuotesHoverInfoComponent = registerComponent('ReactionQuotesHoverInfo', ReactionQuotesHoverInfo, {styles});
+const ReactionQuotesHoverInfoComponent = registerComponent("ReactionQuotesHoverInfo", ReactionQuotesHoverInfo, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    ReactionQuotesHoverInfo: typeof ReactionQuotesHoverInfoComponent
+    ReactionQuotesHoverInfo: typeof ReactionQuotesHoverInfoComponent;
   }
 }
-

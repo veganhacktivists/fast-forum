@@ -1,15 +1,15 @@
-import * as _ from 'underscore';
-import { ensureIndex } from './collectionIndexUtils';
-import { addFieldsDict, schemaDefaultValue } from './utils/schemaUtils';
-export { getDefaultMutations } from './vulcan-core/default_mutations';
-export { getDefaultResolvers } from './vulcan-core/default_resolvers';
+import * as _ from "underscore";
+import { ensureIndex } from "./collectionIndexUtils";
+import { addFieldsDict, schemaDefaultValue } from "./utils/schemaUtils";
+export { getDefaultMutations } from "./vulcan-core/default_mutations";
+export { getDefaultResolvers } from "./vulcan-core/default_resolvers";
 
 declare module "simpl-schema" {
   interface SchemaDefinition {
-    canAutofillDefault?: boolean
-    denormalized?: boolean
-    foreignKey?: CollectionNameString | {collection:CollectionNameString,field:string}
-    nullable?: boolean
+    canAutofillDefault?: boolean;
+    denormalized?: boolean;
+    foreignKey?: CollectionNameString | { collection: CollectionNameString; field: string };
+    nullable?: boolean;
   }
 }
 
@@ -18,30 +18,30 @@ export function addUniversalFields<N extends CollectionNameString>({
   schemaVersion = 1,
   createdAtOptions = {},
 }: {
-  collection: CollectionBase<N>,
-  schemaVersion?: number
-  createdAtOptions?: Partial<CollectionFieldPermissions>,
+  collection: CollectionBase<N>;
+  schemaVersion?: number;
+  createdAtOptions?: Partial<CollectionFieldPermissions>;
 }): void {
   addFieldsDict(collection, {
     _id: {
       optional: true,
       nullable: false,
       type: String,
-      canRead: ['guests'],
+      canRead: ["guests"],
     },
     schemaVersion: {
       type: Number,
-      canRead: ['guests'],
+      canRead: ["guests"],
       optional: true,
       ...schemaDefaultValue(schemaVersion),
-      onUpdate: () => schemaVersion
+      onUpdate: () => schemaVersion,
     },
     createdAt: {
       type: Date,
       optional: true,
       nullable: false,
       hidden: true,
-      canRead: ['guests'],
+      canRead: ["guests"],
       onInsert: () => new Date(),
       ...createdAtOptions,
     },
@@ -51,26 +51,24 @@ export function addUniversalFields<N extends CollectionNameString>({
       nullable: true,
       blackbox: true,
       hidden: true,
-      canRead: ['admins'],
-      canCreate: ['admins'],
-      canUpdate: ['admins'],
+      canRead: ["admins"],
+      canCreate: ["admins"],
+      canUpdate: ["admins"],
     },
-  })
-  ensureIndex(collection, {schemaVersion: 1});
+  });
+  ensureIndex(collection, { schemaVersion: 1 });
 }
 
 export function isUniversalField(fieldName: string): boolean {
-  return fieldName==="_id" || fieldName==="schemaVersion";
+  return fieldName === "_id" || fieldName === "schemaVersion";
 }
 
-export function isUnbackedCollection<N extends CollectionNameString>(
-  collection: CollectionBase<N>,
-): boolean {
+export function isUnbackedCollection<N extends CollectionNameString>(collection: CollectionBase<N>): boolean {
   const collectionName: string = collection.collectionName;
-  if (collectionName === 'Settings' || collectionName === 'Callbacks') {
+  if (collectionName === "Settings" || collectionName === "Callbacks") {
     // Vulcan collections with no backing database table
     return true;
   }
-  
+
   return false;
 }

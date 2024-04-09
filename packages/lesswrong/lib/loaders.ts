@@ -1,7 +1,6 @@
-import { Utils } from './vulcan-lib'; // import from vulcan:lib because vulcan:core isn't loaded yet
-import DataLoader from 'dataloader';
-import * as _ from 'underscore';
-
+import { Utils } from "./vulcan-lib"; // import from vulcan:lib because vulcan:core isn't loaded yet
+import DataLoader from "dataloader";
+import * as _ from "underscore";
 
 //
 // Do a query, with a custom loader for query batching. This effectively does a
@@ -22,32 +21,40 @@ export async function getWithLoader<N extends CollectionNameString>(
   context: ResolverContext,
   collection: CollectionBase<N>,
   loaderName: string,
-  baseQuery: any={},
+  baseQuery: any = {},
   groupByField: string & keyof ObjectsByCollectionName[N],
   id: string,
-  projection: any=undefined,
+  projection: any = undefined,
 ): Promise<ObjectsByCollectionName[N][]> {
   if (!context.extraLoaders) {
     context.extraLoaders = {};
   }
   if (!context.extraLoaders[loaderName]) {
-    context.extraLoaders[loaderName] = new DataLoader(async (docIDs: Array<string>) => {
-      let query = {
-        ...baseQuery,
-        [groupByField]: {$in: docIDs}
-      };
-      const queryResults: ObjectsByCollectionName[N][] = await Utils.Connectors.find(collection, query, projection);
-      const sortedResults = _.groupBy(queryResults, r=>r[groupByField]);
-      return docIDs.map(id => sortedResults[id] || []);
-    }, {
-      cache: true
-    })
+    context.extraLoaders[loaderName] = new DataLoader(
+      async (docIDs: Array<string>) => {
+        let query = {
+          ...baseQuery,
+          [groupByField]: { $in: docIDs },
+        };
+        const queryResults: ObjectsByCollectionName[N][] = await Utils.Connectors.find(collection, query, projection);
+        const sortedResults = _.groupBy(queryResults, (r) => r[groupByField]);
+        return docIDs.map((id) => sortedResults[id] || []);
+      },
+      {
+        cache: true,
+      },
+    );
   }
 
   return await context.extraLoaders[loaderName].load(id);
 }
 
-export async function getWithCustomLoader<T, ID>(context: ResolverContext, loaderName: string, id: ID, idsToResults: (ids: Array<ID>)=>Promise<T[]>): Promise<T> {
+export async function getWithCustomLoader<T, ID>(
+  context: ResolverContext,
+  loaderName: string,
+  id: ID,
+  idsToResults: (ids: Array<ID>) => Promise<T[]>,
+): Promise<T> {
   if (!context.extraLoaders[loaderName]) {
     context.extraLoaders[loaderName] = new DataLoader(idsToResults, { cache: true });
   }
@@ -67,9 +74,13 @@ export async function getWithCustomLoader<T, ID>(context: ResolverContext, loade
  * simplifies calling it by translating any instances of `Error` in the result
  * list to a single thrown exception.
  */
-export async function loadByIds<N extends CollectionNameString>(context: ResolverContext, collectionName: N, ids: string[]): Promise<(ObjectsByCollectionName[N]|null)[]> {
+export async function loadByIds<N extends CollectionNameString>(
+  context: ResolverContext,
+  collectionName: N,
+  ids: string[],
+): Promise<(ObjectsByCollectionName[N] | null)[]> {
   const results = await context.loaders[collectionName].loadMany(ids);
-  
+
   // The `dataloader` library returns an array of (result|null|Error), handling
   // the case where loading a subset of objects threw an exception. If this
   // happens, it probably means something has gone wrong with our connection to
@@ -84,5 +95,5 @@ export async function loadByIds<N extends CollectionNameString>(context: Resolve
   }
 
   // Downcast to remove Error from the possible results, and return
-  return results as Array<ObjectsByCollectionName[N]|null>;
+  return results as Array<ObjectsByCollectionName[N] | null>;
 }

@@ -15,9 +15,9 @@ import { addField, dropField } from "./meta/utils";
  * -
  * --- Accepted on 2023-04-13T18:46:26.000Z by 20230413T184626.add_rejected_reasons_fields.ts
  * +-- Overall schema hash: c4afbf05797c266012f5ba5ae0119c87
- *  
+ *
  * @@ -464,3 +462,3 @@ CREATE TABLE "PostRelations" (
- *  
+ *
  * --- Schema for "Posts", hash: f4ca610b780ee8fc503c04e05fd7a646
  * +-- Schema for "Posts", hash: 1c137ff08da3554ca53a4d51251c143e
  *  CREATE TABLE "Posts" (
@@ -25,7 +25,7 @@ import { addField, dropField } from "./meta/utils";
  *      "moderationStyle" text,
  * +    "ignoreRateLimits" bool,
  *      "hideCommentKarma" bool DEFAULT false,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -36,10 +36,10 @@ import { addField, dropField } from "./meta/utils";
  */
 export const acceptsSchemaHash = "c4afbf05797c266012f5ba5ae0119c87";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Posts, 'ignoreRateLimits')
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Posts, "ignoreRateLimits");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Posts, 'ignoreRateLimits')
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Posts, "ignoreRateLimits");
+};

@@ -45,10 +45,7 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const getItemProps = (
-  post: PostsRecentDiscussion,
-  comments: CommentsList[] = [],
-): EARecentDiscussionItemProps => {
+const getItemProps = (post: PostsRecentDiscussion, comments: CommentsList[] = []): EARecentDiscussionItemProps => {
   if (!comments?.length) {
     // It's a new event
     if (post.isEvent) {
@@ -82,7 +79,7 @@ const getItemProps = (
     post,
     timestamp: comments[0].postedAt,
   };
-}
+};
 
 /**
  * This component handles entries in recent discussions for new posts, new
@@ -96,18 +93,13 @@ const EARecentDiscussionThread = ({
   expandAllThreads: initialExpandAllThreads,
   classes,
 }: {
-  post: PostsRecentDiscussion,
-  comments?: CommentsList[],
-  refetch: () => void,
-  expandAllThreads?: boolean,
-  classes: ClassesType,
+  post: PostsRecentDiscussion;
+  comments?: CommentsList[];
+  refetch: () => void;
+  expandAllThreads?: boolean;
+  classes: ClassesType;
 }) => {
-  const {
-    isSkippable,
-    expandAllThreads,
-    nestedComments,
-    treeOptions,
-  } = useRecentDiscussionThread({
+  const { isSkippable, expandAllThreads, nestedComments, treeOptions } = useRecentDiscussionThread({
     post,
     comments,
     refetch,
@@ -119,34 +111,36 @@ const EARecentDiscussionThread = ({
   }
 
   const {
-    EARecentDiscussionItem, EAPostMeta, ForumIcon, CommentsNode,
-    PostExcerpt, LinkPostMessage, EAKarmaDisplay, PostsTitle,
+    EARecentDiscussionItem,
+    EAPostMeta,
+    ForumIcon,
+    CommentsNode,
+    PostExcerpt,
+    LinkPostMessage,
+    EAKarmaDisplay,
+    PostsTitle,
   } = Components;
   return (
     <EARecentDiscussionItem {...getItemProps(post, comments)}>
       <div className={classes.header}>
-        {!post.isEvent &&
-          <EAKarmaDisplay post={post} className={classes.karmaDisplay} />
-        }
+        {!post.isEvent && <EAKarmaDisplay post={post} className={classes.karmaDisplay} />}
         <div className={classes.postInfo}>
           <PostsTitle
             post={post}
             read={post.isRead}
             className={classes.postTitle}
-            linkEventProps={{intent: 'expandPost'}}
+            linkEventProps={{ intent: "expandPost" }}
           />
           <EAPostMeta post={post} useEventStyles />
         </div>
-        {!post.isEvent &&
+        {!post.isEvent && (
           <Link to={postGetCommentsUrl(post)} className={classes.commentCount}>
             <ForumIcon icon="Comment" />
             {post.commentCount ?? 0}
           </Link>
-        }
+        )}
       </div>
-      {post.url &&
-        <LinkPostMessage post={post} />
-      }
+      {post.url && <LinkPostMessage post={post} />}
       <PostExcerpt
         post={post}
         lines={comments?.length ? 3 : 10}
@@ -154,7 +148,7 @@ const EARecentDiscussionThread = ({
           [classes.excerptBottomMargin]: nestedComments.length,
         })}
       />
-      {nestedComments.map((comment: CommentTreeNode<CommentsList>) =>
+      {nestedComments.map((comment: CommentTreeNode<CommentsList>) => (
         <div key={comment.item._id}>
           <CommentsNode
             treeOptions={treeOptions}
@@ -166,19 +160,17 @@ const EARecentDiscussionThread = ({
             childComments={comment.children}
           />
         </div>
-      )}
+      ))}
     </EARecentDiscussionItem>
   );
-}
+};
 
-const EARecentDiscussionThreadComponent = registerComponent(
-  "EARecentDiscussionThread",
-  EARecentDiscussionThread,
-  {styles},
-);
+const EARecentDiscussionThreadComponent = registerComponent("EARecentDiscussionThread", EARecentDiscussionThread, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    EARecentDiscussionThread: typeof EARecentDiscussionThreadComponent,
+    EARecentDiscussionThread: typeof EARecentDiscussionThreadComponent;
   }
 }

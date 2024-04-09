@@ -1,5 +1,5 @@
-import { getSqlClientOrThrow } from '../../lib/sql/sqlClient';
-import { registerMigration } from './migrationUtils';
+import { getSqlClientOrThrow } from "../../lib/sql/sqlClient";
+import { registerMigration } from "./migrationUtils";
 
 // Postgres tables have weird casing because of legacy requirements
 // This creates a set of views which are a case insensitive copy of the actual tables
@@ -55,7 +55,7 @@ registerMigration({
     END;
     $$
     LANGUAGE plpgsql;
-    `
-    await db.any(sql)
-  }
-})
+    `;
+    await db.any(sql);
+  },
+});

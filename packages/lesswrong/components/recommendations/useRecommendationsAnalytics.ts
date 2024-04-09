@@ -23,14 +23,8 @@ export const useRecommendationAnalytics = <
   onClickHandler?: (e: MouseEvent) => void,
   disableAnalytics = false,
 ) => {
-  const [observeRecommendation] = useMutation(
-    observeRecommendationMutation,
-    {errorPolicy: "all"},
-  );
-  const [clickRecommendation] = useMutation(
-    clickRecommendationMutation,
-    {errorPolicy: "all"},
-  );
+  const [observeRecommendation] = useMutation(observeRecommendationMutation, { errorPolicy: "all" });
+  const [clickRecommendation] = useMutation(clickRecommendationMutation, { errorPolicy: "all" });
 
   const onObserve = useCallback(() => {
     if (!disableAnalytics) {
@@ -47,19 +41,22 @@ export const useRecommendationAnalytics = <
     maxTriggers: 1,
   });
 
-  const onClick = useCallback((e: MouseEvent<U>) => {
-    if (!disableAnalytics) {
-      void clickRecommendation({
-        variables: {
-          postId: postId,
-        },
-      });
-    }
-    onClickHandler?.(e);
-  }, [postId, clickRecommendation, disableAnalytics, onClickHandler]);
+  const onClick = useCallback(
+    (e: MouseEvent<U>) => {
+      if (!disableAnalytics) {
+        void clickRecommendation({
+          variables: {
+            postId: postId,
+          },
+        });
+      }
+      onClickHandler?.(e);
+    },
+    [postId, clickRecommendation, disableAnalytics, onClickHandler],
+  );
 
   return {
     ref,
     onClick,
   };
-}
+};

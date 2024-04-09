@@ -173,14 +173,17 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const VotingPortalThankYou = ({currentUser, classes}: {
-  currentUser: UsersCurrent,
-  classes: ClassesType<typeof styles>,
+const VotingPortalThankYou = ({
+  currentUser,
+  classes,
+}: {
+  currentUser: UsersCurrent;
+  classes: ClassesType<typeof styles>;
 }) => {
   const updateCurrentUser = useUpdateCurrentUser();
   const [loadingFlair, setLoadingFlair] = useState(false);
-  const {captureEvent} = useTracking();
-  const {width, height} = useWindowSize();
+  const { captureEvent } = useTracking();
+  const { width, height } = useWindowSize();
   const [confetti, setConfetti] = useState(true);
 
   const onConfettiComplete = useCallback(() => {
@@ -194,13 +197,13 @@ const VotingPortalThankYou = ({currentUser, classes}: {
       givingSeason2023VotedFlair: newValue,
     });
     setLoadingFlair(false);
-    captureEvent("setGivingSeasonVotedFlair", {value: newValue});
+    captureEvent("setGivingSeasonVotedFlair", { value: newValue });
   }, [updateCurrentUser, currentUser.givingSeason2023VotedFlair, captureEvent]);
 
-  const {ForumIcon, Loading} = Components;
+  const { ForumIcon, Loading } = Components;
   return (
     <div className={classes.root}>
-      {confetti &&
+      {confetti && (
         <ReactConfetti
           width={width}
           height={height}
@@ -210,33 +213,34 @@ const VotingPortalThankYou = ({currentUser, classes}: {
           recycle={false}
           onConfettiComplete={onConfettiComplete}
         />
-      }
+      )}
       <div className={classes.election}>FAST FORUM ELECTION 2023</div>
       <div className={classes.thankYou}>Thank you for voting!</div>
       <div className={classes.horiz}>
         <div className={classes.voted}>
           <div className={classes.votedRow}>
             {currentUser.displayName}
-            <ForumIcon
-              icon="Voted"
-              className={classes.icon}
-            />
+            <ForumIcon icon="Voted" className={classes.icon} />
           </div>
           <div className={classes.tooltipRow}>
-            <div className={classes.tooltip}>
-              I voted in the Donation Election
-            </div>
+            <div className={classes.tooltip}>I voted in the Donation Election</div>
           </div>
         </div>
-        <div className={classNames(classes.button, {
-              [classes.outlineButton]: currentUser.givingSeason2023VotedFlair,
-            })} role="button" onClick={toggleFlair}>
-          {loadingFlair
-            ? <Loading white />
-            : <><ForumIcon icon="ArrowRight" className={classes.arrowIcon} /> {currentUser.givingSeason2023VotedFlair
-              ? "Remove icon from profile"
-              : "Add icon to your profile"}</>
-          }
+        <div
+          className={classNames(classes.button, {
+            [classes.outlineButton]: currentUser.givingSeason2023VotedFlair,
+          })}
+          role="button"
+          onClick={toggleFlair}
+        >
+          {loadingFlair ? (
+            <Loading white />
+          ) : (
+            <>
+              <ForumIcon icon="ArrowRight" className={classes.arrowIcon} />{" "}
+              {currentUser.givingSeason2023VotedFlair ? "Remove icon from profile" : "Add icon to your profile"}
+            </>
+          )}
         </div>
       </div>
       <div className={classes.hr} />
@@ -248,15 +252,18 @@ const VotingPortalThankYou = ({currentUser, classes}: {
           </Link>
         </div>
         <div className={classes.listRow}>
-          -&gt; <a href="https://www.givingwhatwecan.org/fundraisers/ea-forum-donation-election-fund-2023" target="_blank" rel="noopener noreferrer">
+          -&gt;{" "}
+          <a
+            href="https://www.givingwhatwecan.org/fundraisers/ea-forum-donation-election-fund-2023"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Donate to the Donation Election Fund
           </a>
         </div>
         <div className={classes.listRow}>
           -&gt;
-          <Link to="/giving-portal">
-            Explore other giving opportunities
-          </Link>
+          <Link to="/giving-portal">Explore other giving opportunities</Link>
         </div>
       </div>
       <Link to="/voting-portal/select-candidates" className={classNames(classes.button, classes.whiteButton)}>
@@ -264,13 +271,9 @@ const VotingPortalThankYou = ({currentUser, classes}: {
       </Link>
     </div>
   );
-}
+};
 
-const VotingPortalThankYouComponent = registerComponent(
-  "VotingPortalThankYou",
-  VotingPortalThankYou,
-  {styles},
-);
+const VotingPortalThankYouComponent = registerComponent("VotingPortalThankYou", VotingPortalThankYou, { styles });
 
 declare global {
   interface ComponentTypes {

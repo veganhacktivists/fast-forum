@@ -1,30 +1,31 @@
-import React, { useCallback } from 'react'
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import { useLocation } from '../../lib/routeUtil';
-import { useSingle } from '../../lib/crud/withSingle';
-import { useMulti } from '../../lib/crud/withMulti';
-import { postGetPageUrl } from '../../lib/collections/posts/helpers';
-import { useNavigate } from '../../lib/reactRouterWrapper';
+import React, { useCallback } from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import { useLocation } from "../../lib/routeUtil";
+import { useSingle } from "../../lib/crud/withSingle";
+import { useMulti } from "../../lib/crud/withMulti";
+import { postGetPageUrl } from "../../lib/collections/posts/helpers";
+import { useNavigate } from "../../lib/reactRouterWrapper";
 
 const styles = (theme: ThemeType): JssStyles => ({
-  revisionList: {
-  },
+  revisionList: {},
 });
 
-const PostsRevisionSelect = ({ classes }: {
-  classes: ClassesType
-}) => {
+const PostsRevisionSelect = ({ classes }: { classes: ClassesType }) => {
   const { SingleColumnSection, RevisionSelect, Loading } = Components;
   const { params } = useLocation();
   const navigate = useNavigate();
   const postId = params._id;
-  
+
   const { document: post, loading: loadingPost } = useSingle({
     documentId: postId,
     collectionName: "Posts",
     fragmentName: "PostsDetails",
   });
-  const { results: revisions, loading: loadingRevisions, loadMoreProps } = useMulti({
+  const {
+    results: revisions,
+    loading: loadingRevisions,
+    loadMoreProps,
+  } = useMulti({
     skip: !post,
     terms: {
       view: "revisionsOnDocument",
@@ -35,34 +36,43 @@ const PostsRevisionSelect = ({ classes }: {
     collectionName: "Revisions",
     fragmentName: "RevisionMetadataWithChangeMetrics",
   });
-  
-  const compareRevs = useCallback(({before,after}: {before: RevisionMetadata, after: RevisionMetadata}) => {
-    if (!post) return;
-    navigate(`/compare/post/${post._id}/${post.slug}?before=${before.version}&after=${after.version}`);
-  }, [navigate, post]);
 
-  if (!post) {return null;}
-  
-  return <SingleColumnSection>
-    <h1>{post.title}</h1>
-    
-    {(loadingPost || loadingRevisions) && <Loading/>}
-    
-    <div className={classes.revisionList}>
-      {revisions && <RevisionSelect
-        revisions={revisions}
-        getRevisionUrl={(rev: RevisionMetadata) => `${postGetPageUrl(post)}?revision=${rev.version}`}
-        onPairSelected={compareRevs}
-        loadMoreProps={loadMoreProps}
-      />}
-    </div>
-  </SingleColumnSection>
-}
+  const compareRevs = useCallback(
+    ({ before, after }: { before: RevisionMetadata; after: RevisionMetadata }) => {
+      if (!post) return;
+      navigate(`/compare/post/${post._id}/${post.slug}?before=${before.version}&after=${after.version}`);
+    },
+    [navigate, post],
+  );
 
-const PostsRevisionSelectComponent = registerComponent("PostsRevisionSelect", PostsRevisionSelect, {styles});
+  if (!post) {
+    return null;
+  }
+
+  return (
+    <SingleColumnSection>
+      <h1>{post.title}</h1>
+
+      {(loadingPost || loadingRevisions) && <Loading />}
+
+      <div className={classes.revisionList}>
+        {revisions && (
+          <RevisionSelect
+            revisions={revisions}
+            getRevisionUrl={(rev: RevisionMetadata) => `${postGetPageUrl(post)}?revision=${rev.version}`}
+            onPairSelected={compareRevs}
+            loadMoreProps={loadMoreProps}
+          />
+        )}
+      </div>
+    </SingleColumnSection>
+  );
+};
+
+const PostsRevisionSelectComponent = registerComponent("PostsRevisionSelect", PostsRevisionSelect, { styles });
 
 declare global {
   interface ComponentTypes {
-    PostsRevisionSelect: typeof PostsRevisionSelectComponent
+    PostsRevisionSelect: typeof PostsRevisionSelectComponent;
   }
 }

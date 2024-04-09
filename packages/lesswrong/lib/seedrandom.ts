@@ -27,26 +27,32 @@
 function Alea(seed: string) {
   // @ts-ignore
   var me = this,
-      mash = getMash();
+    mash = getMash();
 
-  me.next = function() {
-    var t = (2091639 * me.s0) + (me.c * 2.3283064365386963e-10); // 2^-32
+  me.next = function () {
+    var t = 2091639 * me.s0 + me.c * 2.3283064365386963e-10; // 2^-32
     me.s0 = me.s1;
     me.s1 = me.s2;
-    return me.s2 = t - (me.c = t | 0);
+    return (me.s2 = t - (me.c = t | 0));
   };
 
   // Apply the seeding algorithm from Baagoe.
   me.c = 1;
-  me.s0 = mash(' ');
-  me.s1 = mash(' ');
-  me.s2 = mash(' ');
+  me.s0 = mash(" ");
+  me.s1 = mash(" ");
+  me.s2 = mash(" ");
   me.s0 -= mash(seed);
-  if (me.s0 < 0) { me.s0 += 1; }
+  if (me.s0 < 0) {
+    me.s0 += 1;
+  }
   me.s1 -= mash(seed);
-  if (me.s1 < 0) { me.s1 += 1; }
+  if (me.s1 < 0) {
+    me.s1 += 1;
+  }
   me.s2 -= mash(seed);
-  if (me.s2 < 0) { me.s2 += 1; }
+  if (me.s2 < 0) {
+    me.s2 += 1;
+  }
 }
 
 function copy(f: any, t: any) {
@@ -60,10 +66,12 @@ function copy(f: any, t: any) {
 function impl(seed: string) {
   // @ts-ignore
   var xg = new Alea(seed),
-      prng = xg.next;
-  prng.int32 = function() { return (xg.next() * 0x100000000) | 0; }
-  prng.double = function() {
-    return prng() + ((prng() * 0x200000 | 0) * 1.1102230246251565e-16); // 2^-53
+    prng = xg.next;
+  prng.int32 = function () {
+    return (xg.next() * 0x100000000) | 0;
+  };
+  prng.double = function () {
+    return prng() + ((prng() * 0x200000) | 0) * 1.1102230246251565e-16; // 2^-53
   };
   prng.quick = prng;
   return prng;
@@ -72,7 +80,7 @@ function impl(seed: string) {
 function getMash() {
   var n = 0xefc8249d;
 
-  var mash = function(data: string): number {
+  var mash = function (data: string): number {
     data = String(data);
     for (var i = 0; i < data.length; i++) {
       n += data.charCodeAt(i);

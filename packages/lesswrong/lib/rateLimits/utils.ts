@@ -1,23 +1,38 @@
-import groupBy from "lodash/groupBy"
-import uniq from "lodash/uniq"
-import moment from "moment"
-import { forumSelect } from "../forumTypeUtils"
-import { userIsAdmin, userIsMemberOf } from "../vulcan-users"
-import { autoCommentRateLimits, autoPostRateLimits } from "./constants"
-import { AutoRateLimit, RateLimitComparison, RateLimitFeatures, RateLimitInfo, RateLimitUser, RecentKarmaInfo, RecentVoteInfo, TimeframeUnitType, UserKarmaInfo, UserKarmaInfoWindow } from "./types"
-import { getDownvoteRatio } from "../../components/sunshineDashboard/UsersReviewInfoCard"
-import { ModeratorActions } from "../collections/moderatorActions"
-import { EXEMPT_FROM_RATE_LIMITS } from "../collections/moderatorActions/schema"
+import groupBy from "lodash/groupBy";
+import uniq from "lodash/uniq";
+import moment from "moment";
+import { forumSelect } from "../forumTypeUtils";
+import { userIsAdmin, userIsMemberOf } from "../vulcan-users";
+import { autoCommentRateLimits, autoPostRateLimits } from "./constants";
+import {
+  AutoRateLimit,
+  RateLimitComparison,
+  RateLimitFeatures,
+  RateLimitInfo,
+  RateLimitUser,
+  RecentKarmaInfo,
+  RecentVoteInfo,
+  TimeframeUnitType,
+  UserKarmaInfo,
+  UserKarmaInfoWindow,
+} from "./types";
+import { getDownvoteRatio } from "../../components/sunshineDashboard/UsersReviewInfoCard";
+import { ModeratorActions } from "../collections/moderatorActions";
+import { EXEMPT_FROM_RATE_LIMITS } from "../collections/moderatorActions/schema";
 
-export function getModRateLimitInfo(documents: Array<DbPost|DbComment>, modRateLimitHours: number, itemsPerTimeframe: number): RateLimitInfo|null {
-  if (modRateLimitHours <= 0) return null
-  const nextEligible = getNextAbleToSubmitDate(documents, "hours", modRateLimitHours, itemsPerTimeframe)
-  if (!nextEligible) return null
+export function getModRateLimitInfo(
+  documents: Array<DbPost | DbComment>,
+  modRateLimitHours: number,
+  itemsPerTimeframe: number,
+): RateLimitInfo | null {
+  if (modRateLimitHours <= 0) return null;
+  const nextEligible = getNextAbleToSubmitDate(documents, "hours", modRateLimitHours, itemsPerTimeframe);
+  if (!nextEligible) return null;
   return {
     nextEligible,
     rateLimitMessage: "A moderator has rate limited you.",
-    rateLimitType: "moderator"
-  }
+    rateLimitType: "moderator",
+  };
 }
 
 export function getManualRateLimitIntervalHours(userRateLimit: DbUserRateLimit | null): number {
@@ -26,158 +41,192 @@ export function getManualRateLimitIntervalHours(userRateLimit: DbUserRateLimit |
 }
 
 export function getMaxAutoLimitHours(rateLimits?: Array<AutoRateLimit>) {
-  if (!rateLimits) return 0
-  return Math.max(...rateLimits.map(({timeframeLength, timeframeUnit}) => {
-    return moment.duration(timeframeLength, timeframeUnit).asHours()
-  }))
+  if (!rateLimits) return 0;
+  return Math.max(
+    ...rateLimits.map(({ timeframeLength, timeframeUnit }) => {
+      return moment.duration(timeframeLength, timeframeUnit).asHours();
+    }),
+  );
 }
 
 export async function shouldIgnorePostRateLimit(user: DbUser) {
-  if (userIsAdmin(user) || userIsMemberOf(user, "sunshineRegiment") || userIsMemberOf(user, "canBypassPostRateLimit")) return true
+  if (userIsAdmin(user) || userIsMemberOf(user, "sunshineRegiment") || userIsMemberOf(user, "canBypassPostRateLimit"))
+    return true;
 
   const isRateLimitExempt = await ModeratorActions.findOne({
     userId: user._id,
     type: EXEMPT_FROM_RATE_LIMITS,
-    endedAt: { $gt: new Date() }
-  })
-  if (isRateLimitExempt) return true
-  
-  return false
+    endedAt: { $gt: new Date() },
+  });
+  if (isRateLimitExempt) return true;
+
+  return false;
 }
 
-export function getStrictestRateLimitInfo(rateLimits: Array<RateLimitInfo|null>): RateLimitInfo | null {
-  const nonNullRateLimits = rateLimits.filter((rateLimit): rateLimit is RateLimitInfo => rateLimit !== null)
+export function getStrictestRateLimitInfo(rateLimits: Array<RateLimitInfo | null>): RateLimitInfo | null {
+  const nonNullRateLimits = rateLimits.filter((rateLimit): rateLimit is RateLimitInfo => rateLimit !== null);
   const sortedRateLimits = nonNullRateLimits.sort((a, b) => b.nextEligible.getTime() - a.nextEligible.getTime());
   return sortedRateLimits[0] ?? null;
 }
 
-export function getManualRateLimitInfo(userRateLimit: DbUserRateLimit|null, documents: Array<DbPost|DbComment>): RateLimitInfo|null {
-  if (!userRateLimit) return null
-  const nextEligible = getNextAbleToSubmitDate(documents, userRateLimit.intervalUnit, userRateLimit.intervalLength, userRateLimit.actionsPerInterval)
-  if (!nextEligible) return null
+export function getManualRateLimitInfo(
+  userRateLimit: DbUserRateLimit | null,
+  documents: Array<DbPost | DbComment>,
+): RateLimitInfo | null {
+  if (!userRateLimit) return null;
+  const nextEligible = getNextAbleToSubmitDate(
+    documents,
+    userRateLimit.intervalUnit,
+    userRateLimit.intervalLength,
+    userRateLimit.actionsPerInterval,
+  );
+  if (!nextEligible) return null;
   return {
     nextEligible,
     rateLimitType: "moderator",
-    rateLimitMessage: "A moderator has rate limited you."
-  }
+    rateLimitMessage: "A moderator has rate limited you.",
+  };
 }
 
-export function getNextAbleToSubmitDate(documents: Array<DbPost|DbComment>, timeframeUnit: TimeframeUnitType, timeframeLength: number, itemsPerTimeframe: number): Date|null {
+export function getNextAbleToSubmitDate(
+  documents: Array<DbPost | DbComment>,
+  timeframeUnit: TimeframeUnitType,
+  timeframeLength: number,
+  itemsPerTimeframe: number,
+): Date | null {
   // make sure documents are sorted by descending date
-  const sortedDocs = documents.sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime())
-  const docsInTimeframe = sortedDocs.filter(doc => doc.postedAt > moment().subtract(timeframeLength, timeframeUnit).toDate())
-  const doc = docsInTimeframe[itemsPerTimeframe - 1]
-  if (!doc) return null 
-  return moment(doc.postedAt).add(timeframeLength, timeframeUnit).toDate()
+  const sortedDocs = documents.sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime());
+  const docsInTimeframe = sortedDocs.filter(
+    (doc) => doc.postedAt > moment().subtract(timeframeLength, timeframeUnit).toDate(),
+  );
+  const doc = docsInTimeframe[itemsPerTimeframe - 1];
+  if (!doc) return null;
+  return moment(doc.postedAt).add(timeframeLength, timeframeUnit).toDate();
 }
 
-export function getAutoRateLimitInfo(user: RateLimitUser, features: RateLimitFeatures, rateLimit: AutoRateLimit,  documents: Array<DbPost|DbComment>): RateLimitInfo|null {
+export function getAutoRateLimitInfo(
+  user: RateLimitUser,
+  features: RateLimitFeatures,
+  rateLimit: AutoRateLimit,
+  documents: Array<DbPost | DbComment>,
+): RateLimitInfo | null {
   // rate limit effects
-  const { timeframeUnit, timeframeLength, itemsPerTimeframe, rateLimitMessage, rateLimitType } = rateLimit 
+  const { timeframeUnit, timeframeLength, itemsPerTimeframe, rateLimitMessage, rateLimitType } = rateLimit;
 
-  if (!rateLimit.isActive(user, features)) return null 
+  if (!rateLimit.isActive(user, features)) return null;
 
-  const nextEligible = getNextAbleToSubmitDate(documents, timeframeUnit, timeframeLength, itemsPerTimeframe)
-  if (!nextEligible) return null 
-  return { nextEligible, rateLimitType, rateLimitMessage }
+  const nextEligible = getNextAbleToSubmitDate(documents, timeframeUnit, timeframeLength, itemsPerTimeframe);
+  if (!nextEligible) return null;
+  return { nextEligible, rateLimitType, rateLimitMessage };
 }
 
-function getVotesOnLatestDocuments (votes: RecentVoteInfo[], numItems=20): RecentVoteInfo[] {
+function getVotesOnLatestDocuments(votes: RecentVoteInfo[], numItems = 20): RecentVoteInfo[] {
   // sort the votes via the date of the *postedAt* (joined from )
-  const sortedVotes = votes.sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime())
-  
-  const uniqueDocumentIds = uniq(sortedVotes.map((vote) => vote.documentId))
-  const latestDocumentIds = new Set(uniqueDocumentIds.slice(0, numItems))
+  const sortedVotes = votes.sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime());
+
+  const uniqueDocumentIds = uniq(sortedVotes.map((vote) => vote.documentId));
+  const latestDocumentIds = new Set(uniqueDocumentIds.slice(0, numItems));
 
   // get all votes whose documentId is in the top 20 most recent documents
-  return sortedVotes.filter((vote) => latestDocumentIds.has(vote.documentId))
+  return sortedVotes.filter((vote) => latestDocumentIds.has(vote.documentId));
 }
 
-function getDownvoterCount (votes: RecentVoteInfo[]) {
-  const downvoters = votes.filter((vote: RecentVoteInfo) => vote.power < 0 && vote.totalDocumentKarma <= 0).map((vote: RecentVoteInfo) => vote.userId)
-  return uniq(downvoters).length
+function getDownvoterCount(votes: RecentVoteInfo[]) {
+  const downvoters = votes
+    .filter((vote: RecentVoteInfo) => vote.power < 0 && vote.totalDocumentKarma <= 0)
+    .map((vote: RecentVoteInfo) => vote.userId);
+  return uniq(downvoters).length;
 }
 
-export function calculateRecentKarmaInfo(userId: string, allVotes: RecentVoteInfo[]): RecentKarmaInfo  {
-  const top20DocumentVotes = getVotesOnLatestDocuments(allVotes)
-  
+export function calculateRecentKarmaInfo(userId: string, allVotes: RecentVoteInfo[]): RecentKarmaInfo {
+  const top20DocumentVotes = getVotesOnLatestDocuments(allVotes);
+
   // We filter out the user's self-upvotes here, rather than in the query, because
-  // otherwise the getLatest20contentItems won't know about all the relevant posts and comments. 
+  // otherwise the getLatest20contentItems won't know about all the relevant posts and comments.
   // i.e. if a user comments 20 times, and nobody upvotes them, we wouldn't know to include them in the sorted list
   // (the alternative here would be making an additional query for all posts/comments, regardless of who voted on them,
   // which seemed at least as expensive as filtering out the self-votes here)
-  const nonuserIDallVotes = allVotes.filter((vote: RecentVoteInfo) => vote.userId !== userId)
-  const nonUserIdTop20DocVotes = top20DocumentVotes.filter((vote: RecentVoteInfo) => vote.userId !== userId)
-  const postVotes = nonuserIDallVotes.filter(vote => vote.collectionName === "Posts")
-  const commentVotes = nonuserIDallVotes.filter(vote => vote.collectionName === "Comments")
+  const nonuserIDallVotes = allVotes.filter((vote: RecentVoteInfo) => vote.userId !== userId);
+  const nonUserIdTop20DocVotes = top20DocumentVotes.filter((vote: RecentVoteInfo) => vote.userId !== userId);
+  const postVotes = nonuserIDallVotes.filter((vote) => vote.collectionName === "Posts");
+  const commentVotes = nonuserIDallVotes.filter((vote) => vote.collectionName === "Comments");
 
-  const oneMonthAgo = moment().subtract(30, 'days').toDate();
-  const lastMonthVotes = nonUserIdTop20DocVotes.filter(vote => vote.postedAt > oneMonthAgo)
-  const lastMonthKarma = lastMonthVotes.reduce((sum: number, vote: RecentVoteInfo) => sum + vote.power, 0)
+  const oneMonthAgo = moment().subtract(30, "days").toDate();
+  const lastMonthVotes = nonUserIdTop20DocVotes.filter((vote) => vote.postedAt > oneMonthAgo);
+  const lastMonthKarma = lastMonthVotes.reduce((sum: number, vote: RecentVoteInfo) => sum + vote.power, 0);
 
-  const last20Karma = nonUserIdTop20DocVotes.reduce((sum: number, vote: RecentVoteInfo) => sum + vote.power, 0)
-  const last20PostKarma = postVotes.reduce((sum: number, vote: RecentVoteInfo) => sum + vote.power, 0)
-  const last20CommentKarma = commentVotes.reduce((sum: number, vote: RecentVoteInfo) => sum + vote.power, 0)
+  const last20Karma = nonUserIdTop20DocVotes.reduce((sum: number, vote: RecentVoteInfo) => sum + vote.power, 0);
+  const last20PostKarma = postVotes.reduce((sum: number, vote: RecentVoteInfo) => sum + vote.power, 0);
+  const last20CommentKarma = commentVotes.reduce((sum: number, vote: RecentVoteInfo) => sum + vote.power, 0);
 
-  const downvoterCount = getDownvoterCount(nonUserIdTop20DocVotes)
-  const commentDownvoterCount = getDownvoterCount(commentVotes)
-  const postDownvoterCount = getDownvoterCount(postVotes)
-  const lastMonthDownvoterCount = getDownvoterCount(lastMonthVotes)
-  
-  return { 
-    last20Karma, 
+  const downvoterCount = getDownvoterCount(nonUserIdTop20DocVotes);
+  const commentDownvoterCount = getDownvoterCount(commentVotes);
+  const postDownvoterCount = getDownvoterCount(postVotes);
+  const lastMonthDownvoterCount = getDownvoterCount(lastMonthVotes);
+
+  return {
+    last20Karma,
     lastMonthKarma,
     last20PostKarma,
     last20CommentKarma,
-    downvoterCount: downvoterCount ?? 0, 
+    downvoterCount: downvoterCount ?? 0,
     postDownvoterCount: postDownvoterCount ?? 0,
     commentDownvoterCount: commentDownvoterCount ?? 0,
-    lastMonthDownvoterCount: lastMonthDownvoterCount ?? 0
-  }
+    lastMonthDownvoterCount: lastMonthDownvoterCount ?? 0,
+  };
 }
 
-function getRateLimitName (rateLimit: AutoRateLimit) {
-  let rateLimitName = `${rateLimit.itemsPerTimeframe} ${rateLimit.actionType} per ${rateLimit.timeframeLength} ${rateLimit.timeframeUnit}`
-  return rateLimitName += ` (via function: ${rateLimit.isActive.toString()})`
+function getRateLimitName(rateLimit: AutoRateLimit) {
+  let rateLimitName = `${rateLimit.itemsPerTimeframe} ${rateLimit.actionType} per ${rateLimit.timeframeLength} ${rateLimit.timeframeUnit}`;
+  return (rateLimitName += ` (via function: ${rateLimit.isActive.toString()})`);
 }
 
-function getActiveRateLimits<T extends AutoRateLimit>(user: UserKarmaInfo & { recentKarmaInfo: RecentKarmaInfo }, autoRateLimits: T[]) {
-  const nonUniversalLimits = autoRateLimits.filter(rateLimit => rateLimit.rateLimitType !== "universal")
-  return nonUniversalLimits.filter(rateLimit => (!rateLimit.isActive(user, {...user.recentKarmaInfo, downvoteRatio: getDownvoteRatio(user)})))
+function getActiveRateLimits<T extends AutoRateLimit>(
+  user: UserKarmaInfo & { recentKarmaInfo: RecentKarmaInfo },
+  autoRateLimits: T[],
+) {
+  const nonUniversalLimits = autoRateLimits.filter((rateLimit) => rateLimit.rateLimitType !== "universal");
+  return nonUniversalLimits.filter(
+    (rateLimit) => !rateLimit.isActive(user, { ...user.recentKarmaInfo, downvoteRatio: getDownvoteRatio(user) }),
+  );
 }
 
 export function getActiveRateLimitNames(user: SunshineUsersList, autoRateLimits: AutoRateLimit[]) {
-  return getActiveRateLimits(user, autoRateLimits).map(rateLimit => getRateLimitName(rateLimit))
+  return getActiveRateLimits(user, autoRateLimits).map((rateLimit) => getRateLimitName(rateLimit));
 }
 
-export function getStrictestActiveRateLimitNames (user: UserKarmaInfo & { recentKarmaInfo: RecentKarmaInfo }, autoRateLimits: AutoRateLimit[]) {
-  const activeRateLimits = getActiveRateLimits(user, autoRateLimits)
+export function getStrictestActiveRateLimitNames(
+  user: UserKarmaInfo & { recentKarmaInfo: RecentKarmaInfo },
+  autoRateLimits: AutoRateLimit[],
+) {
+  const activeRateLimits = getActiveRateLimits(user, autoRateLimits);
   const rateLimitsByType = Object.values(
-    groupBy(activeRateLimits, rateLimit => `${rateLimit.timeframeUnit}${rateLimit.actionType}`)
-  )
-  const strictestRateLimits = Object.values(rateLimitsByType).map(rateLimit => {
+    groupBy(activeRateLimits, (rateLimit) => `${rateLimit.timeframeUnit}${rateLimit.actionType}`),
+  );
+  const strictestRateLimits = Object.values(rateLimitsByType).map((rateLimit) => {
     return rateLimit.sort((a, b) => {
-      const rateLimitASeverity = a.itemsPerTimeframe/a.timeframeLength
-      const rateLimitBSeverity = b.itemsPerTimeframe/b.timeframeLength
-      return rateLimitASeverity - rateLimitBSeverity
-    })[0]
-  })
-  return strictestRateLimits.map(rateLimit => getRateLimitName(rateLimit))
+      const rateLimitASeverity = a.itemsPerTimeframe / a.timeframeLength;
+      const rateLimitBSeverity = b.itemsPerTimeframe / b.timeframeLength;
+      return rateLimitASeverity - rateLimitBSeverity;
+    })[0];
+  });
+  return strictestRateLimits.map((rateLimit) => getRateLimitName(rateLimit));
 }
 
 function sortRateLimitsByTimeframe<T extends AutoRateLimit>(rateLimits: T[]) {
   const now = Date.now();
 
-  return [...rateLimits].sort((a, b) => (
+  return [...rateLimits].sort((a, b) =>
     moment(now)
       .add(b.timeframeLength / b.itemsPerTimeframe, b.timeframeUnit)
-      .diff(
-        moment(now).add(a.timeframeLength / a.itemsPerTimeframe, a.timeframeUnit)
-      )
-  ));
+      .diff(moment(now).add(a.timeframeLength / a.itemsPerTimeframe, a.timeframeUnit)),
+  );
 }
 
-function areNewRateLimitsStricter<T extends AutoRateLimit>(newRateLimits: T[], oldRateLimits: T[]): RateLimitComparison<T> {
+function areNewRateLimitsStricter<T extends AutoRateLimit>(
+  newRateLimits: T[],
+  oldRateLimits: T[],
+): RateLimitComparison<T> {
   if (newRateLimits.length === 0) {
     return { isStricter: false };
   }
@@ -192,8 +241,16 @@ function areNewRateLimitsStricter<T extends AutoRateLimit>(newRateLimits: T[], o
     return { isStricter: true, strictestNewRateLimit };
   }
 
-  const { timeframeLength: newLength, timeframeUnit: newUnit, itemsPerTimeframe: newItemsPerTimeframe } = strictestNewRateLimit;
-  const { timeframeLength: oldLength, timeframeUnit: oldUnit, itemsPerTimeframe: oldItemsPerTimeframe } = strictestOldRateLimit;
+  const {
+    timeframeLength: newLength,
+    timeframeUnit: newUnit,
+    itemsPerTimeframe: newItemsPerTimeframe,
+  } = strictestNewRateLimit;
+  const {
+    timeframeLength: oldLength,
+    timeframeUnit: oldUnit,
+    itemsPerTimeframe: oldItemsPerTimeframe,
+  } = strictestOldRateLimit;
 
   const newRateLimitMoment = moment(now).add(newLength / newItemsPerTimeframe, newUnit);
   const oldRateLimitMoment = moment(now).add(oldLength / oldItemsPerTimeframe, oldUnit);
@@ -206,14 +263,18 @@ function areNewRateLimitsStricter<T extends AutoRateLimit>(newRateLimits: T[], o
   }
 }
 
-export function getCurrentAndPreviousUserKarmaInfo(user: DbUser, currentVotes: RecentVoteInfo[], previousVotes: RecentVoteInfo[]): UserKarmaInfoWindow {
+export function getCurrentAndPreviousUserKarmaInfo(
+  user: DbUser,
+  currentVotes: RecentVoteInfo[],
+  previousVotes: RecentVoteInfo[],
+): UserKarmaInfoWindow {
   const currentKarmaInfo = calculateRecentKarmaInfo(user._id, currentVotes);
   const previousKarmaInfo = calculateRecentKarmaInfo(user._id, previousVotes);
 
   // Adjust the user's karma back to what it was before the most recent vote
   // This doesn't always handle the case where the voter is modifying an existing vote's strength correctly, but we don't really care about those
   const mostRecentVotePower = currentVotes[0].power;
-  const previousUserKarma = (user.karma) - mostRecentVotePower;
+  const previousUserKarma = user.karma - mostRecentVotePower;
 
   const currentUserKarmaInfo = { ...user, recentKarmaInfo: currentKarmaInfo };
   const previousUserKarmaInfo = { ...user, recentKarmaInfo: previousKarmaInfo, karma: previousUserKarma };
@@ -239,9 +300,13 @@ export function getRateLimitStrictnessComparisons(userKarmaInfoWindow: UserKarma
   return { commentRateLimitComparison, postRateLimitComparison };
 }
 
-export function documentOnlyHasSelfVote(userId: string, mostRecentVoteInfo: RecentVoteInfo, allVoteInfo: RecentVoteInfo[]) {
+export function documentOnlyHasSelfVote(
+  userId: string,
+  mostRecentVoteInfo: RecentVoteInfo,
+  allVoteInfo: RecentVoteInfo[],
+) {
   return (
     mostRecentVoteInfo.userId === userId &&
-    allVoteInfo.filter(v => v.userId === userId && v.documentId === mostRecentVoteInfo.documentId).length === 1
+    allVoteInfo.filter((v) => v.userId === userId && v.documentId === mostRecentVoteInfo.documentId).length === 1
   );
 }

@@ -5,7 +5,11 @@ import { votingPortalStyles } from "./styles";
 import { useCurrentUser } from "../../common/withUser";
 import { useLocation } from "../../../lib/routeUtil";
 import { makeCloudinaryImageUrl } from "../../common/CloudinaryImage2";
-import { eaGivingSeason23ElectionName, userCanVoteInDonationElection, votingThankYouImageId } from "../../../lib/eaGivingSeason";
+import {
+  eaGivingSeason23ElectionName,
+  userCanVoteInDonationElection,
+  votingThankYouImageId,
+} from "../../../lib/eaGivingSeason";
 import Helmet from "react-helmet";
 import classNames from "classnames";
 import { useElectionVote } from "./hooks";
@@ -32,12 +36,12 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const EAVotingPortalPage = ({classes}: {
-  classes: ClassesType<typeof styles>,
-}) => {
+const EAVotingPortalPage = ({ classes }: { classes: ClassesType<typeof styles> }) => {
   const { Loading, VotingPortalIntro, VotingPortalThankYou } = Components;
 
-  const {location: {search}} = useLocation();
+  const {
+    location: { search },
+  } = useLocation();
   const params = new URLSearchParams(search);
   const { electionVote, loading } = useElectionVote(eaGivingSeason23ElectionName);
   const currentUser = useCurrentUser();
@@ -45,33 +49,25 @@ const EAVotingPortalPage = ({classes}: {
   if (loading && userCanVoteInDonationElection(currentUser)) return <Loading />;
 
   const thankyouParam = params.get("thankyou");
-  const isThankYouPage = currentUser && (thankyouParam === "true" || (!thankyouParam && !!electionVote?.submittedAt))
+  const isThankYouPage = currentUser && (thankyouParam === "true" || (!thankyouParam && !!electionVote?.submittedAt));
 
   return (
-    <AnalyticsContext
-      pageContext="eaVotingPortal"
-      pageSectionContext={isThankYouPage ? "thankyou" : "intro"}
-    >
+    <AnalyticsContext pageContext="eaVotingPortal" pageSectionContext={isThankYouPage ? "thankyou" : "intro"}>
       <Helmet>
         <link rel="preload" as="image" href={BACKGROUND_IMAGE} />
       </Helmet>
-      <div className={classNames(classes.root, classes.layout, {
-        [classes.thankYouBackground]: isThankYouPage,
-      })}>
-        {isThankYouPage
-          ? <VotingPortalThankYou currentUser={currentUser} />
-          : <VotingPortalIntro />
-        }
+      <div
+        className={classNames(classes.root, classes.layout, {
+          [classes.thankYouBackground]: isThankYouPage,
+        })}
+      >
+        {isThankYouPage ? <VotingPortalThankYou currentUser={currentUser} /> : <VotingPortalIntro />}
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const EAVotingPortalPageComponent = registerComponent(
-  "EAVotingPortalPage",
-  EAVotingPortalPage,
-  {styles},
-);
+const EAVotingPortalPageComponent = registerComponent("EAVotingPortalPage", EAVotingPortalPage, { styles });
 
 declare global {
   interface ComponentTypes {

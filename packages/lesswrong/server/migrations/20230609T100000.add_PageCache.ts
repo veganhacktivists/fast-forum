@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-05-24T18:34:35.000Z by 20230524T183435.add_hidePostsRecommendations_field.ts
  * +-- Overall schema hash: ce7fb195e89571423db77ebabc3e5083
- *  
+ *
  * @@ -419,2 +417,16 @@ CREATE TABLE "Notifications" (
- *  
+ *
  * +-- Schema for "PageCache", hash: e63a25c981008d7980870066afa7142e
  * +CREATE TABLE "PageCache" (
  * +    _id varchar(27) PRIMARY KEY,
@@ -30,7 +30,7 @@
  * +);
  * +
  *  -- Schema for "PetrovDayLaunchs", hash: 5b1dee358cd18fda79006cc24eb465b6
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -41,13 +41,13 @@
  */
 export const acceptsSchemaHash = "8f9b37b6b8213a24c21dba39e77f7bbb";
 
-import PageCache from "../../lib/collections/pagecache/collection"
-import { createTable, dropTable } from "./meta/utils"
+import PageCache from "../../lib/collections/pagecache/collection";
+import { createTable, dropTable } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await createTable(db, PageCache)
-}
+export const up = async ({ db }: MigrationContext) => {
+  await createTable(db, PageCache);
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropTable(db, PageCache)
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropTable(db, PageCache);
+};

@@ -68,16 +68,16 @@ export default abstract class AbstractRepo<N extends CollectionNameString> {
   private postProcess(promise: Promise<ObjectsByCollectionName[N]>): Promise<ObjectsByCollectionName[N]>;
   private postProcess(promise: Promise<ObjectsByCollectionName[N] | null>): Promise<ObjectsByCollectionName[N] | null>;
   private postProcess(promise: Promise<ObjectsByCollectionName[N][]>): Promise<ObjectsByCollectionName[N][]>;
-  private postProcess(promise: Promise<ObjectsByCollectionName[N][] | null>): Promise<ObjectsByCollectionName[N][] | null>;
+  private postProcess(
+    promise: Promise<ObjectsByCollectionName[N][] | null>,
+  ): Promise<ObjectsByCollectionName[N][] | null>;
   private async postProcess(
     promise: Promise<ObjectsByCollectionName[N] | ObjectsByCollectionName[N][] | null>,
   ): Promise<ObjectsByCollectionName[N] | ObjectsByCollectionName[N][] | null> {
     const data = await promise;
-    const {postProcess} = this.getCollection();
+    const { postProcess } = this.getCollection();
     if (data && postProcess) {
-      return Array.isArray(data)
-        ? data.map((item) => postProcess(item))
-        : postProcess(data);
+      return Array.isArray(data) ? data.map((item) => postProcess(item)) : postProcess(data);
     }
     return data;
   }

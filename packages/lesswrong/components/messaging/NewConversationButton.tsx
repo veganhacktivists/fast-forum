@@ -1,10 +1,10 @@
-import React, { MouseEvent, ReactNode, useCallback, useEffect } from 'react';
-import { registerComponent } from '../../lib/vulcan-lib';
-import qs from 'qs';
-import { useDialog } from '../common/withDialog';
-import { useNavigate } from '../../lib/reactRouterWrapper';
-import { useInitiateConversation } from '../hooks/useInitiateConversation';
-import { userCanStartConversations } from '../../lib/collections/conversations/collection';
+import React, { MouseEvent, ReactNode, useCallback, useEffect } from "react";
+import { registerComponent } from "../../lib/vulcan-lib";
+import qs from "qs";
+import { useDialog } from "../common/withDialog";
+import { useNavigate } from "../../lib/reactRouterWrapper";
+import { useInitiateConversation } from "../hooks/useInitiateConversation";
+import { userCanStartConversations } from "../../lib/collections/conversations/collection";
 
 export interface TemplateQueryStrings {
   templateId: string;
@@ -12,70 +12,71 @@ export interface TemplateQueryStrings {
 }
 
 // Button used to start a new conversation for a given user
-const NewConversationButton = ({ user, currentUser, children, from, includeModerators, templateQueries, embedConversation }: {
+const NewConversationButton = ({
+  user,
+  currentUser,
+  children,
+  from,
+  includeModerators,
+  templateQueries,
+  embedConversation,
+}: {
   user: {
-    _id: string
-  },
-  currentUser: UsersCurrent|null,
-  templateQueries?: TemplateQueryStrings,
-  from?: string,
-  children: ReactNode,
-  includeModerators?: boolean,
-  embedConversation?: (conversationId: string, templateQueries?: TemplateQueryStrings) => void
+    _id: string;
+  };
+  currentUser: UsersCurrent | null;
+  templateQueries?: TemplateQueryStrings;
+  from?: string;
+  children: ReactNode;
+  includeModerators?: boolean;
+  embedConversation?: (conversationId: string, templateQueries?: TemplateQueryStrings) => void;
 }) => {
   const navigate = useNavigate();
-  const { openDialog } = useDialog()
-  const { conversation, initiateConversation } = useInitiateConversation({ includeModerators })
+  const { openDialog } = useDialog();
+  const { conversation, initiateConversation } = useInitiateConversation({ includeModerators });
 
   const getTemplateParams = useCallback(() => {
-    let templateParams: Array<string> = []
+    let templateParams: Array<string> = [];
     if (templateQueries) {
-      templateParams.push(qs.stringify(templateQueries))
+      templateParams.push(qs.stringify(templateQueries));
     }
     if (from) {
-      templateParams.push(`from=${from}`)
+      templateParams.push(`from=${from}`);
     }
-    return templateParams.length > 0 ? {search:`?${templateParams.join('&')}`} : {}
-  }, [from, templateQueries])
+    return templateParams.length > 0 ? { search: `?${templateParams.join("&")}` } : {};
+  }, [from, templateQueries]);
 
   // Navigate to the conversation that is created
   useEffect(() => {
     if (!conversation) return;
 
     if (embedConversation) {
-      embedConversation(conversation._id, templateQueries)
+      embedConversation(conversation._id, templateQueries);
     } else {
-      const templateParams = getTemplateParams()
-      navigate({pathname: `/inbox/${conversation._id}`, ...templateParams})
+      const templateParams = getTemplateParams();
+      navigate({ pathname: `/inbox/${conversation._id}`, ...templateParams });
     }
-  }, [conversation, embedConversation, getTemplateParams, navigate, templateQueries])
+  }, [conversation, embedConversation, getTemplateParams, navigate, templateQueries]);
 
   const handleClick = currentUser
     ? (e: MouseEvent) => {
-      initiateConversation(user._id)
-      e.stopPropagation()
-    }
-    : () => openDialog({componentName: "LoginPopup"})
+        initiateConversation(user._id);
+        e.stopPropagation();
+      }
+    : () => openDialog({ componentName: "LoginPopup" });
 
-  if (currentUser && !userCanStartConversations(currentUser)) return null
+  if (currentUser && !userCanStartConversations(currentUser)) return null;
 
   // in this case we show the button, but we don't actually let them create a conversation with themselves
-  if (currentUser?._id === user._id)
-    return <div>
-      {children}
-    </div>
+  if (currentUser?._id === user._id) return <div>{children}</div>;
 
-  return (
-    <div onClick={handleClick}>
-      {children}
-    </div>
-  )
-}
+  return <div onClick={handleClick}>{children}</div>;
+};
 
-const NewConversationButtonComponent = registerComponent('NewConversationButton', NewConversationButton);
+const NewConversationButtonComponent = registerComponent("NewConversationButton", NewConversationButton);
 
 declare global {
   interface ComponentTypes {
-    NewConversationButton: typeof NewConversationButtonComponent
+    NewConversationButton: typeof NewConversationButtonComponent;
   }
 }

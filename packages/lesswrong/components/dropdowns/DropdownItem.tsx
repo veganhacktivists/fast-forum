@@ -56,33 +56,36 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-export type DropdownItemAction = {
-  onClick: (event: MouseEvent) => void | Promise<void>,
-  to?: never,
-} | {
-  onClick?: never,
-  to: HashLinkProps["to"],
-}
+export type DropdownItemAction =
+  | {
+      onClick: (event: MouseEvent) => void | Promise<void>;
+      to?: never;
+    }
+  | {
+      onClick?: never;
+      to: HashLinkProps["to"];
+    };
 
 export type DropdownItemProps = DropdownItemAction & {
-  title: string,
-  sideMessage?: string,
-  icon?: ForumIconName | (() => ReactElement),
-  iconClassName?: string,
-  afterIcon?: ForumIconName,
-  tooltip?: string,
-  disabled?: boolean,
-  loading?: boolean,
-  rawLink?: boolean,
-}
+  title: string;
+  sideMessage?: string;
+  icon?: ForumIconName | (() => ReactElement);
+  iconClassName?: string;
+  afterIcon?: ForumIconName;
+  tooltip?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  rawLink?: boolean;
+};
 
-const DummyWrapper: FC<{className?: string}> = ({className, children}) =>
-  <div className={className}>{children}</div>;
+const DummyWrapper: FC<{ className?: string }> = ({ className, children }) => (
+  <div className={className}>{children}</div>
+);
 
 const RawLink: FC<{
-  to: string,
-  className?: string,
-}> = ({to, className, children}) => (
+  to: string;
+  className?: string;
+}> = ({ to, className, children }) => (
   <a href={to} className={className}>
     {children}
   </a>
@@ -101,9 +104,9 @@ const DropdownItem = ({
   loading,
   rawLink,
   classes,
-}: DropdownItemProps & {classes: ClassesType}) => {
-  const {MenuItem, Loading, ForumIcon, LWTooltip} = Components;
-  const LinkWrapper = to ? rawLink ? RawLink : Link : DummyWrapper;
+}: DropdownItemProps & { classes: ClassesType }) => {
+  const { MenuItem, Loading, ForumIcon, LWTooltip } = Components;
+  const LinkWrapper = to ? (rawLink ? RawLink : Link) : DummyWrapper;
   const TooltipWrapper = tooltip ? LWTooltip : DummyWrapper;
   return (
     <LinkWrapper to={to!} className={classes.root}>
@@ -111,44 +114,31 @@ const DropdownItem = ({
         <MenuItem
           onClick={onClick}
           disabled={disabled}
-          className={classNames(classes.main, {[classes.noIcon]: !icon})}
+          className={classNames(classes.main, { [classes.noIcon]: !icon })}
         >
-          {loading &&
+          {loading && (
             <ListItemIcon>
               <Loading />
             </ListItemIcon>
-          }
-          {icon && !loading &&
+          )}
+          {icon && !loading && (
             <ListItemIcon>
-              {typeof icon === "string"
-                ? <ForumIcon icon={icon} className={iconClassName} />
-                : icon()
-              }
+              {typeof icon === "string" ? <ForumIcon icon={icon} className={iconClassName} /> : icon()}
             </ListItemIcon>
-          }
+          )}
           <span className={classes.title}>{title}</span>
-          {afterIcon &&
-            <ForumIcon icon={afterIcon} className={classes.afterIcon} />
-          }
-          {sideMessage &&
-            <div className={classes.sideMessage}>
-              {sideMessage}
-            </div>
-          }
+          {afterIcon && <ForumIcon icon={afterIcon} className={classes.afterIcon} />}
+          {sideMessage && <div className={classes.sideMessage}>{sideMessage}</div>}
         </MenuItem>
       </TooltipWrapper>
     </LinkWrapper>
   );
-}
+};
 
-const DropdownItemComponent = registerComponent(
-  "DropdownItem",
-  DropdownItem,
-  {styles},
-);
+const DropdownItemComponent = registerComponent("DropdownItem", DropdownItem, { styles });
 
 declare global {
   interface ComponentTypes {
-    DropdownItem: typeof DropdownItemComponent
+    DropdownItem: typeof DropdownItemComponent;
   }
 }

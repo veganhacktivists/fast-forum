@@ -11,7 +11,7 @@ export const getBranchDbName = async (): Promise<string | undefined> => {
   }
 
   try {
-    const {stdout, stderr} = await exec("git branch --show-current");
+    const { stdout, stderr } = await exec("git branch --show-current");
     if (stderr || !stdout) {
       throw new Error(`Failed to read git branch: ${stderr}`);
     }
@@ -29,4 +29,4 @@ export const getBranchDbName = async (): Promise<string | undefined> => {
     // eslint-disable-next-line no-console
     // console.warn("Warning loading branch dbs:", e.message, process.cwd());
   }
-}
+};

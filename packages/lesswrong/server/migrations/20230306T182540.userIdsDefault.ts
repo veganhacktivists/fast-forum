@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-02-23T11:56:02.000Z by 20230223T115602.DebouncerEvents_pendingEvents_string_array.ts
  * +-- Overall schema hash: dc774f8734d7cc069d913d351d4225b8
- *  
+ *
  * @@ -69,3 +67,3 @@ CREATE TABLE "Chapters" (
- *  
+ *
  * --- Schema for "ClientIds", hash: 2296197975d2a0425dfabf7632f5bd53
  * +-- Schema for "ClientIds", hash: aae19b103f48347cbd022e63e26ced3b
  *  CREATE TABLE "ClientIds" (
@@ -23,7 +23,7 @@
  * -    "userIds" text[],
  * +    "userIds" text[] DEFAULT '{}' ::text[],
  *      "schemaVersion" double precision DEFAULT 1,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -34,13 +34,13 @@
  */
 export const acceptsSchemaHash = "dc774f8734d7cc069d913d351d4225b8";
 
-import { updateDefaultValue } from './meta/utils';
-import { ClientIds } from '../../lib/collections/clientIds/collection';
+import { updateDefaultValue } from "./meta/utils";
+import { ClientIds } from "../../lib/collections/clientIds/collection";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await updateDefaultValue(db, ClientIds, "userIds");
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await updateDefaultValue(db, ClientIds, "userIds");
-}
+};

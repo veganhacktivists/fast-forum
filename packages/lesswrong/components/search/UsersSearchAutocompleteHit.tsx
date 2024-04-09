@@ -1,9 +1,9 @@
-import {Components, registerComponent} from '../../lib/vulcan-lib'
-import React from 'react'
-import {styles as metaInfo} from '../common/MetaInfo'
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import React from "react";
+import { styles as metaInfo } from "../common/MetaInfo";
 
-const specificityFmClass = 'forum-magnum'
-const specificityCkClass = 'ck-override'
+const specificityFmClass = "forum-magnum";
+const specificityCkClass = "ck-override";
 const styles = (theme: ThemeType): JssStyles => ({
   userHitLabel: {
     // A specificity hack to work around https://github.com/ckeditor/ckeditor5/issues/3424
@@ -13,35 +13,36 @@ const styles = (theme: ThemeType): JssStyles => ({
       marginLeft: theme.spacing.unit,
     },
   },
-})
-
+});
 
 interface UsersSearchAutocompleteHitProps {
-  classes: ClassesType
-  name: string
-  createdAt: Date
-  karma?: number
+  classes: ClassesType;
+  name: string;
+  createdAt: Date;
+  karma?: number;
 }
 
 const UsersSearchAutocompleteHit = (props: UsersSearchAutocompleteHitProps) => {
-  const {MetaInfo, FormatDate} = Components
+  const { MetaInfo, FormatDate } = Components;
 
-  const metaClassName = `${props.classes.userHitLabel} ${specificityFmClass} ${specificityCkClass}`
-  return <span>
-    {props.name}
-    <MetaInfo className={metaClassName}>
-      <FormatDate date={props.createdAt} tooltip={false} />
-    </MetaInfo>
-    <MetaInfo className={metaClassName}>
-      {props.karma || 0} karma
-    </MetaInfo>
-  </span>
-}
+  const metaClassName = `${props.classes.userHitLabel} ${specificityFmClass} ${specificityCkClass}`;
+  return (
+    <span>
+      {props.name}
+      <MetaInfo className={metaClassName}>
+        <FormatDate date={props.createdAt} tooltip={false} />
+      </MetaInfo>
+      <MetaInfo className={metaClassName}>{props.karma || 0} karma</MetaInfo>
+    </span>
+  );
+};
 
-const UsersSearchHitLabelComponent = registerComponent('UsersSearchAutocompleteHit', UsersSearchAutocompleteHit, {styles})
+const UsersSearchHitLabelComponent = registerComponent("UsersSearchAutocompleteHit", UsersSearchAutocompleteHit, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    UsersSearchAutocompleteHit: typeof UsersSearchHitLabelComponent
+    UsersSearchAutocompleteHit: typeof UsersSearchHitLabelComponent;
   }
 }

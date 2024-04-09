@@ -1,6 +1,6 @@
-import { registerMigration, migrateDocuments } from './migrationUtils'
-import Users from '../../lib/collections/users/collection'
-import * as _ from 'underscore';
+import { registerMigration, migrateDocuments } from "./migrationUtils";
+import Users from "../../lib/collections/users/collection";
+import * as _ from "underscore";
 
 registerMigration({
   name: "renameAllPostsSorting",
@@ -12,22 +12,22 @@ registerMigration({
       collection: Users,
       batchSize: 1000,
       unmigratedDocumentQuery: {
-        allPostsView: {$exists: true}
+        allPostsView: { $exists: true },
       },
       migrate: async (users: Array<any>) => {
-        const updates = _.map(users, user => {
+        const updates = _.map(users, (user) => {
           return {
             updateOne: {
-              filter: {_id: user._id},
+              filter: { _id: user._id },
               update: {
-                $set: {allPostsSorting: user.allPostsView},
-                $unset: {allPostsView: ""},
+                $set: { allPostsSorting: user.allPostsView },
+                $unset: { allPostsView: "" },
               },
-            }
-          }
-        })
-        await Users.rawCollection().bulkWrite(updates, {ordered: false})
-      }
-    })
-  }
-})
+            },
+          };
+        });
+        await Users.rawCollection().bulkWrite(updates, { ordered: false });
+      },
+    });
+  },
+});

@@ -17,7 +17,7 @@ import { FloatType } from "../../lib/sql/Type";
 import { getAllCollections } from "../vulcan-lib";
 import { updateFieldType } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   const collections = getAllCollections();
   for (const collection of collections) {
     const fields = collection.getTable().getFields();
@@ -28,4 +28,4 @@ export const up = async ({db}: MigrationContext) => {
       }
     }
   }
-}
+};

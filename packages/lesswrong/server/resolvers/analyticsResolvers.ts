@@ -2,9 +2,13 @@ import { PostAnalyticsResult } from "../../components/hooks/usePostAnalytics";
 import { isEAForum } from "../../lib/instanceSettings";
 import { getAnalyticsConnection, getAnalyticsConnectionOrThrow } from "../analytics/postgresConnection";
 import { addGraphQLQuery, addGraphQLResolvers, addGraphQLSchema } from "../vulcan-lib";
-import  camelCase  from "lodash/camelCase";
+import camelCase from "lodash/camelCase";
 import { canUserEditPostMetadata } from "../../lib/collections/posts/helpers";
-import { AnalyticsSeriesValue, MultiPostAnalyticsResult, PostAnalytics2Result } from "../../components/hooks/useAnalytics";
+import {
+  AnalyticsSeriesValue,
+  MultiPostAnalyticsResult,
+  PostAnalytics2Result,
+} from "../../components/hooks/useAnalytics";
 import Posts from "../../lib/collections/posts/collection";
 import { getHybridView } from "../analytics/hybridViews";
 import { userIsAdminOrMod } from "../../lib/vulcan-users";
@@ -32,7 +36,7 @@ const materializedBatchSizeSetting = new DatabasePublicSetting<number>("analytic
 /**
  * Based on an analytics query, returns a function that runs that query
  */
-function makePgAnalyticsQueryScalar({query, resultColumns}: {query: string, resultColumns: string[]}) {
+function makePgAnalyticsQueryScalar({ query, resultColumns }: { query: string; resultColumns: string[] }) {
   return async (post: DbPost) => {
     const postgres = getAnalyticsConnection();
     if (!postgres) throw new Error("Unable to connect to analytics database - no database configured");
@@ -48,12 +52,22 @@ function makePgAnalyticsQueryScalar({query, resultColumns}: {query: string, resu
       throw new Error(`Multiple rows found for post ${post.title}`);
     }
 
-    const result = Object.fromEntries(resultColumns.map(resultColumn => [camelCase(resultColumn), pgResult[0][resultColumn]]))
-    return result
+    const result = Object.fromEntries(
+      resultColumns.map((resultColumn) => [camelCase(resultColumn), pgResult[0][resultColumn]]),
+    );
+    return result;
   };
 }
 
-function makePgAnalyticsQuerySeries({query, resultColumnRenaming, resultKey}: {query: string, resultColumnRenaming: {[column: string]: string}, resultKey: keyof PostAnalyticsResult}) {
+function makePgAnalyticsQuerySeries({
+  query,
+  resultColumnRenaming,
+  resultKey,
+}: {
+  query: string;
+  resultColumnRenaming: { [column: string]: string };
+  resultKey: keyof PostAnalyticsResult;
+}) {
   return async (post: DbPost) => {
     const postgres = getAnalyticsConnection();
     if (!postgres) throw new Error("Unable to connect to analytics database - no database configured");
@@ -67,13 +81,13 @@ function makePgAnalyticsQuerySeries({query, resultColumnRenaming, resultKey}: {q
       // Should be prepared to return an empty array here
     }
 
-    const result = {[resultKey]: pgResult.map((row: any) => Object.fromEntries(
-      Object.entries(row).map(
-        ([column, values]) => [resultColumnRenaming[column], values]
-      )
-    ))}
-    return result
-  }
+    const result = {
+      [resultKey]: pgResult.map((row: any) =>
+        Object.fromEntries(Object.entries(row).map(([column, values]) => [resultColumnRenaming[column], values])),
+      ),
+    };
+    return result;
+  };
 }
 
 /**
@@ -83,12 +97,11 @@ function makePgAnalyticsQuerySeries({query, resultColumnRenaming, resultKey}: {q
 function generateOrConditionQuery(columnName: string, ids: string[]): string {
   // 8 appears to be about the cutoff where IN is faster than OR
   if (ids.length < 8) {
-    return ids.map((id, index) => `${columnName} = $${index + 1}`).join(' OR ');
+    return ids.map((id, index) => `${columnName} = $${index + 1}`).join(" OR ");
   } else {
     // IN
-    return `${columnName} IN (${ids.map((id, index) => `$${index + 1}`).join(', ')})`;
+    return `${columnName} IN (${ids.map((id, index) => `$${index + 1}`).join(", ")})`;
   }
-  
 }
 
 type QueryFunc = (post: DbPost) => Promise<Partial<PostAnalyticsResult>>;
@@ -100,7 +113,7 @@ const queries: QueryFunc[] = [
       FROM page_view
       WHERE post_id = $1
     `,
-    resultColumns: ["all_views"]
+    resultColumns: ["all_views"],
   }),
   makePgAnalyticsQueryScalar({
     query: `
@@ -109,7 +122,7 @@ const queries: QueryFunc[] = [
       WHERE post_id = $1
         AND client_id IS NOT NULL
     `,
-    resultColumns: ["unique_client_views"]
+    resultColumns: ["unique_client_views"],
   }),
   // TODO: implement median function and change avg call to use it
   makePgAnalyticsQueryScalar({
@@ -128,11 +141,7 @@ const queries: QueryFunc[] = [
         GROUP BY client_id
       ) a
     `,
-    resultColumns: [
-      "unique_client_views_10_sec",
-      "median_reading_time",
-      "unique_client_views_5_min"
-    ]
+    resultColumns: ["unique_client_views_10_sec", "median_reading_time", "unique_client_views_5_min"],
   }),
   makePgAnalyticsQuerySeries({
     // a masterpiece
@@ -160,9 +169,9 @@ const queries: QueryFunc[] = [
       RIGHT JOIN eligible_dates ON eligible_dates.date = unique_client_views.date
       ORDER BY date;
     `,
-     resultColumnRenaming: {date: 'date', unique_client_views: 'uniqueClientViews'},
-     resultKey: 'uniqueClientViewsSeries'
-  })
+    resultColumnRenaming: { date: "date", unique_client_views: "uniqueClientViews" },
+    resultKey: "uniqueClientViewsSeries",
+  }),
 ];
 
 addGraphQLResolvers({
@@ -170,7 +179,7 @@ addGraphQLResolvers({
     async PostAnalytics(
       root: void,
       { postId }: { postId: string },
-      context: ResolverContext
+      context: ResolverContext,
     ): Promise<PostAnalyticsResult> {
       const { currentUser } = context;
       if (!currentUser) throw new Error(`No user`);
@@ -181,10 +190,7 @@ addGraphQLResolvers({
         throw new Error("Permission denied");
       }
       // Maybe check for karma level here?
-      if (
-        !canUserEditPostMetadata(currentUser, post) &&
-        !currentUser.groups?.includes("sunshineRegiment")
-      ) {
+      if (!canUserEditPostMetadata(currentUser, post) && !currentUser.groups?.includes("sunshineRegiment")) {
         throw new Error("Permission denied");
       }
 
@@ -193,9 +199,9 @@ addGraphQLResolvers({
       let postAnalytics: Partial<PostAnalyticsResult> = {};
       for (const queryFunc of queries) {
         const queryResult = await queryFunc(post);
-        postAnalytics = {...postAnalytics, ...queryResult}
+        postAnalytics = { ...postAnalytics, ...queryResult };
       }
-      
+
       // There's no good way to tell TS that because we've iterated over all the
       // keys, the partial is no longer partial
       return postAnalytics as PostAnalyticsResult;
@@ -209,15 +215,22 @@ addGraphQLResolvers({
         desc,
         limit,
         cachedOnly,
-      }: { userId: string; postIds: string[] | null; sortBy: string | null; desc: boolean | null; limit: number | null, cachedOnly: boolean | null },
-      context: ResolverContext
+      }: {
+        userId: string;
+        postIds: string[] | null;
+        sortBy: string | null;
+        desc: boolean | null;
+        limit: number | null;
+        cachedOnly: boolean | null;
+      },
+      context: ResolverContext,
     ): Promise<MultiPostAnalyticsResult> {
       // These are null (not undefined) if not provided, so we have to explicitly set them to the default
       sortBy = sortBy ?? "postedAt";
       desc = desc ?? true;
       limit = limit ?? 10;
       const batchSize = cachedOnly ? materializedBatchSizeSetting.get() : liveBatchSizeSetting.get();
-      
+
       // Directly sortable fields can be sorted and filtered on before querying the analytics database,
       // so we can avoid querying for most of the post ids. Indirectly sortable fields are calculated
       // rely on the results from the analytics database, so we have to query for all the post ids and then
@@ -231,7 +244,7 @@ addGraphQLResolvers({
       const directlySortable = DIRECTLY_SORTABLE_FIELDS.includes(sortBy);
 
       const postSelector = {
-        ...(userId && {$or: [{ userId: userId }, { "coauthorStatuses.userId": userId }]}),
+        ...(userId && { $or: [{ userId: userId }, { "coauthorStatuses.userId": userId }] }),
         ...(postIdsInput && { _id: { $in: postIdsInput } }),
         rejected: { $ne: true },
         draft: false,
@@ -243,8 +256,8 @@ addGraphQLResolvers({
         ...(directlySortable && { limit }),
       }).fetch();
 
-      const filteredPosts = rawPosts.filter((post) =>
-        userIsAdminOrMod(currentUser) || canUserEditPostMetadata(currentUser, post)
+      const filteredPosts = rawPosts.filter(
+        (post) => userIsAdminOrMod(currentUser) || canUserEditPostMetadata(currentUser, post),
       );
 
       const postsById = Object.fromEntries(filteredPosts.map((post) => [post._id, post]));
@@ -270,9 +283,10 @@ addGraphQLResolvers({
       const cachedOnlyQuery = cachedOnly ? "AND source <> 'live'" : "";
 
       const [viewsResults, readsResults] = await Promise.all([
-        executeChunkedQueue(async (batch: string[]) => {
-          return analyticsDb.any<{ _id: string; total_view_count: number, total_unique_view_count: number }>(
-          `
+        executeChunkedQueue(
+          async (batch: string[]) => {
+            return analyticsDb.any<{ _id: string; total_view_count: number; total_unique_view_count: number }>(
+              `
           SELECT
             post_id AS _id,
             sum(view_count) AS total_view_count,
@@ -285,12 +299,17 @@ addGraphQLResolvers({
           GROUP BY
             post_id;
           `,
-            batch
-          );
-        }, postIds, batchSize, MAX_CONCURRENT_QUERIES),
-        executeChunkedQueue(async (batch: string[]) => {
-          return analyticsDb.any<{ _id: string; total_read_count: number, mean_reading_time: number }>(
-          `
+              batch,
+            );
+          },
+          postIds,
+          batchSize,
+          MAX_CONCURRENT_QUERIES,
+        ),
+        executeChunkedQueue(
+          async (batch: string[]) => {
+            return analyticsDb.any<{ _id: string; total_read_count: number; mean_reading_time: number }>(
+              `
           SELECT
             post_id AS _id,
             -- A "read" is anything with a reading_time over 30 seconds
@@ -304,9 +323,13 @@ addGraphQLResolvers({
           GROUP BY
             post_id;
           `,
-            batch
-          );
-        }, postIds, batchSize, MAX_CONCURRENT_QUERIES)
+              batch,
+            );
+          },
+          postIds,
+          batchSize,
+          MAX_CONCURRENT_QUERIES,
+        ),
       ]);
 
       // Flatten the results
@@ -361,7 +384,7 @@ addGraphQLResolvers({
         endDate: Date | null;
         cachedOnly: boolean | null;
       },
-      context: ResolverContext
+      context: ResolverContext,
     ): Promise<AnalyticsSeriesValue[]> {
       const batchSize = cachedOnly ? materializedBatchSizeSetting.get() : liveBatchSizeSetting.get();
 
@@ -374,21 +397,21 @@ addGraphQLResolvers({
       if (!endDate) {
         throw new Error("Must provide endDate");
       }
-    
+
       // Round start date down to nearest day in UTC
       const adjustedStartDate = startDate ? moment(new Date(startDate)).utc().startOf("day") : undefined;
       const adjustedEndDate = moment(new Date(endDate)).utc().add(1, "days").startOf("day");
 
       const postSelector = {
-        ...(userId && {$or: [{ userId: userId }, { "coauthorStatuses.userId": userId }]}),
+        ...(userId && { $or: [{ userId: userId }, { "coauthorStatuses.userId": userId }] }),
         ...(postIds && { _id: { $in: postIds } }),
         rejected: { $ne: true },
         draft: false,
         isEvent: false,
-      }
+      };
       const rawPosts = await Posts.find(postSelector).fetch();
       const filteredPosts = rawPosts.filter(
-        (post) => userIsAdminOrMod(currentUser) || canUserEditPostMetadata(currentUser, post)
+        (post) => userIsAdminOrMod(currentUser) || canUserEditPostMetadata(currentUser, post),
       );
       const queryPostIds = filteredPosts.map((post) => post._id);
 
@@ -408,9 +431,10 @@ addGraphQLResolvers({
 
       const cachedOnlyQuery = cachedOnly ? "AND source <> 'live'" : "";
       const [viewRes, readRes, karmaRes, commentRes] = await Promise.all([
-        executeChunkedQueue(async (batch: string[]) => {
-          return analyticsDb.any<{ window_start_key: string; view_count: string }>(
-            `
+        executeChunkedQueue(
+          async (batch: string[]) => {
+            return analyticsDb.any<{ window_start_key: string; view_count: string }>(
+              `
               SELECT
                 -- Format as YYYY-MM-DD to make grouping easier
                 to_char(window_start, 'YYYY-MM-DD') AS window_start_key,
@@ -424,11 +448,18 @@ addGraphQLResolvers({
                 ${cachedOnlyQuery}
               GROUP BY
                 window_start_key;
-          `, batch)
-        }, queryPostIds, batchSize, MAX_CONCURRENT_QUERIES),
-        executeChunkedQueue(async (batch: string[]) => {
-          return analyticsDb.any<{ window_start_key: string; read_count: string }>(
-            `
+          `,
+              batch,
+            );
+          },
+          queryPostIds,
+          batchSize,
+          MAX_CONCURRENT_QUERIES,
+        ),
+        executeChunkedQueue(
+          async (batch: string[]) => {
+            return analyticsDb.any<{ window_start_key: string; read_count: string }>(
+              `
               SELECT
                 -- Format as YYYY-MM-DD to make grouping easier
                 to_char(window_start, 'YYYY-MM-DD') AS window_start_key,
@@ -442,8 +473,14 @@ addGraphQLResolvers({
                 ${cachedOnlyQuery}
               GROUP BY
                 window_start_key;
-            `, batch)
-        }, queryPostIds, batchSize, MAX_CONCURRENT_QUERIES),
+            `,
+              batch,
+            );
+          },
+          queryPostIds,
+          batchSize,
+          MAX_CONCURRENT_QUERIES,
+        ),
         context.repos.votes.getDocumentKarmaChangePerDay({
           documentIds: queryPostIds,
           startDate: adjustedStartDate?.toDate(),
@@ -454,7 +491,7 @@ addGraphQLResolvers({
           startDate: adjustedStartDate?.toDate(),
           endDate: adjustedEndDate.toDate(),
         }),
-      ])
+      ]);
 
       const viewsByDate = groupBy(viewRes, "window_start_key");
       const readsByDate = groupBy(readRes, "window_start_key");
@@ -467,23 +504,24 @@ addGraphQLResolvers({
           moment.min(Object.keys(viewsByDate).map((date) => moment(date))),
           moment.min(Object.keys(readsByDate).map((date) => moment(date))),
           moment.min(Object.keys(commentsByDate).map((date) => moment(date))),
-          moment.min(Object.keys(karmaByDate).map((date) => moment(date)))
+          moment.min(Object.keys(karmaByDate).map((date) => moment(date))),
         );
-      
+
       const result = generateDateSeries(lowestStartDate, adjustedEndDate).map((date) => ({
         date: new Date(date),
         views: viewsByDate[date]?.reduce((acc, curr) => acc + parseInt(curr.view_count ?? 0), 0) ?? 0,
         reads: readsByDate[date]?.reduce((acc, curr) => acc + parseInt(curr.read_count ?? 0), 0) ?? 0,
         karma: karmaByDate[date]?.reduce((acc, curr) => acc + parseInt(curr.karma_change ?? 0), 0) ?? 0,
-        comments: commentsByDate[date]?.reduce((acc, curr) => acc + parseInt(curr.comment_count ?? 0), 0) ?? 0
+        comments: commentsByDate[date]?.reduce((acc, curr) => acc + parseInt(curr.comment_count ?? 0), 0) ?? 0,
       }));
       // Remove leading values where all fields are 0
-      const truncatedResult = result.slice(result.findIndex((value) => (
-        value.views !== 0 || value.reads !== 0 || value.karma !== 0 || value.comments !== 0
-      )));
+      const truncatedResult = result.slice(
+        result.findIndex(
+          (value) => value.views !== 0 || value.reads !== 0 || value.karma !== 0 || value.comments !== 0,
+        ),
+      );
       return truncatedResult;
     },
-    
   },
 });
 
@@ -534,5 +572,9 @@ addGraphQLSchema(`
 `);
 
 addGraphQLQuery("PostAnalytics(postId: String!): PostAnalyticsResult!");
-addGraphQLQuery("MultiPostAnalytics(userId: String, postIds: [String], sortBy: String, desc: Boolean, limit: Int, cachedOnly: Boolean): MultiPostAnalyticsResult!");
-addGraphQLQuery("AnalyticsSeries(userId: String, postIds: [String], startDate: Date, endDate: Date, cachedOnly: Boolean): [AnalyticsSeriesValue]");
+addGraphQLQuery(
+  "MultiPostAnalytics(userId: String, postIds: [String], sortBy: String, desc: Boolean, limit: Int, cachedOnly: Boolean): MultiPostAnalyticsResult!",
+);
+addGraphQLQuery(
+  "AnalyticsSeries(userId: String, postIds: [String], startDate: Date, endDate: Date, cachedOnly: Boolean): [AnalyticsSeriesValue]",
+);

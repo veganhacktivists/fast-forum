@@ -5,14 +5,14 @@ export type WrappedMostReadTopic = {
   shortName: string;
   slug: string;
   count: number;
-}
+};
 export type WrappedRelativeMostReadCoreTopic = {
   tagId: string;
   tagName: string;
   tagShortName: string;
   userReadCount: number;
   readLikelihoodRatio: number;
-}
+};
 export type WrappedMostReadAuthor = {
   _id: string;
   displayName: string;
@@ -20,13 +20,13 @@ export type WrappedMostReadAuthor = {
   profileImageId: string;
   count: number;
   engagementPercentile: number;
-}
+};
 export type WrappedTopPost = {
   _id: string;
   title: string;
   slug: string;
   baseScore: number;
-}
+};
 export type WrappedTopComment = {
   _id: string;
   postedAt: Date;
@@ -38,7 +38,7 @@ export type WrappedTopComment = {
   contents: {
     html: string;
   };
-}
+};
 export type WrappedTopShortform = {
   _id: string;
   postedAt: Date;
@@ -48,11 +48,11 @@ export type WrappedTopShortform = {
   contents: {
     html: string;
   };
-}
+};
 export type WrappedReceivedReact = {
   name: string;
   count: number;
-}
+};
 
 export type WrappedDataByYearV2 = {
   engagementPercentile: number;
@@ -162,17 +162,14 @@ const query = gql`
 
 // TODO Rename to just useForumWrapped
 export const useForumWrappedV2 = ({ userId, year }: { userId?: string | null; year: number }) => {
-  const { data, loading } = useQuery<WrappedDataQueryResult>(
-    query,
-    {
-      variables: {
-        userId,
-        year,
-      },
-      ssr: true,
-      skip: !userId,
-    }
-  );
+  const { data, loading } = useQuery<WrappedDataQueryResult>(query, {
+    variables: {
+      userId,
+      year,
+    },
+    ssr: true,
+    skip: !userId,
+  });
 
   return { data: data?.UserWrappedDataByYearV2, loading };
 };

@@ -1,13 +1,13 @@
-import Button from '@material-ui/core/Button';
-import CloseIcon from '@material-ui/icons/Close';
-import React, { ComponentProps } from 'react';
-import { AnalyticsContext } from '../../../lib/analyticsEvents';
-import { ForumOptions } from '../../../lib/forumTypeUtils';
-import { Link } from '../../../lib/reactRouterWrapper';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
-import { HashLinkProps } from '../../common/HashLink';
-import { useCookiesWithConsent } from '../../hooks/useCookiesWithConsent';
-import { HIDE_WELCOME_BOX_COOKIE } from '../../../lib/cookies/cookies';
+import Button from "@material-ui/core/Button";
+import CloseIcon from "@material-ui/icons/Close";
+import React, { ComponentProps } from "react";
+import { AnalyticsContext } from "../../../lib/analyticsEvents";
+import { ForumOptions } from "../../../lib/forumTypeUtils";
+import { Link } from "../../../lib/reactRouterWrapper";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
+import { HashLinkProps } from "../../common/HashLink";
+import { useCookiesWithConsent } from "../../hooks/useCookiesWithConsent";
+import { HIDE_WELCOME_BOX_COOKIE } from "../../../lib/cookies/cookies";
 
 const styles = (theme: ThemeType): JssStyles => ({
   welcomeBox: {
@@ -15,20 +15,20 @@ const styles = (theme: ThemeType): JssStyles => ({
     paddingLeft: 24,
     paddingRight: 16,
     paddingBottom: 16,
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
     border: theme.palette.border.normal,
     borderRadius: 3,
   },
   welcomeBoxCloseButton: {
     padding: 0,
     marginBottom: 14,
-    minHeight: '.75em',
-    minWidth: '.75em',
+    minHeight: ".75em",
+    minWidth: ".75em",
   },
   welcomeBoxCloseIcon: {
-    width: '.6em',
-    height: '.6em',
+    width: ".6em",
+    height: ".6em",
     color: theme.palette.icon.dim6,
   },
   welcomeBoxHeader: {
@@ -38,25 +38,29 @@ const styles = (theme: ThemeType): JssStyles => ({
     borderBottom: theme.palette.border.faint,
     marginBottom: 6,
     marginRight: 16,
-    whiteSpace: 'pre'
+    whiteSpace: "pre",
   },
   welcomeBoxHeaderSeparator: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   welcomeBoxLink: {
     fontFamily: theme.typography.body2.fontFamily,
     fontSize: theme.typography.body2.fontSize,
     color: theme.palette.primary.main,
-    whiteSpace: 'pre'
+    whiteSpace: "pre",
   },
 });
 
-const WelcomeBox = ({ title, contents, classes }: {
-  title: string,
-  contents: HashLinkProps[],
-  classes: ClassesType
+const WelcomeBox = ({
+  title,
+  contents,
+  classes,
+}: {
+  title: string;
+  contents: HashLinkProps[];
+  classes: ClassesType;
 }) => {
   const [cookies, setCookie] = useCookiesWithConsent([HIDE_WELCOME_BOX_COOKIE]);
 
@@ -64,27 +68,28 @@ const WelcomeBox = ({ title, contents, classes }: {
     return null;
   }
 
-  const hideBox = () => setCookie(HIDE_WELCOME_BOX_COOKIE, "true", {
-    path: "/"
-  });
+  const hideBox = () =>
+    setCookie(HIDE_WELCOME_BOX_COOKIE, "true", {
+      path: "/",
+    });
 
   const { Typography } = Components;
   return (
     <AnalyticsContext pageElementContext="welcomeBox">
       <div className={classes.welcomeBox}>
         <span className={classes.welcomeBoxHeaderSeparator}>
-          <Typography variant="title" className={classes.welcomeBoxHeader}>{title}</Typography>
+          <Typography variant="title" className={classes.welcomeBoxHeader}>
+            {title}
+          </Typography>
           <Button className={classes.welcomeBoxCloseButton} onClick={hideBox}>
-            <CloseIcon className={classes.welcomeBoxCloseIcon}/>
+            <CloseIcon className={classes.welcomeBoxCloseIcon} />
           </Button>
         </span>
         {contents.map((linkProps, idx) => {
           const { children, ...otherProps } = linkProps;
           return (
             <Typography key={`welcomeBoxContent_${idx}`} variant="body1" className={classes.welcomeBoxLink}>
-              <Link {...otherProps}>
-                {children}
-              </Link>
+              <Link {...otherProps}>{children}</Link>
             </Typography>
           );
         })}
@@ -93,8 +98,7 @@ const WelcomeBox = ({ title, contents, classes }: {
   );
 };
 
-
-const WelcomeBoxComponent = registerComponent('WelcomeBox', WelcomeBox, { styles });
+const WelcomeBoxComponent = registerComponent("WelcomeBox", WelcomeBox, { styles });
 
 export const welcomeBoxes: ForumOptions<ComponentProps<typeof WelcomeBoxComponent> | null> = {
   LessWrong: {
@@ -102,14 +106,14 @@ export const welcomeBoxes: ForumOptions<ComponentProps<typeof WelcomeBoxComponen
     contents: [
       { to: "/about", children: "Getting Started" },
       { to: "/faq", children: "FAQ" },
-      { to: "/library", children: "Library" }
-    ]
+      { to: "/library", children: "Library" },
+    ],
   },
-  default: null
+  default: null,
 };
 
 declare global {
   interface ComponentTypes {
-      WelcomeBox: typeof WelcomeBoxComponent
+    WelcomeBox: typeof WelcomeBoxComponent;
   }
 }

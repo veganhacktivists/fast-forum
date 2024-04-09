@@ -1,4 +1,4 @@
-import { stubbedTests } from './stubbedTests';
+import { stubbedTests } from "./stubbedTests";
 
 stubbedTests();
 
@@ -31,7 +31,7 @@ const commentListMockProps = {
 }
 */
 
-describe('Commenting while banned from post --', () => {
+describe("Commenting while banned from post --", () => {
   /*
   it('CommentsItem does NOT render reply-button when user is in a Post bannedUserIds list', async () => {
     const user = await createDummyUser()
@@ -137,7 +137,6 @@ describe('Commenting while banned from post --', () => {
     expect(commentsListSection.find("#posts-thread-new-comment")).to.have.length(0);
   });
   */
-  
   // These tests are disabled because they were built on a brittle assumption
   // which no longer holds: that the relevant part of the resulting React tree
   // is present when only a shallow render is done (as opposed to a full

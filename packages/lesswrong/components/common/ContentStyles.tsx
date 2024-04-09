@@ -1,18 +1,17 @@
-import React, { CSSProperties } from 'react';
-import { postBodyStyles, smallPostStyles, commentBodyStyles } from '../../themes/stylePiping'
-import { registerComponent } from '../../lib/vulcan-lib';
-import classNames from 'classnames';
-import { isFriendlyUI } from '../../themes/forumTheme';
+import React, { CSSProperties } from "react";
+import { postBodyStyles, smallPostStyles, commentBodyStyles } from "../../themes/stylePiping";
+import { registerComponent } from "../../lib/vulcan-lib";
+import classNames from "classnames";
+import { isFriendlyUI } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   base: {
-    ...postBodyStyles(theme)
+    ...postBodyStyles(theme),
   },
-  postBody: {
-  },
+  postBody: {},
   postHighlight: {
     ...smallPostStyles(theme),
-    '& h1, & h2, & h3': {
+    "& h1, & h2, & h3": {
       fontSize: isFriendlyUI ? "1.1rem" : "1.6rem",
       // Cancel out a negative margin which would cause clipping
       marginBlickStart: "0 !important",
@@ -22,49 +21,56 @@ const styles = (theme: ThemeType): JssStyles => ({
     ...commentBodyStyles(theme),
   },
   commentBodyExceptPointerEvents: {
-    ...commentBodyStyles(theme, true)
+    ...commentBodyStyles(theme, true),
   },
   debateResponseBody: {
     ...commentBodyStyles(theme),
-    fontSize: '1.35rem',
-    '& .dialogue-message-header + p': {
+    fontSize: "1.35rem",
+    "& .dialogue-message-header + p": {
       marginTop: 0,
     },
-    '& blockquote, & li': {
-      fontSize: '1.35rem'
-    }
+    "& blockquote, & li": {
+      fontSize: "1.35rem",
+    },
   },
   answerBody: {
-    ...smallPostStyles(theme)
+    ...smallPostStyles(theme),
   },
   tagBody: {
     ...commentBodyStyles(theme),
     marginBottom: 18,
-    '&& h1': {
-      fontSize: '2rem',
-      marginTop: '3rem',
-      fontWeight:600,
-      ...theme.typography.commentStyle
+    "&& h1": {
+      fontSize: "2rem",
+      marginTop: "3rem",
+      fontWeight: 600,
+      ...theme.typography.commentStyle,
     },
-    '&& h2': {
-      fontSize: '1.7rem',
-      marginTop: '1.5rem',
-      fontWeight:500,
-      ...theme.typography.commentStyle
+    "&& h2": {
+      fontSize: "1.7rem",
+      marginTop: "1.5rem",
+      fontWeight: 500,
+      ...theme.typography.commentStyle,
     },
-    '&& h3': {
-      fontSize: '1.3rem',
-      marginTop: '1.5rem',
-      fontWeight:500,
-      ...theme.typography.commentStyle
+    "&& h3": {
+      fontSize: "1.3rem",
+      marginTop: "1.5rem",
+      fontWeight: 500,
+      ...theme.typography.commentStyle,
     },
-    '&& h1:first-child, h2:first-child, h3:first-child': {
+    "&& h1:first-child, h2:first-child, h3:first-child": {
       marginTop: 0,
     },
   },
 });
 
-export type ContentStyleType = "post"|"postHighlight"|"comment"|"commentExceptPointerEvents"|"answer"|"tag"|"debateResponse";
+export type ContentStyleType =
+  | "post"
+  | "postHighlight"
+  | "comment"
+  | "commentExceptPointerEvents"
+  | "answer"
+  | "tag"
+  | "debateResponse";
 
 // Styling wrapper for user-provided content. This includes descendent
 // selectors for all the various things that might show up in a
@@ -88,35 +94,44 @@ export type ContentStyleType = "post"|"postHighlight"|"comment"|"commentExceptPo
 // so some things want to inherit all of the comment styles *except* for that.
 // (This hack exists to support spoiler blocks and we should probably clean it
 // up.)
-const ContentStyles = ({contentType, className, style, children, classes}: {
-  contentType: ContentStyleType,
-  className?: string,
-  style?: CSSProperties,
-  children: React.ReactNode,
-  classes: ClassesType,
+const ContentStyles = ({
+  contentType,
+  className,
+  style,
+  children,
+  classes,
+}: {
+  contentType: ContentStyleType;
+  className?: string;
+  style?: CSSProperties;
+  children: React.ReactNode;
+  classes: ClassesType;
 }) => {
-  return <div style={style} className={classNames(
-    className, classes.base, "content", {
-      [classes.postBody]: contentType==="post",
-      [classes.postHighlight]: contentType==="postHighlight",
-      [classes.commentBody]: contentType==="comment",
-      [classes.commentBodyExceptPointerEvents]: contentType==="commentExceptPointerEvents",
-      [classes.answerBody]: contentType==="answer",
-      [classes.tagBody]: contentType==="tag",
-      [classes.debateResponseBody]: contentType==="debateResponse"
-    }
-  )}>
-    {children}
-  </div>;
-}
+  return (
+    <div
+      style={style}
+      className={classNames(className, classes.base, "content", {
+        [classes.postBody]: contentType === "post",
+        [classes.postHighlight]: contentType === "postHighlight",
+        [classes.commentBody]: contentType === "comment",
+        [classes.commentBodyExceptPointerEvents]: contentType === "commentExceptPointerEvents",
+        [classes.answerBody]: contentType === "answer",
+        [classes.tagBody]: contentType === "tag",
+        [classes.debateResponseBody]: contentType === "debateResponse",
+      })}
+    >
+      {children}
+    </div>
+  );
+};
 
-const ContentStylesComponent = registerComponent('ContentStyles', ContentStyles, {
+const ContentStylesComponent = registerComponent("ContentStyles", ContentStyles, {
   styles,
   stylePriority: -1,
 });
 
 declare global {
   interface ComponentTypes {
-    ContentStyles: typeof ContentStylesComponent
+    ContentStyles: typeof ContentStylesComponent;
   }
 }

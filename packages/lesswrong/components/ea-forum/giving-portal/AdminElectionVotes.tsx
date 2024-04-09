@@ -34,12 +34,15 @@ function approximatelyEqual(a: number, b: number, fractionalError = 1e-6) {
 
 const normalizeVotes = (
   votes: Record<string, number | null>[],
-  remainingCandidates: ElectionCandidateBasicInfo[]
+  remainingCandidates: ElectionCandidateBasicInfo[],
 ): Record<string, number>[] => {
-  const uniformVote = remainingCandidates.reduce((acc, { _id }) => {
-    acc[_id] = 1 / remainingCandidates.length;
-    return acc;
-  }, {} as Record<string, number>);
+  const uniformVote = remainingCandidates.reduce(
+    (acc, { _id }) => {
+      acc[_id] = 1 / remainingCandidates.length;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   const normalizedVotes = votes.map((vote) => {
     const totalValue = sum(Object.values(vote).filter((val) => val !== null)) ?? 0;
@@ -48,12 +51,15 @@ const normalizeVotes = (
     // is uniform across all candidates
     if (!totalValue) return uniformVote;
 
-    const normalizedVote = Object.entries(vote).reduce((acc, [candidate, val]) => {
-      if (!val) return acc; // Filter out null or zero values
+    const normalizedVote = Object.entries(vote).reduce(
+      (acc, [candidate, val]) => {
+        if (!val) return acc; // Filter out null or zero values
 
-      acc[candidate] = val / totalValue;
-      return acc;
-    }, {} as Record<string, number>);
+        acc[candidate] = val / totalValue;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     return normalizedVote;
   });
@@ -77,12 +83,15 @@ const normalizeVotes = (
 };
 
 const aggregateVotes = (votes: Record<string, number>[]): Record<string, number> => {
-  const aggregatedVote = votes.reduce((acc, vote) => {
-    for (const [candidate, val] of Object.entries(vote)) {
-      acc[candidate] = (acc[candidate] ?? 0) + val;
-    }
-    return acc;
-  }, {} as Record<string, number>);
+  const aggregatedVote = votes.reduce(
+    (acc, vote) => {
+      for (const [candidate, val] of Object.entries(vote)) {
+        acc[candidate] = (acc[candidate] ?? 0) + val;
+      }
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   // Assert the sum of the aggregated vote is equal to the number of votes
   const totalValue = sum(Object.values(aggregatedVote));
@@ -96,7 +105,7 @@ const aggregateVotes = (votes: Record<string, number>[]): Record<string, number>
 const getSortedWinners = (
   votes: Record<string, number | null>[],
   candidates: ElectionCandidateBasicInfo[],
-  numWinners: number
+  numWinners: number,
 ) => {
   let votesWithEliminatedCandidates = [...votes];
   let remainingCandidates = [...candidates];

@@ -1,15 +1,15 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import EmailPropTypes from '../PropTypes'
-import Box from './Box'
-import Item from './Item'
+import React from "react";
+import PropTypes from "prop-types";
+import EmailPropTypes from "../PropTypes";
+import Box from "./Box";
+import Item from "./Item";
 
 // inspired by http://htmlemailboilerplate.com
 export default function Email(props: any) {
   const htmlTagProps: any = {
     lang: props.lang,
-    xmlns: "http://www.w3.org/1999/xhtml"
-  }
+    xmlns: "http://www.w3.org/1999/xhtml",
+  };
   // default nested 600px wide outer table container (see http://templates.mailchimp.com/development/html/)
   return (
     <html {...htmlTagProps}>
@@ -21,24 +21,30 @@ export default function Email(props: any) {
       </head>
       <body
         style={{
-          width: '100%',
+          width: "100%",
           margin: 0,
           padding: 0,
-          WebkitTextSizeAdjust: '100%',
-          MsTextSizeAdjust: '100%',
+          WebkitTextSizeAdjust: "100%",
+          MsTextSizeAdjust: "100%",
           ...props.bodyStyle,
         }}
       >
         <Box width="100%" height="100%" bgcolor={props.bgcolor}>
           <Item align={props.align} valign={props.valign}>
-            <Box width={props.width} align="center" cellPadding={props.cellPadding} cellSpacing={props.cellSpacing} style={props.style}>
+            <Box
+              width={props.width}
+              align="center"
+              cellPadding={props.cellPadding}
+              cellSpacing={props.cellSpacing}
+              style={props.style}
+            >
               {props.children}
             </Box>
           </Item>
         </Box>
       </body>
     </html>
-  )
+  );
 }
 
 Email.propTypes = {
@@ -50,17 +56,17 @@ Email.propTypes = {
   style: EmailPropTypes.style,
   headCSS: PropTypes.string,
   width: PropTypes.string,
-  align: PropTypes.oneOf(['left', 'center', 'right']),
-  valign: PropTypes.oneOf(['top', 'middle', 'bottom']),
+  align: PropTypes.oneOf(["left", "center", "right"]),
+  valign: PropTypes.oneOf(["top", "middle", "bottom"]),
   bodyStyle: EmailPropTypes.style,
   children: PropTypes.node,
-}
+};
 
 Email.defaultProps = {
-  lang: 'en',
-  width: '600',
-  align: 'center',
-  valign: 'top',
+  lang: "en",
+  width: "600",
+  align: "center",
+  valign: "top",
   bgcolor: undefined,
   cellPadding: undefined,
   cellSpacing: undefined,
@@ -68,4 +74,4 @@ Email.defaultProps = {
   headCSS: undefined,
   bodyStyle: undefined,
   children: undefined,
-}
+};

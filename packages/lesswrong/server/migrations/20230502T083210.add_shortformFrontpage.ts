@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-04-24T20:04:07.000Z by 20230424T200407.add_ignore_rate_limits.ts
  * +-- Overall schema hash: 891712d4139cf4505db4fc393acd3332
- *  
+ *
  * @@ -108,3 +106,3 @@ CREATE TABLE "CommentModeratorActions" (
- *  
+ *
  * --- Schema for "Comments", hash: 1a34920ecad5fd219e1d13d6025f4839
  * +-- Schema for "Comments", hash: 7d8b2ae046e14a393e9d6ab86db08331
  *  CREATE TABLE "Comments" (
@@ -22,7 +22,7 @@
  *      "shortform" bool,
  * +    "shortformFrontpage" bool,
  *      "nominatedForReview" text,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -33,13 +33,13 @@
  */
 export const acceptsSchemaHash = "a85cc326da77f34b19140ca908956227";
 
-import Comments from "../../lib/collections/comments/collection"
-import { addField, dropField } from "./meta/utils"
+import Comments from "../../lib/collections/comments/collection";
+import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Comments, 'shortformFrontpage')
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Comments, "shortformFrontpage");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Comments, 'shortformFrontpage')
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Comments, "shortformFrontpage");
+};

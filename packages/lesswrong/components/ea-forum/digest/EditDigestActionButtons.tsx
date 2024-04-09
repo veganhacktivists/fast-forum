@@ -1,46 +1,42 @@
-import React from 'react';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
-import { useUpdate } from '../../../lib/crud/withUpdate';
-import { useDialog } from '../../common/withDialog';
+import React from "react";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
+import { useUpdate } from "../../../lib/crud/withUpdate";
+import { useDialog } from "../../common/withDialog";
 
 const styles = (theme: ThemeType): JssStyles => ({
   questionMark: {
-    alignSelf: 'center',
-    color: theme.palette.grey[600]
+    alignSelf: "center",
+    color: theme.palette.grey[600],
   },
   questionMarkIcon: {
-    fontSize: 20
+    fontSize: 20,
   },
   tooltipSection: {
-    marginTop: 8
-  }
-})
+    marginTop: 8,
+  },
+});
 
+const EditDigestActionButtons = ({ digest, classes }: { digest: DigestsMinimumInfo; classes: ClassesType }) => {
+  const { openDialog } = useDialog();
+  const isPublished = !!digest.publishedDate;
 
-const EditDigestActionButtons = ({digest, classes} : {
-  digest: DigestsMinimumInfo,
-  classes: ClassesType
-}) => {
-  const { openDialog } = useDialog()
-  const isPublished = !!digest.publishedDate
-  
   const { mutate: updateDigest } = useUpdate({
-    collectionName: 'Digests',
-    fragmentName: 'DigestsMinimumInfo',
-  })
-  
+    collectionName: "Digests",
+    fragmentName: "DigestsMinimumInfo",
+  });
+
   /**
    * Set the end date for this digest. A callback will automatically create the next digest.
    */
   const handleStartNewWeek = () => {
     void updateDigest({
-      selector: {_id: digest._id},
+      selector: { _id: digest._id },
       data: {
-        endDate: new Date()
-      }
-    })
-  }
-  
+        endDate: new Date(),
+      },
+    });
+  };
+
   /**
    * If the digest has been published before, set or unset the publishedDate.
    * Otherwise, open the publish confirmation dialog.
@@ -49,29 +45,32 @@ const EditDigestActionButtons = ({digest, classes} : {
     // if the digest has an endDate set, then we know it's already been published
     if (digest.endDate) {
       void updateDigest({
-        selector: {_id: digest._id},
+        selector: { _id: digest._id },
         data: {
-          publishedDate: isPublished ? null : new Date()
-        }
-      })
+          publishedDate: isPublished ? null : new Date(),
+        },
+      });
     } else {
       openDialog({
-        componentName: 'ConfirmPublishDialog',
-        componentProps: {digest}
-      })
+        componentName: "ConfirmPublishDialog",
+        componentProps: { digest },
+      });
     }
-  }
-  
-  const { EAButton, LWTooltip, ForumIcon } = Components
+  };
 
-  return <>
-    {!digest.endDate && <LWTooltip title="This sets the cut-off date for this digest and automatically sets up the next digest.">
-      <EAButton variant='outlined' onClick={handleStartNewWeek}>
-        Start new week
-      </EAButton>
-    </LWTooltip>}
-  
-    {/* TODO: Update this if/when we add an on-site version of the digest
+  const { EAButton, LWTooltip, ForumIcon } = Components;
+
+  return (
+    <>
+      {!digest.endDate && (
+        <LWTooltip title="This sets the cut-off date for this digest and automatically sets up the next digest.">
+          <EAButton variant="outlined" onClick={handleStartNewWeek}>
+            Start new week
+          </EAButton>
+        </LWTooltip>
+      )}
+
+      {/* TODO: Update this if/when we add an on-site version of the digest
     <EAButton variant={isPublished ? 'outlined' : 'contained'} onClick={handlePublish}>
       {isPublished ? 'Unpublish' : 'Publish'}
     </EAButton>
@@ -96,13 +95,16 @@ const EditDigestActionButtons = ({digest, classes} : {
     >
       <ForumIcon icon="QuestionMarkCircle" className={classes.questionMarkIcon} />
     </LWTooltip> */}
-  </>
-}
+    </>
+  );
+};
 
-const EditDigestActionButtonsComponent = registerComponent('EditDigestActionButtons', EditDigestActionButtons, {styles});
+const EditDigestActionButtonsComponent = registerComponent("EditDigestActionButtons", EditDigestActionButtons, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    EditDigestActionButtons: typeof EditDigestActionButtonsComponent
+    EditDigestActionButtons: typeof EditDigestActionButtonsComponent;
   }
 }

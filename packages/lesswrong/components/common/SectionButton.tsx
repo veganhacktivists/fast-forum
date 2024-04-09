@@ -1,7 +1,7 @@
-import React from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import classNames from 'classnames'
-import { isFriendlyUI } from '../../themes/forumTheme';
+import React from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import classNames from "classnames";
+import { isFriendlyUI } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -9,33 +9,40 @@ const styles = (theme: ThemeType): JssStyles => ({
     color: theme.palette.lwTertiary.main,
     display: "flex",
     alignItems: "center",
-    ...(isFriendlyUI ? {fontWeight: 600} : {}),
-    '& svg': {
-      marginRight: theme.spacing.unit
+    ...(isFriendlyUI ? { fontWeight: 600 } : {}),
+    "& svg": {
+      marginRight: theme.spacing.unit,
     },
-  }
-})
+  },
+});
 
-const SectionButton = ({children, classes, className, onClick}: {
-  children?: React.ReactNode,
-  classes: ClassesType,
-  className?: string,
-  onClick?: (event: React.MouseEvent) => void,
+const SectionButton = ({
+  children,
+  classes,
+  className,
+  onClick,
+}: {
+  children?: React.ReactNode;
+  classes: ClassesType;
+  className?: string;
+  onClick?: (event: React.MouseEvent) => void;
 }) => {
-  return <Components.Typography
-    component='span'
-    variant='body2'
-    className={classNames(classes.root, className)}
-    onClick={onClick}
-  >
-    {children}
-  </Components.Typography>
-}
+  return (
+    <Components.Typography
+      component="span"
+      variant="body2"
+      className={classNames(classes.root, className)}
+      onClick={onClick}
+    >
+      {children}
+    </Components.Typography>
+  );
+};
 
-const SectionButtonComponent = registerComponent('SectionButton', SectionButton, {styles})
+const SectionButtonComponent = registerComponent("SectionButton", SectionButton, { styles });
 
 declare global {
   interface ComponentTypes {
-    SectionButton: typeof SectionButtonComponent
+    SectionButton: typeof SectionButtonComponent;
   }
 }

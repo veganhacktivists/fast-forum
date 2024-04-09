@@ -41,23 +41,14 @@ export const styles = (theme: ThemeType): JssStyles => ({
  * votes yet, but most of the logic is in place. Once the design is finished, this
  * is a drop-in replacement for `PostsItemTagRelevance` in `EAPostsItem`.
  */
-const EAPostsItemTagRelevance = ({tagRel, classes}: {
-  tagRel: WithVoteTagRel,
-  classes: ClassesType,
-}) => {
-  const {openDialog} = useDialog();
-  const {flash} = useMessages();
-  const {captureEvent} = useTracking();
+const EAPostsItemTagRelevance = ({ tagRel, classes }: { tagRel: WithVoteTagRel; classes: ClassesType }) => {
+  const { openDialog } = useDialog();
+  const { flash } = useMessages();
+  const { captureEvent } = useTracking();
   const currentUser = useCurrentUser();
-  const {fail, reason: whyYouCantVote} = voteButtonsDisabledForUser(currentUser);
+  const { fail, reason: whyYouCantVote } = voteButtonsDisabledForUser(currentUser);
   const canVote = !fail;
-  const {
-    document,
-    collectionName,
-    baseScore,
-    vote,
-    voteCount,
-  } = useVote(tagRel, "TagRels");
+  const { document, collectionName, baseScore, vote, voteCount } = useVote(tagRel, "TagRels");
 
   const onVote = (voteType: string, isVoted: boolean) => async () => {
     if (currentUser && canVote) {
@@ -66,7 +57,7 @@ const EAPostsItemTagRelevance = ({tagRel, classes}: {
         voteType: isVoted ? "neutral" : voteType,
         currentUser,
       });
-      captureEvent("vote", {collectionName});
+      captureEvent("vote", { collectionName });
     } else if (currentUser) {
       flash(whyYouCantVote ?? "You can't vote on this");
     } else {
@@ -75,54 +66,48 @@ const EAPostsItemTagRelevance = ({tagRel, classes}: {
         componentProps: {},
       });
     }
-  }
+  };
 
   const isUpvoted = document.currentUserVote?.indexOf("Up") > 0;
   const isDownvoted = document.currentUserVote?.indexOf("Down") > 0;
 
-  const {LWTooltip, ForumIcon} = Components;
+  const { LWTooltip, ForumIcon } = Components;
 
   return (
     <div className={classes.root}>
       <ForumIcon
         icon="MinusSmall"
         onClick={onVote("smallDownvote", isDownvoted)}
-        className={classNames(
-          classes.button,
-          classes.downvote,
-          {[classes.downvoted]: isDownvoted},
-        )}
+        className={classNames(classes.button, classes.downvote, { [classes.downvoted]: isDownvoted })}
       />
-      <LWTooltip title={
-        <div>
-          <div>{baseScore} Relevance</div>
-          <div>({voteCount} {voteCount === 1 ? "vote" : "votes"})</div>
-          {!canVote && whyYouCantVote}
-        </div>
-      }>
+      <LWTooltip
+        title={
+          <div>
+            <div>{baseScore} Relevance</div>
+            <div>
+              ({voteCount} {voteCount === 1 ? "vote" : "votes"})
+            </div>
+            {!canVote && whyYouCantVote}
+          </div>
+        }
+      >
         <span>{baseScore}</span>
       </LWTooltip>
       <ForumIcon
         icon="PlusSmall"
         onClick={onVote("smallUpvote", isUpvoted)}
-        className={classNames(
-          classes.button,
-          classes.upvote,
-          {[classes.upvoted]: isUpvoted},
-        )}
+        className={classNames(classes.button, classes.upvote, { [classes.upvoted]: isUpvoted })}
       />
     </div>
   );
-}
+};
 
-const EAPostsItemTagRelevanceComponent = registerComponent(
-  "EAPostsItemTagRelevance",
-  EAPostsItemTagRelevance,
-  {styles},
-);
+const EAPostsItemTagRelevanceComponent = registerComponent("EAPostsItemTagRelevance", EAPostsItemTagRelevance, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    EAPostsItemTagRelevance: typeof EAPostsItemTagRelevanceComponent
+    EAPostsItemTagRelevance: typeof EAPostsItemTagRelevanceComponent;
   }
 }

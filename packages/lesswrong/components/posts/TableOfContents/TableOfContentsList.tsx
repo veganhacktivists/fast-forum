@@ -1,49 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
-import withErrorBoundary from '../../common/withErrorBoundary'
-import { isServer } from '../../../lib/executionEnvironment';
-import { useLocation } from '../../../lib/routeUtil';
-import type { ToCData, ToCSection } from '../../../lib/tableOfContents';
-import qs from 'qs'
-import isEmpty from 'lodash/isEmpty';
-import filter from 'lodash/filter';
-import { getCurrentSectionMark, ScrollHighlightLandmark, useScrollHighlight } from '../../hooks/useScrollHighlight';
-import { useNavigate } from '../../../lib/reactRouterWrapper';
+import React, { useState, useEffect } from "react";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
+import withErrorBoundary from "../../common/withErrorBoundary";
+import { isServer } from "../../../lib/executionEnvironment";
+import { useLocation } from "../../../lib/routeUtil";
+import type { ToCData, ToCSection } from "../../../lib/tableOfContents";
+import qs from "qs";
+import isEmpty from "lodash/isEmpty";
+import filter from "lodash/filter";
+import { getCurrentSectionMark, ScrollHighlightLandmark, useScrollHighlight } from "../../hooks/useScrollHighlight";
+import { useNavigate } from "../../../lib/reactRouterWrapper";
 
 export interface ToCDisplayOptions {
   /**
    * Convert section titles from all-caps to title-case. Used for the Concepts page
    * where the LW version has all-caps section headings as a form of bolding.
    */
-  downcaseAllCapsHeadings?: boolean
-  
+  downcaseAllCapsHeadings?: boolean;
+
   /**
    * Don't show sections nested below a certain depth. Used on the LW version of the
    * Concepts page, where there would otherwise be section headings for subcategories
    * of the core tags, resulting in a ToC that's overwhelmingly big.
    */
-  maxHeadingDepth?: number
-  
+  maxHeadingDepth?: number;
+
   /**
    * Extra rows to add to the bottom of the ToC. You'll want to use this instead of
    * adding extra React components after the ToC if those rows have corresponding
    * anchors and should be highlighted based on scroll position.
    */
-  addedRows?: ToCSection[],
+  addedRows?: ToCSection[];
 }
 
 const topSection = "top";
 
 const isRegularClick = (ev: React.MouseEvent) => {
   if (!ev) return false;
-  return ev.button===0 && !ev.ctrlKey && !ev.shiftKey && !ev.altKey && !ev.metaKey;
-}
+  return ev.button === 0 && !ev.ctrlKey && !ev.shiftKey && !ev.altKey && !ev.metaKey;
+};
 
-const TableOfContentsList = ({tocSections, title, onClickSection, displayOptions}: {
-  tocSections: ToCSection[],
-  title: string|null,
-  onClickSection?: ()=>void,
-  displayOptions?: ToCDisplayOptions,
+const TableOfContentsList = ({
+  tocSections,
+  title,
+  onClickSection,
+  displayOptions,
+}: {
+  tocSections: ToCSection[];
+  title: string | null;
+  onClickSection?: () => void;
+  displayOptions?: ToCDisplayOptions;
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,51 +61,53 @@ const TableOfContentsList = ({tocSections, title, onClickSection, displayOptions
     if (anchorY !== null) {
       delete query.commentId;
       navigate({
-        search: isEmpty(query) ? '' : `?${qs.stringify(query)}`,
+        search: isEmpty(query) ? "" : `?${qs.stringify(query)}`,
         hash: `#${anchor}`,
       });
       let sectionYdocumentSpace = anchorY + window.scrollY;
       jumpToY(sectionYdocumentSpace);
     }
-  }
+  };
 
   const { TableOfContentsRow, AnswerTocRow } = Components;
 
-  let filteredSections = (displayOptions?.maxHeadingDepth && tocSections)
-    ? filter(tocSections, s=>s.level <= displayOptions.maxHeadingDepth!)
-    : tocSections;
+  let filteredSections =
+    displayOptions?.maxHeadingDepth && tocSections
+      ? filter(tocSections, (s) => s.level <= displayOptions.maxHeadingDepth!)
+      : tocSections;
 
   if (displayOptions?.addedRows) {
     filteredSections = [...filteredSections, ...displayOptions.addedRows];
   }
-  
+
   const { landmarkName: currentSection } = useScrollHighlight([
-    ...filteredSections.map((section): ScrollHighlightLandmark => ({
-      landmarkName: section.anchor,
-      elementId: section.anchor,
-      position: "centerOfElement"
-    })),
+    ...filteredSections.map(
+      (section): ScrollHighlightLandmark => ({
+        landmarkName: section.anchor,
+        elementId: section.anchor,
+        position: "centerOfElement",
+      }),
+    ),
     {
       landmarkName: "comments",
       elementId: "postBody",
-      position: "bottomOfElement"
+      position: "bottomOfElement",
     },
   ]);
 
-  if (!tocSections)
-    return <div/>
+  if (!tocSections) return <div />;
 
-  const handleClick = async (ev: React.SyntheticEvent, jumpToSection: ()=>void): Promise<void> => {
+  const handleClick = async (ev: React.SyntheticEvent, jumpToSection: () => void): Promise<void> => {
     ev.preventDefault();
     if (onClickSection) {
       onClickSection();
       // One of the things this callback can do is expand folded-up text which
       // might contain the anchor we want to scroll to. We wait for a setTimeout
       // here, to allow React re-rendering to finish in that case.
-      await new Promise((resolve,reject) => setTimeout(resolve, 0));
+      await new Promise((resolve, reject) => setTimeout(resolve, 0));
     }
     jumpToSection();
-  }
+  };
 
   // Since the Table of Contents data is sent as part of the post data and
   // partially generated from the post html, changing the answers ordering
@@ -111,8 +118,8 @@ const TableOfContentsList = ({tocSections, title, onClickSection, displayOptions
   if (answersSorting === "newest" || answersSorting === "oldest") {
     filteredSections = sectionsWithAnswersSorted(filteredSections, answersSorting);
   }
-  
-  function adjustHeadingText(text: string|undefined) {
+
+  function adjustHeadingText(text: string | undefined) {
     if (!text) return "";
     if (displayOptions?.downcaseAllCapsHeadings) {
       return downcaseIfAllCaps(text.trim());
@@ -121,65 +128,68 @@ const TableOfContentsList = ({tocSections, title, onClickSection, displayOptions
     }
   }
 
-  return <div>
-    <TableOfContentsRow key="postTitle"
-      href="#"
-      onClick={ev => {
-        if (isRegularClick(ev)) {
-          void handleClick(ev, () => {
-            navigate("#");
-            jumpToY(0)
-          });
-        }
-      }}
-      highlighted={currentSection === "above"}
-      title
-    >
-      {title?.trim()}
-    </TableOfContentsRow>
-    
-    {filteredSections.map((section, index) => {
-      return (
-        <TableOfContentsRow
-          key={section.anchor}
-          indentLevel={section.level}
-          divider={section.divider}
-          highlighted={section.anchor === currentSection}
-          href={"#"+section.anchor}
-          onClick={(ev) => {
-            if (isRegularClick(ev)) {
-              void handleClick(ev, () => {
-                jumpToAnchor(section.anchor)
-              });
-            }
-          }}
-          answer={!!section.answer}
-        >
-          {section.answer
-            ? <AnswerTocRow answer={section.answer} />
-            : <span>{adjustHeadingText(section.title)}</span>
+  return (
+    <div>
+      <TableOfContentsRow
+        key="postTitle"
+        href="#"
+        onClick={(ev) => {
+          if (isRegularClick(ev)) {
+            void handleClick(ev, () => {
+              navigate("#");
+              jumpToY(0);
+            });
           }
-        </TableOfContentsRow>
-      )
-    })}
-  </div>
-}
+        }}
+        highlighted={currentSection === "above"}
+        title
+      >
+        {title?.trim()}
+      </TableOfContentsRow>
 
+      {filteredSections.map((section, index) => {
+        return (
+          <TableOfContentsRow
+            key={section.anchor}
+            indentLevel={section.level}
+            divider={section.divider}
+            highlighted={section.anchor === currentSection}
+            href={"#" + section.anchor}
+            onClick={(ev) => {
+              if (isRegularClick(ev)) {
+                void handleClick(ev, () => {
+                  jumpToAnchor(section.anchor);
+                });
+              }
+            }}
+            answer={!!section.answer}
+          >
+            {section.answer ? (
+              <AnswerTocRow answer={section.answer} />
+            ) : (
+              <span>{adjustHeadingText(section.title)}</span>
+            )}
+          </TableOfContentsRow>
+        );
+      })}
+    </div>
+  );
+};
 
 /**
  * Return the screen-space Y coordinate of an anchor. (Screen-space meaning
  * if you've scrolled, the scroll is subtracted from the effective Y
  * position.)
  */
-export const getAnchorY = (anchorName: string): number|null => {
+export const getAnchorY = (anchorName: string): number | null => {
   let anchor = window.document.getElementById(anchorName);
   if (anchor) {
     let anchorBounds = anchor.getBoundingClientRect();
-    return anchorBounds.top + (anchorBounds.height/2);
+    return anchorBounds.top + anchorBounds.height / 2;
   } else {
-    return null
+    return null;
   }
-}
+};
 
 export const jumpToY = (y: number) => {
   if (isServer) return;
@@ -187,30 +197,23 @@ export const jumpToY = (y: number) => {
   try {
     window.scrollTo({
       top: y - getCurrentSectionMark() + 1,
-      behavior: "smooth"
+      behavior: "smooth",
     });
-  } catch(e) {
+  } catch (e) {
     // eslint-disable-next-line no-console
-    console.warn("scrollTo not supported, using link fallback", e)
+    console.warn("scrollTo not supported, using link fallback", e);
   }
-}
+};
 
-
-const TableOfContentsListComponent = registerComponent(
-  "TableOfContentsList", TableOfContentsList, {
-    hocs: [withErrorBoundary]
-  }
-);
-
+const TableOfContentsListComponent = registerComponent("TableOfContentsList", TableOfContentsList, {
+  hocs: [withErrorBoundary],
+});
 
 /**
  * Returns a shallow copy of the ToC sections with question answers sorted by date,
  * without changing the position of other sections.
  */
-const sectionsWithAnswersSorted = (
-  sections: ToCSection[],
-  sorting: "newest" | "oldest"
-) => {
+const sectionsWithAnswersSorted = (sections: ToCSection[], sorting: "newest" | "oldest") => {
   const answersSectionsIndexes = sections
     .map((section, index) => [section, index] as const)
     .filter(([section, _]) => !!section.answer);
@@ -221,8 +224,12 @@ const sectionsWithAnswersSorted = (
   answersSections.sort((section1, section2) => {
     const value1 = section1.answer?.postedAt || "";
     const value2 = section2.answer?.postedAt || "";
-    if (value1 < value2) { return sign; }
-    if (value1 > value2) { return -sign; }
+    if (value1 < value2) {
+      return sign;
+    }
+    if (value1 > value2) {
+      return -sign;
+    }
     return 0;
   });
 
@@ -235,23 +242,22 @@ const sectionsWithAnswersSorted = (
 
 function downcaseIfAllCaps(text: string) {
   // If already mixed-case, don't do anything
-  if (text !== text.toUpperCase())
-    return text;
-  
+  if (text !== text.toUpperCase()) return text;
+
   // Split on spaces, downcase everything except the first character of each token
-  const tokens = text.split(' ');
+  const tokens = text.split(" ");
   const downcaseToken = (tok: string) => {
     if (tok.length > 1) {
-      return tok.substr(0,1) + tok.substr(1).toLowerCase();
+      return tok.substr(0, 1) + tok.substr(1).toLowerCase();
     } else {
       return tok;
     }
-  }
-  return tokens.map(tok => downcaseToken(tok)).join(' ');
+  };
+  return tokens.map((tok) => downcaseToken(tok)).join(" ");
 }
 
 declare global {
   interface ComponentTypes {
-    TableOfContentsList: typeof TableOfContentsListComponent
+    TableOfContentsList: typeof TableOfContentsListComponent;
   }
 }

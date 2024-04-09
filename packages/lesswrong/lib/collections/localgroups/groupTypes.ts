@@ -1,4 +1,4 @@
-import * as _ from 'underscore';
+import * as _ from "underscore";
 
 export const groupTypes = [
   {
@@ -16,13 +16,11 @@ export const groupTypes = [
   {
     shortName: "MIRIx",
     longName: "MIRIx",
-  }
+  },
 ];
 
-export const localGroupTypeFormOptions = _.map(groupTypes,
-  groupType => {
-    return {
-      value: groupType.shortName,
-    };
-  }
-);
+export const localGroupTypeFormOptions = _.map(groupTypes, (groupType) => {
+  return {
+    value: groupType.shortName,
+  };
+});

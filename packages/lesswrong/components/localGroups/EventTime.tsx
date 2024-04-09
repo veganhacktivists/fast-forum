@@ -1,42 +1,39 @@
-import { registerComponent } from '../../lib/vulcan-lib';
-import React from 'react';
-import moment from '../../lib/moment-timezone';
-import { useTimezone } from '../common/withTimezone';
+import { registerComponent } from "../../lib/vulcan-lib";
+import React from "react";
+import moment from "../../lib/moment-timezone";
+import { useTimezone } from "../common/withTimezone";
 
 function getDateFormat(dense: boolean, isThisYear: boolean): string {
   if (dense) {
     if (isThisYear) {
-      return 'DD MMM'; // 5 Jan
+      return "DD MMM"; // 5 Jan
     } else {
-      return 'DD MMM YYYY'; // 5 Jan 2020
+      return "DD MMM YYYY"; // 5 Jan 2020
     }
   } else {
     if (isThisYear) {
-      return 'dddd Do MMMM'; // Friday 5th January
+      return "dddd Do MMMM"; // Friday 5th January
     } else {
-      return 'dddd Do MMMM YYYY'; // Friday 5th January 2020
+      return "dddd Do MMMM YYYY"; // Friday 5th January 2020
     }
   }
 }
 
-const EventTime = ({post, dense=false}: {
-  post: PostsBase,
-  dense?: boolean,
-}) => {
+const EventTime = ({ post, dense = false }: { post: PostsBase; dense?: boolean }) => {
   const { timezone } = useTimezone();
   const start = post.startTime ? moment(post.startTime).tz(timezone) : undefined;
   const end = post.endTime ? moment(post.endTime).tz(timezone) : undefined;
 
-  const isThisYear = moment().isSame(start, 'year')
+  const isThisYear = moment().isSame(start, "year");
 
   // Date and time formats
-  const timeFormat = 'h:mm a z'; // 11:30 am PDT
+  const timeFormat = "h:mm a z"; // 11:30 am PDT
   const dateFormat = getDateFormat(dense, isThisYear);
 
   // Alternate formats omitting the timezone, for the start time in a
   // start-end range.
-  const startTimeFormat = 'h:mm a'; // 11:30 am
-  const calendarFormat = {sameElse: `${dateFormat}[ at ]${startTimeFormat}`};
+  const startTimeFormat = "h:mm a"; // 11:30 am
+  const calendarFormat = { sameElse: `${dateFormat}[ at ]${startTimeFormat}` };
 
   // Neither start nor end time specified
   if (!start && !end) {
@@ -49,7 +46,11 @@ const EventTime = ({post, dense=false}: {
   // less sense, but users can enter silly things.)
   else if (!start || !end) {
     const eventTime = start ? start : end;
-    return <>{eventTime!.calendar(calendarFormat)} {eventTime!.format('z')}</>
+    return (
+      <>
+        {eventTime!.calendar(calendarFormat)} {eventTime!.format("z")}
+      </>
+    );
   }
   // Both start end end time specified
   else {
@@ -59,23 +60,26 @@ const EventTime = ({post, dense=false}: {
     //   January 15, 19:00 to January 16 12:00 PDT
     // In both cases we avoid duplicating the timezone.
     if (start.format("YYYY-MM-DD") === end.format("YYYY-MM-DD")) {
-      return <div>
-        <div>{start.format(dateFormat)}</div>
-        <div>{start.format(startTimeFormat) + ' – ' + end.format(timeFormat)}</div>
-      </div>
+      return (
+        <div>
+          <div>{start.format(dateFormat)}</div>
+          <div>{start.format(startTimeFormat) + " – " + end.format(timeFormat)}</div>
+        </div>
+      );
     } else {
-      return (<span>
-        {start.calendar({}, calendarFormat)} to {end.calendar({}, calendarFormat)} {end.format('z')}
-      </span>);
+      return (
+        <span>
+          {start.calendar({}, calendarFormat)} to {end.calendar({}, calendarFormat)} {end.format("z")}
+        </span>
+      );
     }
   }
 };
 
-const EventTimeComponent = registerComponent('EventTime', EventTime);
+const EventTimeComponent = registerComponent("EventTime", EventTime);
 
 declare global {
   interface ComponentTypes {
-    EventTime: typeof EventTimeComponent
+    EventTime: typeof EventTimeComponent;
   }
 }
-

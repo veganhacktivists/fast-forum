@@ -1,6 +1,6 @@
-import { userOwns } from '../../vulcan-users/permissions';
-import { schemaDefaultValue, resolverOnlyField } from '../../utils/schemaUtils';
-import GraphQLJSON from 'graphql-type-json';
+import { userOwns } from "../../vulcan-users/permissions";
+import { schemaDefaultValue, resolverOnlyField } from "../../utils/schemaUtils";
+import GraphQLJSON from "graphql-type-json";
 
 //
 // Votes. From the user's perspective, they have a vote-state for each voteable
@@ -15,17 +15,17 @@ import GraphQLJSON from 'graphql-type-json';
 // that was reversed.
 //
 
-const docIsTagRel = (currentUser: DbUser|UsersCurrent|null, document: DbVote) => {
+const docIsTagRel = (currentUser: DbUser | UsersCurrent | null, document: DbVote) => {
   // TagRel votes are treated as public
-  return document?.collectionName === "TagRels"
-}
+  return document?.collectionName === "TagRels";
+};
 
 const schema: SchemaType<"Votes"> = {
   // The id of the document that was voted on
   documentId: {
     type: String,
     nullable: false,
-    canRead: ['guests'],
+    canRead: ["guests"],
     // No explicit foreign-key relation because which collection this is depends on collectionName
   },
 
@@ -34,33 +34,33 @@ const schema: SchemaType<"Votes"> = {
     type: String,
     nullable: false,
     typescriptType: "CollectionNameString",
-    canRead: ['guests'],
+    canRead: ["guests"],
   },
 
   // The id of the user that voted
   userId: {
     type: String,
     nullable: false,
-    canRead: [userOwns, docIsTagRel, 'admins'],
-    foreignKey: 'Users',
+    canRead: [userOwns, docIsTagRel, "admins"],
+    foreignKey: "Users",
   },
 
   // The IDs of the authors of the document that was voted on
   authorIds: {
     type: Array,
-    canRead: ['guests'],
+    canRead: ["guests"],
   },
-  'authorIds.$': {
+  "authorIds.$": {
     type: String,
-    foreignKey: 'Users',
+    foreignKey: "Users",
   },
 
   // Resolver-only authorId for backwards compatability after migrating to allow
   // co-authors to receive karma with authorIds
   authorId: resolverOnlyField({
     type: String,
-    graphQLtype: 'String',
-    canRead: ['guests'],
+    graphQLtype: "String",
+    canRead: ["guests"],
     resolver: (vote: DbVote) => vote.authorIds?.[0],
   }),
 
@@ -73,16 +73,16 @@ const schema: SchemaType<"Votes"> = {
   voteType: {
     type: String,
     nullable: false,
-    canRead: ['guests'],
+    canRead: ["guests"],
   },
-  
+
   // If this vote was cast in an alternate voting system, this is the complete
   // ballot. If the vote was cast in traditional Reddit-style upvoting/downvoting,
   // then this is null.
   extendedVoteType: {
     type: GraphQLJSON,
     optional: true,
-    canRead: ['guests'],
+    canRead: ["guests"],
   },
 
   // The vote power - that is, the effect this vote had on the comment/post's
@@ -96,14 +96,14 @@ const schema: SchemaType<"Votes"> = {
   power: {
     type: Number,
     optional: true,
-    nullable: false,    
-    canRead: [userOwns, docIsTagRel, 'admins'],
-    
+    nullable: false,
+    canRead: [userOwns, docIsTagRel, "admins"],
+
     // Can be inferred from userId+voteType+votedAt (votedAt necessary because
     // the user's vote power may have changed over time)
     denormalized: true,
   },
-  
+
   // The vote's alignment-forum power - that is, the effect this vote had on
   // the comment/post's AF score.
   //
@@ -112,21 +112,21 @@ const schema: SchemaType<"Votes"> = {
   afPower: {
     type: Number,
     optional: true,
-    canRead: [userOwns, docIsTagRel, 'admins'],
+    canRead: [userOwns, docIsTagRel, "admins"],
   },
-  
+
   // Whether this vote has been cancelled (by un-voting or switching to a
   // different vote type) or is itself an unvote/cancellation.
   cancelled: {
     type: Boolean,
-    canRead: ['guests'],
+    canRead: ["guests"],
     ...schemaDefaultValue(false),
   },
-  
+
   // Whether this is an unvote. This data is unreliable on the EA Forum for old votes (around 2019).
   isUnvote: {
     type: Boolean,
-    canRead: ['guests'],
+    canRead: ["guests"],
     ...schemaDefaultValue(false),
   },
 
@@ -136,65 +136,65 @@ const schema: SchemaType<"Votes"> = {
     type: Date,
     optional: true,
     nullable: false,
-    canRead: [userOwns, docIsTagRel, 'admins'],
+    canRead: [userOwns, docIsTagRel, "admins"],
   },
 
   tagRel: resolverOnlyField({
     type: "TagRel",
-    graphQLtype: 'TagRel',
-    canRead: [docIsTagRel, 'admins'],
-    resolver: async (vote: DbVote, args: void, { TagRels }: ResolverContext): Promise<DbTagRel|null> => {
+    graphQLtype: "TagRel",
+    canRead: [docIsTagRel, "admins"],
+    resolver: async (vote: DbVote, args: void, { TagRels }: ResolverContext): Promise<DbTagRel | null> => {
       if (vote.collectionName === "TagRels") {
-        return await TagRels.findOne({_id: vote.documentId});
+        return await TagRels.findOne({ _id: vote.documentId });
       } else {
         return null;
       }
-    }
+    },
   }),
 
   comment: resolverOnlyField({
     type: "Comment",
-    graphQLtype: 'Comment',
-    canRead: ['guests'],
-    resolver: async (vote: DbVote, args: void, context: ResolverContext): Promise<DbComment|null> => {
+    graphQLtype: "Comment",
+    canRead: ["guests"],
+    resolver: async (vote: DbVote, args: void, context: ResolverContext): Promise<DbComment | null> => {
       if (vote.collectionName === "Comments") {
         return await context.loaders.Comments.load(vote.documentId);
       } else {
         return null;
       }
-    }
+    },
   }),
 
   post: resolverOnlyField({
     type: "Post",
-    graphQLtype: 'Post',
-    canRead: ['guests'],
-    resolver: async (vote: DbVote, args: void, context: ResolverContext): Promise<DbPost|null> => {
+    graphQLtype: "Post",
+    canRead: ["guests"],
+    resolver: async (vote: DbVote, args: void, context: ResolverContext): Promise<DbPost | null> => {
       if (vote.collectionName === "Posts") {
         return await context.loaders.Posts.load(vote.documentId);
       } else {
         return null;
       }
-    }
+    },
   }),
 
   // This flag allows us to calculate the baseScore/karma of documents and users using nothing but the votes
   // collection. Otherwise doing that calculation would require a lookup, which is pretty expensive
   documentIsAf: {
     type: Boolean,
-    canRead: ['guests'],
-    ...schemaDefaultValue(false)
+    canRead: ["guests"],
+    ...schemaDefaultValue(false),
   },
 
   // Whether to silence notifications of the karma changes from this vote. This is set to true for votes that are
   // nullified by mod actions
   silenceNotification: {
     type: Boolean,
-    canRead: ['guests'],
+    canRead: ["guests"],
     optional: true,
     nullable: false,
-    ...schemaDefaultValue(false)
-  }
+    ...schemaDefaultValue(false),
+  },
 };
 
 export default schema;

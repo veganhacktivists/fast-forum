@@ -1,4 +1,4 @@
-import { registerFragment } from '../../vulcan-lib/fragments';
+import { registerFragment } from "../../vulcan-lib/fragments";
 
 registerFragment(`
   fragment NotificationsList on Notification {

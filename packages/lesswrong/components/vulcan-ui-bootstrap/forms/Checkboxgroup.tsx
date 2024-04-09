@@ -1,27 +1,40 @@
-import React from 'react';
-import Form from 'react-bootstrap/Form';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
-import without from 'lodash/without';
-import uniq from 'lodash/uniq';
-import intersection from 'lodash/intersection';
-import * as _ from 'underscore';
+import React from "react";
+import Form from "react-bootstrap/Form";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
+import without from "lodash/without";
+import uniq from "lodash/uniq";
+import intersection from "lodash/intersection";
+import * as _ from "underscore";
 
 // note: treat checkbox group the same as a nested component, using `path`
-const CheckboxGroupComponent = ({ refFunction, label, path, value, formType, updateCurrentValues, inputProperties, itemProperties }: AnyBecauseTodo) => {
-
+const CheckboxGroupComponent = ({
+  refFunction,
+  label,
+  path,
+  value,
+  formType,
+  updateCurrentValues,
+  inputProperties,
+  itemProperties,
+}: AnyBecauseTodo) => {
   const { options } = inputProperties;
 
   // get rid of duplicate values or any values that are not included in the options provided
-  value = uniq(intersection(value, options.map((o: AnyBecauseTodo) => o.value)));
+  value = uniq(
+    intersection(
+      value,
+      options.map((o: AnyBecauseTodo) => o.value),
+    ),
+  );
 
   // if this is a "new document" form check options' "checked" property to populate value
-  if (formType === 'new' && value.length === 0) {
+  if (formType === "new" && value.length === 0) {
     const checkedValues = _.where(options, { checked: true }).map((option: any) => option.value);
     if (checkedValues.length) {
       value = checkedValues;
     }
   }
-  
+
   return (
     <Components.FormItem path={inputProperties.path} label={inputProperties.label} {...itemProperties}>
       <div>
@@ -48,11 +61,10 @@ const CheckboxGroupComponent = ({ refFunction, label, path, value, formType, upd
   );
 };
 
-const FormComponentCheckboxGroupComponent = registerComponent('FormComponentCheckboxGroup', CheckboxGroupComponent);
+const FormComponentCheckboxGroupComponent = registerComponent("FormComponentCheckboxGroup", CheckboxGroupComponent);
 
 declare global {
   interface ComponentTypes {
-    FormComponentCheckboxGroup: typeof FormComponentCheckboxGroupComponent
+    FormComponentCheckboxGroup: typeof FormComponentCheckboxGroupComponent;
   }
 }
-

@@ -34,15 +34,15 @@
  */
 export const acceptsSchemaHash = "f167b9a94ae9eebe159267d6ca82d3a4";
 
-import Spotlights from "../../lib/collections/spotlights/collection"
-import { addField, dropField } from "./meta/utils"
+import Spotlights from "../../lib/collections/spotlights/collection";
+import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Spotlights, "showAuthor")
-  await addField(db, Spotlights, "spotlightDarkImageId")
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Spotlights, "showAuthor");
+  await addField(db, Spotlights, "spotlightDarkImageId");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Spotlights, "showAuthor")
-  await dropField(db, Spotlights, "spotlightDarkImageId")
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Spotlights, "showAuthor");
+  await dropField(db, Spotlights, "spotlightDarkImageId");
+};

@@ -21,9 +21,9 @@ export const addField = async <N extends CollectionNameString>(
   fieldName: keyof ObjectsByCollectionName[N] & string,
   skipValidation = false,
 ): Promise<void> => {
-  const {sql, args} = new AddFieldQuery(collection.getTable(), fieldName, skipValidation).compile();
+  const { sql, args } = new AddFieldQuery(collection.getTable(), fieldName, skipValidation).compile();
   await db.none(sql, args);
-}
+};
 
 /**
  * WARNING: Please use addField instead (if possible)!
@@ -36,9 +36,9 @@ export const addRemovedField = async <N extends CollectionNameString>(
   collection: CollectionBase<N>,
   fieldName: string,
 ): Promise<void> => {
-  const {sql, args} = new AddFieldQuery(collection.getTable(), fieldName, true).compile();
+  const { sql, args } = new AddFieldQuery(collection.getTable(), fieldName, true).compile();
   await db.none(sql, args);
-}
+};
 
 export const dropField = async <N extends CollectionNameString>(
   db: SqlClientOrTx,
@@ -46,9 +46,9 @@ export const dropField = async <N extends CollectionNameString>(
   fieldName: keyof ObjectsByCollectionName[N] & string,
   skipValidation = false,
 ): Promise<void> => {
-  const {sql, args} = new DropFieldQuery(collection.getTable(), fieldName, skipValidation).compile();
+  const { sql, args } = new DropFieldQuery(collection.getTable(), fieldName, skipValidation).compile();
   await db.none(sql, args);
-}
+};
 
 /**
  * WARNING: Please use dropField instead (if possible)!
@@ -61,45 +61,45 @@ export const dropRemovedField = async <N extends CollectionNameString>(
   collection: CollectionBase<N>,
   fieldName: string,
 ): Promise<void> => {
-  const {sql, args} = new DropFieldQuery(collection.getTable(), fieldName, true).compile();
+  const { sql, args } = new DropFieldQuery(collection.getTable(), fieldName, true).compile();
   await db.none(sql, args);
-}
+};
 
 export const updateDefaultValue = async <N extends CollectionNameString>(
   db: SqlClientOrTx,
   collection: CollectionBase<N>,
   fieldName: keyof ObjectsByCollectionName[N] & string,
 ): Promise<void> => {
-  const {sql, args} = new UpdateDefaultValueQuery(collection.getTable(), fieldName).compile();
+  const { sql, args } = new UpdateDefaultValueQuery(collection.getTable(), fieldName).compile();
   await db.none(sql, args);
-}
+};
 
 export const dropDefaultValue = async <N extends CollectionNameString>(
   db: SqlClientOrTx,
   collection: CollectionBase<N>,
   fieldName: keyof ObjectsByCollectionName[N] & string,
 ): Promise<void> => {
-  const {sql, args} = new DropDefaultValueQuery(collection.getTable(), fieldName).compile();
+  const { sql, args } = new DropDefaultValueQuery(collection.getTable(), fieldName).compile();
   await db.none(sql, args);
-}
+};
 
 export const updateFieldType = async <N extends CollectionNameString>(
   db: SqlClientOrTx,
   collection: CollectionBase<N>,
   fieldName: keyof ObjectsByCollectionName[N] & string,
 ): Promise<void> => {
-  const {sql, args} = new UpdateFieldTypeQuery(collection.getTable(), fieldName).compile();
+  const { sql, args } = new UpdateFieldTypeQuery(collection.getTable(), fieldName).compile();
   await db.none(sql, args);
-}
+};
 
 export const dropIndex = async <N extends CollectionNameString>(
   db: SqlClientOrTx,
   collection: CollectionBase<N>,
   index: TableIndex<ObjectsByCollectionName[N]>,
 ): Promise<void> => {
-  const {sql, args} = new DropIndexQuery(collection.getTable(), index).compile();
+  const { sql, args } = new DropIndexQuery(collection.getTable(), index).compile();
   await db.none(sql, args);
-}
+};
 
 export const createIndex = async <N extends CollectionNameString>(
   db: SqlClientOrTx,
@@ -107,17 +107,17 @@ export const createIndex = async <N extends CollectionNameString>(
   index: TableIndex<ObjectsByCollectionName[N]>,
   ifNotExists = true,
 ): Promise<void> => {
-  const {sql, args} = new CreateIndexQuery(collection.getTable(), index, ifNotExists).compile();
+  const { sql, args } = new CreateIndexQuery(collection.getTable(), index, ifNotExists).compile();
   await db.none(sql, args);
-}
+};
 
 export const dropTable = async <N extends CollectionNameString>(
   db: SqlClientOrTx,
   collection: CollectionBase<N>,
 ): Promise<void> => {
-  const {sql, args} = new DropTableQuery(collection.getTable()).compile();
+  const { sql, args } = new DropTableQuery(collection.getTable()).compile();
   await db.none(sql, args);
-}
+};
 
 export const createTable = async <N extends CollectionNameString>(
   db: SqlClientOrTx,
@@ -125,22 +125,22 @@ export const createTable = async <N extends CollectionNameString>(
   ifNotExists = true,
 ): Promise<void> => {
   const table = collection.getTable();
-  const {sql, args} = new CreateTableQuery(table, ifNotExists).compile();
+  const { sql, args } = new CreateTableQuery(table, ifNotExists).compile();
   await db.none(sql, args);
   for (const index of table.getIndexes()) {
     await createIndex(db, collection, index, ifNotExists);
   }
-}
+};
 
 export const installExtensions = async (db: SqlClientOrTx) => {
   for (const extension of postgresExtensions) {
-    const {sql, args} = new CreateExtensionQuery(extension).compile();
+    const { sql, args } = new CreateExtensionQuery(extension).compile();
     await db.none(sql, args);
   }
-}
+};
 
 export const updateFunctions = async (db: SqlClientOrTx) => {
   for (const query of postgresFunctions) {
     await db.none(query);
   }
-}
+};

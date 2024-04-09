@@ -5,7 +5,7 @@ describe("DeleteQuery", () => {
   runTestCases([
     {
       name: "can build delete with selector",
-      getQuery: () => new DeleteQuery<DbTestObject>(testTable, {a: 3, b: "test"}),
+      getQuery: () => new DeleteQuery<DbTestObject>(testTable, { a: 3, b: "test" }),
       expectedSql: 'DELETE FROM "TestCollection" WHERE ( "a" = $1 AND "b" = $2 )',
       expectedArgs: [3, "test"],
     },
@@ -22,14 +22,15 @@ describe("DeleteQuery", () => {
     },
     {
       name: "can build delete with no selector with 'noSafetyHarness'",
-      getQuery: () => new DeleteQuery<DbTestObject>(testTable, {}, {}, {noSafetyHarness: true}),
+      getQuery: () => new DeleteQuery<DbTestObject>(testTable, {}, {}, { noSafetyHarness: true }),
       expectedSql: 'DELETE FROM "TestCollection"',
       expectedArgs: [],
     },
     {
       name: "can build delete with limit",
-      getQuery: () => new DeleteQuery<DbTestObject>(testTable, {a: 3}, {}, {limit: 1}),
-      expectedSql: 'DELETE FROM "TestCollection" WHERE _id IN ( SELECT "_id" FROM "TestCollection" WHERE "a" = $1 LIMIT $2 )',
+      getQuery: () => new DeleteQuery<DbTestObject>(testTable, { a: 3 }, {}, { limit: 1 }),
+      expectedSql:
+        'DELETE FROM "TestCollection" WHERE _id IN ( SELECT "_id" FROM "TestCollection" WHERE "a" = $1 LIMIT $2 )',
       expectedArgs: [3, 1],
     },
   ]);

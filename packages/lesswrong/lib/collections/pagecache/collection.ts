@@ -1,18 +1,18 @@
-import schema from './schema';
-import { createCollection } from '../../vulcan-lib';
-import { addUniversalFields } from '../../collectionUtils'
-import { ensureCustomPgIndex, ensureIndex } from '../../collectionIndexUtils';
+import schema from "./schema";
+import { createCollection } from "../../vulcan-lib";
+import { addUniversalFields } from "../../collectionUtils";
+import { ensureCustomPgIndex, ensureIndex } from "../../collectionIndexUtils";
 
 export const PageCache: PageCacheCollection = createCollection({
-  collectionName: 'PageCache',
-  typeName: 'PageCacheEntry',
+  collectionName: "PageCache",
+  typeName: "PageCacheEntry",
   schema,
   logChanges: false,
 });
 
-addUniversalFields({collection: PageCache})
+addUniversalFields({ collection: PageCache });
 
-ensureIndex(PageCache, {path: 1, bundleHash: 1, expiresAt: 1})
+ensureIndex(PageCache, { path: 1, bundleHash: 1, expiresAt: 1 });
 
 void ensureCustomPgIndex(`
   CREATE UNIQUE INDEX IF NOT EXISTS "idx_PageCache_path_abTestGroups_bundleHash"

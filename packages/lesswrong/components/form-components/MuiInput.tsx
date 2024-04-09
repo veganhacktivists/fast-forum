@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { registerComponent } from '../../lib/vulcan-lib';
-import Input from '@material-ui/core/Input';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { registerComponent } from "../../lib/vulcan-lib";
+import Input from "@material-ui/core/Input";
 
 const styles = (theme: ThemeType): JssStyles => ({
   // input: {
@@ -9,34 +9,47 @@ const styles = (theme: ThemeType): JssStyles => ({
   //   // padding: "6px 0 7px !important",
   //   fontSize: "15px !important"
   // },
-})
+});
 
-class MuiInput extends Component<any,any> {
+class MuiInput extends Component<any, any> {
   constructor(props: any, context: any) {
-    super(props,context);
+    super(props, context);
     this.state = {
-      contents: (props.document && props.document[props.path]) || props.defaultValue || ""
-    }
+      contents: (props.document && props.document[props.path]) || props.defaultValue || "",
+    };
   }
 
   componentDidMount() {
-    this.context.addToSuccessForm(() => this.setState({contents: ""}))
+    this.context.addToSuccessForm(() => this.setState({ contents: "" }));
     this.context.updateCurrentValues({
-      [this.props.path]: (this.props.document && this.props.document[this.props.path]) || ""
-    })
+      [this.props.path]: (this.props.document && this.props.document[this.props.path]) || "",
+    });
   }
 
   onChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    this.setState({contents: event.target.value})
+    this.setState({ contents: event.target.value });
     this.context.updateCurrentValues({
-      [this.props.path]: event.target.value
-    })
-  }
+      [this.props.path]: event.target.value,
+    });
+  };
 
   render() {
-    const { className, label, multiLine, rows, hintText, placeholder,
-      rowsMax, fullWidth, disableUnderline, startAdornment, disabled, classes } = this.props;
-    return <Input
+    const {
+      className,
+      label,
+      multiLine,
+      rows,
+      hintText,
+      placeholder,
+      rowsMax,
+      fullWidth,
+      disableUnderline,
+      startAdornment,
+      disabled,
+      classes,
+    } = this.props;
+    return (
+      <Input
         className={className}
         value={this.state.contents || ""}
         onChange={this.onChange}
@@ -46,22 +59,23 @@ class MuiInput extends Component<any,any> {
         rowsMax={rowsMax}
         fullWidth={fullWidth}
         disableUnderline={disableUnderline}
-        classes={{input: classes.input}}
+        classes={{ input: classes.input }}
         startAdornment={startAdornment}
         disabled={disabled}
       />
+    );
   }
-};
+}
 
 (MuiInput as any).contextTypes = {
   updateCurrentValues: PropTypes.func,
   addToSuccessForm: PropTypes.func,
 };
 
-const MuiInputComponent = registerComponent("MuiInput", MuiInput, {styles});
+const MuiInputComponent = registerComponent("MuiInput", MuiInput, { styles });
 
 declare global {
   interface ComponentTypes {
-    MuiInput: typeof MuiInputComponent
+    MuiInput: typeof MuiInputComponent;
   }
 }

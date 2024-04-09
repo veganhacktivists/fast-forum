@@ -23,40 +23,35 @@ const IntercomFeedbackButton = ({
   className,
   classes,
 }: {
-  title?: string,
-  eventName: string,
-  className?: string,
-  classes: ClassesType,
+  title?: string;
+  eventName: string;
+  className?: string;
+  classes: ClassesType;
 }) => {
   const currentUser = useCurrentUser();
-  const {captureEvent} = useTracking();
-  const {LWTooltip} = Components;
+  const { captureEvent } = useTracking();
+  const { LWTooltip } = Components;
   const onClick = useCallback(() => {
     // eslint-disable-next-line babel/new-cap
     window.Intercom("trackEvent", eventName);
     captureEvent(eventName);
   }, [eventName, captureEvent]);
   return (
-    <LWTooltip title={
-      currentUser?.hideIntercom
-        ? "You must enable Intercom in your user settings"
-        : ""
-    }>
+    <LWTooltip title={currentUser?.hideIntercom ? "You must enable Intercom in your user settings" : ""}>
       <a onClick={onClick} className={classNames(classes.root, className)}>
         {title}
       </a>
     </LWTooltip>
   );
-}
+};
 
-const IntercomFeedbackButtonComponent = registerComponent(
-  "IntercomFeedbackButton",
-  IntercomFeedbackButton,
-  {styles, stylePriority: -5},
-);
+const IntercomFeedbackButtonComponent = registerComponent("IntercomFeedbackButton", IntercomFeedbackButton, {
+  styles,
+  stylePriority: -5,
+});
 
 declare global {
   interface ComponentTypes {
-    IntercomFeedbackButton: typeof IntercomFeedbackButtonComponent
+    IntercomFeedbackButton: typeof IntercomFeedbackButtonComponent;
   }
 }

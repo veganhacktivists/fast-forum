@@ -78,117 +78,90 @@ const styles = (theme: ThemeType) => ({
     // Maybe we revisit this in the future - Figma designs had a "Read more"
     // but this is spectacularly difficult
     // "&::before": {
-      // content: '"(Show more)"',
-      // float: "right",
-      // marginTop: "1.5em",
-      // color: theme.palette.primary.main,
-      // fontWeight: 600,
-      // "&:hover": {
-        // color: theme.palette.primary.light,
-      // },
+    // content: '"(Show more)"',
+    // float: "right",
+    // marginTop: "1.5em",
+    // color: theme.palette.primary.main,
+    // fontWeight: 600,
+    // "&:hover": {
+    // color: theme.palette.primary.light,
+    // },
     // },
   },
 });
 
 const PopularCommentTitle: FC<{
-  comment: CommentsListWithParentMetadata,
-  post: NonNullable<Pick<CommentsListWithParentMetadata, "post">["post"]>,
-  classes: ClassesType,
-}> = ({comment, post, classes}) => {
-  const {isRead} = useRecordPostView(post);
-  const {PostsTooltip} = Components;
+  comment: CommentsListWithParentMetadata;
+  post: NonNullable<Pick<CommentsListWithParentMetadata, "post">["post"]>;
+  classes: ClassesType;
+}> = ({ comment, post, classes }) => {
+  const { isRead } = useRecordPostView(post);
+  const { PostsTooltip } = Components;
   return (
     <div className={classes.row}>
       <InteractionWrapper className={classes.postWrapper}>
         <PostsTooltip postId={post._id}>
           <Link
             to={postGetPageUrl(post)}
-            className={classNames(classes.post, {[classes.postRead]: isRead})}
-            eventProps={{intent: 'expandPost'}}
+            className={classNames(classes.post, { [classes.postRead]: isRead })}
+            eventProps={{ intent: "expandPost" }}
           >
             {post.title}
           </Link>
         </PostsTooltip>
       </InteractionWrapper>
       <InteractionWrapper>
-        <Link to={commentGetPageUrl(comment)} className={classes.link} eventProps={{intent: 'viewInThread'}}>
+        <Link to={commentGetPageUrl(comment)} className={classes.link} eventProps={{ intent: "viewInThread" }}>
           View in thread
         </Link>
       </InteractionWrapper>
     </div>
   );
-}
+};
 
-const PopularComment = ({comment, classes}: {
-  comment: CommentsListWithParentMetadata,
-  classes: ClassesType,
-}) => {
-  const {captureEvent} = useTracking();
+const PopularComment = ({ comment, classes }: { comment: CommentsListWithParentMetadata; classes: ClassesType }) => {
+  const { captureEvent } = useTracking();
   const [expanded, setExpanded] = useState(false);
 
   const onClickCallback = useCallback(() => {
     setExpanded(!expanded);
-    captureEvent("popularCommentToggleExpanded", {expanded: !expanded});
+    captureEvent("popularCommentToggleExpanded", { expanded: !expanded });
   }, [expanded, captureEvent]);
 
-  const {onClick} = useClickableCell({onClick: onClickCallback});
+  const { onClick } = useClickableCell({ onClick: onClickCallback });
 
-  const {UsersName, LWTooltip, SmallSideVote, CommentBody} = Components;
+  const { UsersName, LWTooltip, SmallSideVote, CommentBody } = Components;
   return (
-    <AnalyticsContext
-      pageElementContext="popularComment"
-      commentId={comment._id}
-      postId={comment.post?._id}
-    >
+    <AnalyticsContext pageElementContext="popularComment" commentId={comment._id} postId={comment.post?._id}>
       <div onClick={onClick} className={classes.root}>
-        {comment.post &&
-          <PopularCommentTitle
-            post={comment.post}
-            comment={comment}
-            classes={classes}
-          />
-        }
+        {comment.post && <PopularCommentTitle post={comment.post} comment={comment} classes={classes} />}
         <InteractionWrapper className={classNames(classes.row, classes.wrap)}>
           <UsersName user={comment.user} className={classes.username} />
           <div className={classes.date}>
-            <LWTooltip
-              placement="right"
-              title={<ExpandedDate date={comment.postedAt} />}
-            >
+            <LWTooltip placement="right" title={<ExpandedDate date={comment.postedAt} />}>
               {moment(new Date(comment.postedAt)).fromNow()}
             </LWTooltip>
           </div>
-          {!comment.debateResponse && !comment.rejected &&
-            <SmallSideVote
-              document={comment}
-              collection={Comments}
-              hideKarma={comment.post?.hideCommentKarma}
-            />
-          }
+          {!comment.debateResponse && !comment.rejected && (
+            <SmallSideVote document={comment} collection={Comments} hideKarma={comment.post?.hideCommentKarma} />
+          )}
         </InteractionWrapper>
-        {expanded
-          ? (
-            <CommentBody comment={comment} className={classes.body} />
-          )
-          : (
-            <div className={classNames(classes.body, classes.bodyCollapsed)}>
-              {htmlToTextDefault(comment.contents?.html)}
-            </div>
-          )
-        }
+        {expanded ? (
+          <CommentBody comment={comment} className={classes.body} />
+        ) : (
+          <div className={classNames(classes.body, classes.bodyCollapsed)}>
+            {htmlToTextDefault(comment.contents?.html)}
+          </div>
+        )}
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const PopularCommentComponent = registerComponent(
-  "PopularComment",
-  PopularComment,
-  {styles},
-);
+const PopularCommentComponent = registerComponent("PopularComment", PopularComment, { styles });
 
 declare global {
   interface ComponentTypes {
-    PopularComment: typeof PopularCommentComponent
+    PopularComment: typeof PopularCommentComponent;
   }
 }

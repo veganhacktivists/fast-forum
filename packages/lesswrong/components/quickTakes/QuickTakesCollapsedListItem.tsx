@@ -97,26 +97,28 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const QuickTakesCollapsedListItem = ({quickTake, setExpanded, classes}: {
-  quickTake: ShortformComments,
-  setExpanded: (expanded: boolean) => void,
-  classes: ClassesType,
+const QuickTakesCollapsedListItem = ({
+  quickTake,
+  setExpanded,
+  classes,
+}: {
+  quickTake: ShortformComments;
+  setExpanded: (expanded: boolean) => void;
+  classes: ClassesType;
 }) => {
-  const {eventHandlers, hover, anchorEl} = useHover({
+  const { eventHandlers, hover, anchorEl } = useHover({
     pageElementContext: "shortformItemTooltip",
     commentId: quickTake._id,
   });
 
-  const {onClick} = useClickableCell({onClick: () => setExpanded(true)});
+  const { onClick } = useClickableCell({ onClick: () => setExpanded(true) });
 
   const commentCount = quickTake.descendentCount ?? 0;
   const commentsAreClickable = commentCount > 0;
   const primaryTag = quickTake.relevantTags?.[0];
-  const displayHoverOver = hover && (quickTake.baseScore > -5) && !isMobile();
+  const displayHoverOver = hover && quickTake.baseScore > -5 && !isMobile();
 
-  const commentsUrl = quickTake.post
-    ? `${postGetPageUrl(quickTake.post)}#${quickTake._id}`
-    : undefined;
+  const commentsUrl = quickTake.post ? `${postGetPageUrl(quickTake.post)}#${quickTake._id}` : undefined;
 
   const setShowEdit = useCallback(() => {
     if (commentsUrl) {
@@ -129,7 +131,7 @@ const QuickTakesCollapsedListItem = ({quickTake, setExpanded, classes}: {
       // Clicking also expands the item - setTimeout allows us to make sure
       // this runs _after_ the expansion is already complete
       setTimeout(() => {
-        const {_id} = quickTake;
+        const { _id } = quickTake;
         const children = document.querySelector(`#${_id} .comments-children`);
         children?.scrollIntoView({
           behavior: "smooth",
@@ -140,15 +142,9 @@ const QuickTakesCollapsedListItem = ({quickTake, setExpanded, classes}: {
     }
   }, [commentsAreClickable, quickTake]);
 
-  const {
-    KarmaDisplay, ForumIcon, UsersName, LWTooltip, FooterTag, CommentsMenu,
-    LWPopper, CommentsNode,
-  } = Components;
+  const { KarmaDisplay, ForumIcon, UsersName, LWTooltip, FooterTag, CommentsMenu, LWPopper, CommentsNode } = Components;
   return (
-    <div
-      onClick={onClick}
-      className={classes.root}
-    >
+    <div onClick={onClick} className={classes.root}>
       <div className={classes.info}>
         <div className={classes.karma}>
           <KarmaDisplay document={quickTake} />
@@ -156,20 +152,17 @@ const QuickTakesCollapsedListItem = ({quickTake, setExpanded, classes}: {
         </div>
         <UsersName user={quickTake.user} className={classes.username} />
         <div className={classes.date}>
-          <LWTooltip
-            placement="right"
-            title={<ExpandedDate date={quickTake.postedAt} />}
-          >
+          <LWTooltip placement="right" title={<ExpandedDate date={quickTake.postedAt} />}>
             {moment(new Date(quickTake.postedAt)).fromNow()}
           </LWTooltip>
         </div>
-        {quickTake.relevantTags.length > 0 &&
+        {quickTake.relevantTags.length > 0 && (
           <InteractionWrapper className={classes.relevantTags}>
-            {quickTake.relevantTags.map((tag) =>
+            {quickTake.relevantTags.map((tag) => (
               <FooterTag key={tag._id} tag={tag} smallText />
-            )}
+            ))}
           </InteractionWrapper>
-        }
+        )}
         <div className={classes.grow} />
         <div
           onClick={onClickComments}
@@ -198,12 +191,7 @@ const QuickTakesCollapsedListItem = ({quickTake, setExpanded, classes}: {
       <div {...eventHandlers} className={classes.body}>
         {htmlToTextDefault(quickTake.contents?.html)}
       </div>
-      <LWPopper
-        open={displayHoverOver}
-        anchorEl={anchorEl}
-        placement="bottom-end"
-        clickable={false}
-      >
+      <LWPopper open={displayHoverOver} anchorEl={anchorEl} placement="bottom-end" clickable={false}>
         <div className={classes.hoverOver}>
           <CommentsNode
             truncated
@@ -222,16 +210,16 @@ const QuickTakesCollapsedListItem = ({quickTake, setExpanded, classes}: {
       </LWPopper>
     </div>
   );
-}
+};
 
 const QuickTakesCollapsedListItemComponent = registerComponent(
   "QuickTakesCollapsedListItem",
   QuickTakesCollapsedListItem,
-  {styles},
+  { styles },
 );
 
 declare global {
   interface ComponentTypes {
-    QuickTakesCollapsedListItem: typeof QuickTakesCollapsedListItemComponent
+    QuickTakesCollapsedListItem: typeof QuickTakesCollapsedListItemComponent;
   }
 }

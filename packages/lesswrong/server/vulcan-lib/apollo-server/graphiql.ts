@@ -3,7 +3,7 @@
 // @see https://github.com/eritikass/express-graphiql-middleware
 // This is the only way to get graphiql to work
 
-import url from 'url';
+import url from "url";
 
 // @seehttps://github.com/apollographql/apollo-server/blob/v1.4.0/packages/apollo-server-module-graphiql/src/resolveGraphiQLString.ts
 
@@ -26,18 +26,18 @@ import url from 'url';
  * - (optional) websocketConnectionParams: an object to pass to the web socket server
  */
 // Current latest version of GraphiQL.
-const GRAPHIQL_VERSION = '0.11.11';
-const SUBSCRIPTIONS_TRANSPORT_VERSION = '0.9.9';
+const GRAPHIQL_VERSION = "0.11.11";
+const SUBSCRIPTIONS_TRANSPORT_VERSION = "0.9.9";
 
 // Ensures string values are safe to be used within a <script> tag.
 // TODO: I don't think that's the right escape function
-function safeSerialize(data: any): string|null {
-  return data ? JSON.stringify(data).replace(/\//g, '\\/') : null;
+function safeSerialize(data: any): string | null {
+  return data ? JSON.stringify(data).replace(/\//g, "\\/") : null;
 }
 
 export function renderGraphiQL(data: any) {
   const endpointURL = data.endpointURL;
-  const endpointWs = endpointURL.startsWith('ws://') || endpointURL.startsWith('wss://');
+  const endpointWs = endpointURL.startsWith("ws://") || endpointURL.startsWith("wss://");
   const subscriptionsEndpoint = data.subscriptionsEndpoint;
   const usingHttp = !endpointWs;
   const usingWs = endpointWs || !!subscriptionsEndpoint;
@@ -47,7 +47,7 @@ export function renderGraphiQL(data: any) {
   const variablesString = data.variables ? JSON.stringify(data.variables, null, 2) : null;
   const resultString = null;
   const operationName = data.operationName;
-  const passHeader = data.passHeader ? data.passHeader : '';
+  const passHeader = data.passHeader ? data.passHeader : "";
   const editorTheme = data.editorTheme;
   const usingEditorTheme = !!editorTheme;
   const websocketConnectionParams = data.websocketConnectionParams || null;
@@ -76,18 +76,18 @@ export function renderGraphiQL(data: any) {
   ${
     usingEditorTheme
       ? `<link href="//cdn.jsdelivr.net/npm/codemirror@5/theme/${editorTheme}.min.css" rel="stylesheet" />`
-      : ''
+      : ""
   }
-  ${usingHttp ? '<script src="//cdn.jsdelivr.net/fetch/2.0.1/fetch.min.js"></script>' : ''}
+  ${usingHttp ? '<script src="//cdn.jsdelivr.net/fetch/2.0.1/fetch.min.js"></script>' : ""}
   ${
     usingWs
       ? `<script src="//unpkg.com/subscriptions-transport-ws@${SUBSCRIPTIONS_TRANSPORT_VERSION}/browser/client.js"></script>`
-      : ''
+      : ""
   }
   ${
     usingWs && usingHttp
       ? '<script src="//unpkg.com/graphiql-subscriptions-fetcher@0.0.2/browser/client.js"></script>'
-      : ''
+      : ""
   }
 </head>
 <body>
@@ -128,12 +128,12 @@ export function renderGraphiQL(data: any) {
         websocketConnectionParams
           ? `,
       connectionParams: ${JSON.stringify(websocketConnectionParams)}`
-          : ''
+          : ""
       }
     });
     var graphQLWSFetcher = subscriptionsClient.request.bind(subscriptionsClient);
     `
-        : ''
+        : ""
     }
     ${
       usingHttp
@@ -162,7 +162,7 @@ export function renderGraphiQL(data: any) {
           });
       }
     `
-        : ''
+        : ""
     }
     ${
       usingWs && usingHttp
@@ -171,22 +171,22 @@ export function renderGraphiQL(data: any) {
         window.GraphiQLSubscriptionsFetcher.graphQLFetcher(subscriptionsClient, graphQLHttpFetcher);
     `
         : `
-      var fetcher = ${usingWs ? 'graphQLWSFetcher' : 'graphQLHttpFetcher'};
+      var fetcher = ${usingWs ? "graphQLWSFetcher" : "graphQLHttpFetcher"};
     `
     }
     // When the query and variables string is edited, update the URL bar so
     // that it can be easily shared.
     function onEditQuery(newQuery) {
       parameters.query = newQuery;
-      ${rewriteURL ? 'updateURL();' : ''}
+      ${rewriteURL ? "updateURL();" : ""}
     }
     function onEditVariables(newVariables) {
       parameters.variables = newVariables;
-      ${rewriteURL ? 'updateURL();' : ''}
+      ${rewriteURL ? "updateURL();" : ""}
     }
     function onEditOperationName(newOperationName) {
       parameters.operationName = newOperationName;
-      ${rewriteURL ? 'updateURL();' : ''}
+      ${rewriteURL ? "updateURL();" : ""}
     }
     function updateURL() {
       var cleanParams = Object.keys(parameters).filter(function(v) {
@@ -221,7 +221,7 @@ export function renderGraphiQL(data: any) {
 /////////////////////////////
 // resolveGraphiqlString
 function isOptionsFunction(arg: any) {
-  return typeof arg === 'function';
+  return typeof arg === "function";
 }
 
 async function resolveGraphiQLOptions(options: any, ...args: any) {
@@ -239,9 +239,9 @@ async function resolveGraphiQLOptions(options: any, ...args: any) {
 function createGraphiQLParams(query: any) {
   const queryObject = query || {};
   return {
-    query: queryObject.query || '',
+    query: queryObject.query || "",
     variables: queryObject.variables,
-    operationName: queryObject.operationName || '',
+    operationName: queryObject.operationName || "",
   };
 }
 
@@ -284,12 +284,12 @@ export const graphiqlMiddleware = (options: any) => {
   const graphiqlHandler = (req: any, res: any, next: any) => {
     const query = req.url && url.parse(req.url, true).query;
     resolveGraphiQLString(query, options, req).then(
-      graphiqlString => {
-        res.setHeader('Content-Type', 'text/html');
+      (graphiqlString) => {
+        res.setHeader("Content-Type", "text/html");
         res.write(graphiqlString);
         res.end();
       },
-      error => next(error)
+      (error) => next(error),
     );
   };
   return graphiqlHandler;

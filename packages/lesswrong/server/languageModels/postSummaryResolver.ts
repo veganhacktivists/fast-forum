@@ -1,7 +1,7 @@
-import { Posts } from '../../lib/collections/posts/collection';
-import { augmentFieldsDict } from '../../lib/utils/schemaUtils'
-import { dataToMarkdown } from '../editor/conversionUtils';
-import { languageModelGenerateText } from './languageModelIntegration';
+import { Posts } from "../../lib/collections/posts/collection";
+import { augmentFieldsDict } from "../../lib/utils/schemaUtils";
+import { dataToMarkdown } from "../editor/conversionUtils";
+import { languageModelGenerateText } from "./languageModelIntegration";
 
 augmentFieldsDict(Posts, {
   languageModelSummary: {
@@ -9,9 +9,12 @@ augmentFieldsDict(Posts, {
       type: "String",
       resolver: async (post: DbPost, args: void, context: ResolverContext): Promise<string> => {
         if (!post.contents?.originalContents) return "";
-        const markdownPostBody = dataToMarkdown(post.contents?.originalContents?.data, post.contents?.originalContents?.type);
+        const markdownPostBody = dataToMarkdown(
+          post.contents?.originalContents?.data,
+          post.contents?.originalContents?.type,
+        );
         const authorName = "Authorname"; //TODO
-        
+
         return await languageModelGenerateText({
           taskName: "summarize",
           inputs: {
@@ -20,9 +23,9 @@ augmentFieldsDict(Posts, {
             text: markdownPostBody,
           },
           maxTokens: 1000,
-          context
+          context,
         });
-      }
+      },
     },
   },
 });

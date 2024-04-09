@@ -1,18 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { MAX_COLUMN_WIDTH } from '../../posts/PostsPage/PostsPage';
-import { TAB_NAVIGATION_MENU_WIDTH } from '../../common/TabNavigationMenu/TabNavigationMenu';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
+import React, { useEffect, useRef, useState } from "react";
+import { MAX_COLUMN_WIDTH } from "../../posts/PostsPage/PostsPage";
+import { TAB_NAVIGATION_MENU_WIDTH } from "../../common/TabNavigationMenu/TabNavigationMenu";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
 
-const MIN_SIDEBAR_WIDTH = 250
-const MAX_SIDEBAR_WIDTH = 370
-const MIN_GAP = 20
+const MIN_SIDEBAR_WIDTH = 250;
+const MAX_SIDEBAR_WIDTH = 370;
+const MIN_GAP = 20;
 
-const TITLE_HEIGHT_DESKTOP = 245 // ~exactly right
-const TITLE_HEIGHT_MOBILE = 210 // slightly oversized to account for possible wrapping
+const TITLE_HEIGHT_DESKTOP = 245; // ~exactly right
+const TITLE_HEIGHT_MOBILE = 210; // slightly oversized to account for possible wrapping
 
-const Z_TOP = 3
-const Z_IMAGE = 1
-const Z_OVERLAY = 2
+const Z_TOP = 3;
+const Z_IMAGE = 1;
+const Z_OVERLAY = 2;
 
 const gridTemplateColumns = `
   minmax(${TAB_NAVIGATION_MENU_WIDTH + MIN_GAP}px, ${TAB_NAVIGATION_MENU_WIDTH + 250}px)
@@ -22,17 +22,17 @@ const gridTemplateColumns = `
   minmax(${MIN_SIDEBAR_WIDTH}px, ${MAX_SIDEBAR_WIDTH}px)
   minmax(${MIN_GAP}px, 50px)
   1fr
-`
+`;
 
 export const styles = (theme: ThemeType): JssStyles => ({
   titleWrapper: {
-    overflow: 'hidden',
-    [theme.breakpoints.down('md')]: {
-      display: 'block !important',
+    overflow: "hidden",
+    [theme.breakpoints.down("md")]: {
+      display: "block !important",
     },
     // Check for support for template areas before applying
     '@supports (grid-template-areas: "title")': {
-      display: 'grid',
+      display: "grid",
       gridTemplateColumns: gridTemplateColumns,
       gridTemplateAreas: `
         "... ... title   .... ....... .... ..."
@@ -40,38 +40,38 @@ export const styles = (theme: ThemeType): JssStyles => ({
     },
   },
   bannerImageWrapper: {
-    position: 'absolute',
-    width: '100%',
+    position: "absolute",
+    width: "100%",
     zIndex: Z_IMAGE,
   },
   bannerImage: {
-    width: '100%',
-    objectFit: 'cover',
+    width: "100%",
+    objectFit: "cover",
     height: TITLE_HEIGHT_DESKTOP,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       height: TITLE_HEIGHT_MOBILE,
-    }
+    },
   },
   translucentOverlay: {
-    position: 'absolute',
+    position: "absolute",
     zIndex: Z_OVERLAY,
-    width: '100%',
+    width: "100%",
     height: TITLE_HEIGHT_DESKTOP,
     backgroundColor: theme.palette.background.imageOverlay, // hardcode overlay to keep it the same in light and dark mode
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       height: TITLE_HEIGHT_MOBILE,
-    }
+    },
   },
   header: {
-    position: 'relative',
+    position: "relative",
     background: theme.palette.panelBackground.default,
     zIndex: Z_TOP,
-    [theme.breakpoints.down('md')]: {
-      display: 'block !important',
+    [theme.breakpoints.down("md")]: {
+      display: "block !important",
     },
     // Check for support for template areas before applying
     '@supports (grid-template-areas: "title")': {
-      display: 'grid',
+      display: "grid",
       gridTemplateColumns: gridTemplateColumns,
       gridTemplateAreas: `
         "... ... header   .... ....... .... ..."
@@ -79,18 +79,18 @@ export const styles = (theme: ThemeType): JssStyles => ({
     },
   },
   titleComponent: {
-    position: 'relative',
-    gridArea: 'title',
+    position: "relative",
+    gridArea: "title",
     zIndex: Z_TOP, // display over image
     maxHeight: TITLE_HEIGHT_DESKTOP,
   },
   body: {
-    [theme.breakpoints.down('md')]: {
-      display: 'block !important',
+    [theme.breakpoints.down("md")]: {
+      display: "block !important",
     },
     // Check for support for template areas before applying
     '@supports (grid-template-areas: "title")': {
-      display: 'grid',
+      display: "grid",
       gridTemplateColumns: gridTemplateColumns,
       gridTemplateAreas: `
         "... ... content gap1 sidebar gap2 ..."
@@ -98,36 +98,43 @@ export const styles = (theme: ThemeType): JssStyles => ({
     },
   },
   headerInner: {
-    gridArea: 'header',
+    gridArea: "header",
   },
   content: {
-    gridArea: 'content',
+    gridArea: "content",
     marginTop: 24,
-    [theme.breakpoints.down('sm')]: {
-      padding: '0 8px',
-    }
+    [theme.breakpoints.down("sm")]: {
+      padding: "0 8px",
+    },
   },
-  gap1: { gridArea: 'gap1'},
+  gap1: { gridArea: "gap1" },
   sidebar: {
-    gridArea: 'sidebar',
-    [theme.breakpoints.down('md')]: {
-      display: 'none'
-    }
+    gridArea: "sidebar",
+    [theme.breakpoints.down("md")]: {
+      display: "none",
+    },
   },
-  gap2: { gridArea: 'gap2' }
+  gap2: { gridArea: "gap2" },
 });
 
-export const SubforumLayout = ({titleComponent, bannerImageId, headerComponent, sidebarComponents = [], children, classes}: {
-  titleComponent: React.ReactNode,
-  bannerImageId: string,
-  headerComponent: React.ReactNode,
-  children: React.ReactNode,
-  classes: ClassesType,
-  sidebarComponents?: React.ReactNode[],
+export const SubforumLayout = ({
+  titleComponent,
+  bannerImageId,
+  headerComponent,
+  sidebarComponents = [],
+  children,
+  classes,
+}: {
+  titleComponent: React.ReactNode;
+  bannerImageId: string;
+  headerComponent: React.ReactNode;
+  children: React.ReactNode;
+  classes: ClassesType;
+  sidebarComponents?: React.ReactNode[];
 }) => {
-  const nonEmptySidebarComponents = sidebarComponents.filter(x => x) // filter out nulls to avoid extra spacing
-  const { CloudinaryImage2 } = Components
-  
+  const nonEmptySidebarComponents = sidebarComponents.filter((x) => x); // filter out nulls to avoid extra spacing
+  const { CloudinaryImage2 } = Components;
+
   /*
    * The logic for rendering the banner image has turned out more complicated than I would
    * have liked, but unfortunately it is neccesary to achieve the following things:
@@ -153,12 +160,9 @@ export const SubforumLayout = ({titleComponent, bannerImageId, headerComponent, 
   const titleComponentRef = useRef<HTMLDivElement>(null);
   const translucentOverlayRef = useRef<HTMLDivElement>(null);
   const [bannerHeight, setBannerHeight] = useState<number | undefined>(undefined);
-  
+
   const updateElementsHeight = () => {
-    if (
-      titleComponentRef.current &&
-      translucentOverlayRef.current
-    ) {
+    if (titleComponentRef.current && translucentOverlayRef.current) {
       const titleHeight = titleComponentRef.current.offsetHeight;
       translucentOverlayRef.current.style.height = `${titleHeight}px`;
       setBannerHeight(titleHeight);
@@ -167,13 +171,13 @@ export const SubforumLayout = ({titleComponent, bannerImageId, headerComponent, 
 
   useEffect(() => {
     updateElementsHeight();
-    window.addEventListener('resize', updateElementsHeight);
-  
+    window.addEventListener("resize", updateElementsHeight);
+
     return () => {
-      window.removeEventListener('resize', updateElementsHeight);
+      window.removeEventListener("resize", updateElementsHeight);
     };
   }, []);
-  
+
   return (
     <>
       <div className={classes.titleWrapper}>
@@ -186,7 +190,9 @@ export const SubforumLayout = ({titleComponent, bannerImageId, headerComponent, 
           />
         </div>
         <div className={classes.translucentOverlay} ref={translucentOverlayRef}></div>
-        <div className={classes.titleComponent} ref={titleComponentRef}>{titleComponent}</div>
+        <div className={classes.titleComponent} ref={titleComponentRef}>
+          {titleComponent}
+        </div>
       </div>
       <div className={classes.header}>
         <div className={classes.headerInner}>{headerComponent}</div>
@@ -201,12 +207,12 @@ export const SubforumLayout = ({titleComponent, bannerImageId, headerComponent, 
       </div>
     </>
   );
-}
+};
 
-const SubforumLayoutComponent = registerComponent("SubforumLayout", SubforumLayout, {styles});
+const SubforumLayoutComponent = registerComponent("SubforumLayout", SubforumLayout, { styles });
 
 declare global {
   interface ComponentTypes {
-    SubforumLayout: typeof SubforumLayoutComponent
+    SubforumLayout: typeof SubforumLayoutComponent;
   }
 }

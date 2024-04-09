@@ -1,5 +1,5 @@
-import { getSqlClientOrThrow } from '../../lib/sql/sqlClient';
-import { registerMigration } from './migrationUtils';
+import { getSqlClientOrThrow } from "../../lib/sql/sqlClient";
+import { registerMigration } from "./migrationUtils";
 
 // This has to be done as a manual migration because of a bootstrapping issue (typeerrors block the automatic migration from running)
 registerMigration({
@@ -21,7 +21,7 @@ registerMigration({
       "createdAt" timestamptz DEFAULT CURRENT_TIMESTAMP,
       "legacyData" jsonb
     );
-    `
-    await db.any(sql)
-  }
-})
+    `;
+    await db.any(sql);
+  },
+});

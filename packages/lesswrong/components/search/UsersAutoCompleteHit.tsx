@@ -1,38 +1,32 @@
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import React from 'react';
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import React from "react";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
-    cursor: "pointer"
-  }
+    cursor: "pointer",
+  },
 });
 
-const UsersAutoCompleteHit = ({document, classes}: {
-  document: SearchUser
-  classes: ClassesType
-}) => {
+const UsersAutoCompleteHit = ({ document, classes }: { document: SearchUser; classes: ClassesType }) => {
   if (document) {
-    return <div className={classes.root}>
-      <Components.MetaInfo>
-        {document.displayName}
-      </Components.MetaInfo>
-      <Components.MetaInfo>
-        {document.karma} karma
-      </Components.MetaInfo>
-      <Components.MetaInfo>
-        <Components.FormatDate date={document.createdAt}/>
-      </Components.MetaInfo>
-    </div>
+    return (
+      <div className={classes.root}>
+        <Components.MetaInfo>{document.displayName}</Components.MetaInfo>
+        <Components.MetaInfo>{document.karma} karma</Components.MetaInfo>
+        <Components.MetaInfo>
+          <Components.FormatDate date={document.createdAt} />
+        </Components.MetaInfo>
+      </div>
+    );
   } else {
-    return <Components.Loading />
+    return <Components.Loading />;
   }
 };
 
-const UsersAutoCompleteHitComponent = registerComponent('UsersAutoCompleteHit', UsersAutoCompleteHit, {styles});
+const UsersAutoCompleteHitComponent = registerComponent("UsersAutoCompleteHit", UsersAutoCompleteHit, { styles });
 
 declare global {
   interface ComponentTypes {
-    UsersAutoCompleteHit: typeof UsersAutoCompleteHitComponent
+    UsersAutoCompleteHit: typeof UsersAutoCompleteHitComponent;
   }
 }
-

@@ -11,19 +11,18 @@ import Matcher from '@ckeditor/ckeditor5-engine/src/view/matcher';
  */
 export default class RemoveRedirect extends Plugin {
 	init() {
-		this.editor.plugins.get( 'ClipboardPipeline' ).on('inputTransformation', ( _, data ) => {
-				if ( data.content ) {
-					const writer = new UpcastWriter( data.content.document );
-					
-					const documentRange = writer.createRangeIn(data.content);
-					const urlElems = this._getRedirectUrls(documentRange);
+		this.editor.plugins.get( "ClipboardPipeline" ).on( "inputTransformation", ( _, data ) => {
+			if (data.content) {
+				const writer = new UpcastWriter(data.content.document);
 
-					for (const {item, url} of urlElems) {
-						writer.setAttribute('href', url, item);
-					}
+				const documentRange = writer.createRangeIn(data.content);
+				const urlElems = this._getRedirectUrls(documentRange);
+
+				for (const { item, url } of urlElems) {
+					writer.setAttribute("href", url, item);
 				}
 			}
-		);
+		});
 	}
 
 	_getRedirectUrls( documentRange ) {
@@ -39,14 +38,18 @@ export default class RemoveRedirect extends Plugin {
 			name: 'a',
 			attributes: {
 				href: hrefPattern,
-			}
+			},
 		});
 
-		return [...documentRange].map(({ item, type }) => {
-			if (!(type === 'elementStart' && redirectUrlMatcher.match(item))) return null;
+		return [...documentRange]
+			.map(({ item, type }) => {
+				if ( !( type === 'elementStart' && redirectUrlMatcher.match(item))) {
+					return null;
+				}
 
-			const url = item.getAttribute('href').match(hrefPattern)[1];
-			return {item, url};
-		}).filter(x => x !== null);
+				const url = item.getAttribute( "href" ).match(hrefPattern)[1];
+				return { item, url };
+			} )
+			.filter( ( x ) => x !== null);
 	}
 }

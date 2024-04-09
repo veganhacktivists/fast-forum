@@ -6,7 +6,7 @@ export const UserSchema = z.object({
   email: z.optional(z.string()),
   avatar: z.optional(z.string()),
   first_connected_at: z.optional(z.string()),
-  last_connected_at: z.optional(z.string())
+  last_connected_at: z.optional(z.string()),
 });
 
 const DocumentUserSchema = z.object({
@@ -36,7 +36,7 @@ const SuggestionSchema = z.object({
   deleted_at: z.optional(z.string()),
   created_at: z.string(),
   updated_at: z.optional(z.string()),
-  state: z.union([z.literal('open'), z.literal('accepted'), z.literal('rejected')]),
+  state: z.union([z.literal("open"), z.literal("accepted"), z.literal("rejected")]),
   has_comments: z.boolean(),
 });
 
@@ -74,12 +74,16 @@ export const DocumentResponseSchema = z.object({
   content: z.object({
     bundle_version: z.string(),
     data: z.string(),
-    attributes: z.optional(z.object({
-      main: z.optional(z.object({
-        order: z.number(),
-      })),
-    })),
-    version: z.optional(z.number())
+    attributes: z.optional(
+      z.object({
+        main: z.optional(
+          z.object({
+            order: z.number(),
+          }),
+        ),
+      }),
+    ),
+    version: z.optional(z.number()),
   }),
   comments: z.array(CommentSchema),
   suggestions: z.array(SuggestionSchema),
@@ -94,7 +98,7 @@ export type DocumentResponse = z.TypeOf<typeof DocumentResponseSchema>;
 export type CkEditorUser = z.TypeOf<typeof UserSchema>;
 
 export interface CreateDocumentPayload extends DocumentResponse {
-  content: DocumentResponse['content'] & {
-    use_initial_data: boolean
-  }
+  content: DocumentResponse["content"] & {
+    use_initial_data: boolean;
+  };
 }

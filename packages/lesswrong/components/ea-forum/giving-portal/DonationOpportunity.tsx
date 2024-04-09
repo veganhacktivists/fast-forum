@@ -44,24 +44,24 @@ const styles = (theme: ThemeType) => ({
     letterSpacing: "-0.18px",
   },
   description: {
-    position: 'relative',
+    position: "relative",
     color: theme.palette.grey[600],
     fontSize: 14,
     fontWeight: 500,
     letterSpacing: "-0.14px",
     lineHeight: "140%",
     flexGrow: 1,
-    overflow: 'hidden',
-    '&:after': {
-      position: 'absolute',
+    overflow: "hidden",
+    "&:after": {
+      position: "absolute",
       left: 0,
       bottom: 0,
-      width: '100%',
+      width: "100%",
       height: 50,
       content: "''",
       background: `linear-gradient(to top, ${theme.palette.givingPortal[0]}, ${theme.palette.background.transparent})`,
-      pointerEvents: 'none'
-    }
+      pointerEvents: "none",
+    },
   },
   buttons: {
     display: "flex",
@@ -69,7 +69,7 @@ const styles = (theme: ThemeType) => ({
     alignItems: "center",
   },
   button: {
-    textAlign: 'center',
+    textAlign: "center",
     padding: 12,
     borderRadius: theme.borderRadius.small,
     border: "none",
@@ -94,11 +94,8 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const DonationOpportunity = ({candidate, classes}: {
-  candidate: ElectionCandidateSimple,
-  classes: ClassesType,
-}) => {
-  const {name, logoSrc, description} = candidate;
+const DonationOpportunity = ({ candidate, classes }: { candidate: ElectionCandidateSimple; classes: ClassesType }) => {
+  const { name, logoSrc, description } = candidate;
   return (
     <AnalyticsContext pageElementContext="donationOpportunity">
       <div className={classes.root}>
@@ -125,13 +122,9 @@ const DonationOpportunity = ({candidate, classes}: {
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const DonationOpportunityComponent = registerComponent(
-  "DonationOpportunity",
-  DonationOpportunity,
-  {styles},
-);
+const DonationOpportunityComponent = registerComponent("DonationOpportunity", DonationOpportunity, { styles });
 
 declare global {
   interface ComponentTypes {

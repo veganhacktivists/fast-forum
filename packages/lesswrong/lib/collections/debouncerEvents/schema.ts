@@ -1,32 +1,31 @@
-
 const schema = {
   name: {
     type: String,
-    nullable: false
+    nullable: false,
   },
   af: {
     type: Boolean,
   },
   dispatched: {
     type: Boolean,
-    nullable: false
+    nullable: false,
   },
   failed: {
     type: Boolean,
   },
-  
+
   delayTime: {
     type: Date,
-    nullable: false
+    nullable: false,
   },
   upperBoundTime: {
     type: Date,
-    nullable: false
+    nullable: false,
   },
-  
+
   key: {
     type: String,
-    nullable: false
+    nullable: false,
   },
   pendingEvents: {
     type: Array,
@@ -34,6 +33,6 @@ const schema = {
   "pendingEvents.$": {
     type: String,
   },
-}
+};
 
 export default schema;

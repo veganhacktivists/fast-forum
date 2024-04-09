@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-10-09T10:16:21.000Z by 20231009T101621.add_wasEverUndrafted_to_posts.ts
  * +-- Overall schema hash: c3e1e47f98b00ea1ff4f2dfe2e646604
- *  
+ *
  * @@ -546,3 +544,3 @@ CREATE TABLE "PostRelations" (
- *  
+ *
  * --- Schema for "Posts", hash: e67887c8c10ef852b3dfaee89c04a20a
  * +-- Schema for "Posts", hash: e2904e780f0bd3a8294f7f504f6e372d
  *  CREATE TABLE "Posts" (
@@ -22,7 +22,7 @@
  *      "collabEditorDialogue" bool DEFAULT false,
  * +    "mostRecentPublishedDialogueResponseDate" timestamptz,
  *      "rejected" bool DEFAULT false,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -33,13 +33,13 @@
  */
 export const acceptsSchemaHash = "c3e1e47f98b00ea1ff4f2dfe2e646604";
 
-import { Posts } from "../../lib/collections/posts/collection"
-import { addField, dropField } from "./meta/utils"
+import { Posts } from "../../lib/collections/posts/collection";
+import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {  
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Posts, "mostRecentPublishedDialogueResponseDate");
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Posts, "mostRecentPublishedDialogueResponseDate");
-}
+};

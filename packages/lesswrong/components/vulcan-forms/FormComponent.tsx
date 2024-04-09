@@ -1,17 +1,17 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { Components, registerComponent, mergeWithComponents } from '../../lib/vulcan-lib';
-import get from 'lodash/get';
-import isEqual from 'lodash/isEqual';
-import SimpleSchema from 'simpl-schema';
-import { isEmptyValue, getNullValue } from '../../lib/vulcan-forms/utils';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { Components, registerComponent, mergeWithComponents } from "../../lib/vulcan-lib";
+import get from "lodash/get";
+import isEqual from "lodash/isEqual";
+import SimpleSchema from "simpl-schema";
+import { isEmptyValue, getNullValue } from "../../lib/vulcan-forms/utils";
 
 interface FormComponentState {
-  charsRemaining?: number
-  charsCount?: number
+  charsRemaining?: number;
+  charsCount?: number;
 }
 
-class FormComponent<T extends DbObject> extends Component<FormComponentWrapperProps<T>,FormComponentState> {
+class FormComponent<T extends DbObject> extends Component<FormComponentWrapperProps<T>, FormComponentState> {
   constructor(props: FormComponentWrapperProps<T>) {
     super(props);
 
@@ -38,21 +38,13 @@ class FormComponent<T extends DbObject> extends Component<FormComponentWrapperPr
     const includesPathOrChildren = (deletedValues: AnyBecauseTodo) =>
       deletedValues.some((deletedPath: AnyBecauseTodo) => deletedPath.includes(path));
 
-    const valueChanged =
-      !isEqual(get(currentValues, path), get(this.props.currentValues, path)); 
+    const valueChanged = !isEqual(get(currentValues, path), get(this.props.currentValues, path));
     const errorChanged = !isEqual(this.getErrors(errors), this.getErrors());
-    const deleteChanged =
-      includesPathOrChildren(deletedValues) !==
-      includesPathOrChildren(this.props.deletedValues);
+    const deleteChanged = includesPathOrChildren(deletedValues) !== includesPathOrChildren(this.props.deletedValues);
     const charsChanged = nextState.charsRemaining !== this.state.charsRemaining;
     const disabledChanged = nextProps.disabled !== this.props.disabled;
 
-    const shouldUpdate =
-      valueChanged ||
-      errorChanged ||
-      deleteChanged ||
-      charsChanged ||
-      disabledChanged;
+    const shouldUpdate = valueChanged || errorChanged || deleteChanged || charsChanged || disabledChanged;
 
     return shouldUpdate;
   }
@@ -74,17 +66,17 @@ class FormComponent<T extends DbObject> extends Component<FormComponentWrapperPr
   */
   isCustomInput = (inputType: FormInputType) => {
     const isStandardInput = [
-      'nested',
-      'number',
-      'url',
-      'email',
-      'textarea',
-      'checkbox',
-      'checkboxgroup',
-      'select',
-      'datetime',
-      'date',
-      'text'
+      "nested",
+      "number",
+      "url",
+      "email",
+      "textarea",
+      "checkbox",
+      "checkboxgroup",
+      "select",
+      "datetime",
+      "date",
+      "text",
     ].includes(inputType);
     return !isStandardInput;
   };
@@ -95,9 +87,8 @@ class FormComponent<T extends DbObject> extends Component<FormComponentWrapperPr
   
   */
   handleChange = (value: AnyBecauseTodo) => {
-
     // if value is an empty string, delete the field
-    if (value === '') {
+    if (value === "") {
       value = null;
     }
     // if this is a number field, convert value before sending it up to Form
@@ -105,9 +96,7 @@ class FormComponent<T extends DbObject> extends Component<FormComponentWrapperPr
       value = Number(value);
     }
 
-    const updateValue = this.props.locale
-      ? { locale: this.props.locale, value }
-      : value;
+    const updateValue = this.props.locale ? { locale: this.props.locale, value } : value;
     void this.props.updateCurrentValues({ [this.getPath()]: updateValue });
 
     // for text fields, update character count on change
@@ -124,8 +113,8 @@ class FormComponent<T extends DbObject> extends Component<FormComponentWrapperPr
   updateCharacterCount = (value: AnyBecauseTodo) => {
     const characterCount = value ? value.length : 0;
     this.setState({
-      charsRemaining: (this.props.max||0) - characterCount,
-      charsCount: characterCount
+      charsRemaining: (this.props.max || 0) - characterCount,
+      charsCount: characterCount,
     });
   };
 
@@ -142,14 +131,14 @@ class FormComponent<T extends DbObject> extends Component<FormComponentWrapperPr
     const currentDocument = c.getDocument();
     let value = get(currentDocument, path);
     // note: force intl fields to be treated like strings
-    const nullValue = locale ? '' : getNullValue(datatype);
+    const nullValue = locale ? "" : getNullValue(datatype);
 
     // handle deleted & empty value
     if (deletedValues.includes(path)) {
       value = nullValue;
     } else if (isEmptyValue(value)) {
       // replace empty value by the default value from the schema if it exists – for new forms only
-      value = formType === 'new' && defaultValue ? defaultValue : nullValue;
+      value = formType === "new" && defaultValue ? defaultValue : nullValue;
     }
     return value;
   };
@@ -161,9 +150,7 @@ class FormComponent<T extends DbObject> extends Component<FormComponentWrapperPr
   */
   showCharsRemaining = (props?: any) => {
     const p = props || this.props;
-    return (
-      p.max && ['url', 'email', 'textarea', 'text'].includes(this.getInputType(p))
-    );
+    return p.max && ["url", "email", "textarea", "text"].includes(this.getInputType(p));
   };
 
   /*
@@ -175,9 +162,7 @@ class FormComponent<T extends DbObject> extends Component<FormComponentWrapperPr
   */
   getErrors = (errors?: any) => {
     errors = errors || this.props.errors;
-    const fieldErrors = errors.filter(
-      (error: AnyBecauseTodo) => error.path && error.path.includes(this.props.path)
-    );
+    const fieldErrors = errors.filter((error: AnyBecauseTodo) => error.path && error.path.includes(this.props.path));
     return fieldErrors;
   };
 
@@ -190,13 +175,7 @@ class FormComponent<T extends DbObject> extends Component<FormComponentWrapperPr
     const p = props || this.props;
     const fieldType = this.getFieldType();
     const autoType =
-      fieldType === Number
-        ? 'number'
-        : fieldType === Boolean
-          ? 'checkbox'
-          : fieldType === Date
-            ? 'date'
-            : 'text';
+      fieldType === Number ? "number" : fieldType === Boolean ? "checkbox" : fieldType === Date ? "date" : "text";
     return p.input || autoType;
   };
 
@@ -226,44 +205,44 @@ class FormComponent<T extends DbObject> extends Component<FormComponentWrapperPr
     const FormComponents = mergeWithComponents(this.props.formComponents);
 
     // if input is a React component, use it
-    if (typeof this.props.input === 'function') {
+    if (typeof this.props.input === "function") {
       const InputComponent = this.props.input;
       return InputComponent;
     } else {
       // else pick a predefined component
 
       switch (inputType) {
-        case 'text':
+        case "text":
           return FormComponents.FormComponentDefault;
 
-        case 'number':
+        case "number":
           return FormComponents.FormComponentNumber;
 
-        case 'url':
+        case "url":
           return FormComponents.FormComponentUrl;
 
-        case 'email':
+        case "email":
           return FormComponents.FormComponentEmail;
 
-        case 'textarea':
+        case "textarea":
           return FormComponents.FormComponentTextarea;
 
-        case 'checkbox':
+        case "checkbox":
           return FormComponents.FormComponentCheckbox;
 
-        case 'checkboxgroup':
+        case "checkboxgroup":
           return FormComponents.FormComponentCheckboxGroup;
 
-        case 'radiogroup':
-          return FormComponents.FormComponentRadioGroup
+        case "radiogroup":
+          return FormComponents.FormComponentRadioGroup;
 
-        case 'select':
+        case "select":
           return FormComponents.FormComponentSelect;
 
-        case 'datetime':
+        case "datetime":
           return FormComponents.FormComponentDateTime;
 
-        case 'date':
+        case "date":
           return FormComponents.FormComponentDate;
 
         default:
@@ -336,11 +315,13 @@ class FormComponent<T extends DbObject> extends Component<FormComponentWrapperPr
     );
 
     if (this.props.tooltip) {
-      return <div>
-        <Components.LWTooltip inlineBlock={false} title={this.props.tooltip} placement="left-start">
-          <div>{ formComponent }</div>
-        </Components.LWTooltip>
-      </div>
+      return (
+        <div>
+          <Components.LWTooltip inlineBlock={false} title={this.props.tooltip} placement="left-start">
+            <div>{formComponent}</div>
+          </Components.LWTooltip>
+        </div>
+      );
     } else {
       return formComponent;
     }
@@ -348,13 +329,13 @@ class FormComponent<T extends DbObject> extends Component<FormComponentWrapperPr
 }
 
 (FormComponent as any).contextTypes = {
-  getDocument: PropTypes.func.isRequired
+  getDocument: PropTypes.func.isRequired,
 };
 
-const FormComponentComponent = registerComponent('FormComponent', FormComponent);
+const FormComponentComponent = registerComponent("FormComponent", FormComponent);
 
 declare global {
   interface ComponentTypes {
-    FormComponent: typeof FormComponentComponent
+    FormComponent: typeof FormComponentComponent;
   }
 }

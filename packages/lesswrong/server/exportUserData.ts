@@ -27,14 +27,11 @@ import { Globals } from "./vulcan-lib";
 
 type Entry<N extends CollectionNameString> = [
   CollectionBase<N>,
-  {fetch: () => Promise<ObjectsByCollectionName[N][]>},
+  { fetch: () => Promise<ObjectsByCollectionName[N][]> },
 ];
 
 /** Please ensure that we know that the user is who they say they are! */
-export const exportUserData = async (
-  selector: {_id?: string, slug?: string, email?: string},
-  outfile?: string,
-) => {
+export const exportUserData = async (selector: { _id?: string; slug?: string; email?: string }, outfile?: string) => {
   if (!selector._id && !selector.slug && !selector.email) {
     throw new Error("Must specify either an _id, slug or email");
   }
@@ -47,37 +44,38 @@ export const exportUserData = async (
   const userId = user._id;
 
   const entries: Entry<CollectionNameString>[] = [
-    [Users, {fetch: () => Promise.resolve([user])}],
-    [Bans, Bans.find({userId})],
-    [ClientIds, ClientIds.find({userIds: userId})],
-    [Collections, Collections.find({userId})],
-    [Comments, Comments.find({userId})],
-    [Conversations, Conversations.find({participantIds: userId})],
-    [Localgroups, Localgroups.find({organizerIds: userId})],
-    [Messages, Messages.find({userId})],
-    [ModeratorActions, ModeratorActions.find({userId})],
-    [Notifications, Notifications.find({userId})],
-    [PetrovDayLaunchs, PetrovDayLaunchs.find({userId})],
-    [Posts, Posts.find({userId})],
-    [RSSFeeds, RSSFeeds.find({userId})],
-    [ReadStatuses, ReadStatuses.find({userId})],
-    [Reports, Reports.find({userId})],
-    [Revisions, Revisions.find({userId})],
-    [Sequences, Sequences.find({userId})],
-    [Subscriptions, Subscriptions.find({userId})],
-    [TagRels, TagRels.find({userId})],
-    [Tags, Tags.find({userId})],
-    [UserMostValuablePosts, UserMostValuablePosts.find({userId})],
-    [UserTagRels, UserTagRels.find({userId})],
-    [Votes, Votes.find({userId})],
+    [Users, { fetch: () => Promise.resolve([user]) }],
+    [Bans, Bans.find({ userId })],
+    [ClientIds, ClientIds.find({ userIds: userId })],
+    [Collections, Collections.find({ userId })],
+    [Comments, Comments.find({ userId })],
+    [Conversations, Conversations.find({ participantIds: userId })],
+    [Localgroups, Localgroups.find({ organizerIds: userId })],
+    [Messages, Messages.find({ userId })],
+    [ModeratorActions, ModeratorActions.find({ userId })],
+    [Notifications, Notifications.find({ userId })],
+    [PetrovDayLaunchs, PetrovDayLaunchs.find({ userId })],
+    [Posts, Posts.find({ userId })],
+    [RSSFeeds, RSSFeeds.find({ userId })],
+    [ReadStatuses, ReadStatuses.find({ userId })],
+    [Reports, Reports.find({ userId })],
+    [Revisions, Revisions.find({ userId })],
+    [Sequences, Sequences.find({ userId })],
+    [Subscriptions, Subscriptions.find({ userId })],
+    [TagRels, TagRels.find({ userId })],
+    [Tags, Tags.find({ userId })],
+    [UserMostValuablePosts, UserMostValuablePosts.find({ userId })],
+    [UserTagRels, UserTagRels.find({ userId })],
+    [Votes, Votes.find({ userId })],
   ];
 
-  const values = await Promise.all(entries.map(async ([collection, {fetch}]) =>
-    accessFilterMultiple(user, collection, await fetch(), null),
-  ));
-  const result = Object.fromEntries(entries
-    .map(([collection, _], i) => [collection.collectionName, values[i]])
-    .filter(([_, records]) => records.length > 0)
+  const values = await Promise.all(
+    entries.map(async ([collection, { fetch }]) => accessFilterMultiple(user, collection, await fetch(), null)),
+  );
+  const result = Object.fromEntries(
+    entries
+      .map(([collection, _], i) => [collection.collectionName, values[i]])
+      .filter(([_, records]) => records.length > 0),
   );
 
   const stringified = JSON.stringify(result, null, 2);
@@ -90,6 +88,6 @@ export const exportUserData = async (
   }
 
   return result;
-}
+};
 
 Globals.exportUserData = exportUserData;

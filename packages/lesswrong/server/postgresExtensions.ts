@@ -15,4 +15,4 @@ export const postgresExtensions = [
   "vector",
 ] as const;
 
-export type PostgresExtension = typeof postgresExtensions[number];
+export type PostgresExtension = (typeof postgresExtensions)[number];

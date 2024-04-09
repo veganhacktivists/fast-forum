@@ -18,9 +18,9 @@
  * --- Accepted on 2023-11-03T20:20:08.000Z by 20231103T202008.originalDialogueIdForShortform.ts
  * ->>>>>>> origin/master
  * +-- Overall schema hash: f5e4a3d5459008e1e5f5e83555a849b1
- *  
+ *
  * @@ -1082,7 +1074,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * -<<<<<<< HEAD
  * --- Schema for "Users", hash: d808bc3d26b57dcc052e7be6e843ae1d
  * -=======
@@ -28,7 +28,7 @@
  * ->>>>>>> origin/master
  * +-- Schema for "Users", hash: e8e6630d880bf48c1c4bd54c4b31e8d0
  *  CREATE TABLE "Users" (
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -40,19 +40,19 @@
 export const acceptsSchemaHash = "f5e4a3d5459008e1e5f5e83555a849b1";
 
 import Users from "../../lib/collections/users/collection";
-import {addField, createTable, dropField, dropTable} from "./meta/utils";
+import { addField, createTable, dropField, dropTable } from "./meta/utils";
 import DialogueCheck from "../../lib/collections/dialogueChecks/collection";
 
 // This was originally 3 migrations from our PR, but after catching up with master, we're combining them into one
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await createTable(db, DialogueCheck);
   await addField(db, Users, "optedInToDialogueFacilitation");
   await addField(db, Users, "revealChecksToAdmins");
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropTable(db, DialogueCheck);
   await dropField(db, Users, "optedInToDialogueFacilitation");
   await dropField(db, Users, "revealChecksToAdmins");
-}
+};

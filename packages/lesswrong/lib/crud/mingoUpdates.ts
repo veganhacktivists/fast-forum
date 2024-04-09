@@ -1,4 +1,4 @@
-import Mingo from 'mingo';
+import Mingo from "mingo";
 
 /*
  * This file contains helper functions for looking at mongodb-style selectors
@@ -17,7 +17,7 @@ import Mingo from 'mingo';
  */
 
 export type MingoDocument = any;
-export type MingoQueryResult = {totalCount: number, results: MingoDocument[], __typename?: string};
+export type MingoQueryResult = { totalCount: number; results: MingoDocument[]; __typename?: string };
 export type MingoSelector = MongoSelector<any>;
 export type MingoSort = MongoSort<any>;
 
@@ -28,10 +28,10 @@ export const mingoBelongsToSet = (document: MingoDocument, selector: MingoSelect
   try {
     const mingoQuery = new Mingo.Query(selector);
     return mingoQuery.test(document);
-  } catch(err) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.error(err)
-    return false
+    console.error(err);
+    return false;
   }
 };
 
@@ -40,7 +40,7 @@ export const mingoBelongsToSet = (document: MingoDocument, selector: MingoSelect
  */
 export const mingoIsInSet = (data: MingoQueryResult, document: MingoDocument) => {
   return data.results.find((item: MingoDocument) => item._id === document._id);
-}
+};
 
 /**
  * Add a document to a set of results
@@ -57,14 +57,14 @@ export const mingoAddToSet = (queryData: MingoQueryResult, document: MingoDocume
  * Update a document in a set of results
  */
 export const mingoUpdateInSet = (queryData: MingoQueryResult, document: MingoDocument) => {
-  const oldDocument = queryData.results.find(item => item._id === document._id);
+  const oldDocument = queryData.results.find((item) => item._id === document._id);
   const newDocument = { ...oldDocument, ...document };
-  const index = queryData.results.findIndex(item => item._id === document._id);
+  const index = queryData.results.findIndex((item) => item._id === document._id);
   const newResults = [...queryData.results];
   newResults[index] = newDocument;
   const newData = {
     ...queryData,
-    results: newResults
+    results: newResults,
   }; // clone
   return newData;
 };
@@ -77,11 +77,11 @@ export const mingoReorderSet = (queryData: MingoQueryResult, sort: MingoSort, se
     const mingoQuery = new Mingo.Query(selector);
     const cursor = mingoQuery.find(queryData.results);
     queryData.results = cursor.sort(sort).all();
-    return queryData;  
-  } catch(err) {
+    return queryData;
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.error(err)
-    return queryData
+    console.error(err);
+    return queryData;
   }
 };
 
@@ -90,7 +90,7 @@ export const mingoReorderSet = (queryData: MingoQueryResult, sort: MingoSort, se
  */
 export const mingoRemoveFromSet = (queryData: MingoQueryResult, document: MingoDocument) => {
   const newData = {
-    results: queryData.results.filter(item => item._id !== document._id),
+    results: queryData.results.filter((item) => item._id !== document._id),
     totalCount: queryData.totalCount - 1,
   };
   return newData;

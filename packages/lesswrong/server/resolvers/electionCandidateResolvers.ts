@@ -10,7 +10,7 @@ const electionCandidateResolvers = {
     async ElectionAmountRaised(
       root: void,
       { electionName }: { electionName: string },
-      context: ResolverContext
+      context: ResolverContext,
     ): Promise<ElectionAmountRaised> {
       return await context.repos.electionCandidates.getAmountRaised(electionName);
     },
@@ -26,4 +26,4 @@ addGraphQLSchema(`
     totalTarget: Float,
   }
 `);
-addGraphQLQuery('ElectionAmountRaised(electionName: String): ElectionAmountRaised');
+addGraphQLQuery("ElectionAmountRaised(electionName: String): ElectionAmountRaised");

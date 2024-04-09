@@ -45,10 +45,10 @@ export const useInitiateConversation = (props?: { includeModerators?: boolean })
   // If there is an error in executing the query, reset and flash a message
   useEffect(() => {
     if (error) {
-      flash({messageString: "Error initiating conversation", type: "error"});
+      flash({ messageString: "Error initiating conversation", type: "error" });
       setUserId(null);
     }
-  }, [error, flash])
+  }, [error, flash]);
 
   const conversation = results?.[0];
 

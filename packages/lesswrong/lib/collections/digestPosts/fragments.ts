@@ -1,4 +1,4 @@
-import { registerFragment } from '../../vulcan-lib';
+import { registerFragment } from "../../vulcan-lib";
 
 registerFragment(`
   fragment DigestPostsMinimumInfo on DigestPost {

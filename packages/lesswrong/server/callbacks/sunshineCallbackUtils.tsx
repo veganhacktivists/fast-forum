@@ -4,7 +4,15 @@ import { DOWNVOTED_COMMENT_ALERT } from "../../lib/collections/commentModeratorA
 import { Comments } from "../../lib/collections/comments";
 import { ModeratorActions } from "../../lib/collections/moderatorActions";
 import { getReasonForReview, isLowAverageKarmaContent } from "../../lib/collections/moderatorActions/helpers";
-import { isActionActive, LOW_AVERAGE_KARMA_COMMENT_ALERT, LOW_AVERAGE_KARMA_POST_ALERT, NEGATIVE_KARMA_USER_ALERT, postAndCommentRateLimits, rateLimitSet, RECENTLY_DOWNVOTED_CONTENT_ALERT } from "../../lib/collections/moderatorActions/schema";
+import {
+  isActionActive,
+  LOW_AVERAGE_KARMA_COMMENT_ALERT,
+  LOW_AVERAGE_KARMA_POST_ALERT,
+  NEGATIVE_KARMA_USER_ALERT,
+  postAndCommentRateLimits,
+  rateLimitSet,
+  RECENTLY_DOWNVOTED_CONTENT_ALERT,
+} from "../../lib/collections/moderatorActions/schema";
 import { Posts } from "../../lib/collections/posts";
 import Users from "../../lib/collections/users/collection";
 import Votes from "../../lib/collections/votes/collection";
@@ -12,16 +20,15 @@ import { getWithLoader } from "../../lib/loaders";
 import { createAdminContext, createMutator, updateMutator } from "../vulcan-lib";
 import { forumSelect } from "../../lib/forumTypeUtils";
 
-/** 
+/**
  * This function contains all logic for determining whether a given user needs review in the moderation sidebar.
  * It's important this this only be be added to async callbacks on posts and comments, so that postCount and commentCount have time to update first
  */
 export async function triggerReviewIfNeeded(userId: string) {
   const user = await Users.findOne({ _id: userId });
-  if (!user)
-    throw new Error("user is null");
+  if (!user) throw new Error("user is null");
 
-  const {needsReview, reason} = getReasonForReview(user);
+  const { needsReview, reason } = getReasonForReview(user);
   if (needsReview) {
     await triggerReview(user._id, reason);
   }
@@ -29,10 +36,10 @@ export async function triggerReviewIfNeeded(userId: string) {
 
 export async function triggerReview(userId: string, reason?: string) {
   // TODO: save the reason
-  await  Users.rawUpdateOne({ _id: userId }, { $set: { needsReview: true } });
+  await Users.rawUpdateOne({ _id: userId }, { $set: { needsReview: true } });
 }
 
-interface VoteableAutomodRuleProps<T extends DbVoteableType>{
+interface VoteableAutomodRuleProps<T extends DbVoteableType> {
   voteableItem: T;
   votes: DbVote[];
 }
@@ -40,7 +47,7 @@ interface VoteableAutomodRuleProps<T extends DbVoteableType>{
 type VoteableAutomodRule<T extends DbVoteableType = DbVoteableType> = (props: VoteableAutomodRuleProps<T>) => boolean;
 
 function hasMultipleDownvotes<T extends DbVoteableType>({ votes }: VoteableAutomodRuleProps<T>) {
-  const downvotes = votes.filter(vote => vote.voteType === 'smallDownvote' || vote.voteType === 'bigDownvote');
+  const downvotes = votes.filter((vote) => vote.voteType === "smallDownvote" || vote.voteType === "bigDownvote");
   return downvotes.length > 1;
 }
 
@@ -50,82 +57,89 @@ function hasMultipleDownvotes<T extends DbVoteableType>({ votes }: VoteableAutom
 function isDownvotedBelowBar<T extends DbVoteableType>(bar: number) {
   return ({ voteableItem }: { voteableItem: T }) => {
     return voteableItem.baseScore <= bar && voteableItem.voteCount > 0;
-  }
+  };
 }
 
 export function isRecentlyDownvotedContent(voteableItems: (DbComment | DbPost)[]) {
   // Not enough engagement to make a judgment
   if (voteableItems.length < 5) return false;
 
-  const oneWeekAgo = moment().subtract(7, 'days').toDate();
+  const oneWeekAgo = moment().subtract(7, "days").toDate();
 
   // If the user hasn't posted in a while, we don't care if someone's been voting on their old content
-  if (voteableItems.every(item => item.postedAt < oneWeekAgo)) return false;
+  if (voteableItems.every((item) => item.postedAt < oneWeekAgo)) return false;
 
   const lastFiveVoteableItems = voteableItems.slice(0, 5);
   const downvotedItemCountThreshold = 2;
-  const downvotedItemCount = lastFiveVoteableItems.filter(item => isDownvotedBelowBar(0)({ voteableItem: item })).length;
+  const downvotedItemCount = lastFiveVoteableItems.filter((item) =>
+    isDownvotedBelowBar(0)({ voteableItem: item }),
+  ).length;
 
   return downvotedItemCount >= downvotedItemCountThreshold;
 }
 
 function isActiveNegativeKarmaUser(user: DbUser, voteableItems: (DbComment | DbPost)[]) {
-    // Not enough engagement to make a judgment
-    if (voteableItems.length < 5) return false;
+  // Not enough engagement to make a judgment
+  if (voteableItems.length < 5) return false;
 
-    const oneMonthAgo = moment().subtract(1, 'month').toDate();
-  
-    // If the user hasn't posted in a while, we don't care if someone's been voting on their old content
-    if (voteableItems.every(item => item.postedAt < oneMonthAgo)) return false;
+  const oneMonthAgo = moment().subtract(1, "month").toDate();
 
-    return (user.karma) < -5;
+  // If the user hasn't posted in a while, we don't care if someone's been voting on their old content
+  if (voteableItems.every((item) => item.postedAt < oneMonthAgo)) return false;
+
+  return user.karma < -5;
 }
 
-async function triggerModerationAction(userId: string, warningType: DbModeratorAction['type']) {
+async function triggerModerationAction(userId: string, warningType: DbModeratorAction["type"]) {
   const context = createAdminContext();
-  const lastModeratorAction = await ModeratorActions.findOne({ userId, type: warningType }, { sort: { createdAt: -1 } });
+  const lastModeratorAction = await ModeratorActions.findOne(
+    { userId, type: warningType },
+    { sort: { createdAt: -1 } },
+  );
   // No previous commentQualityWarning on record for this user
   if (!lastModeratorAction) {
     void createMutator({
       collection: ModeratorActions,
       document: {
         type: warningType,
-        userId
+        userId,
       },
       currentUser: context.currentUser,
-      context
+      context,
     });
 
     // User already has an active commentQualityWarning, escalate?
   } else if (isActionActive(lastModeratorAction)) {
     // TODO
-
     // User has an inactive commentQualityWarning, re-apply?
   } else {
     void createMutator({
       collection: ModeratorActions,
       document: {
         type: warningType,
-        userId  
+        userId,
       },
       currentUser: context.currentUser,
-      context
+      context,
     });
   }
 }
 
-async function disableModerationAction(userId: string, warningType: DbModeratorAction['type']) {
+async function disableModerationAction(userId: string, warningType: DbModeratorAction["type"]) {
   const context = createAdminContext();
-  const lastModeratorAction = await ModeratorActions.findOne({ userId, type: warningType }, { sort: { createdAt: -1 } });
+  const lastModeratorAction = await ModeratorActions.findOne(
+    { userId, type: warningType },
+    { sort: { createdAt: -1 } },
+  );
   if (lastModeratorAction && isActionActive(lastModeratorAction)) {
     void updateMutator({
       collection: ModeratorActions,
       documentId: lastModeratorAction._id,
       data: {
-        endedAt: new Date()
+        endedAt: new Date(),
       },
       currentUser: context.currentUser,
-      context
+      context,
     });
   }
 }
@@ -133,7 +147,7 @@ async function disableModerationAction(userId: string, warningType: DbModeratorA
 /**
  * Enables or disables a moderator action on a specific user, based on a conditional
  */
-function handleAutomodAction(triggerAction: boolean, userId: string, actionType: DbModeratorAction['type']) {
+function handleAutomodAction(triggerAction: boolean, userId: string, actionType: DbModeratorAction["type"]) {
   if (triggerAction) {
     void triggerModerationAction(userId, actionType);
   } else {
@@ -144,21 +158,19 @@ function handleAutomodAction(triggerAction: boolean, userId: string, actionType:
 /**
  * WARNING: assumes that the input actions are already sorted by createdAt descending
  */
-function getLastActionEndedAt(actions: DbModeratorAction[], actionType: DbModeratorAction['type']) {
-  return actions.find(action => action.type === actionType)?.endedAt;
+function getLastActionEndedAt(actions: DbModeratorAction[], actionType: DbModeratorAction["type"]) {
+  return actions.find((action) => action.type === actionType)?.endedAt;
 }
 
 function getUnmoderatedContent(content: (DbPost | DbComment)[], lastActionEndedAt?: Date | null) {
-  return lastActionEndedAt
-    ? content.filter(item => item.postedAt > lastActionEndedAt)
-    : content;
+  return lastActionEndedAt ? content.filter((item) => item.postedAt > lastActionEndedAt) : content;
 }
 
 /**
  * recently downvoted content:
  * - if active, disable if no longer meets condition
  * - if inactive, condition should only check content (both posts & comments) from after the last endedAt
- * 
+ *
  * low average karma:
  * - if active, disable if no longer meets condition
  * - if inactive, condition should only check content (whichever one matches the action type) from after the last endedAt
@@ -170,16 +182,21 @@ export async function triggerAutomodIfNeededForUser(user: DbUser) {
     // Sort by createdAt descending so that `.find` returns the most recent one matching the condition
     ModeratorActions.find({ userId }, { sort: { createdAt: -1 } }).fetch(),
     Comments.find({ userId }, { sort: { postedAt: -1 }, limit: 20 }).fetch(),
-    Posts.find({ userId, isEvent: false, draft: false }, { sort: { postedAt: -1 }, limit: 20, projection: { postedAt: 1, baseScore: 1 } }).fetch()
+    Posts.find(
+      { userId, isEvent: false, draft: false },
+      { sort: { postedAt: -1 }, limit: 20, projection: { postedAt: 1, baseScore: 1 } },
+    ).fetch(),
   ]);
 
-  const voteableContent = [...latestComments, ...latestPosts].sort((a, b) => b.postedAt.valueOf() - a.postedAt.valueOf());
+  const voteableContent = [...latestComments, ...latestPosts].sort(
+    (a, b) => b.postedAt.valueOf() - a.postedAt.valueOf(),
+  );
 
-  if (userModeratorActions.filter(isActionActive).some(action => rateLimitSet.has(action.type) )) {
+  if (userModeratorActions.filter(isActionActive).some((action) => rateLimitSet.has(action.type))) {
     // if a mod has already given them a rate limit, they don't need to have any new actions applied to them
     // TODO: if we build any more complicated mod action rules, this will need to be updated
     // eaforum-look-here
-    return
+    return;
   }
   const activeNegativeKarmaUser = isActiveNegativeKarmaUser(user, voteableContent);
   handleAutomodAction(activeNegativeKarmaUser, userId, NEGATIVE_KARMA_USER_ALERT);
@@ -201,10 +218,10 @@ export async function triggerAutomodIfNeededForUser(user: DbUser) {
   const unmoderatedVoteableContent = getUnmoderatedContent(voteableContent, downvotedContentActionEndedAt);
   const unmoderatedLatestComments = getUnmoderatedContent(latestComments, lowAvgKarmaCommentEndedAt);
   const unmoderatedLatestPosts = getUnmoderatedContent(latestPosts, lowAvgKarmaPostEndedAt);
-  
+
   const lowQualityContent = isRecentlyDownvotedContent(unmoderatedVoteableContent);
-  const { lowAverage: mediocreQualityComments } = isLowAverageKarmaContent(unmoderatedLatestComments, 'comment');
-  const { lowAverage: mediocreQualityPosts } = isLowAverageKarmaContent(unmoderatedLatestPosts, 'post');
+  const { lowAverage: mediocreQualityComments } = isLowAverageKarmaContent(unmoderatedLatestComments, "comment");
+  const { lowAverage: mediocreQualityPosts } = isLowAverageKarmaContent(unmoderatedLatestPosts, "post");
 
   handleAutomodAction(lowQualityContent, userId, RECENTLY_DOWNVOTED_CONTENT_ALERT);
   handleAutomodAction(mediocreQualityComments, userId, LOW_AVERAGE_KARMA_COMMENT_ALERT);
@@ -224,17 +241,19 @@ export async function triggerCommentAutomodIfNeeded(comment: DbVoteableType, vot
 
   const [allVotes, previousCommentModeratorActions] = await Promise.all([
     getWithLoader(context, Votes, "votesByDocument", { cancelled: false }, "documentId", commentId),
-    CommentModeratorActions.find({ commentId }, { sort: { createdAt: -1 } }).fetch()
+    CommentModeratorActions.find({ commentId }, { sort: { createdAt: -1 } }).fetch(),
   ]);
 
-  const existingDownvotedCommentAction = previousCommentModeratorActions.find(action => action.type === DOWNVOTED_COMMENT_ALERT);
+  const existingDownvotedCommentAction = previousCommentModeratorActions.find(
+    (action) => action.type === DOWNVOTED_COMMENT_ALERT,
+  );
 
   const automodRule = forumSelect<VoteableAutomodRule>({
     LessWrong: hasMultipleDownvotes,
     EAForum: isDownvotedBelowBar(-10),
-    default: () => false
+    default: () => false,
   });
-  
+
   const needsModeration = automodRule({ voteableItem: comment, votes: allVotes });
 
   if (!existingDownvotedCommentAction && needsModeration) {
@@ -242,10 +261,10 @@ export async function triggerCommentAutomodIfNeeded(comment: DbVoteableType, vot
       collection: CommentModeratorActions,
       document: {
         type: DOWNVOTED_COMMENT_ALERT,
-        commentId
+        commentId,
       },
       currentUser: context.currentUser,
-      context
+      context,
     });
   }
 }

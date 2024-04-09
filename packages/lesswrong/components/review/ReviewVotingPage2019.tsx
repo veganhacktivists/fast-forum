@@ -169,7 +169,7 @@
 //   warning: {
 //     color: theme.palette.error.main
 //   },
-  
+
 //   // averageVoteInstructions: {
 //   //   padding: 12,
 //   //   ...commentBodyStyles(theme),
@@ -181,7 +181,7 @@
 //   // averageVoteLabel: {
 //   //   marginTop: 8,
 //   //   flexGrow: 1,
-    
+
 //   //   fontSize: "1.3rem",
 //   //   fontFamily: theme.typography.postStyle.fontFamily,
 //   // },
@@ -197,7 +197,7 @@
 //   //   paddingRight: 10,
 //   //   cursor: "pointer"
 //   // },
-  
+
 //   voteAverage: {
 //     cursor: 'pointer',
 //   },
@@ -210,11 +210,10 @@
 // export type quadraticVote = ReviewVote & {type: "quadratic"}
 // export type qualitativeVote = ReviewVote & {type: "qualitative", score: 0|1|2|3|4}
 
-
 // const generatePermutation = (count: number, user: UsersCurrent|null): Array<number> => {
 //   const seed = user?._id || "";
 //   const rng = seedrandom(seed);
-  
+
 //   let remaining = _.range(count);
 //   let result: Array<number> = [];
 //   while(remaining.length > 0) {
@@ -232,7 +231,6 @@
 
 //   const currentUser = useCurrentUser()
 //   const { captureEvent } = useTracking({eventType: "reviewVotingEvent"})
-  
 
 //   const { results: posts, loading: postsLoading } = useMulti({
 //     terms: {view: VOTING_VIEW, limit: 300},
@@ -240,7 +238,7 @@
 //     fragmentName: 'PostsListWithVotes',
 //     fetchPolicy: 'cache-and-network',
 //   });
-  
+
 //   const { results: dbVotes, loading: dbVotesLoading } = useMulti({
 //     terms: {view: "reviewVotesFromUser", limit: 300, userId: currentUser?._id, year: YEAR+""},
 //     collectionName: "ReviewVotes",
@@ -276,7 +274,7 @@
 //   const [showKarmaVotes, setShowKarmaVotes] = useState<any>(null)
 
 //   const votes = dbVotes?.map(({_id, qualitativeScore, postId, reactions}) => ({_id, postId, score: qualitativeScore, type: "qualitative", reactions})) as qualitativeVote[]
-  
+
 //   const handleSetUseQuadratic = (newUseQuadratic: boolean) => {
 //     if (!newUseQuadratic) {
 //       if (!confirm("WARNING: This will discard your quadratic vote data. Are you sure you want to return to basic voting?")) {
@@ -354,7 +352,7 @@
 //   const voteTotal = useQuadratic ? computeTotalCost(quadraticVotes) : 0
 //   // const averageQuadraticVote = posts?.length>0 ? sumBy(quadraticVotes, v=>v.score)/posts.length : 0;
 //   // const averageQuadraticVoteStr = averageQuadraticVote.toFixed(2);
-  
+
 //   // const adjustAllQuadratic = (delta: number) => {
 //   //   for (let post of posts) {
 //   //     const existingVote = votes.find(vote => vote.postId === post._id);
@@ -367,7 +365,7 @@
 //   // }
 
 //   const currentReactions = expandedPost ? [...(votes.find(vote => vote.postId === expandedPost._id)?.reactions || [])] : []
-  
+
 //   // TODO: Redundancy here due to merge
 //   const voteSum = useQuadratic ? computeTotalVote(quadraticVotes) : 0
 //   const voteAverage = (posts && posts.length > 0) ? voteSum/posts?.length : 0
@@ -393,7 +391,7 @@
 //             </LWTooltip>
 //             <LWTooltip title="Show which posts you have upvoted or downvoted">
 //               <Button onClick={() => setShowKarmaVotes(!showKarmaVotes)}>
-//                 {showKarmaVotes ? "Hide Karma Votes" : "Show Karma Votes"} 
+//                 {showKarmaVotes ? "Hide Karma Votes" : "Show Karma Votes"}
 //               </Button>
 //             </LWTooltip>
 //             {(postsLoading || dbVotesLoading || loading) && <Loading/>}
@@ -437,7 +435,7 @@
 //             {!!posts && !!postOrder && applyOrdering(posts, postOrder).map((post) => {
 //                 const currentQualitativeVote = votes.find(vote => vote.postId === post._id)
 //                 const currentQuadraticVote = quadraticVotes.find(vote => vote.postId === post._id)
-  
+
 //                 return <div key={post._id} onClick={()=>{
 //                   setExpandedPost(post)
 //                   captureEvent(undefined, {eventSubType: "voteTableRowClicked", postId: post._id})}}
@@ -482,19 +480,19 @@
 //           {expandedPost && <div className={classes.expandedInfoWrapper}>
 //             <div className={classes.expandedInfo}>
 //               <div className={classes.leaveReactions}>
-//                 {[...new Set([...defaultReactions, ...currentReactions])].map(reaction =>  <ReactionsButton 
-//                   postId={expandedPost._id} 
+//                 {[...new Set([...defaultReactions, ...currentReactions])].map(reaction =>  <ReactionsButton
+//                   postId={expandedPost._id}
 //                   key={reaction}
-//                   vote={useQuadratic ? dispatchQuadraticVote : dispatchQualitativeVote} 
+//                   vote={useQuadratic ? dispatchQuadraticVote : dispatchQualitativeVote}
 //                   votes={votes as any}
-//                   reaction={reaction} 
+//                   reaction={reaction}
 //                   freeEntry={false}
 //                 />)}
-//                 <ReactionsButton 
-//                   postId={expandedPost._id} 
-//                   vote={useQuadratic ? dispatchQuadraticVote : dispatchQualitativeVote} 
+//                 <ReactionsButton
+//                   postId={expandedPost._id}
+//                   vote={useQuadratic ? dispatchQuadraticVote : dispatchQualitativeVote}
 //                   votes={votes as any}
-//                   reaction={"Other..."} 
+//                   reaction={"Other..."}
 //                   freeEntry={true}
 //                 />
 //               </div>

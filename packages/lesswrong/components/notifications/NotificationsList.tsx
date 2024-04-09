@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { useMulti } from '../../lib/crud/withMulti';
+import React, { useState } from "react";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useMulti } from "../../lib/crud/withMulti";
 
-import { isFriendlyUI, preferredHeadingCase } from '../../themes/forumTheme';
+import { isFriendlyUI, preferredHeadingCase } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -15,7 +15,7 @@ const styles = (theme: ThemeType): JssStyles => ({
 
   empty: {
     ...(isFriendlyUI ? theme.typography.body2 : {}),
-    padding: 10
+    padding: 10,
   },
 
   loadMoreButton: {
@@ -30,62 +30,65 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const NotificationsList = ({ terms, currentUser, classes }: {
-  terms: NotificationsViewTerms,
-  currentUser: UsersCurrent,
-  classes: ClassesType,
+const NotificationsList = ({
+  terms,
+  currentUser,
+  classes,
+}: {
+  terms: NotificationsViewTerms;
+  currentUser: UsersCurrent;
+  classes: ClassesType;
 }) => {
   const { results, loading, loadMore } = useMulti({
     terms,
     collectionName: "Notifications",
-    fragmentName: 'NotificationsList',
+    fragmentName: "NotificationsList",
     limit: 20,
-    enableTotal: false
+    enableTotal: false,
   });
-  const [lastNotificationsCheck] = useState(
-    ((currentUser?.lastNotificationsCheck) || ""),
-  );
+  const [lastNotificationsCheck] = useState(currentUser?.lastNotificationsCheck || "");
 
   if (results?.length) {
     return (
       <List className={classes.root}>
-        {results.map(notification =>
+        {results.map((notification) => (
           <Components.NotificationsItem
             notification={notification}
             lastNotificationsCheck={lastNotificationsCheck}
             currentUser={currentUser}
             key={notification._id}
           />
+        ))}
+        {results.length >= 20 && (
+          <ListItem button={true} className={classes.loadMoreButton} onClick={() => loadMore()}>
+            <div className={classes.loadMoreLabel}>{preferredHeadingCase("Load More")}</div>
+          </ListItem>
         )}
-        {results.length >= 20 &&
-          <ListItem
-            button={true}
-            className={classes.loadMoreButton}
-            onClick={() => loadMore()}
-          >
-            <div className={classes.loadMoreLabel}>
-              {preferredHeadingCase("Load More")}
-            </div>
-          </ListItem>}
       </List>
-    )
+    );
   } else if (loading) {
-    return <Components.Loading/>
+    return <Components.Loading />;
   } else {
     const modifier =
-        (terms.type === undefined) ? (<></>)
-      : (terms.type === 'newPost') ? (<b>new post</b>)
-      : (terms.type === 'newComment') ? (<b>new comment</b>)
-      : (terms.type === 'newMessage') ? (<b>new message</b>)
-      : "of these";
-    return <div className={classes.empty}> You don't have any {modifier} notifications yet</div>
+      terms.type === undefined ? (
+        <></>
+      ) : terms.type === "newPost" ? (
+        <b>new post</b>
+      ) : terms.type === "newComment" ? (
+        <b>new comment</b>
+      ) : terms.type === "newMessage" ? (
+        <b>new message</b>
+      ) : (
+        "of these"
+      );
+    return <div className={classes.empty}> You don't have any {modifier} notifications yet</div>;
   }
-}
+};
 
-const NotificationsListComponent = registerComponent('NotificationsList', NotificationsList, {styles});
+const NotificationsListComponent = registerComponent("NotificationsList", NotificationsList, { styles });
 
 declare global {
   interface ComponentTypes {
-    NotificationsList: typeof NotificationsListComponent
+    NotificationsList: typeof NotificationsListComponent;
   }
 }

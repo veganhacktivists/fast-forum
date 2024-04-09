@@ -1,26 +1,21 @@
-import type { PartialDeep } from 'type-fest'
-import { defaultShadePalette, defaultComponentPalette } from './defaultPalette';
+import type { PartialDeep } from "type-fest";
+import { defaultShadePalette, defaultComponentPalette } from "./defaultPalette";
 
-const monoStack = [
-  '"Liberation Mono"',
-  'Menlo',
-  'Courier',
-  'monospace'
-].join(',')
+const monoStack = ['"Liberation Mono"', "Menlo", "Courier", "monospace"].join(",");
 
 // Will be used for the distance between the post title divider and the text on
 // mobile
 // Matches distance from the bottom of the secondaryInfo to the divider
 // = 16 (see header and divider) + the ~4 pixel distance from the bottom
 // of the secondaryInfo text to the bottom of the associated div
-const titleDividerSpacing = 20
+const titleDividerSpacing = 20;
 
 export const zIndexes = {
   frontpageBooks: 0,
   frontpageSplashImage: 0,
   sequenceBanner: 0,
   singleColumnSection: 1,
-  modTopBar: 1, 
+  modTopBar: 1,
   spotlightItem: 1,
   editorPresenceList: 1,
   spotlightItemCloseButton: 2,
@@ -62,15 +57,15 @@ export const zIndexes = {
   commentBoxPopup: 10000000001, // has to be higher than Intercom,
   // ckEditorToolbar: 10000000002, // has to be higher than commentBoxPopup, (note: the css had to be applied in an scss file, "_editor.scss", but the position is listed here for ease of reference)
   petrovDayButton: 6,
-  petrovDayLoss: 1000000
-}
+  petrovDayLoss: 1000000,
+};
 
 export const baseTheme: BaseThemeSpecification = {
   shadePalette: defaultShadePalette(),
   componentPalette: (shadePalette: ThemeShadePalette) => defaultComponentPalette(shadePalette),
   make: (palette: ThemePalette): PartialDeep<ThemeType> => {
-    const spacingUnit = 8
-  
+    const spacingUnit = 8;
+
     return {
       baseFontSize: 13,
       breakpoints: {
@@ -85,7 +80,7 @@ export const baseTheme: BaseThemeSpecification = {
       spacing: {
         unit: spacingUnit,
         titleDividerSpacing,
-        mainLayoutPaddingTop: 50
+        mainLayoutPaddingTop: 50,
       },
       borderRadius: {
         default: 0,
@@ -102,69 +97,69 @@ export const baseTheme: BaseThemeSpecification = {
         contentNotice: {
           fontStyle: "italic",
           color: palette.grey[600],
-          fontSize:".9em",
+          fontSize: ".9em",
           // This should be at least as big as the margin-bottom of <p> tags (18.1
           // on LW), and the distance on mobile between the divider and the top of
           // the notice is as good as any
           marginBottom: titleDividerSpacing,
-          wordBreak: "break-word"
+          wordBreak: "break-word",
         },
         body1: {
-          fontSize: '1.4rem',
-          lineHeight: '2rem'
+          fontSize: "1.4rem",
+          lineHeight: "2rem",
         },
         body2: {
           fontWeight: 400,
-          fontSize: '1.1rem',
-          lineHeight: '1.5rem',
+          fontSize: "1.1rem",
+          lineHeight: "1.5rem",
         },
         postsItemTitle: {
-          fontSize: "1.3rem"
+          fontSize: "1.3rem",
         },
         chapterTitle: {
           fontSize: "1.2em",
           textTransform: "uppercase",
-          color: palette.grey[600]
+          color: palette.grey[600],
         },
         largeChapterTitle: {
-          fontSize: '1.4rem',
+          fontSize: "1.4rem",
           margin: "1.5em 0 .5em 0",
-          color: palette.grey[800]
+          color: palette.grey[800],
         },
         smallText: {
           fontFamily: palette.fonts.sansSerifStack,
           fontWeight: 400,
           fontSize: "1rem",
-          lineHeight: '1.4rem'
+          lineHeight: "1.4rem",
         },
         tinyText: {
           fontWeight: 400,
           fontSize: ".75rem",
-          lineHeight: '1.4rem'
+          lineHeight: "1.4rem",
         },
         // used by h3
         display0: {
           color: palette.grey[700],
-          fontSize: '1.6rem',
-          marginTop: '1em',
+          fontSize: "1.6rem",
+          marginTop: "1em",
           // added by MUI to display1, which we're imitating
           fontWeight: 400,
           lineHeight: "1.20588em",
         },
         display1: {
           color: palette.grey[800],
-          fontSize: '2rem',
-          marginTop: '1em'
+          fontSize: "2rem",
+          marginTop: "1em",
         },
         display2: {
           color: palette.grey[800],
-          fontSize: '2.8rem',
-          marginTop: '1em'
+          fontSize: "2.8rem",
+          marginTop: "1em",
         },
         display3: {
           color: palette.grey[800],
-          marginTop: '1.2em',
-          fontSize: '3rem'
+          marginTop: "1.2em",
+          fontSize: "3rem",
         },
         display4: {
           color: palette.grey[800],
@@ -180,33 +175,33 @@ export const baseTheme: BaseThemeSpecification = {
           fontFamily: palette.fonts.sansSerifStack,
         },
         caption: {
-          fontSize: ".9rem"
+          fontSize: ".9rem",
         },
         blockquote: {
           fontWeight: 400,
-          paddingTop: spacingUnit*2,
-          paddingRight: spacingUnit*2,
-          paddingBottom: spacingUnit*2,
-          paddingLeft: spacingUnit*2,
+          paddingTop: spacingUnit * 2,
+          paddingRight: spacingUnit * 2,
+          paddingBottom: spacingUnit * 2,
+          paddingLeft: spacingUnit * 2,
           borderLeft: `solid 3px ${palette.grey[300]}`,
           margin: 0,
         },
         commentBlockquote: {
           fontWeight: 400,
           paddingTop: spacingUnit,
-          paddingRight: spacingUnit*3,
+          paddingRight: spacingUnit * 3,
           paddingBottom: spacingUnit,
-          paddingLeft: spacingUnit*2,
+          paddingLeft: spacingUnit * 2,
           borderLeft: `solid 3px ${palette.grey[300]}`,
           margin: 0,
-          marginLeft: spacingUnit*1.5,
+          marginLeft: spacingUnit * 1.5,
         },
         codeblock: {
           backgroundColor: palette.grey[100],
           borderRadius: "5px",
           border: `solid 1px ${palette.grey[300]}`,
-          padding: '1rem',
-          whiteSpace: 'pre-wrap',
+          padding: "1rem",
+          whiteSpace: "pre-wrap",
           margin: "1em 0",
         },
         code: {
@@ -217,24 +212,24 @@ export const baseTheme: BaseThemeSpecification = {
           borderRadius: 2,
           paddingTop: 3,
           paddingBottom: 3,
-          lineHeight: 1.42
+          lineHeight: 1.42,
         },
         li: {
-          marginBottom: '.5rem',
+          marginBottom: ".5rem",
         },
         commentHeader: {
-          fontSize: '1.5rem',
-          marginTop: '.5em',
-          fontWeight:500,
+          fontSize: "1.5rem",
+          marginTop: ".5em",
+          fontWeight: 500,
         },
         subheading: {
-          fontSize:15,
-          color: palette.grey[600]
+          fontSize: 15,
+          color: palette.grey[600],
         },
         subtitle: {
           fontSize: 16,
           fontWeight: 600,
-          marginBottom: ".5rem"
+          marginBottom: ".5rem",
         },
         italic: {
           fontStyle: "italic",
@@ -244,7 +239,7 @@ export const baseTheme: BaseThemeSpecification = {
         },
       },
       zIndexes: {
-        ...zIndexes
+        ...zIndexes,
       },
       postImageStyles: {},
       voting: {
@@ -297,8 +292,8 @@ export const baseTheme: BaseThemeSpecification = {
         },
         MuiSelect: {
           selectMenu: {
-            paddingLeft: spacingUnit
-          }
+            paddingLeft: spacingUnit,
+          },
         },
         MuiFormControlLabel: {
           label: {
@@ -306,12 +301,12 @@ export const baseTheme: BaseThemeSpecification = {
             fontSize: "1.1rem",
             fontWeight: 400,
             lineHeight: "1.5rem",
-          }
+          },
         },
         MuiTableCell: {
           body: {
-            fontSize: '1.1rem',
-            lineHeight: '1.5rem',
+            fontSize: "1.1rem",
+            lineHeight: "1.5rem",
             paddingLeft: 16,
             paddingRight: 16,
             paddingTop: 12,
@@ -319,10 +314,10 @@ export const baseTheme: BaseThemeSpecification = {
             marginTop: 0,
             marginBottom: 0,
             wordBreak: "normal",
-          }
-        }
+          },
+        },
       },
       rawCSS: [],
-    }
-  }
+    };
+  },
 };

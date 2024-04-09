@@ -1,4 +1,4 @@
-import { foreignKeyField } from "../../utils/schemaUtils"
+import { foreignKeyField } from "../../utils/schemaUtils";
 
 export const EMBEDDINGS_VECTOR_SIZE = 1536;
 

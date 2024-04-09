@@ -1,4 +1,4 @@
-import * as _ from 'underscore';
+import * as _ from "underscore";
 
 // Bulk apply a js function to a mongo collection; this is possibly less
 // performant, but much easier to write than the mongo update syntax.
@@ -9,18 +9,25 @@ import * as _ from 'underscore';
 // Despite the presence of writeErrors in the result, the update appears to
 // crash and stop on some errors
 // TODO: Fails if nothing matches the query
-export const bulkUpdateWithJS = async ({collection, query={}, queryOptions={}, updateFunction}: AnyBecauseTodo) => {
-  const documents = await collection.find(query, queryOptions)
-  const updates = await Promise.all(documents.map(async (document: AnyBecauseTodo) => ({
-    updateOne: {
-      filter: {
-        _id: document._id
+export const bulkUpdateWithJS = async ({
+  collection,
+  query = {},
+  queryOptions = {},
+  updateFunction,
+}: AnyBecauseTodo) => {
+  const documents = await collection.find(query, queryOptions);
+  const updates = await Promise.all(
+    documents.map(async (document: AnyBecauseTodo) => ({
+      updateOne: {
+        filter: {
+          _id: document._id,
+        },
+        update: await updateFunction(document),
       },
-      update: await updateFunction(document)
-    }
-  })));
-  await collection.rawCollection().bulkWrite(updates)
-}
+    })),
+  );
+  await collection.rawCollection().bulkWrite(updates);
+};
 
 // Better dev experience for running async scripts from the meteor shell.
 //
@@ -44,26 +51,28 @@ export const bulkUpdateWithJS = async ({collection, query={}, queryOptions={}, u
 // In the meteor shell:
 //
 // > Vulcan.fixAllTheThings('fee', 'bee')
-export const wrapVulcanAsyncScript = (name: string, scriptFunc: Function) => async (...args: AnyBecauseTodo[]) => {
-  try {
-    // eslint-disable-next-line no-console
-    console.log(`================ ${name} ================`)
-    // eslint-disable-next-line no-console
-    console.time(name)
-    await scriptFunc(...args)
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error(`Failed to run ${name}, got error ${err}`)
-  } finally {
-    // eslint-disable-next-line no-console
-    console.timeEnd(name)
-    // eslint-disable-next-line no-console
-    console.log(`============ ${name} exiting ============`)
-  }
-}
+export const wrapVulcanAsyncScript =
+  (name: string, scriptFunc: Function) =>
+  async (...args: AnyBecauseTodo[]) => {
+    try {
+      // eslint-disable-next-line no-console
+      console.log(`================ ${name} ================`);
+      // eslint-disable-next-line no-console
+      console.time(name);
+      await scriptFunc(...args);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(`Failed to run ${name}, got error ${err}`);
+    } finally {
+      // eslint-disable-next-line no-console
+      console.timeEnd(name);
+      // eslint-disable-next-line no-console
+      console.log(`============ ${name} exiting ============`);
+    }
+  };
 
 export function getFieldsWithAttribute(schema: AnyBecauseTodo, attributeName: string): Array<string> {
-  return _.filter(Object.keys(schema), (fieldName) => !!schema[fieldName][attributeName])
+  return _.filter(Object.keys(schema), (fieldName) => !!schema[fieldName][attributeName]);
 }
 
 export async function urlIsBroken(url: string): Promise<boolean> {
@@ -77,14 +86,14 @@ export async function urlIsBroken(url: string): Promise<boolean> {
       // Redirect. In principle this shouldn't happen because meteor's HTTP.call
       // is documented to follow redirects by default. But maybe it does happen.
       //eslint-disable-next-line no-console
-      console.log("Got "+statusCode+" redirect on "+url)
-      return false
+      console.log("Got " + statusCode + " redirect on " + url);
+      return false;
     } else if (statusCode !== 200) {
-      return true
+      return true;
     } else {
-      return false
+      return false;
     }
-  } catch(e) {
-    return true
+  } catch (e) {
+    return true;
   }
 }

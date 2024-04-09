@@ -1,7 +1,7 @@
-import React from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import { themeMetadata, getDefaultThemeOptions } from '../../themes/themeNames';
-import { useThemeOptions } from '../themes/useTheme';
+import React from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import { themeMetadata, getDefaultThemeOptions } from "../../themes/themeNames";
+import { useThemeOptions } from "../themes/useTheme";
 
 const getValue = (props: any) => {
   if (props.value?.name) {
@@ -13,18 +13,18 @@ const getValue = (props: any) => {
   }
 
   return getDefaultThemeOptions().name;
-}
+};
 
 const ThemeSelect = (props: any) => {
   const themeOptions = useThemeOptions();
-  const options = themeMetadata.map(({name, label}) => ({value: name, label}));
+  const options = themeMetadata.map(({ name, label }) => ({ value: name, label }));
 
-  const updateCurrentValues = ({theme, ...rest}: AnyBecauseTodo) => {
+  const updateCurrentValues = ({ theme, ...rest }: AnyBecauseTodo) => {
     props.updateCurrentValues({
       ...rest,
-      theme: {...themeOptions, name: theme},
+      theme: { ...themeOptions, name: theme },
     });
-  }
+  };
 
   return (
     <Components.FormComponentSelect
@@ -35,12 +35,12 @@ const ThemeSelect = (props: any) => {
       options={options}
     />
   );
-}
+};
 
 const ThemeSelectComponent = registerComponent("ThemeSelect", ThemeSelect);
 
 declare global {
   interface ComponentTypes {
-    ThemeSelect: typeof ThemeSelectComponent
+    ThemeSelect: typeof ThemeSelectComponent;
   }
 }

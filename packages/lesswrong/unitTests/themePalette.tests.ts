@@ -1,16 +1,16 @@
-import { importAllComponents, ComponentsTable } from '../lib/vulcan-lib/components';
-import { getForumTheme } from '../themes/forumTheme';
-import * as _ from 'underscore';
-import { themePaletteTestExcludedComponents } from '../server/register-mui-styles';
+import { importAllComponents, ComponentsTable } from "../lib/vulcan-lib/components";
+import { getForumTheme } from "../themes/forumTheme";
+import * as _ from "underscore";
+import { themePaletteTestExcludedComponents } from "../server/register-mui-styles";
 
 // This component imports a lot of JSX files for plugins and our current build
 // setup for tests can't parse them correctly for some reason. For now we can
 // just avoid importing them at all
 jest.mock("../components/editor/DraftJSEditor", () => {
-  const {registerComponent} = require("../lib/vulcan-lib/components");
-  const {styleMap} = require("../components/editor/draftJsEditorStyleMap");
-  registerComponent("DraftJSEditor", () => null, {styles: styleMap});
-  return {default: jest.fn()};
+  const { registerComponent } = require("../lib/vulcan-lib/components");
+  const { styleMap } = require("../components/editor/draftJsEditorStyleMap");
+  registerComponent("DraftJSEditor", () => null, { styles: styleMap });
+  return { default: jest.fn() };
 });
 
 /*
@@ -21,31 +21,30 @@ jest.mock("../components/editor/DraftJSEditor", () => {
  */
 import "../server";
 
-describe('JSS', () => {
-  it('uses only colors from the theme palette', () => {
+describe("JSS", () => {
+  it("uses only colors from the theme palette", () => {
     importAllComponents();
-    const realTheme = getForumTheme({name: "default", siteThemeOverride: {}}) as unknown as ThemeType;
+    const realTheme = getForumTheme({ name: "default", siteThemeOverride: {} }) as unknown as ThemeType;
     const fakeTheme = replacePaletteWithStubs(realTheme);
     let nonPaletteColors: string[] = [];
-    
+
     // Some components get a pass, such as the ones who's styles are directly stolen from MUI
-    const componentsToTest = Object.keys(ComponentsTable)
-      .filter(
-        cName => !themePaletteTestExcludedComponents.includes(cName)
-      ) as (keyof typeof ComponentsTable)[];
+    const componentsToTest = Object.keys(ComponentsTable).filter(
+      (cName) => !themePaletteTestExcludedComponents.includes(cName),
+    ) as (keyof typeof ComponentsTable)[];
 
     if (componentsToTest.length < 1000) {
       throw new Error("Expected more components to test - are they imported correctly?");
     }
 
-    for (let componentName of _.sortBy(componentsToTest, x=>x)) {
+    for (let componentName of _.sortBy(componentsToTest, (x) => x)) {
       const styleGetter = ComponentsTable[componentName].options?.styles;
-      const styles = (typeof styleGetter === 'function') ? styleGetter(fakeTheme) : styleGetter;
+      const styles = typeof styleGetter === "function" ? styleGetter(fakeTheme) : styleGetter;
       if (styles && !ComponentsTable[componentName].options?.allowNonThemeColors) {
         assertNoNonPaletteColors(componentName, styles, nonPaletteColors);
       }
     }
-    
+
     if (nonPaletteColors.length > 0) {
       // eslint-disable-next-line no-console
       console.error(`No-palette colors in JSS styles:\n${nonPaletteColors.join("\n")}`);
@@ -60,7 +59,12 @@ function assertNoNonPaletteColors(componentName: string, styles: JssStyles, outN
   }
 }
 
-function assertNoNonPaletteColorsRec(componentName: string, path: string, styleFragment: any, outNonPaletteColors: string[]) {
+function assertNoNonPaletteColorsRec(
+  componentName: string,
+  path: string,
+  styleFragment: any,
+  outNonPaletteColors: string[],
+) {
   if (typeof styleFragment === "string") {
     const mentionedColor = stringMentionsAnyColor(styleFragment);
     if (mentionedColor) {
@@ -75,12 +79,10 @@ function assertNoNonPaletteColorsRec(componentName: string, path: string, styleF
 
 function replacePaletteWithStubs(theme: ThemeType): ThemeType {
   function objReplaceColors(obj: any, replacement: string) {
-    if (typeof obj === 'string') {
-      if (stringMentionsAnyColor(obj))
-        return replacement;
-      else
-        return obj;
-    } else if (typeof obj === 'object') {
+    if (typeof obj === "string") {
+      if (stringMentionsAnyColor(obj)) return replacement;
+      else return obj;
+    } else if (typeof obj === "object") {
       let result: typeof obj = {};
       for (let key of Object.keys(obj)) {
         result[key] = objReplaceColors(obj[key], replacement);
@@ -90,33 +92,29 @@ function replacePaletteWithStubs(theme: ThemeType): ThemeType {
       return obj;
     }
   }
-  
+
   return {
     ...theme,
     typography: objReplaceColors(theme.typography, "fakecolor"),
     shadows: theme.shadows.map(() => "fakecolor"),
     palette: {
       ...objReplaceColors(theme.palette, "fakecolor"),
-      greyAlpha: ()=>"fakecolor",
-      inverseGreyAlpha: ()=>"fakecolor",
-      primaryAlpha: ()=>"fakecolor",
-      boxShadowColor: ()=>"fakecolor",
-      greyBorder: ()=>"fakecolor",
+      greyAlpha: () => "fakecolor",
+      inverseGreyAlpha: () => "fakecolor",
+      primaryAlpha: () => "fakecolor",
+      boxShadowColor: () => "fakecolor",
+      greyBorder: () => "fakecolor",
     },
   };
 }
 
-const colorWords = ["white","black","red","grey","gray"];
+const colorWords = ["white", "black", "red", "grey", "gray"];
 function stringMentionsAnyColor(str: string): string | null {
-  if (!!str.match(/rgba?\(/)
-    || !!str.match(/#[0-9a-fA-F]{6}/)
-    || !!str.match(/#[0-9a-fA-F]{3}/)
-  ) {
+  if (!!str.match(/rgba?\(/) || !!str.match(/#[0-9a-fA-F]{6}/) || !!str.match(/#[0-9a-fA-F]{3}/)) {
     return `color literal (${str})`;
   }
   for (let colorWord of colorWords) {
-    if (new RegExp(`\\b${colorWord}\\b`).test(str))
-      return `color word (${str})`;
+    if (new RegExp(`\\b${colorWord}\\b`).test(str)) return `color word (${str})`;
   }
   if (str.match(/theme/)) {
     return '"theme"'; // Usually suggests a typo with trying to string-interpolate

@@ -1,15 +1,26 @@
 import { getCollection } from "../vulcan-lib/getCollection";
-import GraphQLJSON from 'graphql-type-json';
+import GraphQLJSON from "graphql-type-json";
 import SimpleSchema from "simpl-schema";
 import { ID_LENGTH } from "../random";
 import { DeferredForumSelect } from "../forumTypeUtils";
 import { ForumTypeString } from "../instanceSettings";
 
-const forceNonResolverFields = ["contents", "moderationGuidelines", "customHighlight", "originalContents", "description", "subforumWelcomeText", "howOthersCanHelpMe", "howICanHelpOthers", "biography"];
+const forceNonResolverFields = [
+  "contents",
+  "moderationGuidelines",
+  "customHighlight",
+  "originalContents",
+  "description",
+  "subforumWelcomeText",
+  "howOthersCanHelpMe",
+  "howICanHelpOthers",
+  "biography",
+];
 
-export const isResolverOnly =
-  <N extends CollectionNameString>(fieldName: string, schema: CollectionFieldSpecification<N>) =>
-    schema.resolveAs && !schema.resolveAs.addOriginalField && forceNonResolverFields.indexOf(fieldName) < 0;
+export const isResolverOnly = <N extends CollectionNameString>(
+  fieldName: string,
+  schema: CollectionFieldSpecification<N>,
+) => schema.resolveAs && !schema.resolveAs.addOriginalField && forceNonResolverFields.indexOf(fieldName) < 0;
 
 /**
  * The `Type` classes model data types as they exist in Postgres.
@@ -58,15 +69,13 @@ export abstract class Type {
     }
 
     if (schema.defaultValue !== undefined && schema.defaultValue !== null) {
-      const {defaultValue, ...rest} = schema;
-      const value = defaultValue instanceof DeferredForumSelect
-        ? defaultValue.get(forumType)
-        : defaultValue;
+      const { defaultValue, ...rest } = schema;
+      const value = defaultValue instanceof DeferredForumSelect ? defaultValue.get(forumType) : defaultValue;
       return new DefaultValueType(Type.fromSchema(fieldName, rest, indexSchema, forumType), value);
     }
 
     if (schema.optional === false || schema.nullable === false) {
-      const newSchema = {...schema, optional: true, nullable: true};
+      const newSchema = { ...schema, optional: true, nullable: true };
       return new NotNullType(Type.fromSchema(fieldName, newSchema, indexSchema, forumType));
     }
 
@@ -78,14 +87,13 @@ export abstract class Type {
       case Boolean:
         return new BoolType();
       case Date:
-        return fieldName === "createdAt"
-          ? new DefaultValueType(new DateType(), "CURRENT_TIMESTAMP")
-          : new DateType();
+        return fieldName === "createdAt" ? new DefaultValueType(new DateType(), "CURRENT_TIMESTAMP") : new DateType();
       case Number:
         return new FloatType();
       case "SimpleSchema.Integer":
         return new IntType();
-      case Object: case GraphQLJSON:
+      case Object:
+      case GraphQLJSON:
         return new JsonType();
       case Array:
         if (!indexSchema) {
@@ -235,8 +243,7 @@ export class NotNullType extends Type {
  */
 const sqlEscape = (data: string): string => data.replace(/'/g, "''");
 
-const escapedValueToString = (value: any, subtype?: Type): string =>
-  sqlEscape(valueToString(value, subtype, true));
+const escapedValueToString = (value: any, subtype?: Type): string => sqlEscape(valueToString(value, subtype, true));
 
 const valueToString = (value: any, subtype?: Type, isNested = false): string => {
   if (value instanceof Date) {
@@ -257,13 +264,16 @@ const valueToString = (value: any, subtype?: Type, isNested = false): string => 
     return isNested ? result : `'${sqlEscape(result)}'::JSONB`;
   }
   return `${value}`;
-}
+};
 
 /**
  * Annotate a type as having a default value. Subtype may or may not be concrete.
  */
 export class DefaultValueType extends Type {
-  constructor(private type: Type, private value: any) {
+  constructor(
+    private type: Type,
+    private value: any,
+  ) {
     super();
   }
 
@@ -272,7 +282,7 @@ export class DefaultValueType extends Type {
   }
 
   getDefaultValue(): AnyBecauseHard {
-    return this.value
+    return this.value;
   }
 
   getDefaultValueString(): string | null {

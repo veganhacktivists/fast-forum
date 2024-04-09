@@ -1,5 +1,3 @@
-const testConversation = require('./testConversation');
+const testConversation = require("./testConversation");
 
-module.exports = [
-  testConversation,
-];
+module.exports = [testConversation];

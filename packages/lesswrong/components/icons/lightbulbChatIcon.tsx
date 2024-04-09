@@ -59,4 +59,4 @@ export const LightbulbChatIcon = (props: React.HTMLAttributes<SVGElement>) => {
       />
     </svg>
   );
-}
+};

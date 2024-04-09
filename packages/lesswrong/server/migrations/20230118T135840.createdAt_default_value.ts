@@ -1,7 +1,7 @@
 export const acceptsSchemaHash = "afb5555a6e3a18714877036b68c63786";
 
-import { Collections } from "../vulcan-lib"
-import { updateDefaultValue, dropDefaultValue } from "./meta/utils"
+import { Collections } from "../vulcan-lib";
+import { updateDefaultValue, dropDefaultValue } from "./meta/utils";
 
 /*
  * NOTE 31-08-2023
@@ -10,14 +10,14 @@ import { updateDefaultValue, dropDefaultValue } from "./meta/utils"
  * bootstrap new instances
  */
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   for (const collection of Collections) {
     // await updateDefaultValue(db, collection, "createdAt");
   }
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   for (const collection of Collections) {
     // await dropDefaultValue(db, collection, "createdAt");
   }
-}
+};

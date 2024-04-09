@@ -1,37 +1,37 @@
-import type { PartialDeep } from 'type-fest'
-import { invertHexColor, invertColor, colorToString, zeroTo255 } from '../colorUtil';
-import { forumSelect } from '../../lib/forumTypeUtils';
-import deepmerge from 'deepmerge';
+import type { PartialDeep } from "type-fest";
+import { invertHexColor, invertColor, colorToString, zeroTo255 } from "../colorUtil";
+import { forumSelect } from "../../lib/forumTypeUtils";
+import deepmerge from "deepmerge";
 
 export const invertedGreyscale = {
   // Present in @material-ui/core/colors/grey
-  50: invertHexColor('#fafafa'),
-  100: invertHexColor('#f5f5f5'),
-  200: invertHexColor('#eeeeee'),
-  300: invertHexColor('#e0e0e0'),
-  400: invertHexColor('#bdbdbd'),
-  500: invertHexColor('#9e9e9e'),
-  600: invertHexColor('#757575'),
-  700: invertHexColor('#616161'),
-  800: invertHexColor('#424242'),
-  900: invertHexColor('#212121'),
-  A100: invertHexColor('#d5d5d5'),
-  A200: invertHexColor('#aaaaaa'),
-  A400: invertHexColor('#303030'),
-  A700: invertHexColor('#616161'),
-  
+  50: invertHexColor("#fafafa"),
+  100: invertHexColor("#f5f5f5"),
+  200: invertHexColor("#eeeeee"),
+  300: invertHexColor("#e0e0e0"),
+  400: invertHexColor("#bdbdbd"),
+  500: invertHexColor("#9e9e9e"),
+  600: invertHexColor("#757575"),
+  700: invertHexColor("#616161"),
+  800: invertHexColor("#424242"),
+  900: invertHexColor("#212121"),
+  A100: invertHexColor("#d5d5d5"),
+  A200: invertHexColor("#aaaaaa"),
+  A400: invertHexColor("#303030"),
+  A700: invertHexColor("#616161"),
+
   // Greyscale colors not in the MUI palette
-  0: invertHexColor('#ffffff'),
-  1000: invertHexColor('#000000'),
-  
-  10: invertHexColor('#fefefe'),
-  20: invertHexColor('#fdfdfd'),
-  25: invertHexColor('#fcfcfc'),
-  30: invertHexColor('#fbfbfb'),
-  55: invertHexColor('#f9f9f9'),
-  60: invertHexColor('#f8f8f8'),
+  0: invertHexColor("#ffffff"),
+  1000: invertHexColor("#000000"),
+
+  10: invertHexColor("#fefefe"),
+  20: invertHexColor("#fdfdfd"),
+  25: invertHexColor("#fcfcfc"),
+  30: invertHexColor("#fbfbfb"),
+  55: invertHexColor("#f9f9f9"),
+  60: invertHexColor("#f8f8f8"),
   110: invertHexColor("#f3f3f3"),
-  120: invertHexColor('#f2f2f2'),
+  120: invertHexColor("#f2f2f2"),
   140: invertHexColor("#f0f0f0"),
   250: invertHexColor("#e8e8e8"),
   310: invertHexColor("#dddddd"),
@@ -41,8 +41,8 @@ export const invertedGreyscale = {
   410: invertHexColor("#b3b3b3"),
   550: invertHexColor("#999999"),
   620: invertHexColor("#888888"),
-  650: invertHexColor('#808080'),
-  680: invertHexColor('#666666'),
+  650: invertHexColor("#808080"),
+  680: invertHexColor("#666666"),
 };
 
 const greyAlpha = (alpha: number) => `rgba(255,255,255,${alpha})`;
@@ -50,7 +50,7 @@ const greyAlpha = (alpha: number) => `rgba(255,255,255,${alpha})`;
 const inverseGreyAlpha = (alpha: number) => {
   const [r, g, b] = invertColor([1, 1, 1, 1]);
   return `rgba(${zeroTo255(r)},${zeroTo255(g)},${zeroTo255(b)},${alpha})`;
-}
+};
 
 // CkEditor allows users to provide colors for table cell backgrounds and
 // borders, which get embedded into the HTML looking like this:
@@ -93,21 +93,22 @@ const safeColorFallbacks = (palette: ThemePalette) => `
 }
 `;
 
-const colorReplacements: Record<string,string> = {
+const colorReplacements: Record<string, string> = {
   "rgba(255,255,255,.5)": "rgba(0,0,0.5)",
-  "hsl(0, 0%, 90%)":    "hsl(0, 0%, 10%)",
-  "#F2F2F2":            invertHexColor("#f2f2f2"),
+  "hsl(0, 0%, 90%)": "hsl(0, 0%, 10%)",
+  "#F2F2F2": invertHexColor("#f2f2f2"),
   "rgb(255, 247, 222)": "rgb(50,30,0)",
   "rgb(255, 255, 255)": invertHexColor("#ffffff"),
-  "hsl(0,0%,100%)":     invertHexColor("#ffffff"),
-  "#FFEEBB":            invertHexColor("#ffeebb"),
-  "rgb(255, 238, 187)": colorToString(invertColor([255/255.0,238/255.0,187/255.0,1])),
-  "rgb(230, 230, 230)": colorToString(invertColor([230/255.0,230/255.0,230/255.0,1])),
+  "hsl(0,0%,100%)": invertHexColor("#ffffff"),
+  "#FFEEBB": invertHexColor("#ffeebb"),
+  "rgb(255, 238, 187)": colorToString(invertColor([255 / 255.0, 238 / 255.0, 187 / 255.0, 1])),
+  "rgb(230, 230, 230)": colorToString(invertColor([230 / 255.0, 230 / 255.0, 230 / 255.0, 1])),
 } as const;
 function generateColorOverrides(): string {
-  return Object.keys(colorReplacements).map((colorString: keyof typeof colorReplacements) => {
-    const replacement = colorReplacements[colorString];
-    return `
+  return Object.keys(colorReplacements)
+    .map((colorString: keyof typeof colorReplacements) => {
+      const replacement = colorReplacements[colorString];
+      return `
       .content td[style*="background-color:${colorString}"], .content table[style*="background-color:${colorString}"] {
         background-color: ${replacement} !important;
       }
@@ -115,44 +116,45 @@ function generateColorOverrides(): string {
         border-color: ${replacement} !important;
       }
     `;
-  }).join('\n');
+    })
+    .join("\n");
 }
 
 const forumComponentPalette = (shadePalette: ThemeShadePalette) =>
   forumSelect({
     EAForum: {
       primary: {
-        main: '#67A453',
-        light: '#0c869b',
-        dark: '#67A453'
+        main: "#67A453",
+        light: "#0c869b",
+        dark: "#67A453",
       },
       secondary: {
-        main: '#3c9eaf',
-        light: '#0c869b',
-        dark: '#3c9eaf'
+        main: "#3c9eaf",
+        light: "#0c869b",
+        dark: "#3c9eaf",
       },
       lwTertiary: {
         main: "#67A453",
         dark: "#67A453",
       },
       text: {
-        primaryAlert: '#F3F9FA'
+        primaryAlert: "#F3F9FA",
       },
       link: {
-        visited: '#9b71be',
-        visitedHover: '#8a59b3',
+        visited: "#9b71be",
+        visitedHover: "#8a59b3",
       },
       panelBackground: {
         default: shadePalette.grey[20],
       },
       background: {
-        primaryTranslucent: "rgba(12,134,155,0.4)"
-      }
+        primaryTranslucent: "rgba(12,134,155,0.4)",
+      },
     },
     default: {},
   });
 
-const forumOverrides = (palette: ThemePalette): PartialDeep<ThemeType['overrides']> =>
+const forumOverrides = (palette: ThemePalette): PartialDeep<ThemeType["overrides"]> =>
   forumSelect({
     EAForum: {
       PostsTopSequencesNav: {
@@ -161,15 +163,15 @@ const forumOverrides = (palette: ThemePalette): PartialDeep<ThemeType['overrides
         },
       },
       MuiPaper: {
-        elevation1: {boxShadow: "none"},
-        elevation2: {boxShadow: "none"},
-        elevation3: {boxShadow: "none"},
-        elevation4: {boxShadow: "none"},
-        elevation5: {boxShadow: "none"},
-        elevation6: {boxShadow: "none"},
-        elevation7: {boxShadow: "none"},
-        elevation8: {boxShadow: "none"},
-        elevation24: {boxShadow: "none"},
+        elevation1: { boxShadow: "none" },
+        elevation2: { boxShadow: "none" },
+        elevation3: { boxShadow: "none" },
+        elevation4: { boxShadow: "none" },
+        elevation5: { boxShadow: "none" },
+        elevation6: { boxShadow: "none" },
+        elevation7: { boxShadow: "none" },
+        elevation8: { boxShadow: "none" },
+        elevation24: { boxShadow: "none" },
       },
     },
     default: {},
@@ -184,129 +186,133 @@ export const darkModeTheme: UserThemeSpecification = {
     greyBorder: (thickness: string, alpha: number) => `${thickness} solid ${greyAlpha(alpha)}`,
     type: "dark",
   },
-  componentPalette: (shadePalette: ThemeShadePalette) => deepmerge({
-    text: {
-      primaryAlert: '#b2c5b5',
-      warning: '#FFF7E6',
-      alwaysWhite: '#fff',
-      primaryDarkOnDim: '#a8cad7',
-      aprilFools: {
-        orange: "#ff7144",
-        yellow: "#ffba7d",
-        green: "#7ee486",
+  componentPalette: (shadePalette: ThemeShadePalette) =>
+    deepmerge(
+      {
+        text: {
+          primaryAlert: "#b2c5b5",
+          warning: "#FFF7E6",
+          alwaysWhite: "#fff",
+          primaryDarkOnDim: "#a8cad7",
+          aprilFools: {
+            orange: "#ff7144",
+            yellow: "#ffba7d",
+            green: "#7ee486",
+          },
+        },
+        link: {
+          primaryDim: "#3a7883",
+          visited: "#bb7c43",
+        },
+        panelBackground: {
+          translucent: "rgba(0,0,0,.87)",
+          translucent2: "rgba(0,0,0,.8)",
+          translucent3: "rgba(0,0,0,.75)",
+          translucent4: "rgba(0,0,0,.6)",
+          deletedComment: "#3a0505",
+          commentModeratorHat: "#202719",
+          spoilerBlock: "#1b1b1b",
+          cookieBanner: shadePalette.grey[900],
+        },
+        background: {
+          contrastInDarkMode: shadePalette.grey[100],
+          diffInserted: "#205120",
+          diffDeleted: "#b92424",
+          primaryDim: "#28383e",
+          primaryTranslucent: "rgba(99,141,103,0.3)",
+          primaryTranslucentHeavy: "rgba(99,141,103,0.6)",
+          warningTranslucent: "rgba(255,173,8,0.3)",
+          transparent: "transparent",
+        },
+        border: {
+          itemSeparatorBottom: shadePalette.greyBorder("1px", 0.2),
+          commentBorder: "1px solid rgba(255,255,255,.2)",
+          answerBorder: "2px solid rgba(255,255,255,.2)",
+          primaryHighlight: "#314a4e",
+          primaryHighlight2: "#314a4e",
+          secondaryHighlight: "#3e503a",
+          secondaryHighlight2: "#3e503a",
+          mentionsBaloon: shadePalette.grey[100],
+        },
+        buttons: {
+          mentions: {
+            hover: shadePalette.grey[100],
+            selected: "#0c70c7",
+            selectedHover: "#0b62ae",
+          },
+        },
+        intercom: {
+          buttonBackground: `${shadePalette.grey[400]} !important`,
+        },
+        embeddedPlayer: {
+          opacity: 0.85,
+        },
+        dropdown: {
+          background: shadePalette.grey[100],
+          border: shadePalette.grey[250],
+          hoverBackground: shadePalette.grey[250],
+        },
+        editor: {
+          commentPanelBackground: shadePalette.grey[200],
+          sideCommentEditorBackground: shadePalette.grey[100],
+          commentMarker: "#80792e",
+          commentMarkerActive: "#cbc14f",
+        },
+        givingPortal: {
+          [0]: "#202020",
+          [200]: "#34201E",
+          [800]: "#49201C",
+          [900]: "#5B3633",
+          [1000]: "#FFF",
+          candidate: "#64342E",
+          votedCandidate: "#8A5751",
+          selectedCandidate: "#49201C",
+          thankYouBackground: shadePalette.grey[100],
+          ctaBackground: "#64342E",
+          ctaText: "#FFF",
+          rhsLink: "#E7714E",
+          votingPortalIntroBackground: "#202020",
+          button: {
+            alwaysDark: "#862115",
+            dark: "#FFF",
+            light: "#862115",
+            hoverOutlined: "#744843",
+            borderColor: "#FFF",
+          },
+          homepageHeader: {
+            light4: "#fdfcfc",
+            light3: "#fcf5f3",
+            light3Opaque: "rgba(252, 245, 243, 0.20)",
+            light2: "#f8e7e2",
+            light2Opaque: "rgba(248, 231, 226, 0.30)",
+            light1: "#EDD3CE",
+            light1Opaque: "rgba(237, 211, 206, 0.30)",
+            heartsBackground: "#6C0C00",
+            main: "#862115",
+            dark: "#6C0C00",
+            secondary: "#b44c42",
+            secondaryDark: "#a0443c",
+            secondaryOpaque: "rgba(253, 139, 132, 0.40)",
+            secondaryOpaqueDark: "rgba(197, 106, 101, 0.40)",
+            secondaryButtonText: "#EDD3CE",
+          },
+        },
+        wrapped: {
+          background: "#072C47",
+          highlightText: "#FFC443",
+          secondaryText: "#008DAC",
+          tertiaryText: "rgba(255, 255, 255, 0.50)",
+          black: "#212121",
+          darkGrey: "#424242",
+          grey: "#757575",
+          darkDot: "rgba(255, 255, 255, 0.40)",
+          panelBackground: "rgba(255, 255, 255, 0.10)",
+          panelBackgroundDark: "rgba(255, 255, 255, 0.05)",
+          postScoreArrow: "#BCBCBC",
+        },
       },
-    },
-    link: {
-      primaryDim: '#3a7883',
-      visited: "#bb7c43",
-    },
-    panelBackground: {
-      translucent: "rgba(0,0,0,.87)",
-      translucent2: "rgba(0,0,0,.8)",
-      translucent3: "rgba(0,0,0,.75)",
-      translucent4: "rgba(0,0,0,.6)",
-      deletedComment: "#3a0505",
-      commentModeratorHat: "#202719",
-      spoilerBlock: "#1b1b1b",
-      cookieBanner: shadePalette.grey[900],
-    },
-    background: {
-      contrastInDarkMode: shadePalette.grey[100],
-      diffInserted: "#205120",
-      diffDeleted: "#b92424",
-      primaryDim: "#28383e",
-      primaryTranslucent: "rgba(99,141,103,0.3)",
-      primaryTranslucentHeavy: "rgba(99,141,103,0.6)",
-      warningTranslucent: "rgba(255,173,8,0.3)",
-      transparent: 'transparent',
-    },
-    border: {
-      itemSeparatorBottom: shadePalette.greyBorder("1px", .2),
-      commentBorder: "1px solid rgba(255,255,255,.2)",
-      answerBorder: "2px solid rgba(255,255,255,.2)",
-      primaryHighlight: '#314a4e',
-      primaryHighlight2: '#314a4e',
-      secondaryHighlight: '#3e503a',
-      secondaryHighlight2: '#3e503a',
-      mentionsBaloon: shadePalette.grey[100],
-    },
-    buttons: {
-      mentions: {
-        hover: shadePalette.grey[100],
-        selected: "#0c70c7",
-        selectedHover: "#0b62ae",
-      },
-    },
-    intercom: {
-      buttonBackground: `${shadePalette.grey[400]} !important`,
-    },
-    embeddedPlayer: {
-      opacity: 0.85,
-    },
-    dropdown: {
-      background: shadePalette.grey[100],
-      border: shadePalette.grey[250],
-      hoverBackground: shadePalette.grey[250],
-    },
-    editor: {
-      commentPanelBackground: shadePalette.grey[200],
-      sideCommentEditorBackground: shadePalette.grey[100],
-      commentMarker: "#80792e",
-      commentMarkerActive: "#cbc14f",
-    },
-    givingPortal: {
-      [0]: "#202020",
-      [200]: "#34201E",
-      [800]: "#49201C",
-      [900]: "#5B3633",
-      [1000]: "#FFF",
-      candidate: "#64342E",
-      votedCandidate: "#8A5751",
-      selectedCandidate: "#49201C",
-      thankYouBackground: shadePalette.grey[100],
-      ctaBackground: "#64342E",
-      ctaText: "#FFF",
-      rhsLink: '#E7714E',
-      votingPortalIntroBackground: "#202020",
-      button: {
-        alwaysDark: "#862115",
-        dark: "#FFF",
-        light: "#862115",
-        hoverOutlined: "#744843",
-        borderColor: "#FFF",
-      },
-      homepageHeader: {
-        light4: "#fdfcfc",
-        light3: "#fcf5f3",
-        light3Opaque: "rgba(252, 245, 243, 0.20)",
-        light2: "#f8e7e2",
-        light2Opaque: "rgba(248, 231, 226, 0.30)",
-        light1: "#EDD3CE",
-        light1Opaque: "rgba(237, 211, 206, 0.30)",
-        heartsBackground: "#6C0C00",
-        main: "#862115",
-        dark: "#6C0C00",
-        secondary: "#b44c42",
-        secondaryDark: "#a0443c",
-        secondaryOpaque: "rgba(253, 139, 132, 0.40)",
-        secondaryOpaqueDark: "rgba(197, 106, 101, 0.40)",
-        secondaryButtonText: "#EDD3CE",
-      },
-    },
-    wrapped: {
-      background: '#072C47',
-      highlightText: '#FFC443',
-      secondaryText: '#008DAC',
-      tertiaryText: "rgba(255, 255, 255, 0.50)",
-      black: '#212121',
-      darkGrey: '#424242',
-      grey: '#757575',
-      darkDot: "rgba(255, 255, 255, 0.40)",
-      panelBackground: "rgba(255, 255, 255, 0.10)",
-      panelBackgroundDark: "rgba(255, 255, 255, 0.05)",
-      postScoreArrow: '#BCBCBC',
-    },
-  }, forumComponentPalette(shadePalette)),
+      forumComponentPalette(shadePalette),
+    ),
   make: (palette: ThemePalette): PartialDeep<ThemeType> => ({
     postImageStyles: {
       // Override image background color to white (so that transparent isn't
@@ -315,9 +321,6 @@ export const darkModeTheme: UserThemeSpecification = {
       background: "#ffffff",
     },
     overrides: forumOverrides(palette),
-    rawCSS: [
-      safeColorFallbacks(palette),
-      generateColorOverrides()
-    ]
+    rawCSS: [safeColorFallbacks(palette), generateColorOverrides()],
   }),
 };

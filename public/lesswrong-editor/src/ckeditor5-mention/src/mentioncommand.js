@@ -10,7 +10,6 @@
 import { Command } from 'ckeditor5/src/core';
 import { CKEditorError, toMap } from 'ckeditor5/src/utils';
 
-
 /**
  * The mention command.
  *
@@ -48,7 +47,6 @@ import { CKEditorError, toMap } from 'ckeditor5/src/utils';
  * @extends module:core/command~Command
  */
 export default class MentionCommand extends Command {
-
 	/**
 	 * Executes the command.
 	 *
@@ -73,7 +71,6 @@ export default class MentionCommand extends Command {
 
 		const mentionText = options.text || mentionID;
 
-
 		if ( options.marker.length != 1 ) {
 			/**
 			 * The marker must be a single character.
@@ -86,10 +83,7 @@ export default class MentionCommand extends Command {
 			 *
 			 * @error mentioncommand-incorrect-marker
 			 */
-			throw new CKEditorError(
-				'mentioncommand-incorrect-marker',
-				this
-			);
+			throw new CKEditorError( "mentioncommand-incorrect-marker", this );
 		}
 
 		if ( mentionID.charAt( 0 ) != options.marker ) {
@@ -118,21 +112,21 @@ export default class MentionCommand extends Command {
 			 *
 			 * @error mentioncommand-incorrect-id
 			 */
-			throw new CKEditorError(
-				'mentioncommand-incorrect-id',
-				this
-			);
+			throw new CKEditorError( "mentioncommand-incorrect-id", this );
 		}
 
-		model.change( writer => {
+		model.change( ( writer ) => {
 			const currentAttributes = toMap( selection.getAttributes() );
 			const attributesWithMention = new Map( currentAttributes.entries() );
 
-		  	attributesWithMention.set( 'linkHref', mentionData.link );
+			attributesWithMention.set( "linkHref", mentionData.link );
 
 			// Replace a range with the text with link attribute.
 			model.insertContent( writer.createText( mentionText, attributesWithMention ), range );
-			model.insertContent( writer.createText( ' ', currentAttributes ), range.start.getShiftedBy( mentionText.length ) );
+			model.insertContent(
+				writer.createText( " ", currentAttributes ),
+				range.start.getShiftedBy( mentionText.length ),
+			);
 		} );
 	}
 }

@@ -7,7 +7,7 @@ export type SearchQuery = {
   indexName: string;
   query: string;
   params: QueryParameters;
-}
+};
 
 class NativeSearchClient implements Client {
   private headers: Record<string, string> = {};
@@ -17,15 +17,12 @@ class NativeSearchClient implements Client {
     throw new Error("initIndex not supported by NativeSearchClient");
   }
 
-  search<T=unknown>(
+  search<T = unknown>(queries: SearchQuery[], cb: (err: Error | null, res: MultiResponse<T> | null) => void): void;
+  search<T = unknown>(queries: SearchQuery[]): Promise<MultiResponse<T>>;
+  search<T = unknown>(
     queries: SearchQuery[],
-    cb: (err: Error|null, res: MultiResponse<T>|null) => void,
-  ): void;
-  search<T=unknown>(queries: SearchQuery[]): Promise<MultiResponse<T>>;
-  search<T=unknown>(
-    queries: SearchQuery[],
-    cb?: (err: Error|null, res: MultiResponse<T>|null) => void,
-  ): Promise<MultiResponse<T>>|void {
+    cb?: (err: Error | null, res: MultiResponse<T> | null) => void,
+  ): Promise<MultiResponse<T>> | void {
     const body = stringify(queries);
     const cached = this.cache.get(body);
     if (cached) {
@@ -39,11 +36,16 @@ class NativeSearchClient implements Client {
           "Content-Type": "application/json",
         },
         body,
-      }).then((response) => {
-        response.json().then((results) => {
-          resolve({results});
-        }).catch(reject);
-      }).catch(reject);
+      })
+        .then((response) => {
+          response
+            .json()
+            .then((results) => {
+              resolve({ results });
+            })
+            .catch(reject);
+        })
+        .catch(reject);
     });
     this.cache.set(body, promise);
     if (cb) {
@@ -54,7 +56,7 @@ class NativeSearchClient implements Client {
   }
 
   searchForFacetValues(
-    _queries: [{ indexName: string; params: SearchForFacetValues.Parameters }]
+    _queries: [{ indexName: string; params: SearchForFacetValues.Parameters }],
   ): Promise<SearchForFacetValues.Response[]> {
     throw new Error("searchForFacetValues not supported by NativeSearchClient");
   }

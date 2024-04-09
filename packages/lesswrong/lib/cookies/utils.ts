@@ -4,7 +4,7 @@ import { getExplicitConsentRequiredAsync } from "../../components/common/CookieB
 
 export const CookiesTable: Record<string, CookieSignature> = {};
 
-const CookieTypes = new TupleSet(["necessary", "functional", "analytics"] as const)
+const CookieTypes = new TupleSet(["necessary", "functional", "analytics"] as const);
 export type CookieType = UnionOf<typeof CookieTypes>;
 
 export const ONLY_NECESSARY_COOKIES: CookieType[] = ["necessary"];
@@ -13,13 +13,15 @@ export const ALL_COOKIES: CookieType[] = ["necessary", "functional", "analytics"
 export const COOKIE_PREFERENCES_COOKIE = registerCookie({
   name: "cookie_preferences", // Must match variable in Google Tag Manager
   type: "necessary",
-  description: "Stores the current cookie preferences (set by the user, or automatically if outside a country subject to GDPR)",
+  description:
+    "Stores the current cookie preferences (set by the user, or automatically if outside a country subject to GDPR)",
 });
 
 export const COOKIE_CONSENT_TIMESTAMP_COOKIE = registerCookie({
   name: "cookie_consent_timestamp",
   type: "necessary",
-  description: "Stores the time at which the user set their cookie preferences (once this is set the cookie preferences will never be changed automatically)",
+  description:
+    "Stores the time at which the user set their cookie preferences (once this is set the cookie preferences will never be changed automatically)",
 });
 
 export type CookieSignature = {
@@ -34,17 +36,17 @@ export type CookieSignature = {
    * In this case, you can provide a function that returns true if the cookie name matches a pattern (e.g. if
    * it starts with 'intercom-id') */
   matches: (name: string) => boolean;
-}
+};
 // maxExpires and matches are filled in by registerCookie if not provided
-export type CookieSignatureMinimum = Omit<CookieSignature, 'maxExpires' | 'matches'> & {
+export type CookieSignatureMinimum = Omit<CookieSignature, "maxExpires" | "matches"> & {
   matches?: (name: string) => boolean;
   maxExpires?: string;
-}
+};
 
 export const isValidCookieTypeArray = (types?: string[] | null): types is CookieType[] => {
   if (!types) return false;
-  return types.every(type => CookieTypes.has(type));
-}
+  return types.every((type) => CookieTypes.has(type));
+};
 
 export function isCookieAllowed(name: string, cookieTypesAllowed: CookieType[]): boolean {
   const cookie = CookiesTable[name];
@@ -80,12 +82,8 @@ export async function getCookiePreferences(): Promise<{
   const explicitConsentGiven = !!consentTimestamp && isValidCookieTypeArray(preferencesValue);
 
   const explicitConsentRequired = await getExplicitConsentRequiredAsync();
-  const fallbackPreferences: CookieType[] = explicitConsentRequired
-    ? ONLY_NECESSARY_COOKIES
-    : ALL_COOKIES;
-  const cookiePreferences = explicitConsentGiven
-    ? preferencesValue
-    : fallbackPreferences;
+  const fallbackPreferences: CookieType[] = explicitConsentRequired ? ONLY_NECESSARY_COOKIES : ALL_COOKIES;
+  const cookiePreferences = explicitConsentGiven ? preferencesValue : fallbackPreferences;
 
   return { cookiePreferences, explicitConsentGiven };
 }
@@ -101,9 +99,9 @@ export function registerCookie(cookie: CookieSignatureMinimum): string {
   }
 
   CookiesTable[cookie.name] = {
-    maxExpires: '24 months',
+    maxExpires: "24 months",
     matches: (name) => name === cookie.name,
-    ...cookie
+    ...cookie,
   };
-  return cookie.name
+  return cookie.name;
 }

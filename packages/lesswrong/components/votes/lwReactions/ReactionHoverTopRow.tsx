@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 import { Components, registerComponent } from "../../../lib/vulcan-lib";
-import type { EmojiReactName, UserReactInfo } from '../../../lib/voting/namesAttachedReactions';
-import { VotingProps } from '../votingProps';
-import { getNamesAttachedReactionsByName } from '../../../lib/voting/reactions';
-import { useNamesAttachedReactionsVoting } from './NamesAttachedReactionsVoteOnComment';
-import filter from 'lodash/filter';
-import sumBy from 'lodash/sumBy';
+import type { EmojiReactName, UserReactInfo } from "../../../lib/voting/namesAttachedReactions";
+import { VotingProps } from "../votingProps";
+import { getNamesAttachedReactionsByName } from "../../../lib/voting/reactions";
+import { useNamesAttachedReactionsVoting } from "./NamesAttachedReactionsVoteOnComment";
+import filter from "lodash/filter";
+import sumBy from "lodash/sumBy";
 
 const styles = (theme: ThemeType): JssStyles => ({
   hoverBallotEntry: {
@@ -18,7 +18,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     "&:hover": {
       background: theme.palette.panelBackground.darken04,
     },
-    
+
     display: "flex",
     alignItems: "flex-start",
   },
@@ -31,57 +31,64 @@ const styles = (theme: ThemeType): JssStyles => ({
     verticalAlign: "middle",
     display: "inline-block",
     minWidth: 80,
-    marginBottom: 4
+    marginBottom: 4,
   },
   hoverBallotReactDescription: {
     fontSize: 11,
     marginBottom: 8,
-    '& em': {
-      display: "none"
-    }
+    "& em": {
+      display: "none",
+    },
   },
-})
+});
 
-const ReactionHoverTopRow = ({reactionName, userReactions, showNonInlineVoteButtons, voteProps, classes}: {
-  reactionName: EmojiReactName
-  userReactions: UserReactInfo[],
-  showNonInlineVoteButtons: boolean,
-  voteProps: VotingProps<VoteableTypeClient>,
-  classes: ClassesType,
+const ReactionHoverTopRow = ({
+  reactionName,
+  userReactions,
+  showNonInlineVoteButtons,
+  voteProps,
+  classes,
+}: {
+  reactionName: EmojiReactName;
+  userReactions: UserReactInfo[];
+  showNonInlineVoteButtons: boolean;
+  voteProps: VotingProps<VoteableTypeClient>;
+  classes: ClassesType;
 }) => {
   const { ReactionDescription, ReactionIcon } = Components;
-  const nonInlineReactions = filter(userReactions, r => !(r.quotes?.length));
-  const nonInlineNetReactionCount = sumBy(nonInlineReactions, r => r.reactType==="disagreed"?-1:1);
+  const nonInlineReactions = filter(userReactions, (r) => !r.quotes?.length);
+  const nonInlineNetReactionCount = sumBy(nonInlineReactions, (r) => (r.reactType === "disagreed" ? -1 : 1));
   const { getCurrentUserReactionVote, setCurrentUserReaction } = useNamesAttachedReactionsVoting(voteProps);
 
-  return <div className={classes.hoverBallotEntry}>
-    <ReactionIcon react={reactionName} size={30}/>
-    <div className={classes.hoverInfo}>
-      <span className={classes.hoverBallotLabel}>
-        {getNamesAttachedReactionsByName(reactionName).label}
-      </span>
-      
-      <ReactionDescription
-        reaction={getNamesAttachedReactionsByName(reactionName)}
-        className={classes.hoverBallotReactDescription}
-      />
-      <Components.UsersWhoReacted reactions={nonInlineReactions} wrap showTooltip={false}/>
-    </div>
-    {showNonInlineVoteButtons && <Components.ReactOrAntireactVote
-      reactionName={reactionName}
-      quote={null}
-      netReactionCount={nonInlineNetReactionCount}
-      currentUserReaction={getCurrentUserReactionVote(reactionName, null)}
-      setCurrentUserReaction={setCurrentUserReaction}
-    />}
-  </div>
-}
+  return (
+    <div className={classes.hoverBallotEntry}>
+      <ReactionIcon react={reactionName} size={30} />
+      <div className={classes.hoverInfo}>
+        <span className={classes.hoverBallotLabel}>{getNamesAttachedReactionsByName(reactionName).label}</span>
 
-const ReactionHoverTopRowComponent = registerComponent('ReactionHoverTopRow', ReactionHoverTopRow, {styles});
+        <ReactionDescription
+          reaction={getNamesAttachedReactionsByName(reactionName)}
+          className={classes.hoverBallotReactDescription}
+        />
+        <Components.UsersWhoReacted reactions={nonInlineReactions} wrap showTooltip={false} />
+      </div>
+      {showNonInlineVoteButtons && (
+        <Components.ReactOrAntireactVote
+          reactionName={reactionName}
+          quote={null}
+          netReactionCount={nonInlineNetReactionCount}
+          currentUserReaction={getCurrentUserReactionVote(reactionName, null)}
+          setCurrentUserReaction={setCurrentUserReaction}
+        />
+      )}
+    </div>
+  );
+};
+
+const ReactionHoverTopRowComponent = registerComponent("ReactionHoverTopRow", ReactionHoverTopRow, { styles });
 
 declare global {
   interface ComponentTypes {
-    ReactionHoverTopRow: typeof ReactionHoverTopRowComponent
+    ReactionHoverTopRow: typeof ReactionHoverTopRowComponent;
   }
 }
-

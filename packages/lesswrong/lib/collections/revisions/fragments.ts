@@ -1,4 +1,4 @@
-import { registerFragment } from '../../vulcan-lib';
+import { registerFragment } from "../../vulcan-lib";
 
 registerFragment(`
   fragment RevisionDisplay on Revision {
@@ -12,9 +12,7 @@ registerFragment(`
     htmlHighlight
     plaintextDescription
   }
-`)
-
-
+`);
 
 registerFragment(`
   fragment RevisionEdit on Revision {
@@ -35,7 +33,7 @@ registerFragment(`
     htmlHighlight
     plaintextDescription
   }
-`)
+`);
 
 registerFragment(`
   fragment RevisionMetadata on Revision {

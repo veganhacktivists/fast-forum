@@ -35,54 +35,32 @@ const styles = (theme: ThemeType) => ({
 });
 
 interface EAEmojisVoteOnPostProps extends PostVotingComponentProps {
-  classes: ClassesType,
+  classes: ClassesType;
 }
 
-const EAEmojisVoteOnPost = ({
-  document,
-  votingSystem,
-  isFooter,
-  classes,
-}: EAEmojisVoteOnPostProps) => {
+const EAEmojisVoteOnPost = ({ document, votingSystem, isFooter, classes }: EAEmojisVoteOnPostProps) => {
   const voteProps = useVote(document, "Posts", votingSystem);
 
-  const {PostsVoteDefault, EAReactsSection} = Components;
+  const { PostsVoteDefault, EAReactsSection } = Components;
   if (!isFooter) {
-    return (
-      <PostsVoteDefault
-        post={document}
-        votingSystem={votingSystem}
-      />
-    );
+    return <PostsVoteDefault post={document} votingSystem={votingSystem} />;
   }
 
   return (
     <div className={classes.root}>
-      <PostsVoteDefault
-        post={document}
-        votingSystem={votingSystem}
-        useHorizontalLayout
-      />
+      <PostsVoteDefault post={document} votingSystem={votingSystem} useHorizontalLayout />
       <div className={classNames(classes.divider, classes.hideOnMobile)} />
       <div className={classNames(classes.reacts, classes.hideOnMobile)}>
-        <EAReactsSection
-          document={document}
-          voteProps={voteProps}
-          large
-        />
+        <EAReactsSection document={document} voteProps={voteProps} large />
       </div>
     </div>
   );
-}
+};
 
-const EAEmojisVoteOnPostComponent = registerComponent(
-  "EAEmojisVoteOnPost",
-  EAEmojisVoteOnPost,
-  {styles},
-);
+const EAEmojisVoteOnPostComponent = registerComponent("EAEmojisVoteOnPost", EAEmojisVoteOnPost, { styles });
 
 declare global {
   interface ComponentTypes {
-    EAEmojisVoteOnPost: typeof EAEmojisVoteOnPostComponent
+    EAEmojisVoteOnPost: typeof EAEmojisVoteOnPostComponent;
   }
 }

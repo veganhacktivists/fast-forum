@@ -1,118 +1,128 @@
 import "./integrationTestSetup";
-import React from 'react';
-import { useSingle } from '../lib/crud/withSingle';
-import { createDummyUser, createDummyPost } from './utils'
-import { emailDoctype, generateEmail } from '../server/emails/renderEmail';
-import { withStyles, createStyles } from '@material-ui/core/styles';
+import React from "react";
+import { useSingle } from "../lib/crud/withSingle";
+import { createDummyUser, createDummyPost } from "./utils";
+import { emailDoctype, generateEmail } from "../server/emails/renderEmail";
+import { withStyles, createStyles } from "@material-ui/core/styles";
 import { getUserEmail } from "../lib/collections/users/helpers";
 
-const unitTestBoilerplateGenerator = ({css,title,body}: {css: string, title: string, body: string}): string => {
-  const styleTag = (css && css.length>0) ? `<style>${css}</style>` : "";
+const unitTestBoilerplateGenerator = ({ css, title, body }: { css: string; title: string; body: string }): string => {
+  const styleTag = css && css.length > 0 ? `<style>${css}</style>` : "";
   const html = `${styleTag}<body>${body}</body>`;
   return html;
-}
+};
 
-async function renderTestEmail({ user=null, subject="Unit test email", bodyComponent, boilerplateGenerator }: {
-  user?: DbUser|null,
-  subject?: string,
-  bodyComponent: JSX.Element,
-  boilerplateGenerator?: typeof unitTestBoilerplateGenerator
+async function renderTestEmail({
+  user = null,
+  subject = "Unit test email",
+  bodyComponent,
+  boilerplateGenerator,
+}: {
+  user?: DbUser | null;
+  subject?: string;
+  bodyComponent: JSX.Element;
+  boilerplateGenerator?: typeof unitTestBoilerplateGenerator;
 }) {
-  const destinationUser = user || await createDummyUser();
-  const email = getUserEmail(destinationUser)
-  if (!email) throw new Error("test email has no email address")
+  const destinationUser = user || (await createDummyUser());
+  const email = getUserEmail(destinationUser);
+  if (!email) throw new Error("test email has no email address");
   return await generateEmail({
     user: destinationUser,
     to: email,
     subject: "Unit test email",
     bodyComponent,
-    boilerplateGenerator: boilerplateGenerator||unitTestBoilerplateGenerator
+    boilerplateGenerator: boilerplateGenerator || unitTestBoilerplateGenerator,
   });
 }
 
-describe('renderEmail', () => {
+describe("renderEmail", () => {
   it("Renders a simple component", async () => {
     const email = await renderTestEmail({
       bodyComponent: <div>Hello</div>,
     });
-    
-    (email.html as any).should.equal(emailDoctype+'<body><div>Hello</div></body>');
+
+    (email.html as any).should.equal(emailDoctype + "<body><div>Hello</div></body>");
   });
-  
+
   it("Generates a textual representation of the body", async () => {
     const email = await renderTestEmail({
       bodyComponent: <div>Hello</div>,
     });
-    
+
     email.text.should.equal("Hello");
   });
-  
+
   it("Renders styles with withStyles", async () => {
     const styles = createStyles({
       underlined: {
         textDecoration: "underline",
-      }
+      },
     });
-    const StyledComponent = withStyles(styles, {name:"StyledComponent"})(
-      ({classes, children}: {classes: any, children: any}) =>
-        <div className={classes.underlined}>{children}</div>
+    const StyledComponent = withStyles(styles, { name: "StyledComponent" })(
+      ({ classes, children }: { classes: any; children: any }) => <div className={classes.underlined}>{children}</div>,
     );
-    
-    
+
     const email = await renderTestEmail({
-      bodyComponent: <div>Hello, <StyledComponent>World</StyledComponent></div>,
+      bodyComponent: (
+        <div>
+          Hello, <StyledComponent>World</StyledComponent>
+        </div>
+      ),
     });
-    
-    (email.html as any).should.equal(emailDoctype+'<body><div>Hello, <div class="StyledComponent-underlined" style="text-decoration: underline;">World</div></div></body>');
+
+    (email.html as any).should.equal(
+      emailDoctype +
+        '<body><div>Hello, <div class="StyledComponent-underlined" style="text-decoration: underline;">World</div></div></body>',
+    );
   });
-  
+
   it("Can use Apollo useSingle", async () => {
     const user = await createDummyUser();
     const post = await createDummyPost(user, { title: "Email unit test post" });
-    
-    const PostTitleComponent= ({documentId}: {documentId: string}) => {
+
+    const PostTitleComponent = ({ documentId }: { documentId: string }) => {
       const { document } = useSingle({
         documentId,
         collectionName: "Posts",
-        fragmentName: 'PostsRevision',
+        fragmentName: "PostsRevision",
         extraVariables: {
-          version: 'String'
+          version: "String",
         },
         extraVariablesValues: {
           version: null,
         },
       });
       return <div>{document?.title}</div>;
-    }
-    
-    const email = await renderTestEmail({
-      bodyComponent: <PostTitleComponent documentId={post._id}/>,
-    });
-    (email.html as any).should.equal(emailDoctype+'<body><div>Email unit test post</div></body>');
-  });
-  
-  it("Can use Apollo hooks", async () => {
-    const user = await createDummyUser();
-    const post = await createDummyPost(user, { title: "Email unit test post" });
-    
-    const PostTitleComponent = ({documentId}: {documentId: string}) => {
-      const { document } = useSingle({
-        documentId,
-        collectionName: "Posts",
-        fragmentName: 'PostsRevision',
-        extraVariables: {
-          version: 'String'
-        }
-      });
-      return <div>{document?.title}</div>
-    }
-    
+    };
+
     const email = await renderTestEmail({
       bodyComponent: <PostTitleComponent documentId={post._id} />,
     });
-    (email.html as any).should.equal(emailDoctype+'<body><div>Email unit test post</div></body>');
+    (email.html as any).should.equal(emailDoctype + "<body><div>Email unit test post</div></body>");
   });
-  
+
+  it("Can use Apollo hooks", async () => {
+    const user = await createDummyUser();
+    const post = await createDummyPost(user, { title: "Email unit test post" });
+
+    const PostTitleComponent = ({ documentId }: { documentId: string }) => {
+      const { document } = useSingle({
+        documentId,
+        collectionName: "Posts",
+        fragmentName: "PostsRevision",
+        extraVariables: {
+          version: "String",
+        },
+      });
+      return <div>{document?.title}</div>;
+    };
+
+    const email = await renderTestEmail({
+      bodyComponent: <PostTitleComponent documentId={post._id} />,
+    });
+    (email.html as any).should.equal(emailDoctype + "<body><div>Email unit test post</div></body>");
+  });
+
   /*it("Supports the withCurrentUser HoC", async () => {
     // TODO: Not currently passing
     const user = await createDummyUser();

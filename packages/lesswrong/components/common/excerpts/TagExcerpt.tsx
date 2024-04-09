@@ -7,31 +7,23 @@ const TagExcerpt = ({
   tag,
   ...commonExcerptProps
 }: CommonExcerptProps & {
-  tag: TagRecentDiscussion,
+  tag: TagRecentDiscussion;
 }) => {
   const contentHtml = tag.description?.htmlHighlight;
   if (!contentHtml) {
     return null;
   }
 
-  const {ContentExcerpt} = Components;
+  const { ContentExcerpt } = Components;
   return (
-    <ContentExcerpt
-      contentHtml={contentHtml}
-      moreLink={tagGetUrl(tag)}
-      contentType="tag"
-      {...commonExcerptProps}
-    />
+    <ContentExcerpt contentHtml={contentHtml} moreLink={tagGetUrl(tag)} contentType="tag" {...commonExcerptProps} />
   );
-}
+};
 
-const TagExcerptComponent = registerComponent(
-  "TagExcerpt",
-  TagExcerpt,
-);
+const TagExcerptComponent = registerComponent("TagExcerpt", TagExcerpt);
 
 declare global {
   interface ComponentTypes {
-    TagExcerpt: typeof TagExcerptComponent,
+    TagExcerpt: typeof TagExcerptComponent;
   }
 }

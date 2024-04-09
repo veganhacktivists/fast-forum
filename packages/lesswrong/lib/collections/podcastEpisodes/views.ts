@@ -1,11 +1,11 @@
 import { ensureIndex } from "../../collectionIndexUtils";
-import PodcastEpisodes from "./collection"
+import PodcastEpisodes from "./collection";
 
 declare global {
   interface PodcastEpisodesViewTerms extends ViewTermsBase {
-    view?: PodcastEpisodesViewName
-    _id?: string
-    externalEpisodeId?: string
+    view?: PodcastEpisodesViewName;
+    _id?: string;
+    externalEpisodeId?: string;
   }
 }
 

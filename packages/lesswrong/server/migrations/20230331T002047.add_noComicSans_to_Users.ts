@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-03-14T15:22:03.000Z by 20230314T152203.add_backfilled.ts
  * +-- Overall schema hash: 222d42945763fb6dcaff3b497911d7b7
- *  
+ *
  * @@ -889,3 +887,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * --- Schema for "Users", hash: 81c37a8199dc46ac8d6053b9455dada5
  * +-- Schema for "Users", hash: dca06a3ff139a831e465b8a67f6f9e68
  *  CREATE TABLE "Users" (
@@ -22,7 +22,7 @@
  *      "showCommunityInRecentDiscussion" bool DEFAULT false,
  * +    "noComicSans" bool DEFAULT false,
  *      "petrovOptOut" bool DEFAULT false,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -33,8 +33,8 @@
  */
 export const acceptsSchemaHash = "222d42945763fb6dcaff3b497911d7b7";
 
-import Users from "../../lib/collections/users/collection"
-import { addRemovedField, dropRemovedField } from "./meta/utils"
+import Users from "../../lib/collections/users/collection";
+import { addRemovedField, dropRemovedField } from "./meta/utils";
 
 /*
  * NOTE 31-08-2023
@@ -43,11 +43,11 @@ import { addRemovedField, dropRemovedField } from "./meta/utils"
  * bootstrap new instances
  */
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   // // TODO: This appears not to work
   // await addRemovedField(db, Users, "noComicSans")
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   // await dropRemovedField(db, Users, "noComicSans")
-}
+};

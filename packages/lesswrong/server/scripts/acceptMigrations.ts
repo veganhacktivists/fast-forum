@@ -1,14 +1,14 @@
-import { readFile, readdir, writeFile } from 'node:fs/promises'
-import path from 'path';
+import { readFile, readdir, writeFile } from "node:fs/promises";
+import path from "path";
 
 const ROOT_PATH = path.join(__dirname, "../../../");
 const schemaChangelogPath = (rootPath: string) => path.join(rootPath, "schema/schema_changelog.json");
 export const migrationsPath = (rootPath: string) => path.join(rootPath, "packages/lesswrong/server/migrations");
 
 export interface SchemaChangelogEntry {
-  acceptsSchemaHash: string
-  acceptedByMigration?: string
-  timestamp: string
+  acceptsSchemaHash: string;
+  acceptedByMigration?: string;
+  timestamp: string;
 }
 
 export const migrationNameToDate = (name: string): Date => {
@@ -21,59 +21,57 @@ export const migrationNameToDate = (name: string): Date => {
   }
   const stamp = `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 11)}:${s.slice(11, 13)}:${s.slice(13, 15)}.000Z`;
   return new Date(stamp);
-}
+};
 
 export const migrationNameToTime = (name: string): number => {
   return migrationNameToDate(name).getTime();
-}
+};
 
 const assertNoDuplicateTimestamps = (entries: SchemaChangelogEntry[]) => {
-  const timestamps = entries.map(e => e.timestamp);
+  const timestamps = entries.map((e) => e.timestamp);
   const uniqueTimestamps = new Set(timestamps);
   if (timestamps.length !== uniqueTimestamps.size) {
     throw new Error(`Duplicate timestamps: ${timestamps.sort()}`);
   }
-}
+};
 
 const getSchemaChangelogEntries = async (rootPath: string): Promise<SchemaChangelogEntry[]> => {
-  const schemaChangelog = await readFile(schemaChangelogPath(rootPath), 'utf8');
+  const schemaChangelog = await readFile(schemaChangelogPath(rootPath), "utf8");
   return JSON.parse(schemaChangelog);
-}
+};
 
 const getMigrationChangelogEntries = async (rootPath: string): Promise<SchemaChangelogEntry[]> => {
-  const migrationFiles = (
-    (await readdir(migrationsPath(rootPath), { withFileTypes: true }))
-      .filter(dirent => dirent.isFile())
-      .map(dirent => path.join(migrationsPath(rootPath), dirent.name))
-  );
-  
+  const migrationFiles = (await readdir(migrationsPath(rootPath), { withFileTypes: true }))
+    .filter((dirent) => dirent.isFile())
+    .map((dirent) => path.join(migrationsPath(rootPath), dirent.name));
+
   const migrationChangelogEntries: SchemaChangelogEntry[] = [];
   for (const migrationFile of migrationFiles) {
     // NOTE: I'm using this regex hack rather than importing because esbuild doesn't support
     // dynamic imports, I would very much like to change this
     const acceptsHashRegex = new RegExp(/^export const acceptsSchemaHash = ["'](.*)["']/);
     const contents = (await readFile(migrationFile)).toString().split("\n");
-    const acceptsHashLine = contents.find(line => acceptsHashRegex.test(line));
-    
+    const acceptsHashLine = contents.find((line) => acceptsHashRegex.test(line));
+
     if (!acceptsHashLine) continue;
 
     const match = acceptsHashRegex.exec(acceptsHashLine);
-    
+
     if (!match) throw new Error(`Invalid acceptsHashLine: ${acceptsHashLine}`);
-    
+
     const acceptsHash = match[1];
     const migrationName = path.basename(migrationFile);
     const timestamp = migrationNameToDate(migrationName);
-    
+
     migrationChangelogEntries.push({
       acceptsSchemaHash: acceptsHash,
       acceptedByMigration: migrationName,
       timestamp: timestamp.toISOString(),
     });
   }
-  
+
   return migrationChangelogEntries;
-}
+};
 
 const arrayToTimestampMap = (array: SchemaChangelogEntry[]): Record<string, SchemaChangelogEntry> => {
   const map: Record<string, SchemaChangelogEntry> = {};
@@ -81,7 +79,7 @@ const arrayToTimestampMap = (array: SchemaChangelogEntry[]): Record<string, Sche
     map[entry.timestamp] = entry;
   }
   return map;
-}
+};
 
 /**
  * There are two ways you can "accept" a schema change, by adding a migration file with `export const acceptsSchemaHash = "..."`,
@@ -91,28 +89,33 @@ const arrayToTimestampMap = (array: SchemaChangelogEntry[]): Record<string, Sche
  */
 const updateSchemaChangelogWithMigrationEntries = async ({
   schemaChangelogEntries,
-  migrationChangelogEntries}: {
-  schemaChangelogEntries: SchemaChangelogEntry[],
-  migrationChangelogEntries: SchemaChangelogEntry[]
+  migrationChangelogEntries,
+}: {
+  schemaChangelogEntries: SchemaChangelogEntry[];
+  migrationChangelogEntries: SchemaChangelogEntry[];
 }) => {
   assertNoDuplicateTimestamps(schemaChangelogEntries);
   assertNoDuplicateTimestamps(migrationChangelogEntries);
 
   const schemaChangelogEntriesMap = arrayToTimestampMap(schemaChangelogEntries);
   const migrationChangelogEntriesMap = arrayToTimestampMap(migrationChangelogEntries);
-  
+
   const newSchemaChangelogEntries: SchemaChangelogEntry[] = [];
-  
+
   for (const timestamp in migrationChangelogEntriesMap) {
     if (schemaChangelogEntriesMap[timestamp]) {
       const existingEntry = schemaChangelogEntriesMap[timestamp];
       const newEntry = migrationChangelogEntriesMap[timestamp];
-      if (existingEntry.acceptsSchemaHash !== newEntry.acceptsSchemaHash ||
-          existingEntry.acceptedByMigration !== newEntry.acceptedByMigration) {
-          const existingString = JSON.stringify(existingEntry);
-          const newString = JSON.stringify(newEntry);
-          throw new Error(`Cannot change accepted migration: ${timestamp}. The entry in schema_changelog.json is ${existingString}`
-            + ` but the entry generated by the migration file is ${newString}`);
+      if (
+        existingEntry.acceptsSchemaHash !== newEntry.acceptsSchemaHash ||
+        existingEntry.acceptedByMigration !== newEntry.acceptedByMigration
+      ) {
+        const existingString = JSON.stringify(existingEntry);
+        const newString = JSON.stringify(newEntry);
+        throw new Error(
+          `Cannot change accepted migration: ${timestamp}. The entry in schema_changelog.json is ${existingString}` +
+            ` but the entry generated by the migration file is ${newString}`,
+        );
       }
     } else {
       // eslint-disable-next-line no-console
@@ -120,29 +123,41 @@ const updateSchemaChangelogWithMigrationEntries = async ({
     }
     newSchemaChangelogEntries.push(migrationChangelogEntriesMap[timestamp]);
   }
-  
-  const manualEntries = schemaChangelogEntries.filter(entry => !migrationChangelogEntriesMap[entry.timestamp]);
-  
+
+  const manualEntries = schemaChangelogEntries.filter((entry) => !migrationChangelogEntriesMap[entry.timestamp]);
+
   // Assert that the manual entries are in fact manual, if they have an acceptedByMigration field this
   // probably means that the migration file was deleted
-  const invalidManualEntries = manualEntries.filter(entry => entry.acceptedByMigration)
+  const invalidManualEntries = manualEntries.filter((entry) => entry.acceptedByMigration);
   if (invalidManualEntries.length) {
     // eslint-disable-next-line no-console
-    console.error(`There are entries with an acceptedByMigration field in schema_changelog.json where the corresponding migration can't be found. ` +
-    `This is probably because the migration files were deleted. If you really do want to delete these files then remove these entries from schema_changelog.json:`, invalidManualEntries)
+    console.error(
+      `There are entries with an acceptedByMigration field in schema_changelog.json where the corresponding migration can't be found. ` +
+        `This is probably because the migration files were deleted. If you really do want to delete these files then remove these entries from schema_changelog.json:`,
+      invalidManualEntries,
+    );
     throw new Error();
   }
-  
+
   newSchemaChangelogEntries.push(...manualEntries);
   return newSchemaChangelogEntries.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-}
+};
 
-export const acceptMigrations = async ({write=true, rootPath=ROOT_PATH}: {write: boolean, rootPath: string}): Promise<SchemaChangelogEntry> => {
+export const acceptMigrations = async ({
+  write = true,
+  rootPath = ROOT_PATH,
+}: {
+  write: boolean;
+  rootPath: string;
+}): Promise<SchemaChangelogEntry> => {
   const schemaChangelogEntries = await getSchemaChangelogEntries(rootPath);
   const migrationChangelogEntries = await getMigrationChangelogEntries(rootPath);
 
-  const newSchemaChangelogEntries = await updateSchemaChangelogWithMigrationEntries({schemaChangelogEntries, migrationChangelogEntries});
-   
+  const newSchemaChangelogEntries = await updateSchemaChangelogWithMigrationEntries({
+    schemaChangelogEntries,
+    migrationChangelogEntries,
+  });
+
   if (write) {
     await writeFile(schemaChangelogPath(rootPath), JSON.stringify(newSchemaChangelogEntries, null, 2));
   } else {
@@ -152,4 +167,4 @@ export const acceptMigrations = async ({write=true, rootPath=ROOT_PATH}: {write:
   }
 
   return newSchemaChangelogEntries[newSchemaChangelogEntries.length - 1];
-}
+};

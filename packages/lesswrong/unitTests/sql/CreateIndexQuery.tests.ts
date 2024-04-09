@@ -18,19 +18,22 @@ describe("CreateIndexQuery", () => {
     {
       name: "can build create index query with unique constraint",
       getQuery: () => new CreateIndexQuery(testTable, testTable.getIndexes()[2]),
-      expectedSql: 'CREATE UNIQUE INDEX IF NOT EXISTS "idx_TestCollection_a_b" ON "TestCollection" USING btree ( "a" , COALESCE("b", \'\') )',
+      expectedSql:
+        'CREATE UNIQUE INDEX IF NOT EXISTS "idx_TestCollection_a_b" ON "TestCollection" USING btree ( "a" , COALESCE("b", \'\') )',
       expectedArgs: [],
     },
     {
       name: "can build create index query with partial filter expression",
       getQuery: () => new CreateIndexQuery(testTable, testTable.getIndexes()[3]),
-      expectedSql: 'CREATE INDEX IF NOT EXISTS "idx_TestCollection_a_b_filtered" ON "TestCollection" USING btree ( "a" , "b" ) WHERE ( "a" > $1 AND "b" = $2 )',
+      expectedSql:
+        'CREATE INDEX IF NOT EXISTS "idx_TestCollection_a_b_filtered" ON "TestCollection" USING btree ( "a" , "b" ) WHERE ( "a" > $1 AND "b" = $2 )',
       expectedArgs: [3, "test"],
     },
     {
       name: "can build case-insensitive create index query",
       getQuery: () => new CreateIndexQuery(testTable, testTable.getIndexes()[4]),
-      expectedSql: 'CREATE INDEX IF NOT EXISTS "idx_TestCollection_b_ci" ON "TestCollection" USING btree ( LOWER("b") )',
+      expectedSql:
+        'CREATE INDEX IF NOT EXISTS "idx_TestCollection_b_ci" ON "TestCollection" USING btree ( LOWER("b") )',
       expectedArgs: [],
     },
   ]);

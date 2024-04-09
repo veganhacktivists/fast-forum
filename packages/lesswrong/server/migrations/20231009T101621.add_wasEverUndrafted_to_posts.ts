@@ -1,9 +1,9 @@
-import { Posts } from "../../lib/collections/posts"
-import { addField, dropField } from "./meta/utils"
+import { Posts } from "../../lib/collections/posts";
+import { addField, dropField } from "./meta/utils";
 
 export const acceptsSchemaHash = "881c509060130982ab7f20a92a5c9602";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Posts, "wasEverUndrafted");
   await db.none(`
     UPDATE "Posts"
@@ -13,8 +13,8 @@ export const up = async ({db}: MigrationContext) => {
       "frontpageDate" IS NOT NULL OR
       "curatedDate" IS NOT NULL
   `);
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Posts, "wasEverUndrafted");
-}
+};

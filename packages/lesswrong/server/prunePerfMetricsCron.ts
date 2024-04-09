@@ -4,8 +4,8 @@ import { Globals } from "./vulcan-lib";
 import { performanceMetricLoggingEnabled } from "../lib/publicSettings";
 
 addCronJob({
-  name: 'prunePerfMetrics',
-  interval: 'every 24 hours',
+  name: "prunePerfMetrics",
+  interval: "every 24 hours",
   async job() {
     if (performanceMetricLoggingEnabled.get()) {
       await pruneOldPerfMetrics();

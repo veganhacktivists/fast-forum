@@ -1,10 +1,10 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import EmailPropTypes from '../PropTypes'
-import includeDataProps from '../includeDataProps'
+import React from "react";
+import PropTypes from "prop-types";
+import EmailPropTypes from "../PropTypes";
+import includeDataProps from "../includeDataProps";
 
 export default function Span(props: any) {
-  const lineHeight = props.lineHeight !== undefined ? props.lineHeight : props.fontSize
+  const lineHeight = props.lineHeight !== undefined ? props.lineHeight : props.fontSize;
   return (
     <span
       {...includeDataProps(props)}
@@ -19,7 +19,7 @@ export default function Span(props: any) {
     >
       {props.children}
     </span>
-  )
+  );
 }
 
 Span.propTypes = {
@@ -30,14 +30,14 @@ Span.propTypes = {
   color: PropTypes.string,
   style: EmailPropTypes.style,
   children: PropTypes.node,
-}
+};
 
 Span.defaultProps = {
-  fontFamily: 'sans-serif',
+  fontFamily: "sans-serif",
   fontSize: 14,
   fontWeight: undefined,
   lineHeight: undefined,
-  color: '#000',
+  color: "#000",
   style: undefined,
   children: undefined,
-}
+};

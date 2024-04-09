@@ -33,25 +33,25 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const AdminSynonymsEditor: FC<{classes: ClassesType}> = ({classes}) => {
+const AdminSynonymsEditor: FC<{ classes: ClassesType }> = ({ classes }) => {
   const [synonyms, setSynonyms] = useState<string[]>([]);
-  const {data, loading, error} = useQuery(searchSynonymsQuery);
-  const [updateSearchSynonyms, updateLoading] = useMutation(
-    searchSynonymsMutation,
-    {errorPolicy: "all"},
-  );
+  const { data, loading, error } = useQuery(searchSynonymsQuery);
+  const [updateSearchSynonyms, updateLoading] = useMutation(searchSynonymsMutation, { errorPolicy: "all" });
 
   useEffect(() => {
     setSynonyms(data?.SearchSynonyms ?? []);
   }, [data]);
 
-  const onEditSynonym = useCallback((index: number) => {
-    return (event: ChangeEvent<HTMLInputElement>) => {
-      const newSynonyms = [...synonyms];
-      newSynonyms[index] = event.target.value;
-      setSynonyms(newSynonyms);
-    };
-  }, [synonyms]);
+  const onEditSynonym = useCallback(
+    (index: number) => {
+      return (event: ChangeEvent<HTMLInputElement>) => {
+        const newSynonyms = [...synonyms];
+        newSynonyms[index] = event.target.value;
+        setSynonyms(newSynonyms);
+      };
+    },
+    [synonyms],
+  );
 
   const onAddSynonym = useCallback(() => {
     setSynonyms([...synonyms.filter((synonym) => synonym), ""]);
@@ -69,57 +69,46 @@ const AdminSynonymsEditor: FC<{classes: ClassesType}> = ({classes}) => {
 
   const isLoading = loading || updateLoading?.loading;
 
-  const {SingleColumnSection, SectionTitle, Loading} = Components;
+  const { SingleColumnSection, SectionTitle, Loading } = Components;
   return (
     <SingleColumnSection className={classes.root}>
       <SectionTitle title="Search synonyms" />
       <p>
-        Synonyms should be formatted as a comma-separated list of values which will be
-        considered as equivalent terms when performing a search. For instance, if you
-        create the synonym "cat,lion,tiger" then a search for "cat" will also match all
-        documents containing the words "lion" or "tiger". Synonyms work better when
-        each option is only a single word, but multiple-word synonyms are also possible.
+        Synonyms should be formatted as a comma-separated list of values which will be considered as equivalent terms
+        when performing a search. For instance, if you create the synonym "cat,lion,tiger" then a search for "cat" will
+        also match all documents containing the words "lion" or "tiger". Synonyms work better when each option is only a
+        single word, but multiple-word synonyms are also possible.
       </p>
       {isLoading && <Loading />}
       {error && <p>Error: {error.message}</p>}
-      {!isLoading && !error &&
+      {!isLoading && !error && (
         <>
-          {synonyms.map((synonym: string, i: number) =>
-            <TextField
-              key={i}
-              value={synonym}
-              onChange={onEditSynonym(i)}
-              variant="standard"
-              fullWidth
-            />
-          )}
+          {synonyms.map((synonym: string, i: number) => (
+            <TextField key={i} value={synonym} onChange={onEditSynonym(i)} variant="standard" fullWidth />
+          ))}
           <div className={classes.buttons}>
-            <Button variant="outlined" onClick={onAddSynonym}>Add synonym</Button>
-            <Button variant="contained" onClick={onSave}>Save</Button>
+            <Button variant="outlined" onClick={onAddSynonym}>
+              Add synonym
+            </Button>
+            <Button variant="contained" onClick={onSave}>
+              Save
+            </Button>
           </div>
         </>
-      }
+      )}
     </SingleColumnSection>
   );
-}
+};
 
-const AdminSynonymsPage = ({classes}: {
-  classes: ClassesType,
-}) => {
+const AdminSynonymsPage = ({ classes }: { classes: ClassesType }) => {
   const currentUser = useCurrentUser();
-  return currentUser?.isAdmin
-    ? <AdminSynonymsEditor classes={classes} />
-    : <Components.Error404 />;
-}
+  return currentUser?.isAdmin ? <AdminSynonymsEditor classes={classes} /> : <Components.Error404 />;
+};
 
-const AdminSynonymsPageComponent = registerComponent(
-  "AdminSynonymsPage",
-  AdminSynonymsPage,
-  {styles},
-);
+const AdminSynonymsPageComponent = registerComponent("AdminSynonymsPage", AdminSynonymsPage, { styles });
 
 declare global {
   interface ComponentTypes {
-    AdminSynonymsPage: typeof AdminSynonymsPageComponent
+    AdminSynonymsPage: typeof AdminSynonymsPageComponent;
   }
 }

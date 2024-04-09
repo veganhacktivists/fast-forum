@@ -25,11 +25,7 @@ export const isValidSearchQuery = (value: unknown): value is SearchQuery => {
   const result = querySchema.safeParse(value);
   if (!result.success) {
     // eslint-disable-next-line no-console
-    console.error(
-      "Invalid search query:",
-      result.error.message,
-      JSON.stringify(value, null, 2),
-    );
+    console.error("Invalid search query:", result.error.message, JSON.stringify(value, null, 2));
   }
   return result.success;
-}
+};

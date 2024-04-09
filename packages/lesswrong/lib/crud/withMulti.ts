@@ -1,12 +1,12 @@
-import { WatchQueryFetchPolicy, ApolloError, useQuery, NetworkStatus, gql, useApolloClient } from '@apollo/client';
-import qs from 'qs';
-import { useState } from 'react';
-import * as _ from 'underscore';
-import { extractFragmentInfo, getFragment, getCollection, pluralize, camelCaseify } from '../vulcan-lib';
-import { useLocation } from '../routeUtil';
-import { invalidateQuery } from './cacheUpdates';
-import { isServer } from '../executionEnvironment';
-import { useNavigate } from '../reactRouterWrapper';
+import { WatchQueryFetchPolicy, ApolloError, useQuery, NetworkStatus, gql, useApolloClient } from "@apollo/client";
+import qs from "qs";
+import { useState } from "react";
+import * as _ from "underscore";
+import { extractFragmentInfo, getFragment, getCollection, pluralize, camelCaseify } from "../vulcan-lib";
+import { useLocation } from "../routeUtil";
+import { invalidateQuery } from "./cacheUpdates";
+import { isServer } from "../executionEnvironment";
+import { useNavigate } from "../reactRouterWrapper";
 
 // Template of a GraphQL query for useMulti. A sample query might look
 // like:
@@ -22,11 +22,15 @@ import { useNavigate } from '../reactRouterWrapper';
 //     __typename
 //   }
 // }
-const multiClientTemplate = ({ typeName, fragmentName, extraVariablesString }: {
-  typeName: string,
-  fragmentName: FragmentName,
-  extraVariablesString: string,
-}) => `query multi${typeName}Query($input: Multi${typeName}Input, ${extraVariablesString || ''}) {
+const multiClientTemplate = ({
+  typeName,
+  fragmentName,
+  extraVariablesString,
+}: {
+  typeName: string;
+  fragmentName: FragmentName;
+  extraVariablesString: string;
+}) => `query multi${typeName}Query($input: Multi${typeName}Input, ${extraVariablesString || ""}) {
   ${camelCaseify(pluralize(typeName))}(input: $input) {
     results {
       ...${fragmentName}
@@ -36,21 +40,29 @@ const multiClientTemplate = ({ typeName, fragmentName, extraVariablesString }: {
   }
 }`;
 
-function getGraphQLQueryFromOptions({collectionName, collection, fragmentName, fragment, extraVariables}: {
-  collectionName: CollectionNameString,
-  collection: any,
-  fragmentName: FragmentName,
-  fragment: any,
-  extraVariables: any,
+function getGraphQLQueryFromOptions({
+  collectionName,
+  collection,
+  fragmentName,
+  fragment,
+  extraVariables,
+}: {
+  collectionName: CollectionNameString;
+  collection: any;
+  fragmentName: FragmentName;
+  fragment: any;
+  extraVariables: any;
 }) {
   const typeName = collection.options.typeName;
   ({ fragmentName, fragment } = extractFragmentInfo({ fragmentName, fragment }, collectionName));
 
-  let extraVariablesString = ''
+  let extraVariablesString = "";
   if (extraVariables) {
-    extraVariablesString = Object.keys(extraVariables).map(k => `$${k}: ${extraVariables[k]}`).join(', ')
+    extraVariablesString = Object.keys(extraVariables)
+      .map((k) => `$${k}: ${extraVariables[k]}`)
+      .join(", ");
   }
-  
+
   // build graphql query from options
   return gql`
     ${multiClientTemplate({ typeName, fragmentName, extraVariablesString })}
@@ -60,54 +72,52 @@ function getGraphQLQueryFromOptions({collectionName, collection, fragmentName, f
 
 export interface UseMultiOptions<
   FragmentTypeName extends keyof FragmentTypes,
-  CollectionName extends CollectionNameString
+  CollectionName extends CollectionNameString,
 > {
-  terms: ViewTermsByCollectionName[CollectionName],
-  extraVariablesValues?: any,
-  pollInterval?: number,
-  enableTotal?: boolean,
-  enableCache?: boolean,
-  extraVariables?: any,
-  fetchPolicy?: WatchQueryFetchPolicy,
-  nextFetchPolicy?: WatchQueryFetchPolicy,
-  collectionName: CollectionNameString,
-  fragmentName: FragmentTypeName,
-  limit?: number,
-  itemsPerPage?: number,
-  skip?: boolean,
-  queryLimitName?: string,
-  alwaysShowLoadMore?: boolean,
-  createIfMissing?: Partial<ObjectsByCollectionName[CollectionName]>,
-  ssr?: boolean,
+  terms: ViewTermsByCollectionName[CollectionName];
+  extraVariablesValues?: any;
+  pollInterval?: number;
+  enableTotal?: boolean;
+  enableCache?: boolean;
+  extraVariables?: any;
+  fetchPolicy?: WatchQueryFetchPolicy;
+  nextFetchPolicy?: WatchQueryFetchPolicy;
+  collectionName: CollectionNameString;
+  fragmentName: FragmentTypeName;
+  limit?: number;
+  itemsPerPage?: number;
+  skip?: boolean;
+  queryLimitName?: string;
+  alwaysShowLoadMore?: boolean;
+  createIfMissing?: Partial<ObjectsByCollectionName[CollectionName]>;
+  ssr?: boolean;
 }
 
-export type LoadMoreCallback = (limitOverride?: number) => void
+export type LoadMoreCallback = (limitOverride?: number) => void;
 
 export type LoadMoreProps = {
-  loadMore: LoadMoreCallback
-  count: number,
-  totalCount?: number,
-  loading: boolean,
-  hidden?: boolean,
-}
+  loadMore: LoadMoreCallback;
+  count: number;
+  totalCount?: number;
+  loading: boolean;
+  hidden?: boolean;
+};
 
-export type UseMultiResult<
-  FragmentTypeName extends keyof FragmentTypes,
-> = {
-  loading: boolean,
-  loadingInitial: boolean,
-  loadingMore: boolean,
-  results?: Array<FragmentTypes[FragmentTypeName]>,
-  totalCount?: number,
-  refetch: any,
-  invalidateCache: () => void,
-  error: ApolloError|undefined,
-  count?: number,
-  showLoadMore: boolean,
-  loadMoreProps: LoadMoreProps,
-  loadMore: any,
-  limit: number,
-}
+export type UseMultiResult<FragmentTypeName extends keyof FragmentTypes> = {
+  loading: boolean;
+  loadingInitial: boolean;
+  loadingMore: boolean;
+  results?: Array<FragmentTypes[FragmentTypeName]>;
+  totalCount?: number;
+  refetch: any;
+  invalidateCache: () => void;
+  error: ApolloError | undefined;
+  count?: number;
+  showLoadMore: boolean;
+  loadMoreProps: LoadMoreProps;
+  loadMore: any;
+  limit: number;
+};
 
 /**
  * React hook that queries a collection, and returns those results along with
@@ -123,7 +133,7 @@ export type UseMultiResult<
  */
 export function useMulti<
   FragmentTypeName extends keyof FragmentTypes,
-  CollectionName extends CollectionNameString = CollectionNamesByFragmentName[FragmentTypeName]
+  CollectionName extends CollectionNameString = CollectionNamesByFragmentName[FragmentTypeName],
 >({
   terms,
   extraVariablesValues,
@@ -135,38 +145,43 @@ export function useMulti<
   nextFetchPolicy,
   collectionName,
   fragmentName, //fragment,
-  limit:initialLimit = 10, // Only used as a fallback if terms.limit is not specified
+  limit: initialLimit = 10, // Only used as a fallback if terms.limit is not specified
   itemsPerPage = 10,
   skip = false,
   queryLimitName,
   alwaysShowLoadMore = false,
   createIfMissing,
   ssr = true,
-}: UseMultiOptions<FragmentTypeName,CollectionName>): UseMultiResult<FragmentTypeName> {
+}: UseMultiOptions<FragmentTypeName, CollectionName>): UseMultiResult<FragmentTypeName> {
   const { query: locationQuery, location } = useLocation();
   const navigate = useNavigate();
 
-  const locationQueryLimit = locationQuery && queryLimitName && !isNaN(parseInt(locationQuery[queryLimitName])) ? parseInt(locationQuery[queryLimitName]) : undefined;
+  const locationQueryLimit =
+    locationQuery && queryLimitName && !isNaN(parseInt(locationQuery[queryLimitName]))
+      ? parseInt(locationQuery[queryLimitName])
+      : undefined;
   const termsLimit = terms?.limit; // FIXME despite the type definition, terms can actually be undefined
-  const defaultLimit: number = locationQueryLimit ?? termsLimit ?? initialLimit
+  const defaultLimit: number = locationQueryLimit ?? termsLimit ?? initialLimit;
 
-  const [ limit, setLimit ] = useState(defaultLimit);
-  const [ lastTerms, setLastTerms ] = useState(_.clone(terms));
-  
+  const [limit, setLimit] = useState(defaultLimit);
+  const [lastTerms, setLastTerms] = useState(_.clone(terms));
+
   const collection = getCollection(collectionName);
   const fragment = getFragment(fragmentName);
-  
+
   const query = getGraphQLQueryFromOptions({ collectionName, collection, fragmentName, fragment, extraVariables });
   const resolverName = collection.options.multiResolverName;
 
   const graphQLVariables = {
     input: {
       terms: { ...terms, limit: defaultLimit },
-      enableCache, enableTotal, createIfMissing
+      enableCache,
+      enableTotal,
+      createIfMissing,
     },
-    ...(_.pick(extraVariablesValues, Object.keys(extraVariables || {})))
-  }
-  
+    ..._.pick(extraVariablesValues, Object.keys(extraVariables || {})),
+  };
+
   let effectiveLimit = limit;
   if (!_.isEqual(terms, lastTerms)) {
     setLastTerms(terms);
@@ -175,39 +190,41 @@ export function useMulti<
   }
 
   // Due to https://github.com/apollographql/apollo-client/issues/6760 this is necessary to restore the Apollo 2.0 behavior for cache-and-network policies
-  const newNextFetchPolicy = nextFetchPolicy || (fetchPolicy === "cache-and-network" || fetchPolicy === "network-only") ? "cache-only" : undefined
-  
+  const newNextFetchPolicy =
+    nextFetchPolicy || fetchPolicy === "cache-and-network" || fetchPolicy === "network-only" ? "cache-only" : undefined;
+
   const useQueryArgument = {
     variables: graphQLVariables,
-    pollInterval, 
+    pollInterval,
     fetchPolicy,
     nextFetchPolicy: newNextFetchPolicy as WatchQueryFetchPolicy,
     // This is a workaround for a bug in apollo where setting `ssr: false` makes it not fetch
     // the query on the client (see https://github.com/apollographql/apollo-client/issues/5918)
     ssr: ssr || !isServer,
     skip,
-    notifyOnNetworkStatusChange: true
-  }
-  const {data, error, loading, refetch, fetchMore, networkStatus} = useQuery(query, useQueryArgument);
+    notifyOnNetworkStatusChange: true,
+  };
+  const { data, error, loading, refetch, fetchMore, networkStatus } = useQuery(query, useQueryArgument);
 
   const client = useApolloClient();
-  const invalidateCache = () => invalidateQuery({
-    client,
-    query,
-    variables: graphQLVariables,
-  });
+  const invalidateCache = () =>
+    invalidateQuery({
+      client,
+      query,
+      variables: graphQLVariables,
+    });
 
   if (error) {
     // This error was already caught by the apollo middleware, but the
     // middleware had no idea who  made the query. To aid in debugging, log a
     // stack trace here.
     // eslint-disable-next-line no-console
-    console.error(error.message)
+    console.error(error.message);
   }
-  
+
   const count = (data && data[resolverName] && data[resolverName].results && data[resolverName].results.length) || 0;
   const totalCount = data && data[resolverName] && data[resolverName].totalCount;
-  
+
   // If we did a query to count the total number of results (enableTotal),
   // show a Load More if we have fewer than that many results. If we didn't do
   // that, show a Load More if we got at least as many results as requested.
@@ -216,42 +233,45 @@ export function useMulti<
   //
   // The caller of this function is responsible for showing a Load More button
   // if showLoadMore returned true.
-  const showLoadMore = alwaysShowLoadMore || (enableTotal ? (count < totalCount) : (count >= effectiveLimit));
-  
+  const showLoadMore = alwaysShowLoadMore || (enableTotal ? count < totalCount : count >= effectiveLimit);
+
   const loadMore: LoadMoreCallback = async (limitOverride?: number) => {
-    const newLimit = limitOverride || (effectiveLimit+itemsPerPage)
+    const newLimit = limitOverride || effectiveLimit + itemsPerPage;
     if (queryLimitName) {
-      const newQuery = {...locationQuery, [queryLimitName]: newLimit}
-      navigate({...location, search: `?${qs.stringify(newQuery)}`})
+      const newQuery = { ...locationQuery, [queryLimitName]: newLimit };
+      navigate({ ...location, search: `?${qs.stringify(newQuery)}` });
     }
     void fetchMore({
       variables: {
         ...graphQLVariables,
         input: {
           ...graphQLVariables.input,
-          terms: {...graphQLVariables.input.terms, limit: newLimit}
-        }
+          terms: { ...graphQLVariables.input.terms, limit: newLimit },
+        },
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) return prev;
-        return fetchMoreResult
-      }
-    })
-    setLimit(newLimit)
+        return fetchMoreResult;
+      },
+    });
+    setLimit(newLimit);
   };
-  
+
   // A bundle of props that you can pass to Components.LoadMore, to make
   // everything just work.
   const loadMoreProps = {
-    loadMore, count, totalCount, loading,
+    loadMore,
+    count,
+    totalCount,
+    loading,
     hidden: !showLoadMore,
   };
-  
+
   let results = data?.[resolverName]?.results;
   if (results && results.length > limit) {
     results = _.take(results, limit);
   }
-  
+
   return {
     loading: loading || networkStatus === NetworkStatus.fetchMore,
     loadingInitial: networkStatus === NetworkStatus.loading,

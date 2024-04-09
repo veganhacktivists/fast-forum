@@ -1,24 +1,25 @@
-import { camelCaseify, pluralize } from '../../../lib/vulcan-lib';
-import type { SchemaGraphQLFieldDescription, SchemaGraphQLFieldArgument } from './initGraphQL';
+import { camelCaseify, pluralize } from "../../../lib/vulcan-lib";
+import type { SchemaGraphQLFieldDescription, SchemaGraphQLFieldArgument } from "./initGraphQL";
 
 const convertToGraphQL = (fields: SchemaGraphQLFieldDescription[], indentation: string) => {
-  return fields.length > 0 ? fields.map(f => fieldTemplate(f, indentation)).join('\n') : '';
+  return fields.length > 0 ? fields.map((f) => fieldTemplate(f, indentation)).join("\n") : "";
 };
 
-export const arrayToGraphQL = (fields: SchemaGraphQLFieldArgument[]) => fields.map(f => `${f.name}: ${f.type}`).join(', ');
+export const arrayToGraphQL = (fields: SchemaGraphQLFieldArgument[]) =>
+  fields.map((f) => `${f.name}: ${f.type}`).join(", ");
 
 /*
 
 For backwards-compatibility reasons, args can either be a string or an array of objects
 
 */
-const getArguments = (args: string|SchemaGraphQLFieldArgument[]|null|undefined) => {
+const getArguments = (args: string | SchemaGraphQLFieldArgument[] | null | undefined) => {
   if (Array.isArray(args) && args.length > 0) {
     return `(${arrayToGraphQL(args)})`;
-  } else if (typeof args === 'string') {
+  } else if (typeof args === "string") {
     return `(${args})`;
   } else {
-    return '';
+    return "";
   }
 };
 
@@ -28,8 +29,11 @@ const getArguments = (args: string|SchemaGraphQLFieldArgument[]|null|undefined) 
 // `${description ?  `${indentation}# ${description}\n` : ''}${indentation}${name}${getArguments(args)}: ${type}${required ? '!' : ''} ${directive ? directive : ''}`;
 
 // version that does not make any fields required
-const fieldTemplate = ({ name, type, args, directive, description, required }: SchemaGraphQLFieldDescription, indentation = '') =>
-`${description ?  `${indentation}# ${description}\n` : ''}${indentation}${name}${getArguments(args)}: ${type} ${directive ? directive : ''}`;
+const fieldTemplate = (
+  { name, type, args, directive, description, required }: SchemaGraphQLFieldDescription,
+  indentation = "",
+) =>
+  `${description ? `${indentation}# ${description}\n` : ""}${indentation}${name}${getArguments(args)}: ${type} ${directive ? directive : ""}`;
 
 /* ------------------------------------- Main Type ------------------------------------- */
 
@@ -45,17 +49,22 @@ type Movie{
 }
 
 */
-export const mainTypeTemplate = ({ typeName, description, interfaces, fields }: {
-  typeName: string,
-  description?: string,
-  interfaces: string[],
-  fields: SchemaGraphQLFieldDescription[],
-}) => (
+export const mainTypeTemplate = ({
+  typeName,
+  description,
+  interfaces,
+  fields,
+}: {
+  typeName: string;
+  description?: string;
+  interfaces: string[];
+  fields: SchemaGraphQLFieldDescription[];
+}) =>
   `# ${description}
-  type ${typeName} ${interfaces.length ? `implements ${interfaces.join(', ')} ` : ''}{
-  ${convertToGraphQL(fields, '  ')}
+  type ${typeName} ${interfaces.length ? `implements ${interfaces.join(", ")} ` : ""}{
+  ${convertToGraphQL(fields, "  ")}
   }
-`);
+`;
 
 /* ------------------------------------- Selector Types ------------------------------------- */
 
@@ -81,13 +90,18 @@ type MovieSelectorInput {
 see https://www.opencrud.org/#sec-Data-types
 
 */
-export const selectorInputTemplate = ({ typeName, fields }: { typeName: string, fields: SchemaGraphQLFieldDescription[] }) => (
-`input ${typeName}SelectorInput {
+export const selectorInputTemplate = ({
+  typeName,
+  fields,
+}: {
+  typeName: string;
+  fields: SchemaGraphQLFieldDescription[];
+}) =>
+  `input ${typeName}SelectorInput {
   AND: [${typeName}SelectorInput]
   OR: [${typeName}SelectorInput]
-${convertToGraphQL(fields, '  ')}
-}`
-);
+${convertToGraphQL(fields, "  ")}
+}`;
 
 /*
 
@@ -99,14 +113,19 @@ type MovieSelectorUniqueInput {
 }
 
 */
-export const selectorUniqueInputTemplate = ({ typeName, fields }: { typeName: string, fields: SchemaGraphQLFieldDescription[] }) => (
-`input ${typeName}SelectorUniqueInput {
+export const selectorUniqueInputTemplate = ({
+  typeName,
+  fields,
+}: {
+  typeName: string;
+  fields: SchemaGraphQLFieldDescription[];
+}) =>
+  `input ${typeName}SelectorUniqueInput {
   _id: String
   documentId: String # OpenCRUD backwards compatibility
   slug: String
-${convertToGraphQL(fields, '  ')}
-}`
-);
+${convertToGraphQL(fields, "  ")}
+}`;
 
 /*
 
@@ -118,12 +137,17 @@ enum MovieOrderByInput {
 }
 
 */
-export const orderByInputTemplate = ({ typeName, fields }: { typeName: string, fields: SchemaGraphQLFieldDescription[] }) => (
-`enum ${typeName}OrderByInput {
+export const orderByInputTemplate = ({
+  typeName,
+  fields,
+}: {
+  typeName: string;
+  fields: SchemaGraphQLFieldDescription[];
+}) =>
+  `enum ${typeName}OrderByInput {
   foobar
-  ${fields.join('\n  ')}
-}`
-);
+  ${fields.join("\n  ")}
+}`;
 
 /* ------------------------------------- Query Types ------------------------------------- */
 
@@ -134,8 +158,8 @@ A query for a single document
 movie(input: SingleMovieInput) : SingleMovieOutput
 
 */
-export const singleQueryTemplate = ({ typeName }: {typeName: string}) => `${camelCaseify(typeName)}(input: Single${typeName}Input): Single${typeName}Output`;
-
+export const singleQueryTemplate = ({ typeName }: { typeName: string }) =>
+  `${camelCaseify(typeName)}(input: Single${typeName}Input): Single${typeName}Output`;
 
 /*
 
@@ -144,7 +168,8 @@ A query for multiple documents
 movies(input: MultiMovieInput) : MultiMovieOutput
 
 */
-export const multiQueryTemplate = ({ typeName }: {typeName: string}) => `${camelCaseify(pluralize(typeName))}(input: Multi${typeName}Input): Multi${typeName}Output`;
+export const multiQueryTemplate = ({ typeName }: { typeName: string }) =>
+  `${camelCaseify(pluralize(typeName))}(input: Multi${typeName}Input): Multi${typeName}Output`;
 
 /* ------------------------------------- Query Input Types ------------------------------------- */
 
@@ -162,15 +187,14 @@ type SingleMovieInput {
 }
 
 */
-export const singleInputTemplate = ({ typeName }: {typeName: string}) => (
-`input Single${typeName}Input {
+export const singleInputTemplate = ({ typeName }: { typeName: string }) =>
+  `input Single${typeName}Input {
   selector: ${typeName}SelectorUniqueInput
   # Whether to enable caching for this query
   enableCache: Boolean
   # Return null instead of throwing MissingDocumentError
   allowNull: Boolean
-}`
-);
+}`;
 
 /*
 
@@ -184,8 +208,8 @@ type MultiMovieInput {
 }
 
 */
-export const multiInputTemplate = ({ typeName }: {typeName: string}) => (
-`input Multi${typeName}Input {
+export const multiInputTemplate = ({ typeName }: { typeName: string }) =>
+  `input Multi${typeName}Input {
   # A JSON object that contains the query terms used to fetch data
   terms: JSON,
   # How much to offset the results by
@@ -206,8 +230,7 @@ export const multiInputTemplate = ({ typeName }: {typeName: string}) => (
   before: String
   first: Int
   last: Int
-}`
-);
+}`;
 
 /* ------------------------------------- Query Output Types ------------------------------------- */
 
@@ -220,11 +243,10 @@ type SingleMovieOuput{
 }
 
 */
-export const singleOutputTemplate = ({ typeName }: {typeName: string}) => (
-`type Single${typeName}Output{
+export const singleOutputTemplate = ({ typeName }: { typeName: string }) =>
+  `type Single${typeName}Output{
   result: ${typeName}
-}`
-);
+}`;
 
 /*
 
@@ -236,12 +258,11 @@ type MultiMovieOuput{
 }
 
 */
-export const multiOutputTemplate = ({ typeName }: {typeName: string}) => (
-`type Multi${typeName}Output{
+export const multiOutputTemplate = ({ typeName }: { typeName: string }) =>
+  `type Multi${typeName}Output{
   results: [${typeName}]
   totalCount: Int
-}`
-);
+}`;
 
 /* ------------------------------------- Mutation Types ------------------------------------- */
 
@@ -252,9 +273,8 @@ Mutation for creating a new document
 createMovie(input: CreateMovieInput) : MovieOutput
 
 */
-export const createMutationTemplate = ({ typeName }: {typeName: string}) => (
-  `create${typeName}(data: Create${typeName}DataInput!) : ${typeName}Output`
-);
+export const createMutationTemplate = ({ typeName }: { typeName: string }) =>
+  `create${typeName}(data: Create${typeName}DataInput!) : ${typeName}Output`;
 
 /*
 
@@ -263,9 +283,8 @@ Mutation for updating an existing document
 updateMovie(input: UpdateMovieInput) : MovieOutput
 
 */
-export const updateMutationTemplate = ({ typeName }: {typeName: string}) => (
-  `update${typeName}(selector: ${typeName}SelectorUniqueInput!, data: Update${typeName}DataInput! ) : ${typeName}Output`
-);
+export const updateMutationTemplate = ({ typeName }: { typeName: string }) =>
+  `update${typeName}(selector: ${typeName}SelectorUniqueInput!, data: Update${typeName}DataInput! ) : ${typeName}Output`;
 
 /*
 
@@ -274,9 +293,8 @@ Mutation for updating an existing document; or creating it if it doesn't exist y
 upsertMovie(input: UpsertMovieInput) : MovieOutput
 
 */
-export const upsertMutationTemplate = ({ typeName }: {typeName: string}) => (
-  `upsert${typeName}(selector: ${typeName}SelectorUniqueInput!, data: Update${typeName}DataInput! ) : ${typeName}Output`
-);
+export const upsertMutationTemplate = ({ typeName }: { typeName: string }) =>
+  `upsert${typeName}(selector: ${typeName}SelectorUniqueInput!, data: Update${typeName}DataInput! ) : ${typeName}Output`;
 
 /*
 
@@ -285,9 +303,8 @@ Mutation for deleting an existing document
 deleteMovie(input: DeleteMovieInput) : MovieOutput
 
 */
-export const deleteMutationTemplate = ({ typeName }: {typeName: string}) => (
-  `delete${typeName}(selector: ${typeName}SelectorUniqueInput!) : ${typeName}Output`
-);
+export const deleteMutationTemplate = ({ typeName }: { typeName: string }) =>
+  `delete${typeName}(selector: ${typeName}SelectorUniqueInput!) : ${typeName}Output`;
 
 /* ------------------------------------- Mutation Input Types ------------------------------------- */
 
@@ -302,11 +319,10 @@ type CreateMovieInput {
 }
 
 */
-export const createInputTemplate = ({ typeName }: {typeName: string}) => (
-`input Create${typeName}Input{
+export const createInputTemplate = ({ typeName }: { typeName: string }) =>
+  `input Create${typeName}Input{
   data: Create${typeName}DataInput!
-}`
-);
+}`;
 
 /*
 
@@ -318,12 +334,11 @@ type UpdateMovieInput {
 }
 
 */
-export const updateInputTemplate = ({ typeName }: {typeName: string}) => (
-`input Update${typeName}Input{
+export const updateInputTemplate = ({ typeName }: { typeName: string }) =>
+  `input Update${typeName}Input{
   selector: ${typeName}SelectorUniqueInput!
   data: Update${typeName}DataInput!
-}`
-);
+}`;
 
 /*
 
@@ -337,12 +352,11 @@ type UpsertMovieInput {
 }
 
 */
-export const upsertInputTemplate = ({ typeName }: {typeName: string}) => (
-`input Upsert${typeName}Input{
+export const upsertInputTemplate = ({ typeName }: { typeName: string }) =>
+  `input Upsert${typeName}Input{
   selector: ${typeName}SelectorUniqueInput!
   data: Update${typeName}DataInput!
-}`
-);
+}`;
 
 /*
 
@@ -353,11 +367,10 @@ type DeleteMovieInput {
 }
 
 */
-export const deleteInputTemplate = ({ typeName }: {typeName: string}) => (
-`input Delete${typeName}Input{
+export const deleteInputTemplate = ({ typeName }: { typeName: string }) =>
+  `input Delete${typeName}Input{
   selector: ${typeName}SelectorUniqueInput!
-}`
-);
+}`;
 
 /*
 
@@ -369,11 +382,16 @@ type CreateMovieDataInput {
 }
 
 */
-export const createDataInputTemplate = ({ typeName, fields }: { typeName: string, fields: SchemaGraphQLFieldDescription[] }) => (
-`input Create${typeName}DataInput {
-${convertToGraphQL(fields, '  ')}
-}`
-);
+export const createDataInputTemplate = ({
+  typeName,
+  fields,
+}: {
+  typeName: string;
+  fields: SchemaGraphQLFieldDescription[];
+}) =>
+  `input Create${typeName}DataInput {
+${convertToGraphQL(fields, "  ")}
+}`;
 
 /*
 
@@ -385,11 +403,16 @@ type UpdateMovieDataInput {
 }
 
 */
-export const updateDataInputTemplate = ({ typeName, fields }: { typeName: string, fields: SchemaGraphQLFieldDescription[] }) => (
-`input Update${typeName}DataInput {
-${convertToGraphQL(fields, '  ')}
-}`
-);
+export const updateDataInputTemplate = ({
+  typeName,
+  fields,
+}: {
+  typeName: string;
+  fields: SchemaGraphQLFieldDescription[];
+}) =>
+  `input Update${typeName}DataInput {
+${convertToGraphQL(fields, "  ")}
+}`;
 
 /* ------------------------------------- Mutation Output Type ------------------------------------- */
 
@@ -402,11 +425,10 @@ type MovieOutput {
 }
 
 */
-export const mutationOutputTemplate = ({ typeName }: {typeName: string}) => (
-`type ${typeName}Output{
+export const mutationOutputTemplate = ({ typeName }: { typeName: string }) =>
+  `type ${typeName}Output{
   data: ${typeName}
-}`
-);
+}`;
 
 /* ------------------------------------- Mutation Queries ------------------------------------- */
 
@@ -426,16 +448,19 @@ mutation upsertMovie($selector: MovieSelectorUniqueInput!, $data: UpdateMovieDat
 }
 
 */
-export const upsertClientTemplate = ({ typeName, fragmentName, extraVariablesString }: {
-  typeName: string,
-  fragmentName: string,
-  extraVariablesString?: string,
-}) => (
-`mutation upsert${typeName}($selector: ${typeName}SelectorUniqueInput!, $data: Update${typeName}DataInput!, ${extraVariablesString || ''}) {
+export const upsertClientTemplate = ({
+  typeName,
+  fragmentName,
+  extraVariablesString,
+}: {
+  typeName: string;
+  fragmentName: string;
+  extraVariablesString?: string;
+}) =>
+  `mutation upsert${typeName}($selector: ${typeName}SelectorUniqueInput!, $data: Update${typeName}DataInput!, ${extraVariablesString || ""}) {
   upsert${typeName}(selector: $selector, data: $data) {
     data {
       ...${fragmentName}
     }
   }
-}`
-);
+}`;

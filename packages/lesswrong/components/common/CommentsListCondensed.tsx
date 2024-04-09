@@ -1,9 +1,9 @@
-import React, { useCallback, useState } from 'react';
-import { useMulti } from '../../lib/crud/withMulti';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { useCurrentUser } from './withUser';
-import AddBoxIcon from '@material-ui/icons/AddBox'
-import { isEAForum } from '../../lib/instanceSettings';
+import React, { useCallback, useState } from "react";
+import { useMulti } from "../../lib/crud/withMulti";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useCurrentUser } from "./withUser";
+import AddBoxIcon from "@material-ui/icons/AddBox";
+import { isEAForum } from "../../lib/instanceSettings";
 
 const styles = (_: ThemeType): JssStyles => ({
   subheader: {
@@ -12,18 +12,27 @@ const styles = (_: ThemeType): JssStyles => ({
   shortformSubmitForm: {
     marginTop: 6,
     marginBottom: 12,
-  }
+  },
 });
 
-const CommentsListCondensed = ({label, terms, initialLimit, itemsPerPage, showTotal=false, hideTag, shortformButton=false, classes}: {
-  label: string,
-  terms: CommentsViewTerms
-  initialLimit?: number,
-  itemsPerPage?: number,
-  showTotal?: boolean,
-  hideTag?: boolean,
-  shortformButton?: boolean,
-  classes: ClassesType,
+const CommentsListCondensed = ({
+  label,
+  terms,
+  initialLimit,
+  itemsPerPage,
+  showTotal = false,
+  hideTag,
+  shortformButton = false,
+  classes,
+}: {
+  label: string;
+  terms: CommentsViewTerms;
+  initialLimit?: number;
+  itemsPerPage?: number;
+  showTotal?: boolean;
+  hideTag?: boolean;
+  shortformButton?: boolean;
+  classes: ClassesType;
 }) => {
   const currentUser = useCurrentUser();
   const [showShortformFeed, setShowShortformFeed] = useState(false);
@@ -39,50 +48,53 @@ const CommentsListCondensed = ({label, terms, initialLimit, itemsPerPage, showTo
     itemsPerPage,
     enableTotal: true,
     collectionName: "Comments",
-    fragmentName: 'ShortformComments',
+    fragmentName: "ShortformComments",
   });
 
   if (loading && !results?.length) {
-    return <Loading/>;
+    return <Loading />;
   }
   if (!results?.length) {
     return null;
   }
 
-  const showLoadMore = !loading && (count === undefined || totalCount === undefined || count < totalCount)
-  return <>
-    <SectionTitle title={label} className={classes.subheader} >
-      {currentUser?.isReviewed && shortformButton && !currentUser.allCommentingDisabled && <div onClick={toggleShortformFeed}>
-        <SectionButton>
-          <AddBoxIcon />
-          {isEAForum ? "New quick take" : "New shortform"}
-        </SectionButton>
-      </div>}
-    </SectionTitle>
-    {showShortformFeed && <ShortformSubmitForm successCallback={refetch} className={classes.shortformSubmitForm} />}
-    {results.map((comment) => {
-      return <ShortformListItem
-        comment={comment}
-        key={comment._id}
-        hideTag={hideTag}
-      />
-    })}
-    {loading && <Loading/>}
-    {showLoadMore && <LoadMore {...{
-      ...loadMoreProps,
-      totalCount: showTotal ? totalCount : undefined,
-    }} />}
-  </>;
-}
+  const showLoadMore = !loading && (count === undefined || totalCount === undefined || count < totalCount);
+  return (
+    <>
+      <SectionTitle title={label} className={classes.subheader}>
+        {currentUser?.isReviewed && shortformButton && !currentUser.allCommentingDisabled && (
+          <div onClick={toggleShortformFeed}>
+            <SectionButton>
+              <AddBoxIcon />
+              {isEAForum ? "New quick take" : "New shortform"}
+            </SectionButton>
+          </div>
+        )}
+      </SectionTitle>
+      {showShortformFeed && <ShortformSubmitForm successCallback={refetch} className={classes.shortformSubmitForm} />}
+      {results.map((comment) => {
+        return <ShortformListItem comment={comment} key={comment._id} hideTag={hideTag} />;
+      })}
+      {loading && <Loading />}
+      {showLoadMore && (
+        <LoadMore
+          {...{
+            ...loadMoreProps,
+            totalCount: showTotal ? totalCount : undefined,
+          }}
+        />
+      )}
+    </>
+  );
+};
 
-const CommentsListCondensedComponent = registerComponent(
-  'CommentsListCondensed',
-  CommentsListCondensed,
-  {styles, stylePriority: 1},
-);
+const CommentsListCondensedComponent = registerComponent("CommentsListCondensed", CommentsListCondensed, {
+  styles,
+  stylePriority: 1,
+});
 
 declare global {
   interface ComponentTypes {
-    CommentsListCondensed: typeof CommentsListCondensedComponent
+    CommentsListCondensed: typeof CommentsListCondensedComponent;
   }
 }

@@ -1,5 +1,5 @@
-import { calculateActivityFactor } from './collections/useractivities/utils';
-import { DatabasePublicSetting } from './publicSettings';
+import { calculateActivityFactor } from "./collections/useractivities/utils";
+import { DatabasePublicSetting } from "./publicSettings";
 
 /**
  * We apply a score boost to subforum comments using the formula:
@@ -20,21 +20,21 @@ const defaultSubforumCommentBonus = {
 type SubforumCommentBonus = typeof defaultSubforumCommentBonus;
 
 // LW (and legacy) time decay algorithm settings
-const timeDecayFactorSetting = new DatabasePublicSetting<number>('timeDecayFactor', 1.15)
-const frontpageBonusSetting = new DatabasePublicSetting<number>('frontpageScoreBonus', 10)
-const curatedBonusSetting = new DatabasePublicSetting<number>('curatedScoreBonus', 10)
+const timeDecayFactorSetting = new DatabasePublicSetting<number>("timeDecayFactor", 1.15);
+const frontpageBonusSetting = new DatabasePublicSetting<number>("frontpageScoreBonus", 10);
+const curatedBonusSetting = new DatabasePublicSetting<number>("curatedScoreBonus", 10);
 const subforumCommentBonusSetting = new DatabasePublicSetting<SubforumCommentBonus>(
-  'subforumCommentBonus',
+  "subforumCommentBonus",
   defaultSubforumCommentBonus,
 );
 
 // EA Frontpage time decay algorithm settings
-const startingAgeHoursSetting = new DatabasePublicSetting<number>('frontpageAlgorithm.startingAgeHours', 6)
-const decayFactorSlowestSetting = new DatabasePublicSetting<number>('frontpageAlgorithm.decayFactorSlowest', 0.5)
-const decayFactorFastestSetting = new DatabasePublicSetting<number>('frontpageAlgorithm.decayFactorFastest', 1.08)
-const activityWeightSetting = new DatabasePublicSetting<number>('frontpageAlgorithm.activityWeight', 1.4)
-export const activityHalfLifeSetting = new DatabasePublicSetting<number>('frontpageAlgorithm.activityHalfLife', 60)
-export const frontpageDaysAgoCutoffSetting = new DatabasePublicSetting<number>('frontpageAlgorithm.daysAgoCutoff', 90)
+const startingAgeHoursSetting = new DatabasePublicSetting<number>("frontpageAlgorithm.startingAgeHours", 6);
+const decayFactorSlowestSetting = new DatabasePublicSetting<number>("frontpageAlgorithm.decayFactorSlowest", 0.5);
+const decayFactorFastestSetting = new DatabasePublicSetting<number>("frontpageAlgorithm.decayFactorFastest", 1.08);
+const activityWeightSetting = new DatabasePublicSetting<number>("frontpageAlgorithm.activityWeight", 1.4);
+export const activityHalfLifeSetting = new DatabasePublicSetting<number>("frontpageAlgorithm.activityHalfLife", 60);
+export const frontpageDaysAgoCutoffSetting = new DatabasePublicSetting<number>("frontpageAlgorithm.daysAgoCutoff", 90);
 
 export const TIME_DECAY_FACTOR = timeDecayFactorSetting;
 // Basescore bonuses for various categories
@@ -43,23 +43,23 @@ export const CURATED_BONUS = curatedBonusSetting;
 export const SCORE_BIAS = 2;
 
 export const getSubforumScoreBoost = (): SubforumCommentBonus => {
-  const defaultBonus = {...defaultSubforumCommentBonus};
+  const defaultBonus = { ...defaultSubforumCommentBonus };
   const bonus = subforumCommentBonusSetting.get();
   return Object.assign(defaultBonus, bonus);
-}
+};
 
 /**
  * This implements the same formula as commentScoreModifiers below
  */
 const getSubforumCommentBonus = (item: VoteableType) => {
   if ("tagCommentType" in item && (item as AnyBecauseTodo)["tagCommentType"] === "SUBFORUM") {
-    const {base, magnitude, duration, exponent} = getSubforumScoreBoost();
+    const { base, magnitude, duration, exponent } = getSubforumScoreBoost();
     const createdAt = (item as any).createdAt ?? new Date();
     const ageHours = (Date.now() - createdAt.getTime()) / 3600000;
-    return Math.max(base, magnitude * (1 - ((ageHours / duration) ** exponent)));
+    return Math.max(base, magnitude * (1 - (ageHours / duration) ** exponent));
   }
   return 0;
-}
+};
 
 // NB: If you want to change this algorithm, make sure to also change the
 // modifier functions below, and the SQL in updateScores.ts (until the refactor
@@ -81,7 +81,8 @@ export const recalculateScore = (item: VoteableType) => {
     baseScore = baseScore + frontpageBonus + curatedBonus + subforumBonus;
 
     // HN algorithm
-    const newScore = Math.round((baseScore / Math.pow(ageInHours + SCORE_BIAS, TIME_DECAY_FACTOR.get()))*1000000)/1000000;
+    const newScore =
+      Math.round((baseScore / Math.pow(ageInHours + SCORE_BIAS, TIME_DECAY_FACTOR.get())) * 1000000) / 1000000;
 
     return newScore;
   } else {
@@ -89,15 +90,14 @@ export const recalculateScore = (item: VoteableType) => {
   }
 };
 
-
 type TimeDecayExprProps = {
-  startingAgeHours?: number
-  decayFactorSlowest?: number
-  decayFactorFastest?: number
-  activityWeight?: number
-  activityHalfLifeHours?: number
-  overrideActivityFactor?: number
-}
+  startingAgeHours?: number;
+  decayFactorSlowest?: number;
+  decayFactorFastest?: number;
+  activityWeight?: number;
+  activityHalfLifeHours?: number;
+  overrideActivityFactor?: number;
+};
 
 export const frontpageTimeDecayExpr = (props: TimeDecayExprProps, context: ResolverContext) => {
   const {
@@ -117,14 +117,11 @@ export const frontpageTimeDecayExpr = (props: TimeDecayExprProps, context: Resol
   };
 
   // See lib/collections/useractivities/collection.ts for a high-level overview
-  const activityFactor = overrideActivityFactor ??
-    calculateActivityFactor(context?.visitorActivity?.activityArray, activityHalfLifeHours)
+  const activityFactor =
+    overrideActivityFactor ?? calculateActivityFactor(context?.visitorActivity?.activityArray, activityHalfLifeHours);
 
   // Higher timeDecayFactor => more recency bias
-  const timeDecayFactor = Math.min(
-    decayFactorSlowest * (1 + (activityWeight * activityFactor)),
-    decayFactorFastest
-  );
+  const timeDecayFactor = Math.min(decayFactorSlowest * (1 + activityWeight * activityFactor), decayFactorFastest);
 
   const ageInHours = {
     $divide: [
@@ -139,27 +136,36 @@ export const frontpageTimeDecayExpr = (props: TimeDecayExprProps, context: Resol
   };
 
   return { $pow: [{ $add: [ageInHours, startingAgeHours] }, timeDecayFactor] };
-}
+};
 
 export const timeDecayExpr = () => {
-  return {$pow: [
-    {$add: [
-      {$divide: [
-        {$subtract: [
-          new Date(), '$postedAt' // Age in miliseconds
-        ]},
-        60 * 60 * 1000
-      ] }, // Age in hours
-      SCORE_BIAS,
-    ]},
-    TIME_DECAY_FACTOR.get()
-  ]}
-}
+  return {
+    $pow: [
+      {
+        $add: [
+          {
+            $divide: [
+              {
+                $subtract: [
+                  new Date(),
+                  "$postedAt", // Age in miliseconds
+                ],
+              },
+              60 * 60 * 1000,
+            ],
+          }, // Age in hours
+          SCORE_BIAS,
+        ],
+      },
+      TIME_DECAY_FACTOR.get(),
+    ],
+  };
+};
 
 export const postScoreModifiers = () => {
   return [
-    {$cond: {if: "$frontpageDate", then: FRONTPAGE_BONUS.get(), else: 0}},
-    {$cond: {if: "$curatedDate", then: CURATED_BONUS.get(), else: 0}}
+    { $cond: { if: "$frontpageDate", then: FRONTPAGE_BONUS.get(), else: 0 } },
+    { $cond: { if: "$curatedDate", then: CURATED_BONUS.get(), else: 0 } },
   ];
 };
 
@@ -167,15 +173,12 @@ export const postScoreModifiers = () => {
  * This implements the same formula as getSubforumCommentBonus above
  */
 export const commentScoreModifiers = () => {
-  const {base, magnitude, duration, exponent} = getSubforumScoreBoost();
+  const { base, magnitude, duration, exponent } = getSubforumScoreBoost();
 
   const ageHoursExpr = {
     $divide: [
       {
-        $subtract: [
-          new Date(),
-          "$createdAt",
-        ],
+        $subtract: [new Date(), "$createdAt"],
       },
       3600000,
     ],
@@ -188,10 +191,7 @@ export const commentScoreModifiers = () => {
         $subtract: [
           1,
           {
-            $pow: [
-              {$divide: [ageHoursExpr, duration]},
-              exponent,
-            ],
+            $pow: [{ $divide: [ageHoursExpr, duration] }, exponent],
           },
         ],
       },
@@ -199,10 +199,12 @@ export const commentScoreModifiers = () => {
   };
 
   return [
-    {$cond: {
-      if: {tagCommentType: "SUBFORUM"},
-      then: {$max: [base, bonusExpr]},
-      else: 0,
-    }},
+    {
+      $cond: {
+        if: { tagCommentType: "SUBFORUM" },
+        then: { $max: [base, bonusExpr] },
+        else: 0,
+      },
+    },
   ];
 };

@@ -1,7 +1,7 @@
-import { ApolloClient, ApolloLink, InMemoryCache } from '@apollo/client';
-import { apolloCacheVoteablePossibleTypes } from '../../../lib/make_voteable';
-import { getExecutableSchema } from '../apollo-server/initGraphQL';
-import { createSchemaLink, createHttpLink, createErrorLink } from '../../../lib/apollo/links';
+import { ApolloClient, ApolloLink, InMemoryCache } from "@apollo/client";
+import { apolloCacheVoteablePossibleTypes } from "../../../lib/make_voteable";
+import { getExecutableSchema } from "../apollo-server/initGraphQL";
+import { createSchemaLink, createHttpLink, createErrorLink } from "../../../lib/apollo/links";
 import { fmCrosspostBaseUrlSetting } from "../../../lib/instanceSettings";
 
 // This client is used to prefetch data server side (necessary for SSR)
@@ -9,8 +9,8 @@ import { fmCrosspostBaseUrlSetting } from "../../../lib/instanceSettings";
 export const createClient = async (context: ResolverContext | null, foreign = false) => {
   const cache = new InMemoryCache({
     possibleTypes: {
-      ...apolloCacheVoteablePossibleTypes()
-    }
+      ...apolloCacheVoteablePossibleTypes(),
+    },
   });
 
   const links: ApolloLink[] = [];

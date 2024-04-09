@@ -1,41 +1,52 @@
-import cloneDeep from 'lodash/cloneDeep';
-import compact from 'lodash/compact';
-import find from 'lodash/find';
-import get from 'lodash/get';
-import isEqual from 'lodash/isEqual';
-import isEqualWith from 'lodash/isEqualWith';
-import isObject from 'lodash/isObject';
-import mapValues from 'lodash/mapValues';
-import merge from 'lodash/merge';
-import pick from 'lodash/pick';
-import pickBy from 'lodash/pickBy';
-import set from 'lodash/set';
-import uniq from 'lodash/uniq';
-import uniqBy from 'lodash/uniqBy';
-import unset from 'lodash/unset';
-import update from 'lodash/update';
-import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import SimpleSchema from 'simpl-schema';
-import * as _ from 'underscore';
-import { getParentPath } from '../../lib/vulcan-forms/path_utils';
-import { convertSchema, formProperties, getEditableFields, getInsertableFields } from '../../lib/vulcan-forms/schema_utils';
-import { getSimpleSchema } from '../../lib/utils/getSchema';
-import { isEmptyValue } from '../../lib/vulcan-forms/utils';
-import { getErrors, mergeWithComponents, runCallbacksList } from '../../lib/vulcan-lib';
-import { removeProperty } from '../../lib/vulcan-lib/utils';
-import { callbackProps, SmartFormProps } from './propTypes';
-import { isFunction } from '../../lib/utils/typeGuardUtils';
-import { formatLabel, formatMessage } from '../../lib/vulcan-i18n/provider';
+import cloneDeep from "lodash/cloneDeep";
+import compact from "lodash/compact";
+import find from "lodash/find";
+import get from "lodash/get";
+import isEqual from "lodash/isEqual";
+import isEqualWith from "lodash/isEqualWith";
+import isObject from "lodash/isObject";
+import mapValues from "lodash/mapValues";
+import merge from "lodash/merge";
+import pick from "lodash/pick";
+import pickBy from "lodash/pickBy";
+import set from "lodash/set";
+import uniq from "lodash/uniq";
+import uniqBy from "lodash/uniqBy";
+import unset from "lodash/unset";
+import update from "lodash/update";
+import PropTypes from "prop-types";
+import React, { Component } from "react";
+import SimpleSchema from "simpl-schema";
+import * as _ from "underscore";
+import { getParentPath } from "../../lib/vulcan-forms/path_utils";
+import {
+  convertSchema,
+  formProperties,
+  getEditableFields,
+  getInsertableFields,
+} from "../../lib/vulcan-forms/schema_utils";
+import { getSimpleSchema } from "../../lib/utils/getSchema";
+import { isEmptyValue } from "../../lib/vulcan-forms/utils";
+import { getErrors, mergeWithComponents, runCallbacksList } from "../../lib/vulcan-lib";
+import { removeProperty } from "../../lib/vulcan-lib/utils";
+import { callbackProps, SmartFormProps } from "./propTypes";
+import { isFunction } from "../../lib/utils/typeGuardUtils";
+import { formatLabel, formatMessage } from "../../lib/vulcan-i18n/provider";
 
 /** FormField in the process of being created */
-type FormFieldUnfinished<N extends CollectionNameString> = Partial<FormField<N>>
+type FormFieldUnfinished<N extends CollectionNameString> = Partial<FormField<N>>;
 
 // props that should trigger a form reset
 const RESET_PROPS = [
-  'collection', 'collectionName', 'typeName', 'document', 'schema', 'currentUser',
-  'fields', 'removeFields',
-  'prefilledProps' // TODO: prefilledProps should be merged instead?
+  "collection",
+  "collectionName",
+  "typeName",
+  "document",
+  "schema",
+  "currentUser",
+  "fields",
+  "removeFields",
+  "prefilledProps", // TODO: prefilledProps should be merged instead?
 ] as const;
 
 const compactParent = (object: AnyBecauseTodo, path: AnyBecauseTodo) => {
@@ -50,40 +61,33 @@ const compactParent = (object: AnyBecauseTodo, path: AnyBecauseTodo) => {
 const getDefaultValues = (convertedSchema: AnyBecauseTodo) => {
   // TODO: make this work with nested schemas, too
   return pickBy(
-    mapValues(convertedSchema, field => field.defaultValue),
-    value => value
+    mapValues(convertedSchema, (field) => field.defaultValue),
+    (value) => value,
   );
 };
 
-const getInitialStateFromProps = <T extends DbObject>(nextProps: SmartFormProps<CollectionNameOfObject<T>>): FormState => {
+const getInitialStateFromProps = <T extends DbObject>(
+  nextProps: SmartFormProps<CollectionNameOfObject<T>>,
+): FormState => {
   const collection = nextProps.collection;
-  const schema = nextProps.schema
-    ? new SimpleSchema(nextProps.schema)
-    : getSimpleSchema(collection);
+  const schema = nextProps.schema ? new SimpleSchema(nextProps.schema) : getSimpleSchema(collection);
   const convertedSchema = convertSchema(schema as any)!;
-  const formType = nextProps.document ? 'edit' : 'new';
+  const formType = nextProps.document ? "edit" : "new";
   // for new document forms, add default values to initial document
-  const defaultValues =
-    formType === 'new' ? getDefaultValues(convertedSchema) : {};
-  const initialDocument = merge(
-    {},
-    defaultValues,
-    nextProps.prefilledProps||{},
-    nextProps.document
-  );
+  const defaultValues = formType === "new" ? getDefaultValues(convertedSchema) : {};
+  const initialDocument = merge({}, defaultValues, nextProps.prefilledProps || {}, nextProps.document);
 
   //if minCount is specified, go ahead and create empty nested documents
-  Object.keys(convertedSchema).forEach(key => {
+  Object.keys(convertedSchema).forEach((key) => {
     let minCount = convertedSchema[key].minCount;
     if (minCount) {
       initialDocument[key] = initialDocument[key] || [];
-      while (initialDocument[key].length < minCount)
-        initialDocument[key].push({});
+      while (initialDocument[key].length < minCount) initialDocument[key].push({});
     }
   });
 
   // remove all instances of the `__typename` property from document
-  removeProperty(initialDocument, '__typename');
+  removeProperty(initialDocument, "__typename");
 
   return {
     disabled: false,
@@ -98,19 +102,19 @@ const getInitialStateFromProps = <T extends DbObject>(nextProps: SmartFormProps<
     // the initial document passed as props
     initialDocument,
     // initialize the current document to be the same as the initial document
-    currentDocument: initialDocument
+    currentDocument: initialDocument,
   };
 };
 
 interface FormState {
-  disabled: boolean,
-  errors: any[],
-  deletedValues: any[],
-  currentValues: any,
-  schema: any,
-  flatSchema: any
-  initialDocument: any,
-  currentDocument: any
+  disabled: boolean;
+  errors: any[];
+  deletedValues: any[];
+  currentValues: any;
+  schema: any;
+  flatSchema: any;
+  initialDocument: any;
+  currentDocument: any;
 }
 
 /**
@@ -122,19 +126,19 @@ interface FormState {
  * This is not in the Components table and is not registered with
  * registerComponent because you aren't supposed to use it without FormWrapper.
  */
-export class Form<N extends CollectionNameString> extends Component<SmartFormProps<N>,FormState> {
+export class Form<N extends CollectionNameString> extends Component<SmartFormProps<N>, FormState> {
   constructor(props: SmartFormProps<N>) {
     super(props);
 
     this.formRef = React.createRef<HTMLFormElement>();
     this.state = {
-      ...getInitialStateFromProps(props)
+      ...getInitialStateFromProps(props),
     };
   }
 
-  formRef: React.RefObject<HTMLFormElement>
-  unblock: any
-  
+  formRef: React.RefObject<HTMLFormElement>;
+  unblock: any;
+
   defaultValues: any = {};
 
   submitFormCallbacks: Array<any> = [];
@@ -147,31 +151,22 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
 
   /** If a document is being passed, this is an edit form */
   getFormType = () => {
-    return this.props.document ? 'edit' : 'new';
+    return this.props.document ? "edit" : "new";
   };
 
   /** Get a list of all insertable fields */
   getInsertableFields = (schema: SchemaType<N>) => {
-    return getInsertableFields(
-      schema || this.state.schema,
-      this.props.currentUser??null
-    );
+    return getInsertableFields(schema || this.state.schema, this.props.currentUser ?? null);
   };
 
   /** Get a list of all editable fields */
   getEditableFields = (schema: SchemaType<N>) => {
-    return getEditableFields(
-      schema || this.state.schema,
-      this.props.currentUser??null,
-      this.state.initialDocument
-    );
+    return getEditableFields(schema || this.state.schema, this.props.currentUser ?? null, this.state.initialDocument);
   };
 
   /** Get a list of all mutable (insertable/editable depending on current form type) fields */
   getMutableFields = (schema: SchemaType<N>) => {
-    return this.getFormType() === 'edit'
-      ? this.getEditableFields(schema)
-      : this.getInsertableFields(schema);
+    return this.getFormType() === "edit" ? this.getEditableFields(schema) : this.getInsertableFields(schema);
   };
 
   /** Get the current document */
@@ -191,7 +186,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
       excludeRemovedFields: false,
       excludeHiddenFields: false,
       addExtraFields: false,
-      ...customArgs
+      ...customArgs,
     };
 
     // only keep relevant fields
@@ -199,8 +194,8 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
     let data = pick(this.getDocument(), ...fields);
 
     // compact deleted values
-    this.state.deletedValues.forEach(path => {
-      if (path.includes('.')) {
+    this.state.deletedValues.forEach((path) => {
+      if (path.includes(".")) {
         /*
 
         If deleted field is a nested field, nested array, or nested array item, try to compact its parent array
@@ -239,32 +234,32 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
       return this.createField(fieldName, this.state.schema, mutableFields);
     });
 
-    fields = _.sortBy(fields, 'order');
+    fields = _.sortBy(fields, "order");
 
     // get list of all unique groups (based on their name) used in current fields
-    let groups = _.compact(uniqBy(_.pluck(fields, 'group'), (g) => g && g.name));
+    let groups = _.compact(uniqBy(_.pluck(fields, "group"), (g) => g && g.name));
 
     // for each group, add relevant fields
-    groups = groups.map(group => {
+    groups = groups.map((group) => {
       group.label = group.label || formatMessage({ id: group.name });
-      group.fields = fields.filter(field => {
+      group.fields = fields.filter((field) => {
         return field.group && field.group.name === group.name;
-      })
+      });
       return group;
     });
-    
+
     // add default group
     groups.unshift({
-      name: 'default',
-      label: 'default',
+      name: "default",
+      label: "default",
       order: 0,
-      fields: _.filter(fields, field => {
+      fields: _.filter(fields, (field) => {
         return !field.group;
-      })
+      }),
     });
 
     // sort by order
-    groups = _.sortBy(groups, 'order');
+    groups = _.sortBy(groups, "order");
 
     return groups;
   };
@@ -281,7 +276,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
       schema = this.state.schema,
       excludeHiddenFields = true,
       excludeRemovedFields = true,
-      addExtraFields = true
+      addExtraFields = true,
     } = args0;
 
     const { fields, addFields } = this.props;
@@ -290,35 +285,29 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
     let relevantFields = this.getMutableFields(schema);
 
     // if "fields" prop is specified, restrict list of fields to it
-    if (typeof fields !== 'undefined' && fields.length > 0) {
+    if (typeof fields !== "undefined" && fields.length > 0) {
       relevantFields = _.intersection(relevantFields, fields);
     }
 
     // if "removeFields" prop is specified, remove its fields
     if (excludeRemovedFields) {
       const removeFields = this.props.removeFields;
-      if (typeof removeFields !== 'undefined' && removeFields.length > 0) {
+      if (typeof removeFields !== "undefined" && removeFields.length > 0) {
         relevantFields = _.difference(relevantFields, removeFields);
       }
     }
 
     // if "addFields" prop is specified, add its fields
-    if (
-      addExtraFields &&
-      typeof addFields !== 'undefined' &&
-      addFields.length > 0
-    ) {
+    if (addExtraFields && typeof addFields !== "undefined" && addFields.length > 0) {
       relevantFields = relevantFields.concat(addFields);
     }
 
     // remove all hidden fields
     if (excludeHiddenFields) {
       const document = this.getDocument();
-      relevantFields = _.reject(relevantFields, fieldName => {
+      relevantFields = _.reject(relevantFields, (fieldName) => {
         const hidden = schema[fieldName].hidden;
-        return typeof hidden === 'function'
-          ? hidden({ ...this.props, document })
-          : hidden;
+        return typeof hidden === "function" ? hidden({ ...this.props, document }) : hidden;
       });
     }
 
@@ -339,12 +328,12 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
       name: fieldName,
       datatype: fieldSchema.type,
       layout: this.props.layout || "horizontal",
-      input: fieldSchema.input || fieldSchema.control
+      input: fieldSchema.input || fieldSchema.control,
     };
     field.label = this.getLabel(fieldName);
 
     // if options are a function, call it
-    if (typeof field.options === 'function') {
+    if (typeof field.options === "function") {
       field.options = field.options.call(fieldSchema, this.props);
     }
 
@@ -353,10 +342,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
     const inputProperties = fieldSchema.form || {};
     for (const prop in inputProperties) {
       const property = inputProperties[prop];
-      (field as AnyBecauseTodo)[prop] =
-        isFunction(property)
-          ? property.call(fieldSchema, this.props)
-          : property;
+      (field as AnyBecauseTodo)[prop] = isFunction(property) ? property.call(fieldSchema, this.props) : property;
     }
 
     // add description as help prop
@@ -388,16 +374,18 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
     }
     return field;
   };
-  handleFieldChildren = (field: FormFieldUnfinished<N>, fieldName: string, fieldSchema: any, mutableFields: any, schema: any) => {
+  handleFieldChildren = (
+    field: FormFieldUnfinished<N>,
+    fieldName: string,
+    fieldSchema: any,
+    mutableFields: any,
+    schema: any,
+  ) => {
     // array field
     if (fieldSchema.field) {
       field.arrayFieldSchema = fieldSchema.field;
       // create a field that can be exploited by the form
-      field.arrayField = this.createArraySubField(
-        fieldName,
-        field.arrayFieldSchema,
-        mutableFields
-      );
+      field.arrayField = this.createArraySubField(fieldName, field.arrayFieldSchema, mutableFields);
 
       //field.nestedInput = true
     }
@@ -409,15 +397,10 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
       // get nested schema
       // for each nested field, get field object by calling createField recursively
       field.nestedFields = this.getFieldNames({
-        schema: field.nestedSchema, addExtraFields: false
-      }).map(subFieldName => {
-        return this.createField(
-          subFieldName,
-          field.nestedSchema,
-          mutableFields,
-          fieldName,
-          field.path
-        );
+        schema: field.nestedSchema,
+        addExtraFields: false,
+      }).map((subFieldName) => {
+        return this.createField(subFieldName, field.nestedSchema, mutableFields, fieldName, field.path);
       });
     }
     return field;
@@ -494,8 +477,8 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
     console.log(formErrors);
 
     // add error(s) to state
-    this.setState(prevState => ({
-      errors: [...prevState.errors, ...formErrors]
+    this.setState((prevState) => ({
+      errors: [...prevState.errors, ...formErrors],
     }));
   };
 
@@ -505,7 +488,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
 
   */
   clearFieldErrors = (path: string) => {
-    const errors = this.state.errors.filter(error => error.path !== path);
+    const errors = this.state.errors.filter((error) => error.path !== path);
     this.setState({ errors });
   };
 
@@ -515,8 +498,8 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
 
   // add something to deleted values
   addToDeletedValues = (name: string) => {
-    this.setState(prevState => ({
-      deletedValues: [...prevState.deletedValues, name]
+    this.setState((prevState) => ({
+      deletedValues: [...prevState.deletedValues, name],
     }));
   };
 
@@ -526,8 +509,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
     this.submitFormCallbacks.push(callback);
     return () => {
       const index = this.submitFormCallbacks.indexOf(callback);
-      if (index >= 0)
-        this.submitFormCallbacks.splice(index, 1);
+      if (index >= 0) this.submitFormCallbacks.splice(index, 1);
     };
   };
 
@@ -537,8 +519,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
     this.successFormCallbacks.push(callback);
     return () => {
       const index = this.successFormCallbacks.indexOf(callback);
-      if (index >= 0)
-        this.successFormCallbacks.splice(index, 1);
+      if (index >= 0) this.successFormCallbacks.splice(index, 1);
     };
   };
 
@@ -548,8 +529,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
     this.failureFormCallbacks.push(callback);
     return () => {
       const index = this.failureFormCallbacks.indexOf(callback);
-      if (index >= 0)
-        this.failureFormCallbacks.splice(index, 1);
+      if (index >= 0) this.failureFormCallbacks.splice(index, 1);
     };
   };
 
@@ -578,7 +558,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
       addToFailureForm: this.addToFailureForm,
       errors: this.state.errors,
       currentValues: this.state.currentValues,
-      deletedValues: this.state.deletedValues
+      deletedValues: this.state.deletedValues,
     };
   };
 
@@ -599,11 +579,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
       const prev = this.props[prop];
       const next = nextProps[prop];
       if (!isEqual(prev, next)) {
-        if (
-          prop === "currentUser" &&
-          prev._id === next._id &&
-          prev.acceptedTos !== next.acceptedTos
-        ) {
+        if (prop === "currentUser" && prev._id === next._id && prev.acceptedTos !== next.acceptedTos) {
           continue;
         }
         this.setState(getInitialStateFromProps(nextProps));
@@ -617,52 +593,54 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
   // a React state update, this is not immediate.
   updateCurrentValues = async (newValues: AnyBecauseTodo, options: any = {}) => {
     // default to overwriting old value with new
-    const { mode = 'overwrite' } = options;
+    const { mode = "overwrite" } = options;
     const { autoSubmit, changeCallback } = this.props;
 
     // keep the previous ones and extend (with possible replacement) with new ones
     return new Promise<void>((resolve, reject) => {
-      this.setState(prevState => {
-        // keep only the relevant properties
-        const newState = {
-          currentValues: cloneDeep(prevState.currentValues),
-          currentDocument: cloneDeep(prevState.currentDocument),
-          deletedValues: prevState.deletedValues,
-        };
-  
-        Object.keys(newValues).forEach(key => {
-          const path = key;
-          let value = newValues[key];
-  
-          if (isEmptyValue(value)) {
-            // delete value
-            unset(newState.currentValues, path);
-            set(newState.currentDocument, path, null);
-            newState.deletedValues = [...prevState.deletedValues, path];
-          } else {
-  
-            // 1. update currentValues
-            set(newState.currentValues, path, value);
-  
-            // 2. update currentDocument
-            // For arrays and objects, give option to merge instead of overwrite
-            if (mode === 'merge' && (Array.isArray(value) || isObject(value))) {
-              const oldValue = get(newState.currentDocument, path);
-              set(newState.currentDocument, path, merge(oldValue, value));
+      this.setState(
+        (prevState) => {
+          // keep only the relevant properties
+          const newState = {
+            currentValues: cloneDeep(prevState.currentValues),
+            currentDocument: cloneDeep(prevState.currentDocument),
+            deletedValues: prevState.deletedValues,
+          };
+
+          Object.keys(newValues).forEach((key) => {
+            const path = key;
+            let value = newValues[key];
+
+            if (isEmptyValue(value)) {
+              // delete value
+              unset(newState.currentValues, path);
+              set(newState.currentDocument, path, null);
+              newState.deletedValues = [...prevState.deletedValues, path];
             } else {
-              set(newState.currentDocument, path, value);
+              // 1. update currentValues
+              set(newState.currentValues, path, value);
+
+              // 2. update currentDocument
+              // For arrays and objects, give option to merge instead of overwrite
+              if (mode === "merge" && (Array.isArray(value) || isObject(value))) {
+                const oldValue = get(newState.currentDocument, path);
+                set(newState.currentDocument, path, merge(oldValue, value));
+              } else {
+                set(newState.currentDocument, path, value);
+              }
+
+              // 3. in case value had previously been deleted, "undelete" it
+              newState.deletedValues = _.without(prevState.deletedValues, path);
             }
-  
-            // 3. in case value had previously been deleted, "undelete" it
-            newState.deletedValues = _.without(prevState.deletedValues, path);
-          }
-        });
-        if (changeCallback) changeCallback(newState.currentDocument);
-        return newState;
-      }, () => {
-        if (autoSubmit) void this.submitForm();
-        return resolve()
-      })
+          });
+          if (changeCallback) changeCallback(newState.currentDocument);
+          return newState;
+        },
+        () => {
+          if (autoSubmit) void this.submitForm();
+          return resolve();
+        },
+      );
     });
   };
 
@@ -674,18 +652,21 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
   componentDidMount = () => {
     this.checkRouteChange();
     this.checkBrowserClosing();
-    
+
     if (this.formRef.current) {
       // Attack a keyboard event handler with `{capture:true}` (rather than using
       // a normal event handler with `onKeyDown)`. We do this so that if the
       // key event turns out to be Cmd+Enter, we can call `stopPropagation` on
       // it so that it submits without also inserting a newline.
-      this.formRef.current.addEventListener('keydown',
+      this.formRef.current.addEventListener(
+        "keydown",
         (ev: KeyboardEvent) => {
-          this.formKeyDown(ev)
-        }, { capture: true });
+          this.formKeyDown(ev);
+        },
+        { capture: true },
+      );
     }
-  }
+  };
 
   /*
   Remove the closing browser check on component unmount
@@ -702,15 +683,14 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
     }
   };
 
-
   // -------------------- Check on form leaving ----- //
 
   /**
    * Check if we must warn user on unsaved change
    */
   getWarnUnsavedChanges = () => {
-    return false
-  }
+    return false;
+  };
 
   // check for route change, prevent form content loss
   checkRouteChange = () => {
@@ -726,14 +706,14 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
       });
     }
      */
-  }
+  };
   // check for browser closing
   checkBrowserClosing = () => {
     if (this.getWarnUnsavedChanges()) {
       //check for closing the browser with unsaved changes too
       (window as any).onbeforeunload = this.handlePageLeave;
     }
-  }
+  };
 
   /*
   Check if the user has unsaved changes, returns a message if yes
@@ -753,7 +733,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
    */
   handlePageLeave = (event: AnyBecauseTodo) => {
     if (this.isChanged()) {
-      const message = "Discard changes?"
+      const message = "Discard changes?";
       if (event) {
         event.returnValue = message;
       }
@@ -776,7 +756,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
       });
     });
 
-    return typeof changedValue !== 'undefined';
+    return typeof changedValue !== "undefined";
   };
 
   /*
@@ -813,15 +793,15 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
    *  Document to use as new initial document when values are cleared instead of
    *  the existing one. Note that prefilled props will be merged
    */
-  clearForm = ({ document=null }) => {
-    document = document ? merge({}, this.props.prefilledProps||{}, document) : null;
-    this.setState(prevState => ({
+  clearForm = ({ document = null }) => {
+    document = document ? merge({}, this.props.prefilledProps || {}, document) : null;
+    this.setState((prevState) => ({
       errors: [],
       currentValues: {},
       deletedValues: [],
       currentDocument: document || prevState.initialDocument,
       initialDocument: document || prevState.initialDocument,
-      disabled: false
+      disabled: false,
     }));
   };
 
@@ -838,26 +818,26 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
   };
 
   newMutationSuccessCallback = (result: AnyBecauseTodo, submitOptions?: AnyBecauseTodo) => {
-    this.mutationSuccessCallback(result, 'new', submitOptions);
+    this.mutationSuccessCallback(result, "new", submitOptions);
   };
 
   editMutationSuccessCallback = (result: AnyBecauseTodo, submitOptions?: AnyBecauseTodo) => {
-    this.mutationSuccessCallback(result, 'edit', submitOptions);
+    this.mutationSuccessCallback(result, "edit", submitOptions);
   };
 
   mutationSuccessCallback = (result: AnyBecauseTodo, mutationType: AnyBecauseTodo, submitOptions?: AnyBecauseTodo) => {
-    this.setState(prevState => ({ disabled: false }));
+    this.setState((prevState) => ({ disabled: false }));
     let document = result.data[Object.keys(result.data)[0]].data; // document is always on first property
 
     // for new mutation, run refetch function if it exists
-    if (mutationType === 'new' && this.props.refetch) this.props.refetch();
+    if (mutationType === "new" && this.props.refetch) this.props.refetch();
 
     // call the clear form method (i.e. trigger setState) only if the form has not been unmounted
     // (we are in an async callback, everything can happen!)
     // avoid doing this if we're autosaving a new post without reloading
     if (this.formRef.current) {
       this.clearForm({
-        document: mutationType === 'edit' || submitOptions?.noReload ? document : undefined
+        document: mutationType === "edit" || submitOptions?.noReload ? document : undefined,
       });
     }
 
@@ -872,30 +852,32 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
     if (this.props.successCallback) {
       this.props.successCallback(document, {
         form: this,
-        submitOptions
+        submitOptions,
       });
     }
   };
 
   // catch graphql errors
   mutationErrorCallback = (document: AnyBecauseTodo, error: AnyBecauseTodo) => {
-    this.setState(prevState => ({ disabled: false }));
+    this.setState((prevState) => ({ disabled: false }));
 
     // eslint-disable-next-line no-console
-    console.log('// graphQL Error');
-    // Error is sometimes actually a ApolloError which wraps a real 
+    console.log("// graphQL Error");
+    // Error is sometimes actually a ApolloError which wraps a real
     // error, and displaying this is surprisingly hard. See this:
     // https://stackoverflow.com/questions/18391212/is-it-not-possible-to-stringify-an-error-using-json-stringify
     // eslint-disable-next-line no-console
-    console.log(JSON.stringify(error, (key: AnyBecauseTodo, value) =>
-      (value instanceof Error) ?
-        Object.getOwnPropertyNames(value).reduce((ac: AnyBecauseTodo, propName: AnyBecauseTodo) => {
-          ac[propName] = (value as AnyBecauseTodo)[propName];
-          return ac;
-        }, {})
-        : value
-    ))
-  
+    console.log(
+      JSON.stringify(error, (key: AnyBecauseTodo, value) =>
+        value instanceof Error
+          ? Object.getOwnPropertyNames(value).reduce((ac: AnyBecauseTodo, propName: AnyBecauseTodo) => {
+              ac[propName] = (value as AnyBecauseTodo)[propName];
+              return ac;
+            }, {})
+          : value,
+      ),
+    );
+
     // run mutation failure callbacks on error, we do not allow the callbacks to change the error
     runCallbacksList({
       callbacks: this.failureFormCallbacks,
@@ -924,7 +906,6 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
 
   */
   submitForm = async (event?: any, submitOptions?: any) => {
-
     event && event.preventDefault();
 
     // if form is disabled (there is already a submit handler running) don't do anything
@@ -933,7 +914,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
     }
 
     // clear errors and disable form while it's submitting
-    this.setState(prevState => ({ errors: [], disabled: true }));
+    this.setState((prevState) => ({ errors: [], disabled: true }));
 
     // complete the data with values from custom components
     // note: it follows the same logic as SmartForm's getDocument method
@@ -944,12 +925,12 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
       data = this.props.submitCallback(data) || data;
     }
 
-    if (this.getFormType() === 'new') {
+    if (this.getFormType() === "new") {
       // create document form
       try {
         const result = await this.props.createMutation({ data });
         this.newMutationSuccessCallback(result, submitOptions);
-      } catch(error) {
+      } catch (error) {
         this.mutationErrorCallback(document, error);
       }
     } else {
@@ -958,10 +939,10 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
       try {
         const result = await this.props.updateMutation({
           selector: { documentId },
-          data
+          data,
         });
         this.editMutationSuccessCallback(result, submitOptions);
-      } catch(error) {
+      } catch (error) {
         this.mutationErrorCallback(document, error);
       }
     }
@@ -975,7 +956,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
   deleteDocument = () => {
     const document = this.getDocument();
     const documentId = this.props.document?._id;
-    const documentTitle = document.title || document.name || '';
+    const documentTitle = document.title || document.name || "";
 
     const deleteDocumentConfirm = "Delete document?";
 
@@ -984,8 +965,7 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
         .removeMutation({ documentId })
         .then((mutationResult: AnyBecauseTodo) => {
           // the mutation result looks like {data:{collectionRemove: null}} if succeeded
-          if (this.props.removeSuccessCallback)
-            this.props.removeSuccessCallback({ documentId, documentTitle });
+          if (this.props.removeSuccessCallback) this.props.removeSuccessCallback({ documentId, documentTitle });
           if (this.props.refetch) this.props.refetch();
         })
         .catch((error: AnyBecauseTodo) => {
@@ -994,7 +974,6 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
         });
     }
   };
-
 
   // --------------------------------------------------------------------- //
   // ----------------------------- Render -------------------------------- //
@@ -1005,14 +984,12 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
 
     return (
       <form
-        className={'vulcan-form document-' + this.getFormType()}
+        className={"vulcan-form document-" + this.getFormType()}
         id={this.props.id}
         onSubmit={this.submitForm}
         ref={this.formRef}
       >
-        <FormComponents.FormErrors
-          errors={this.state.errors}
-        />
+        <FormComponents.FormErrors errors={this.state.errors} />
 
         {this.getFieldGroups().map((group, i) => (
           <FormComponents.FormGroup
@@ -1034,31 +1011,26 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
           />
         ))}
 
-        {this.props.repeatErrors && <FormComponents.FormErrors
-          errors={this.state.errors}
-        />}
+        {this.props.repeatErrors && <FormComponents.FormErrors errors={this.state.errors} />}
 
-        {!this.props.autoSubmit && <FormComponents.FormSubmit
-          submitLabel={this.props.submitLabel}
-          cancelLabel={this.props.cancelLabel}
-          revertLabel={this.props.revertLabel}
-          cancelCallback={this.props.cancelCallback}
-          revertCallback={this.props.revertCallback}
-          submitForm={this.submitForm}
-          updateCurrentValues={this.updateCurrentValues}
-          formType={this.getFormType()}
-          document={this.getDocument()}
-          deleteDocument={
-            (this.getFormType() === 'edit' &&
-              this.props.showRemove &&
-              this.deleteDocument) ||
-            null
-          }
-          collectionName={this.props.collectionName}
-          currentValues={this.state.currentValues}
-          deletedValues={this.state.deletedValues}
-          errors={this.state.errors}
-        />}
+        {!this.props.autoSubmit && (
+          <FormComponents.FormSubmit
+            submitLabel={this.props.submitLabel}
+            cancelLabel={this.props.cancelLabel}
+            revertLabel={this.props.revertLabel}
+            cancelCallback={this.props.cancelCallback}
+            revertCallback={this.props.revertCallback}
+            submitForm={this.submitForm}
+            updateCurrentValues={this.updateCurrentValues}
+            formType={this.getFormType()}
+            document={this.getDocument()}
+            deleteDocument={(this.getFormType() === "edit" && this.props.showRemove && this.deleteDocument) || null}
+            collectionName={this.props.collectionName}
+            currentValues={this.state.currentValues}
+            deletedValues={this.state.deletedValues}
+            errors={this.state.errors}
+          />
+        )}
       </form>
     );
   }
@@ -1114,5 +1086,5 @@ export class Form<N extends CollectionNameString> extends Component<SmartFormPro
   getLabel: PropTypes.func,
   submitForm: PropTypes.func,
   errors: PropTypes.array,
-  currentValues: PropTypes.object
+  currentValues: PropTypes.object,
 };

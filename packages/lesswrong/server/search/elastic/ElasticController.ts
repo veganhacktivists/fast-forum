@@ -3,12 +3,10 @@ import { isValidSearchQuery } from "./SearchQuery";
 import ElasticService from "./ElasticService";
 
 class ElasticController {
-  constructor(
-    private searchService = new ElasticService(),
-  ) {}
+  constructor(private searchService = new ElasticService()) {}
 
   private async onSearch(req: Request, res: Response) {
-    const {body} = req;
+    const { body } = req;
     if (!Array.isArray(body)) {
       res.status(400).send("Expected an array of queries");
       return;
@@ -33,7 +31,7 @@ class ElasticController {
   static addRoutes(app: Application) {
     const controller = new ElasticController();
     const route = "/api/search";
-    app.use(route, json({limit: "1mb"}));
+    app.use(route, json({ limit: "1mb" }));
     app.post(route, controller.onSearch.bind(controller));
   }
 }

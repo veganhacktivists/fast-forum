@@ -19,9 +19,7 @@ class PostgresView {
   }
 
   async createIndexes(db: SqlClient) {
-    await Promise.all(this.createIndexQueries.map((index) =>
-      queryWithLock(db, index, this.queryTimeout),
-    ));
+    await Promise.all(this.createIndexQueries.map((index) => queryWithLock(db, index, this.queryTimeout)));
   }
 
   async refresh(db: SqlClient) {
@@ -43,18 +41,14 @@ export const createPostgresView = (
       return;
     }
   }
-  const view = new PostgresView(
-    createViewQuery,
-    createIndexQueries,
-    refreshQuery,
-  );
+  const view = new PostgresView(createViewQuery, createIndexQueries, refreshQuery);
   postgresViews.push(view);
-}
+};
 
 export const ensurePostgresViewsExist = async (db = getSqlClientOrThrow()) => {
   await Promise.all(postgresViews.map((view) => view.createView(db)));
   await Promise.all(postgresViews.map((view) => view.createIndexes(db)));
-}
+};
 
 addCronJob({
   name: "refreshPostgresViews",

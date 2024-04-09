@@ -1,7 +1,7 @@
-import { mergeFeedQueries, defineFeedResolver, viewBasedSubquery } from '../utils/feedUtil';
-import { Comments } from '../../lib/collections/comments/collection';
-import { Tags } from '../../lib/collections/tags/collection';
-import { Revisions } from '../../lib/collections/revisions/collection';
+import { mergeFeedQueries, defineFeedResolver, viewBasedSubquery } from "../utils/feedUtil";
+import { Comments } from "../../lib/collections/comments/collection";
+import { Tags } from "../../lib/collections/tags/collection";
+import { Revisions } from "../../lib/collections/revisions/collection";
 
 defineFeedResolver<Date>({
   name: "AllTagsActivityFeed",
@@ -12,15 +12,25 @@ defineFeedResolver<Date>({
     tagRevision: Revision
     tagDiscussionComment: Comment
   `,
-  resolver: async ({limit=20, cutoff, offset, args, context}: {
-    limit?: number, cutoff?: Date, offset?: number,
-    args: {af: boolean},
-    context: ResolverContext
+  resolver: async ({
+    limit = 20,
+    cutoff,
+    offset,
+    args,
+    context,
+  }: {
+    limit?: number;
+    cutoff?: Date;
+    offset?: number;
+    args: { af: boolean };
+    context: ResolverContext;
   }) => {
     type SortKeyType = Date;
-    
+
     const result = await mergeFeedQueries<SortKeyType>({
-      limit, cutoff, offset,
+      limit,
+      cutoff,
+      offset,
       subqueries: [
         // Tag creation
         viewBasedSubquery({
@@ -28,7 +38,7 @@ defineFeedResolver<Date>({
           collection: Tags,
           sortField: "createdAt",
           context,
-          selector: {}
+          selector: {},
         }),
         // Tag revisions
         viewBasedSubquery({
@@ -39,14 +49,17 @@ defineFeedResolver<Date>({
           selector: {
             collectionName: "Tags",
             fieldName: "description",
-            
+
             // Exclude no-change revisions (sometimes produced as a byproduct of
             // imports, metadata changes, etc)
-            $or: [{
-              "changeMetrics.added": {$gt: 0},
-            }, {
-              "changeMetrics.removed": {$gt: 0},
-            }]
+            $or: [
+              {
+                "changeMetrics.added": { $gt: 0 },
+              },
+              {
+                "changeMetrics.removed": { $gt: 0 },
+              },
+            ],
           },
         }),
         // Tag discussion comments
@@ -56,12 +69,11 @@ defineFeedResolver<Date>({
           sortField: "postedAt",
           context,
           selector: {
-            tagId: {$ne: null},
+            tagId: { $ne: null },
           },
         }),
       ],
     });
     return result;
-  }
+  },
 });
-

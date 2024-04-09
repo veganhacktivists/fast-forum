@@ -12,7 +12,7 @@ const ElectionVotes: ElectionVotesCollection = createCollection({
   schema,
   resolvers: getDefaultResolvers("ElectionVotes"),
   mutations: getDefaultMutations("ElectionVotes", {
-    newCheck: (user: DbUser|null) => {
+    newCheck: (user: DbUser | null) => {
       if (!user) return false;
       if (isAdmin(user)) return true;
 
@@ -25,7 +25,7 @@ const ElectionVotes: ElectionVotesCollection = createCollection({
 
       return true;
     },
-    editCheck: async (user: DbUser|null, document: DbElectionVote|null) => {
+    editCheck: async (user: DbUser | null, document: DbElectionVote | null) => {
       if (!user || !document) return false;
       if (isAdmin(user)) return true;
 
@@ -47,6 +47,6 @@ addUniversalFields({
   collection: ElectionVotes,
 });
 
-ensureIndex(ElectionVotes, {electionName: 1, userId: 1}, {unique: true});
+ensureIndex(ElectionVotes, { electionName: 1, userId: 1 }, { unique: true });
 
 export default ElectionVotes;

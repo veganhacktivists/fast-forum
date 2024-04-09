@@ -1,19 +1,19 @@
-import classNames from 'classnames';
-import React, { useCallback, useState } from 'react';
-import { useLocation } from '../../../lib/routeUtil';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
+import classNames from "classnames";
+import React, { useCallback, useState } from "react";
+import { useLocation } from "../../../lib/routeUtil";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
 import { AnalyticsContext, useTracking } from "../../../lib/analyticsEvents";
-import { EditTagForm } from '../EditTagPage';
-import { useApolloClient } from '@apollo/client/react';
+import { EditTagForm } from "../EditTagPage";
+import { useApolloClient } from "@apollo/client/react";
 import truncateTagDescription from "../../../lib/utils/truncateTagDescription";
-import { taggingNamePluralSetting } from '../../../lib/instanceSettings';
-import { truncate } from '../../../lib/editor/ellipsize';
-import { tagPageHeaderStyles, tagPostTerms } from '../TagPage';
-import { useOnSearchHotkey } from '../../common/withGlobalKeydown';
-import { MAX_COLUMN_WIDTH } from '../../posts/PostsPage/PostsPage';
-import { tagMinimumKarmaPermissions, tagUserHasSufficientKarma } from '../../../lib/collections/tags/helpers';
-import { useCurrentUser } from '../../common/withUser';
-import { isFriendlyUI } from '../../../themes/forumTheme';
+import { taggingNamePluralSetting } from "../../../lib/instanceSettings";
+import { truncate } from "../../../lib/editor/ellipsize";
+import { tagPageHeaderStyles, tagPostTerms } from "../TagPage";
+import { useOnSearchHotkey } from "../../common/withGlobalKeydown";
+import { MAX_COLUMN_WIDTH } from "../../posts/PostsPage/PostsPage";
+import { tagMinimumKarmaPermissions, tagUserHasSufficientKarma } from "../../../lib/collections/tags/helpers";
+import { useCurrentUser } from "../../common/withUser";
+import { isFriendlyUI } from "../../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   centralColumn: {
@@ -23,7 +23,7 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   pastRevisionNotice: {
     ...theme.typography.commentStyle,
-    fontStyle: 'italic'
+    fontStyle: "italic",
   },
   wikiSection: {
     paddingTop: 12,
@@ -37,12 +37,18 @@ const styles = (theme: ThemeType): JssStyles => ({
   ...tagPageHeaderStyles(theme),
 });
 
-const SubforumWikiTab = ({tag, revision, truncated, setTruncated, classes}: {
-  tag: TagPageFragment | TagPageWithRevisionFragment,
-  revision?: string,
-  truncated: boolean,
-  setTruncated: (truncated: boolean) => void,
-  classes: ClassesType,
+const SubforumWikiTab = ({
+  tag,
+  revision,
+  truncated,
+  setTruncated,
+  classes,
+}: {
+  tag: TagPageFragment | TagPageWithRevisionFragment;
+  revision?: string;
+  truncated: boolean;
+  setTruncated: (truncated: boolean) => void;
+  classes: ClassesType;
 }) => {
   const {
     PostsListSortDropdown,
@@ -59,39 +65,46 @@ const SubforumWikiTab = ({tag, revision, truncated, setTruncated, classes}: {
 
   const currentUser = useCurrentUser();
   const { query } = useLocation();
-  const client = useApolloClient()
-  const { captureEvent } =  useTracking()
+  const client = useApolloClient();
+  const { captureEvent } = useTracking();
   const terms = {
     ...tagPostTerms(tag, query),
-    limit: 15
-  }
-  
-  const [editing, setEditing] = useState(!!query.edit || !!query.flagId)
-  useOnSearchHotkey(() => setTruncated(false));
-  
-  if (editing && !tagUserHasSufficientKarma(currentUser, "edit")) {
-    throw new Error(`Sorry, you cannot edit ${taggingNamePluralSetting.get()} without ${tagMinimumKarmaPermissions.edit} or more karma.`)
-  }
-  
-  const clickReadMore = useCallback(() => {
-    setTruncated(false)
-    captureEvent("readMoreClicked", {tagId: tag._id, tagName: tag.name, pageSectionContext: "wikiSection"})
-  }, [captureEvent, setTruncated, tag._id, tag.name])
+    limit: 15,
+  };
 
-  const htmlWithAnchors = tag.tableOfContents?.html ?? tag.description?.html ?? ""
+  const [editing, setEditing] = useState(!!query.edit || !!query.flagId);
+  useOnSearchHotkey(() => setTruncated(false));
+
+  if (editing && !tagUserHasSufficientKarma(currentUser, "edit")) {
+    throw new Error(
+      `Sorry, you cannot edit ${taggingNamePluralSetting.get()} without ${tagMinimumKarmaPermissions.edit} or more karma.`,
+    );
+  }
+
+  const clickReadMore = useCallback(() => {
+    setTruncated(false);
+    captureEvent("readMoreClicked", { tagId: tag._id, tagName: tag.name, pageSectionContext: "wikiSection" });
+  }, [captureEvent, setTruncated, tag._id, tag.name]);
+
+  const htmlWithAnchors = tag.tableOfContents?.html ?? tag.description?.html ?? "";
   let description = htmlWithAnchors;
   // EA Forum wants to truncate much less than LW
-  if(isFriendlyUI) {
-    description = truncated
-      ? truncateTagDescription(htmlWithAnchors, tag.descriptionTruncationCount)
-      : htmlWithAnchors;
+  if (isFriendlyUI) {
+    description = truncated ? truncateTagDescription(htmlWithAnchors, tag.descriptionTruncationCount) : htmlWithAnchors;
   } else {
-    description = (truncated && !tag.wikiOnly)
-      ? truncate(htmlWithAnchors, tag.descriptionTruncationCount || 4, "paragraphs", "<span>...<p><a>(Read More)</a></p></span>")
-      : htmlWithAnchors
+    description =
+      truncated && !tag.wikiOnly
+        ? truncate(
+            htmlWithAnchors,
+            tag.descriptionTruncationCount || 4,
+            "paragraphs",
+            "<span>...<p><a>(Read More)</a></p></span>",
+          )
+        : htmlWithAnchors;
   }
 
-  return <>
+  return (
+    <>
       <div className={classNames(classes.wikiSection, classes.centralColumn)}>
         <TagPageButtonRow tag={tag} editing={editing} setEditing={setEditing} />
         <AnalyticsContext pageSectionContext="wikiSection">
@@ -139,14 +152,13 @@ const SubforumWikiTab = ({tag, revision, truncated, setTruncated, classes}: {
         )}
       </div>
     </>
-}
+  );
+};
 
-const SubforumWikiTabComponent = registerComponent(
-  'SubforumWikiTab', SubforumWikiTab, {styles}
-);
+const SubforumWikiTabComponent = registerComponent("SubforumWikiTab", SubforumWikiTab, { styles });
 
 declare global {
   interface ComponentTypes {
-    SubforumWikiTab: typeof SubforumWikiTabComponent
+    SubforumWikiTab: typeof SubforumWikiTabComponent;
   }
 }

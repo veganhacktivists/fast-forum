@@ -1,11 +1,11 @@
-import React from 'react';
-import { registerComponent, Components } from '../../../lib/vulcan-lib';
-import type { ToCAnswer } from '../../../lib/tableOfContents';
+import React from "react";
+import { registerComponent, Components } from "../../../lib/vulcan-lib";
+import type { ToCAnswer } from "../../../lib/tableOfContents";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     marginLeft: -theme.spacing.unit,
-    display: "flex"
+    display: "flex",
   },
   karma: {
     display: "inline-block",
@@ -16,13 +16,13 @@ const styles = (theme: ThemeType): JssStyles => ({
     fontFamily: theme.typography.commentStyle.fontFamily,
   },
   tooltip: {
-    wordBreak: "break-word"
+    wordBreak: "break-word",
   },
   tooltipKarma: {
     fontStyle: "italic",
-    marginBottom: theme.spacing.unit*2,
-    display:"flex",
-    justifyContent: "space-between"
+    marginBottom: theme.spacing.unit * 2,
+    display: "flex",
+    justifyContent: "space-between",
   },
   firstLine: {
     width: "calc(100% - 20px)",
@@ -32,49 +32,46 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   author: {
     fontFamily: theme.typography.commentStyle.fontFamily,
-    marginBottom: 4
-  }
-})
+    marginBottom: 4,
+  },
+});
 
-const AnswerTocRow = ({classes, answer}: {
-  classes: ClassesType,
-  answer: ToCAnswer,
-}) => {
-  const { LWTooltip, FormatDate } = Components
+const AnswerTocRow = ({ classes, answer }: { classes: ClassesType; answer: ToCAnswer }) => {
+  const { LWTooltip, FormatDate } = Components;
 
-  const tooltip = <div>
-    <div className={classes.tooltipKarma}>
-      <div>
-        { answer.baseScore } karma ({answer.voteCount} votes)
+  const tooltip = (
+    <div>
+      <div className={classes.tooltipKarma}>
+        <div>
+          {answer.baseScore} karma ({answer.voteCount} votes)
+        </div>
+        <div>
+          Posted <FormatDate date={answer.postedAt} tooltip={false} /> ago
+        </div>
       </div>
-      <div>
-        Posted <FormatDate date={answer.postedAt} tooltip={false} /> ago
-      </div>
+      <div dangerouslySetInnerHTML={{ __html: answer.highlight }} className={classes.tooltip} />
     </div>
-    <div dangerouslySetInnerHTML={{__html:answer.highlight}} className={classes.tooltip} />
-  </div>
+  );
 
-  return <div>
-    <LWTooltip title={tooltip} placement="right-start">
-      <span className={classes.root}>
-        <span className={classes.karma}>
-          {answer.baseScore}
+  return (
+    <div>
+      <LWTooltip title={tooltip} placement="right-start">
+        <span className={classes.root}>
+          <span className={classes.karma}>{answer.baseScore}</span>
+          <span className={classes.firstLine}>
+            <div className={classes.author}>{answer.author}</div>
+            <div>{answer.shortHighlight}</div>
+          </span>
         </span>
-        <span className={classes.firstLine}>
-          <div className={classes.author}>{answer.author}</div> 
-          <div>
-            { answer.shortHighlight }
-          </div>
-        </span>
-      </span>
-    </LWTooltip>
-  </div>
-}
+      </LWTooltip>
+    </div>
+  );
+};
 
-const AnswerTocRowComponent = registerComponent('AnswerTocRow', AnswerTocRow, {styles});
+const AnswerTocRowComponent = registerComponent("AnswerTocRow", AnswerTocRow, { styles });
 
 declare global {
   interface ComponentTypes {
-    AnswerTocRow: typeof AnswerTocRowComponent
+    AnswerTocRow: typeof AnswerTocRowComponent;
   }
 }

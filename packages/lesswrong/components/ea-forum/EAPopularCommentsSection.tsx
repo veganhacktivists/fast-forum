@@ -4,14 +4,14 @@ import { useExpandedFrontpageSection } from "../hooks/useExpandedFrontpageSectio
 import { SHOW_POPULAR_COMMENTS_SECTION_COOKIE } from "../../lib/cookies/cookies";
 
 const EAPopularCommentsSection = () => {
-  const {expanded, toggleExpanded} = useExpandedFrontpageSection({
+  const { expanded, toggleExpanded } = useExpandedFrontpageSection({
     section: "popularComments",
     defaultExpanded: "all",
     onExpandEvent: "popularCommentsSectionExpanded",
     onCollapseEvent: "popularCommentsSectionCollapsed",
     cookieName: SHOW_POPULAR_COMMENTS_SECTION_COOKIE,
   });
-  const {ExpandableSection, PopularCommentsList} = Components;
+  const { ExpandableSection, PopularCommentsList } = Components;
   return (
     <ExpandableSection
       pageSectionContext="popularCommentsSection"
@@ -21,15 +21,12 @@ const EAPopularCommentsSection = () => {
       Content={PopularCommentsList}
     />
   );
-}
+};
 
-const EAPopularCommentsSectionComponent = registerComponent(
-  "EAPopularCommentsSection",
-  EAPopularCommentsSection,
-);
+const EAPopularCommentsSectionComponent = registerComponent("EAPopularCommentsSection", EAPopularCommentsSection);
 
 declare global {
   interface ComponentTypes {
-    EAPopularCommentsSection: typeof EAPopularCommentsSectionComponent
+    EAPopularCommentsSection: typeof EAPopularCommentsSectionComponent;
   }
 }

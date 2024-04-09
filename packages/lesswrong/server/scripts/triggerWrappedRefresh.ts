@@ -11,7 +11,7 @@ import { Globals } from "../vulcan-lib";
 //   state
 // FROM pg_stat_activity order by duration desc;
 
-const USER_ENGAGEMENT_VIEW_NAME = 'user_engagement_wrapped_2023';
+const USER_ENGAGEMENT_VIEW_NAME = "user_engagement_wrapped_2023";
 const USER_ENGAGEMENT_VIEWDEF = `
 WITH normalized AS (
   SELECT
@@ -76,6 +76,6 @@ const triggerWrappedRefresh = async (recreateViews = false) => {
     console.log(`View ${USER_ENGAGEMENT_VIEW_NAME} does not exist. Creating the view...`);
     await analyticsDb.none(`CREATE MATERIALIZED VIEW ${USER_ENGAGEMENT_VIEW_NAME} AS ${USER_ENGAGEMENT_VIEWDEF};`);
   }
-}
+};
 
 Globals.triggerWrappedRefresh = triggerWrappedRefresh;

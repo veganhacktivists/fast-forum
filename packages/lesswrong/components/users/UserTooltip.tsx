@@ -6,22 +6,26 @@ import { isFriendlyUI } from "../../themes/forumTheme";
 const styles = () => ({
   root: isFriendlyUI
     ? {
-      padding: 12,
-      top: 2,
-    }
+        padding: 12,
+        top: 2,
+      }
     : {},
 });
 
-const UserTooltip = ({user, placement, inlineBlock, children, classes}: {
-  user: UsersMinimumInfo,
-  placement?: PopperPlacementType,
-  inlineBlock?: boolean,
-  children: ReactNode,
-  classes: ClassesType,
+const UserTooltip = ({
+  user,
+  placement,
+  inlineBlock,
+  children,
+  classes,
+}: {
+  user: UsersMinimumInfo;
+  placement?: PopperPlacementType;
+  inlineBlock?: boolean;
+  children: ReactNode;
+  classes: ClassesType;
 }) => {
-  const {
-    EAHoverOver, EAUserTooltipContent, LWTooltip, LWUserTooltipContent,
-  } = Components;
+  const { EAHoverOver, EAUserTooltipContent, LWTooltip, LWUserTooltipContent } = Components;
   const Tooltip = isFriendlyUI ? EAHoverOver : LWTooltip;
   const Content = isFriendlyUI ? EAUserTooltipContent : LWUserTooltipContent;
   return (
@@ -34,12 +38,12 @@ const UserTooltip = ({user, placement, inlineBlock, children, classes}: {
       {children}
     </Tooltip>
   );
-}
+};
 
-const UserTooltipComponent = registerComponent("UserTooltip", UserTooltip, {styles});
+const UserTooltipComponent = registerComponent("UserTooltip", UserTooltip, { styles });
 
 declare global {
   interface ComponentTypes {
-    UserTooltip: typeof UserTooltipComponent
+    UserTooltip: typeof UserTooltipComponent;
   }
 }

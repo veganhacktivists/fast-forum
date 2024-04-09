@@ -1,45 +1,45 @@
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import React, { useEffect } from 'react';
-import type { Hit } from 'react-instantsearch-core';
-import { Snippet } from 'react-instantsearch-dom';
-import LocationIcon from '@material-ui/icons/LocationOn'
-import { isEAForum } from '../../lib/instanceSettings';
-import classNames from 'classnames';
-import { useInitiateConversation } from '../hooks/useInitiateConversation';
-import { useNavigate } from '../../lib/reactRouterWrapper';
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import React, { useEffect } from "react";
+import type { Hit } from "react-instantsearch-core";
+import { Snippet } from "react-instantsearch-dom";
+import LocationIcon from "@material-ui/icons/LocationOn";
+import { isEAForum } from "../../lib/instanceSettings";
+import classNames from "classnames";
+import { useInitiateConversation } from "../hooks/useInitiateConversation";
+import { useNavigate } from "../../lib/reactRouterWrapper";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     maxWidth: 600,
     paddingTop: 2,
     paddingBottom: 2,
-    marginBottom: 18
+    marginBottom: 18,
   },
   link: {
     display: "flex",
     columnGap: 14,
     cursor: "pointer",
-    '&:hover': {
-      opacity: 0.8
-    }
+    "&:hover": {
+      opacity: 0.8,
+    },
   },
   profilePhotoCol: {
-    flex: 'none'
+    flex: "none",
   },
   displayNameRow: {
     display: "flex",
-    flexWrap: 'wrap',
-    alignItems: 'center',
+    flexWrap: "wrap",
+    alignItems: "center",
     columnGap: 16,
-    rowGap: '3px',
+    rowGap: "3px",
     color: theme.palette.grey[600],
     fontSize: 12,
     fontFamily: theme.typography.fontFamily,
   },
   metaInfo: {
     display: "flex",
-    alignItems: 'center',
-    columnGap: 3
+    alignItems: "center",
+    columnGap: 3,
   },
   metaInfoIcon: {
     fontSize: 12,
@@ -55,18 +55,18 @@ const styles = (theme: ThemeType): JssStyles => ({
     fontFamily: theme.typography.fontFamily,
     fontSize: 12,
     color: theme.palette.grey[600],
-    marginTop: 3
+    marginTop: 3,
   },
   snippet: {
     overflowWrap: "break-word",
     fontFamily: theme.typography.fontFamily,
     wordBreak: "break-word",
     fontSize: 14,
-    lineHeight: '21px',
+    lineHeight: "21px",
     color: theme.palette.grey[700],
-    marginTop: 5
-  }
-})
+    marginTop: 5,
+  },
+});
 
 const ExpandedUsersConversationSearchHit = ({
   hit,
@@ -91,7 +91,10 @@ const ExpandedUsersConversationSearchHit = ({
 
   useEffect(() => {
     if (conversation) {
-      navigate({ pathname: `/${isModInbox ? "moderatorInbox" : "inbox"}/${conversation._id}`, search: "?from=new_conversation_dialog" });
+      navigate({
+        pathname: `/${isModInbox ? "moderatorInbox" : "inbox"}/${conversation._id}`,
+        search: "?from=new_conversation_dialog",
+      });
       onClose();
     }
   }, [conversation, navigate, isModInbox, onClose]);
@@ -131,11 +134,14 @@ const ExpandedUsersConversationSearchHit = ({
   );
 };
 
-const ExpandedUsersConversationSearchHitComponent = registerComponent("ExpandedUsersConversationSearchHit", ExpandedUsersConversationSearchHit, {styles});
+const ExpandedUsersConversationSearchHitComponent = registerComponent(
+  "ExpandedUsersConversationSearchHit",
+  ExpandedUsersConversationSearchHit,
+  { styles },
+);
 
 declare global {
   interface ComponentTypes {
-    ExpandedUsersConversationSearchHit: typeof ExpandedUsersConversationSearchHitComponent
+    ExpandedUsersConversationSearchHit: typeof ExpandedUsersConversationSearchHitComponent;
   }
 }
-

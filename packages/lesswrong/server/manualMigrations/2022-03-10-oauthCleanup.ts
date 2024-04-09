@@ -1,5 +1,5 @@
-import { forEachDocumentInCollection, registerMigration } from './migrationUtils';
-import { Users } from '../../lib/collections/users/collection';
+import { forEachDocumentInCollection, registerMigration } from "./migrationUtils";
+import { Users } from "../../lib/collections/users/collection";
 
 registerMigration({
   name: "oauthCleanup",
@@ -10,9 +10,9 @@ registerMigration({
       collection: Users,
       callback: async (user: DbUser) => {
         await maybeFixAccount(user);
-      }
+      },
     });
-  }
+  },
 });
 
 async function maybeFixAccount(user: DbUser): Promise<void> {
@@ -22,18 +22,20 @@ async function maybeFixAccount(user: DbUser): Promise<void> {
   // This would have been created by an OAuth bug where the email field was populated
   // but the emails field was not, for GitHub and Facebook logins.
   // Fix them by setting the emails field to [{address: user.email, verified: true}]
-  if (user.email && isSensibleEmail(user.email) && JSON.stringify(user.emails)==='{"0":{"verified":true}}') {
+  if (user.email && isSensibleEmail(user.email) && JSON.stringify(user.emails) === '{"0":{"verified":true}}') {
     // eslint-disable-next-line no-console
     console.log(`Fixing emails for ${user.slug}`);
     await Users.rawUpdateOne(
-      {_id: user._id},
-      {$set: {
-        emails: [{address: user.email, verified: true}]
-      }}
+      { _id: user._id },
+      {
+        $set: {
+          emails: [{ address: user.email, verified: true }],
+        },
+      },
     );
     return;
   }
-  
+
   // When:
   //  * There is a services.<oauthprovider>.id field that is an object
   //  * services.<oauthprovider>.id.id is a number or a string
@@ -41,26 +43,32 @@ async function maybeFixAccount(user: DbUser): Promise<void> {
   // Move services.<oauthprovider>.id to services.<oauthprovider>
   // This would have been created by an OAuth bug where OAuth profiles merge
   // into the wrong field.
-  for (let oauthProvider of ['google', 'facebook', 'github', 'auth0']) {
+  for (let oauthProvider of ["google", "facebook", "github", "auth0"]) {
     if (user.services?.[oauthProvider]?.id?.id) {
       const realId = user.services[oauthProvider].id.id;
-      if (typeof realId !== 'number' && typeof realId !== 'string') {
+      if (typeof realId !== "number" && typeof realId !== "string") {
         // eslint-disable-next-line no-console
-        console.log(`Can't fix user ${user.slug} with nested OAuth IDs: services.${oauthProvider}.id.id has wrong type`);
+        console.log(
+          `Can't fix user ${user.slug} with nested OAuth IDs: services.${oauthProvider}.id.id has wrong type`,
+        );
         return;
       }
-      const otherUser = await Users.findOne({[`services.${oauthProvider}.id`]: realId});
+      const otherUser = await Users.findOne({ [`services.${oauthProvider}.id`]: realId });
       if (otherUser) {
         // eslint-disable-next-line no-console
-        console.log(`Can't fix user ${user.slug} with nested OAuth IDs: services.${oauthProvider}.id is also taken by account ${otherUser.slug}`);
+        console.log(
+          `Can't fix user ${user.slug} with nested OAuth IDs: services.${oauthProvider}.id is also taken by account ${otherUser.slug}`,
+        );
         return;
       }
-      
+
       await Users.rawUpdateOne(
-        {_id: user._id},
-        {$set: {
-          [`services.${oauthProvider}`]: user.services[oauthProvider].id,
-        }}
+        { _id: user._id },
+        {
+          $set: {
+            [`services.${oauthProvider}`]: user.services[oauthProvider].id,
+          },
+        },
       );
     }
   }

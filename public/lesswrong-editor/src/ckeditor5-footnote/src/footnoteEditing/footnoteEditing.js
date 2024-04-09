@@ -5,28 +5,28 @@
  *  * Upcasting is converting to the platonic ckeditor version.
  *  * Downcasting is converting to the output version.
  */
-import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
-import { viewToModelPositionOutsideModelElement } from '@ckeditor/ckeditor5-widget/src/utils';
-import Widget from '@ckeditor/ckeditor5-widget/src/widget';
-import InsertFootnoteCommand from '../insertfootnotecommand';
-import '../../theme/placeholder.css';
-import '../../theme/footnote.css';
-import ModelElement from '@ckeditor/ckeditor5-engine/src/model/element';
-import ModelWriter from '@ckeditor/ckeditor5-engine/src/model/writer';
-import Batch from '@ckeditor/ckeditor5-engine/src/model/batch';
-import RootElement from '@ckeditor/ckeditor5-engine/src/model/rootelement';
-import { modelQueryElementsAll, modelQueryElement } from '../utils';
-import Autoformat from '@ckeditor/ckeditor5-autoformat/src/autoformat';
+import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import { viewToModelPositionOutsideModelElement } from "@ckeditor/ckeditor5-widget/src/utils";
+import Widget from "@ckeditor/ckeditor5-widget/src/widget";
+import InsertFootnoteCommand from "../insertfootnotecommand";
+import "../../theme/placeholder.css";
+import "../../theme/footnote.css";
+import ModelElement from "@ckeditor/ckeditor5-engine/src/model/element";
+import ModelWriter from "@ckeditor/ckeditor5-engine/src/model/writer";
+import Batch from "@ckeditor/ckeditor5-engine/src/model/batch";
+import RootElement from "@ckeditor/ckeditor5-engine/src/model/rootelement";
+import { modelQueryElementsAll, modelQueryElement } from "../utils";
+import Autoformat from "@ckeditor/ckeditor5-autoformat/src/autoformat";
 
-import { defineSchema } from './schema';
-import { defineConverters } from './converters';
-import { addFootnoteAutoformatting } from './autoformatting';
-import { ATTRIBUTES, COMMANDS, ELEMENTS } from '../constants';
-import GoogleDocsFootnotesNormalizer from './googleDocsFootnotesNormalizer';
+import { defineSchema } from "./schema";
+import { defineConverters } from "./converters";
+import { addFootnoteAutoformatting } from "./autoformatting";
+import { ATTRIBUTES, COMMANDS, ELEMENTS } from "../constants";
+import GoogleDocsFootnotesNormalizer from "./googleDocsFootnotesNormalizer";
 
 export default class FootnoteEditing extends Plugin {
 	static get requires() {
-		return [ Widget, Autoformat ];
+		return [Widget, Autoformat];
 	}
 
 	/**
@@ -34,53 +34,56 @@ export default class FootnoteEditing extends Plugin {
 	 */
 	get rootElement() {
 		const rootElement = this.editor.model.document.getRoot();
-		if(!rootElement) {
-			throw new Error('Document has no rootElement element.');
+		if ( !rootElement ) {
+			throw new Error( 'Document has no rootElement element.' );
 		}
 		return rootElement;
 	}
 
 	init() {
-		defineSchema(this.editor.model.schema);
-		defineConverters(this.editor);
+		defineSchema( this.editor.model.schema );
+		defineConverters( this.editor );
 
-		this.editor.commands.add( COMMANDS.insertFootnote, new InsertFootnoteCommand( this.editor ) );
+		this.editor.commands.add(COMMANDS.insertFootnote, new InsertFootnoteCommand(this.editor));
 
-		addFootnoteAutoformatting(this.editor, this.rootElement);
+		addFootnoteAutoformatting( this.editor, this.rootElement );
 
-		this.editor.model.document.on('change:data', (eventInfo, batch) => {
-			const diffItems = [...eventInfo.source.differ.getChanges()];
-			// If a footnote reference is inserted, ensure that footnote references remain ordered.
-			if(diffItems.some(diffItem => (
-				diffItem.type === 'insert' &&
-				diffItem.name === ELEMENTS.footnoteReference
-			))) {
-				this._orderFootnotes(batch);
-			};
-			// for each change to a footnote item's index attribute, update the corresponding references accordingly
-			diffItems.forEach(diffItem => {
-				if(
-					diffItem.type === 'attribute' &&
-					diffItem.attributeKey === ATTRIBUTES.footnoteIndex
+		this.editor.model.document.on( 'change:data', ( eventInfo, batch ) => {
+				const diffItems = [ ...eventInfo.source.differ.getChanges() ];
+				// If a footnote reference is inserted, ensure that footnote references remain ordered.
+				if (
+					diffItems.some(
+						(diffItem) => diffItem.type === "insert" && diffItem.name === ELEMENTS.footnoteReference,
+					)
 				) {
-					const {attributeNewValue: newFootnoteIndex} = diffItem;
-					const footnote = [...diffItem.range.getItems()].find(item => item.is('element', ELEMENTS.footnoteItem));
-					const footnoteId = footnote instanceof ModelElement && footnote.getAttribute(ATTRIBUTES.footnoteId);
-					if(!footnoteId) {
-						return;
-					}
-					this._updateReferenceIndices(batch, `${footnoteId}`, newFootnoteIndex);
+					this._orderFootnotes( batch );
 				}
-			});
-		}, { priority: 'high' });
-
-		this.editor.plugins.get( 'ClipboardPipeline' ).on(
-			'inputTransformation',
-			( _, data ) => {
-				const googleDocsFootnotesNormalizer = new GoogleDocsFootnotesNormalizer();
-				googleDocsFootnotesNormalizer.execute( data );
+				// for each change to a footnote item's index attribute, update the corresponding references accordingly
+				diffItems.forEach((diffItem) => {
+					if (diffItem.type === "attribute" && diffItem.attributeKey === ATTRIBUTES.footnoteIndex) {
+						const { attributeNewValue: newFootnoteIndex } = diffItem;
+						const footnote = [...diffItem.range.getItems()].find((item) =>
+							item.is("element", ELEMENTS.footnoteItem),
+						);
+						const footnoteId =
+							footnote instanceof ModelElement && footnote.getAttribute( ATTRIBUTES.footnoteId );
+						if ( !footnoteId ) {
+							return;
+						}
+						this._updateReferenceIndices( batch, `${ footnoteId }`, newFootnoteIndex );
+					}
+				} );
 			},
-			{ priority: 'high' }
+			{ priority: "high" },
+		);
+
+		this.editor.plugins.get("ClipboardPipeline").on(
+			"inputTransformation",
+			(_, data) => {
+				const googleDocsFootnotesNormalizer = new GoogleDocsFootnotesNormalizer();
+				googleDocsFootnotesNormalizer.execute(data);
+			},
+			{ priority: "high" },
 		);
 
 		this._handleDelete();
@@ -88,9 +91,11 @@ export default class FootnoteEditing extends Plugin {
 		// The following callbacks are needed to map nonempty view elements
 		// to empty model elements. See https://ckeditor.com/docs/ckeditor5/latest/api/module_widget_utils.html#function-viewToModelPositionOutsideModelElement
 		this.editor.editing.mapper.on(
-			'viewToModelPosition',
+			"viewToModelPosition",
 			// @ts-ignore -- the type signature of `on` here seem to be just wrong, given how it's used in the source code.
-			viewToModelPositionOutsideModelElement( this.editor.model, viewElement => viewElement.hasAttribute( ATTRIBUTES.footnoteReference ) )
+			viewToModelPositionOutsideModelElement(this.editor.model, (viewElement) =>
+				viewElement.hasAttribute(ATTRIBUTES.footnoteReference),
+			),
 		);
 	}
 
@@ -103,47 +108,52 @@ export default class FootnoteEditing extends Plugin {
 	_handleDelete() {
 		const viewDocument = this.editor.editing.view.document;
 		const editor = this.editor;
-		this.listenTo( viewDocument, 'delete', (evt, data) => {
-			const doc = editor.model.document;
-			const deletedElement = doc.selection.getSelectedElement();
-			const selectionEndPos = doc.selection.getLastPosition();
-			const selectionStartPos = doc.selection.getFirstPosition();
-			if(!selectionEndPos || !selectionStartPos) {
-				throw new Error('Selection must have at least one range to perform delete operation.');
-			}
-
-			this.editor.model.change( modelWriter => {
-				// delete all footnote references if footnote section gets deleted
-				if (deletedElement && deletedElement.is('element', ELEMENTS.footnoteSection)) {
-					this._removeReferences(modelWriter);
+		this.listenTo(
+			viewDocument,
+			"delete",
+			( evt, data ) => {
+				const doc = editor.model.document;
+				const deletedElement = doc.selection.getSelectedElement();
+				const selectionEndPos = doc.selection.getLastPosition();
+				const selectionStartPos = doc.selection.getFirstPosition();
+				if ( !selectionEndPos || !selectionStartPos ) {
+					throw new Error("Selection must have at least one range to perform delete operation.");
 				}
 
-				const deletingFootnote = deletedElement && deletedElement.is('element', ELEMENTS.footnoteItem);
+				this.editor.model.change((modelWriter) => {
+					// delete all footnote references if footnote section gets deleted
+					if (deletedElement && deletedElement.is("element", ELEMENTS.footnoteSection ) ) {
+						this._removeReferences( modelWriter );
+					}
 
-				const currentFootnote = deletingFootnote ?
-					deletedElement :
-					selectionEndPos.findAncestor(ELEMENTS.footnoteItem);
-				if(!currentFootnote) {
-					return;
-				}
+					const deletingFootnote = deletedElement && deletedElement.is("element", ELEMENTS.footnoteItem );
 
-				const endParagraph = selectionEndPos.findAncestor('paragraph');
-				const startParagraph = selectionStartPos.findAncestor('paragraph');
-				const currentFootnoteContent = selectionEndPos.findAncestor(ELEMENTS.footnoteContent);
-				if(!currentFootnoteContent || !startParagraph || !endParagraph) {
-					return;
-				}
+					const currentFootnote = deletingFootnote
+						? deletedElement
+						: selectionEndPos.findAncestor( ELEMENTS.footnoteItem );
+					if ( !currentFootnote ) {
+						return;
+					}
 
-				const footnoteIsEmpty = startParagraph.maxOffset === 0 && currentFootnoteContent.childCount === 1;
+					const endParagraph = selectionEndPos.findAncestor("paragraph");
+					const startParagraph = selectionStartPos.findAncestor("paragraph");
+					const currentFootnoteContent = selectionEndPos.findAncestor( ELEMENTS.footnoteContent );
+					if ( !currentFootnoteContent || !startParagraph || !endParagraph ) {
+						return;
+					}
 
-				if(deletingFootnote || footnoteIsEmpty) {
-					this._removeFootnote(modelWriter, currentFootnote);
-					data.preventDefault();
-					evt.stop();
-					return;
-				}
-			});
-		}, { priority: 'high' });
+					const footnoteIsEmpty = startParagraph.maxOffset === 0 && currentFootnoteContent.childCount === 1;
+
+					if ( deletingFootnote || footnoteIsEmpty ) {
+						this._removeFootnote( modelWriter, currentFootnote );
+						data.preventDefault();
+						evt.stop();
+						return;
+					}
+				} );
+			},
+			{ priority: "high" },
+		);
 	}
 
 	/**
@@ -154,10 +164,10 @@ export default class FootnoteEditing extends Plugin {
 	 * such that the set can be undone with a single action.
 	 * @param {ModelElement} footnoteContent
 	 */
-	_clearContents(modelWriter, footnoteContent) {
-		const contents = modelWriter.createRangeIn(footnoteContent);
-		modelWriter.appendElement("paragraph", footnoteContent);
-		modelWriter.remove(contents);
+	_clearContents( modelWriter, footnoteContent ) {
+		const contents = modelWriter.createRangeIn( footnoteContent );
+		modelWriter.appendElement( "paragraph", footnoteContent );
+		modelWriter.remove( contents );
 	}
 
 	/**
@@ -168,52 +178,49 @@ export default class FootnoteEditing extends Plugin {
 	 * @param {ModelWriter} modelWriter
 	 * @param {ModelElement} footnote
 	 */
-	_removeFootnote(modelWriter, footnote) {
+	_removeFootnote( modelWriter, footnote ) {
 		// delete the current footnote and its references,
 		// and renumber subsequent footnotes.
-		if(!this.editor) {
+		if ( !this.editor ) {
 			return;
 		}
-		const footnoteSection = footnote.findAncestor(ELEMENTS.footnoteSection);
+		const footnoteSection = footnote.findAncestor( ELEMENTS.footnoteSection );
 
-		if(!footnoteSection) {
-			modelWriter.remove(footnote);
+		if ( !footnoteSection ) {
+			modelWriter.remove( footnote );
 			return;
 		}
-		const index = footnoteSection.getChildIndex(footnote);
-		const id = footnote.getAttribute(ATTRIBUTES.footnoteId);
-		this._removeReferences(modelWriter, `${id}`);
+		const index = footnoteSection.getChildIndex( footnote );
+		const id = footnote.getAttribute( ATTRIBUTES.footnoteId );
+		this._removeReferences( modelWriter, `${ id }` );
 
-		modelWriter.remove(footnote);
+		modelWriter.remove( footnote );
 		// if no footnotes remain, remove the footnote section
-		if(footnoteSection.childCount === 0) {
-			modelWriter.remove(footnoteSection);
-			this._removeReferences(modelWriter);
+		if ( footnoteSection.childCount === 0 ) {
+			modelWriter.remove( footnoteSection );
+			this._removeReferences( modelWriter );
 		} else {
 			// after footnote deletion the selection winds up surrounding the previous footnote
 			// (or the following footnote if no previous footnote exists). Typing in that state
 			// immediately deletes the footnote. This deliberately sets the new selection position
 			// to avoid that.
-			const neighborFootnote = index === 0 ?
-				footnoteSection.getChild(index) :
-				footnoteSection.getChild(index-1)
-			if(!(neighborFootnote instanceof ModelElement)) {
+			const neighborFootnote =
+				index === 0 ? footnoteSection.getChild(index) : footnoteSection.getChild(index - 1);
+			if ( !( neighborFootnote instanceof ModelElement ) ) {
 				return;
 			}
 
-			const neighborEndParagraph = modelQueryElementsAll(
-				this.editor,
-				neighborFootnote,
-				element =>  element.is('element', 'paragraph')
+			const neighborEndParagraph = modelQueryElementsAll(this.editor, neighborFootnote, (element) =>
+				element.is("element", "paragraph"),
 			).pop();
 
-			neighborEndParagraph && modelWriter.setSelection(neighborEndParagraph, 'end');
+			neighborEndParagraph && modelWriter.setSelection( neighborEndParagraph, "end");
 		}
 
 		// renumber subsequent footnotes
-		const subsequentFootnotes = [...footnoteSection.getChildren()].slice(index);
-		for (const [i, child] of subsequentFootnotes.entries()) {
-			modelWriter.setAttribute( ATTRIBUTES.footnoteIndex, `${index+i+1}`, child);
+		const subsequentFootnotes = [ ...footnoteSection.getChildren() ].slice( index );
+		for ( const [ i, child ] of subsequentFootnotes.entries() ) {
+			modelWriter.setAttribute(ATTRIBUTES.footnoteIndex, `${index + i + 1 }`, child );
 		}
 	}
 
@@ -224,18 +231,20 @@ export default class FootnoteEditing extends Plugin {
 	 * @param {ModelWriter} modelWriter
 	 * @param {string|undefined} footnoteId
 	 */
-	_removeReferences(modelWriter, footnoteId=undefined) {
+	_removeReferences( modelWriter, footnoteId = undefined ) {
 		const removeList = [];
-		if(!this.rootElement) throw new Error('Document has no root element.');
-		const footnoteReferences = modelQueryElementsAll(this.editor, this.rootElement, e => e.is('element', ELEMENTS.footnoteReference));
-		footnoteReferences.forEach((footnoteReference) => {
-			const id = footnoteReference.getAttribute(ATTRIBUTES.footnoteId);
-			if (!footnoteId || id === footnoteId) {
-				removeList.push(footnoteReference);
+		if ( !this.rootElement ) {throw new Error('Document has no root element.');}
+		const footnoteReferences = modelQueryElementsAll( this.editor, this.rootElement, (e) =>
+			e.is("element", ELEMENTS.footnoteReference),
+		);
+		footnoteReferences.forEach( ( footnoteReference ) => {
+			const id = footnoteReference.getAttribute( ATTRIBUTES.footnoteId );
+			if ( !footnoteId || id === footnoteId ) {
+				removeList.push( footnoteReference );
 			}
-		});
-		for (const item of removeList) {
-			modelWriter.remove( item );
+		} );
+		for ( const item of removeList ) {
+			modelWriter.remove(item);
 		}
 	}
 
@@ -248,17 +257,17 @@ export default class FootnoteEditing extends Plugin {
 	 * @param {string} footnoteId
 	 * @param {string} newFootnoteIndex
 	 */
-	_updateReferenceIndices(batch, footnoteId, newFootnoteIndex) {
+	_updateReferenceIndices( batch, footnoteId, newFootnoteIndex ) {
 		const footnoteReferences = modelQueryElementsAll(
 			this.editor,
 			this.rootElement,
-			e => e.is('element', ELEMENTS.footnoteReference) && e.getAttribute(ATTRIBUTES.footnoteId) === footnoteId
+			(e) => e.is("element", ELEMENTS.footnoteReference) && e.getAttribute(ATTRIBUTES.footnoteId) === footnoteId,
 		);
-		this.editor.model.enqueueChange(batch, writer => {
-			footnoteReferences.forEach(footnoteReference => {
-				writer.setAttribute(ATTRIBUTES.footnoteIndex, newFootnoteIndex, footnoteReference);
-			});
-		});
+		this.editor.model.enqueueChange( batch, (writer) => {
+			footnoteReferences.forEach( footnoteReference => {
+				writer.setAttribute( ATTRIBUTES.footnoteIndex, newFootnoteIndex, footnoteReference );
+			} );
+		} );
 	}
 
 	/**
@@ -267,40 +276,47 @@ export default class FootnoteEditing extends Plugin {
 	 * the ones that instantiated them.
 	 * @param {Batch} batch
 	 */
-	_orderFootnotes(batch) {
-		const footnoteReferences = modelQueryElementsAll(this.editor, this.rootElement, e => e.is('element', ELEMENTS.footnoteReference));
-		const uniqueIds = new Set(footnoteReferences.map(e => e.getAttribute(ATTRIBUTES.footnoteId)));
-		const orderedFootnotes = [...uniqueIds].map(id => (
-			modelQueryElement(this.editor, this.rootElement, e => e.is('element', ELEMENTS.footnoteItem) && e.getAttribute(ATTRIBUTES.footnoteId) === id)
-		));
+	_orderFootnotes( batch ) {
+		const footnoteReferences = modelQueryElementsAll( this.editor, this.rootElement, (e) =>
+			e.is("element", ELEMENTS.footnoteReference),
+		);
+		const uniqueIds = new Set( footnoteReferences.map( e => e.getAttribute( ATTRIBUTES.footnoteId ) ) );
+		const orderedFootnotes = [ ...uniqueIds ].map( id => (
+			modelQueryElement( this.editor, this.rootElement, e => e.is( 'element', ELEMENTS.footnoteItem ) && e.getAttribute( ATTRIBUTES.footnoteId ) === id )
+		);
 
-		this.editor.model.enqueueChange(batch, writer => {
-			const footnoteSection = modelQueryElement(this.editor, this.rootElement, e => e.is('element', ELEMENTS.footnoteSection));
-			if(!footnoteSection) {
+		this.editor.model.enqueueChange( batch, (writer) => {
+			const footnoteSection = modelQueryElement( this.editor, this.rootElement, (e) =>
+				e.is("element", ELEMENTS.footnoteSection),
+			);
+			if ( !footnoteSection ) {
 				return;
 			}
+
 			/**
 			 * In order to keep footnotes with no existing references at the end of the list,
 			 * the loop below reverses the list of footnotes with references and inserts them
 			 * each at the beginning.
 			 */
-			for (const footnote of orderedFootnotes.reverse()) {
-				footnote && writer.move(writer.createRangeOn(footnote), footnoteSection, 0);
+			for ( const footnote of orderedFootnotes.reverse() ) {
+				footnote && writer.move( writer.createRangeOn( footnote ), footnoteSection, 0 );
 			}
+
 			/**
 			 * once the list is sorted, make one final pass to update footnote indices.
 			 */
-			for(const footnote of modelQueryElementsAll(this.editor, footnoteSection, e => e.is('element', ELEMENTS.footnoteItem))) {
-				const index =  `${footnoteSection.getChildIndex(footnote)+1}`;
-				footnote && writer.setAttribute(ATTRIBUTES.footnoteIndex, index, footnote);
-				const id = footnote.getAttribute(ATTRIBUTES.footnoteId);
+			for ( const footnote of modelQueryElementsAll( this.editor, footnoteSection, e => e.is( 'element', ELEMENTS.footnoteItem ) ) ) {
+				const index = `${ footnoteSection.getChildIndex( footnote ) + 1 }`;
+				footnote && writer.setAttribute( ATTRIBUTES.footnoteIndex, index, footnote );
+				const id = footnote.getAttribute( ATTRIBUTES.footnoteId );
+
 				/**
 				 * unfortunately the following line seems to be necessary, even though updateReferenceIndices
 				 * should fire from the attribute change immediately above. It seems that events initiated by
 				 * a `change:data` event do not themselves fire another `change:data` event.
 				 */
-				id && this._updateReferenceIndices(batch, `${id}`, `${index}`);
+				id && this._updateReferenceIndices( batch, `${ id }`, `${ index }` );
 			}
-		});
+		} );
 	}
 }

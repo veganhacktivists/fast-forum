@@ -3,15 +3,14 @@
 Run a GraphQL request from the server with the proper context
 
 */
-import { graphql, GraphQLError } from 'graphql';
-import { localeSetting } from '../../lib/publicSettings';
-import { getExecutableSchema } from './apollo-server/initGraphQL';
-import { generateDataLoaders } from './apollo-server/context';
-import { getAllRepos } from '../repos';
-import { getCollectionsByName } from '../../lib/vulcan-lib/getCollection';
+import { graphql, GraphQLError } from "graphql";
+import { localeSetting } from "../../lib/publicSettings";
+import { getExecutableSchema } from "./apollo-server/initGraphQL";
+import { generateDataLoaders } from "./apollo-server/context";
+import { getAllRepos } from "../repos";
+import { getCollectionsByName } from "../../lib/vulcan-lib/getCollection";
 
-function writeGraphQLErrorToStderr(errors: readonly GraphQLError[])
-{
+function writeGraphQLErrorToStderr(errors: readonly GraphQLError[]) {
   // eslint-disable-next-line no-console
   console.error(`runQuery error: ${errors[0].message}`);
   // eslint-disable-next-line no-console
@@ -19,12 +18,9 @@ function writeGraphQLErrorToStderr(errors: readonly GraphQLError[])
 }
 
 let onGraphQLError = writeGraphQLErrorToStderr;
-export function setOnGraphQLError(fn: ((errors: readonly GraphQLError[])=>void)|null)
-{
-  if (fn)
-    onGraphQLError = fn;
-  else
-    onGraphQLError = writeGraphQLErrorToStderr;
+export function setOnGraphQLError(fn: ((errors: readonly GraphQLError[]) => void) | null) {
+  if (fn) onGraphQLError = fn;
+  else onGraphQLError = writeGraphQLErrorToStderr;
 }
 
 // note: if no context is passed, default to running requests with full admin privileges
@@ -57,14 +53,14 @@ export const createAnonymousContext = (options?: Partial<ResolverContext>): Reso
     ...generateDataLoaders(),
     ...options,
   };
-  
+
   return queryContext;
-}
+};
 export const createAdminContext = (options?: Partial<ResolverContext>): ResolverContext => {
   return {
     ...createAnonymousContext(),
     // HACK: Instead of a full user object, this is just a mostly-empty object with isAdmin set to true
-    currentUser: {isAdmin: true} as DbUser,
+    currentUser: { isAdmin: true } as DbUser,
     ...options,
   };
-}
+};

@@ -50,7 +50,7 @@ const styles = (theme: ThemeType) => ({
     [theme.breakpoints.down("xs")]: {
       flexDirection: "column",
       alignItems: "flex-start",
-      padding: '16px 8px'
+      padding: "16px 8px",
     },
   },
   details: {
@@ -84,10 +84,10 @@ const styles = (theme: ThemeType) => ({
     fontWeight: 600,
     fontSize: 18,
     color: theme.palette.givingPortal[1000],
-    '&:hover': {
-      textUnderlineOffset: '3px',
-      textDecoration: 'underline',
-    }
+    "&:hover": {
+      textUnderlineOffset: "3px",
+      textDecoration: "underline",
+    },
   },
   allocateInput: {
     width: 150,
@@ -97,14 +97,14 @@ const styles = (theme: ThemeType) => ({
       fontSize: 18,
       fontWeight: 500,
       color: theme.palette.grey[1000],
-      zIndex: theme.zIndexes.singleColumnSection
+      zIndex: theme.zIndexes.singleColumnSection,
     },
     "& .MuiNotchedOutline-focused": {
-      border: `2px solid ${theme.palette.givingPortal[1000]} !important`
+      border: `2px solid ${theme.palette.givingPortal[1000]} !important`,
     },
     "& .MuiNotchedOutline-root": {
       backgroundColor: theme.palette.grey[100],
-      border: "none"
+      border: "none",
     },
     [theme.breakpoints.down("xs")]: {
       width: "100%",
@@ -143,9 +143,9 @@ const styles = (theme: ThemeType) => ({
   normalizedWarning: {
     color: theme.palette.grey[600],
     fontSize: 16,
-    fontStyle: 'italic',
+    fontStyle: "italic",
     fontWeight: 500,
-    margin: '2px 0',
+    margin: "2px 0",
     [theme.breakpoints.down("xs")]: {
       fontSize: 14,
     },
@@ -168,9 +168,7 @@ const AllocateVoteRow = ({
   const { _id: candidateId, name, logoSrc, href, description } = candidate;
   const naiveValue = voteState[candidateId];
   const formattedValue =
-    typeof naiveValue === "number"
-      ? numberToEditableString(naiveValue, 15)
-      : voteState[candidateId] ?? "";
+    typeof naiveValue === "number" ? numberToEditableString(naiveValue, 15) : voteState[candidateId] ?? "";
 
   return (
     <AnalyticsContext pageElementContext="allocateVoteRow">
@@ -194,10 +192,10 @@ const AllocateVoteRow = ({
           onChange={(e) => {
             const value = e.target.value;
             if (value === "" || value === null) {
-              setVoteState((prev) => ({ ...prev, [candidateId]: null } as Record<string, number | string | null>));
+              setVoteState((prev) => ({ ...prev, [candidateId]: null }) as Record<string, number | string | null>);
             } else if (/^\d*\.?\d*$/.test(value) && value.length < 15) {
               // Only allow positive (decimal) numbers up to 15 characters
-              setVoteState((prev) => ({ ...prev, [candidateId]: value } as Record<string, number | string | null>));
+              setVoteState((prev) => ({ ...prev, [candidateId]: value }) as Record<string, number | string | null>);
             }
           }}
           type="string"
@@ -225,14 +223,14 @@ const ElectionAllocateVote = ({
 
   const selectedResults = useMemo(
     () => results?.filter((candidate) => voteState[candidate._id] !== undefined),
-    [results, voteState]
+    [results, voteState],
   );
   const sortedResults = useMemo(
     () =>
       selectedResults?.slice().sort((a, b) => {
         const numericalVoteState = Object.fromEntries(
           // Treate 0, "0", null etc all as null
-          Object.entries(voteState).map(([id, value]) => [id, value ? parseFloat(value as string) : null])
+          Object.entries(voteState).map(([id, value]) => [id, value ? parseFloat(value as string) : null]),
         );
 
         const aValue = numericalVoteState[a._id] ?? 0;
@@ -240,13 +238,13 @@ const ElectionAllocateVote = ({
 
         return bValue - aValue;
       }),
-    [selectedResults, voteState]
+    [selectedResults, voteState],
   );
   const canUpdateSort = useMemo(
     () =>
       displayedResults?.length &&
       stringify(sortedResults?.map((r) => r._id)) !== stringify(displayedResults?.map((r) => r._id)),
-    [sortedResults, displayedResults]
+    [sortedResults, displayedResults],
   );
 
   const updateSort = useCallback(() => {
@@ -292,17 +290,19 @@ const ElectionAllocateVote = ({
           </React.Fragment>
         ))}
       </div>
-      {displayedResults.length > 10 && <div className={classes.controls}>
-        <button
-          className={classNames(classes.sort, {
-            [classes.hidden]: !canUpdateSort,
-          })}
-          disabled={!canUpdateSort}
-          onClick={updateSort}
-        >
-          <ForumIcon icon="BarsArrowDown" className={classes.sortIcon} /> Sort descending
-        </button>
-      </div>}
+      {displayedResults.length > 10 && (
+        <div className={classes.controls}>
+          <button
+            className={classNames(classes.sort, {
+              [classes.hidden]: !canUpdateSort,
+            })}
+            disabled={!canUpdateSort}
+            onClick={updateSort}
+          >
+            <ForumIcon icon="BarsArrowDown" className={classes.sortIcon} /> Sort descending
+          </button>
+        </div>
+      )}
     </div>
   );
 };

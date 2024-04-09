@@ -10,16 +10,16 @@ import { useTracking } from "../../lib/analyticsEvents";
  * after the user has stopped typing.
  */
 export const useSearchAnalytics = (timeoutMS = 1000) => {
-  const {captureEvent} = useTracking();
+  const { captureEvent } = useTracking();
   const searchTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const captureSearch = useCallback(
     (context: string, searchState: Record<string, unknown>) => {
       clearTimeout(searchTimeout.current);
       searchTimeout.current = setTimeout(() => {
-        captureEvent("search", {context, ...searchState});
+        captureEvent("search", { context, ...searchState });
       }, timeoutMS);
     },
     [captureEvent, timeoutMS],
   );
   return captureSearch;
-}
+};

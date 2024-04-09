@@ -1,6 +1,6 @@
-import type { Request, Response } from 'express';
-import type { IncomingMessage } from 'http';
-import Cookies from 'universal-cookie';
+import type { Request, Response } from "express";
+import type { IncomingMessage } from "http";
+import Cookies from "universal-cookie";
 
 // Utility functions for dealing with HTTP requests/responses, eg getting and
 // setting cookies, headers, getting the URL, etc. The main purpose for these
@@ -8,12 +8,12 @@ import Cookies from 'universal-cookie';
 // Express; after we've gotten rid of Meteor, these functions will be trivial
 // and unnecessary wrappers.
 
-/** 
+/**
  * Given an HTTP request, get a cookie. Exists mainly to cover up a difference
  * between the Meteor and Express server middleware setups.
- * 
+ *
  * Default to the value pulled from `universalCookies` if there is one, but if not try `cookies` as well
- *  
+ *
  * We need to do this because {@link setCookieOnResponse} can only assign to `cookies`, not `universalCookies`, so sometimes `universalCookies` will exist but won't have the (newly assigned) cookie value.
  */
 export function getCookieFromReq(req: Request | IncomingMessage, cookieName: string) {
@@ -28,11 +28,13 @@ export function getCookieFromReq(req: Request | IncomingMessage, cookieName: str
 // the Meteor and Express server middleware setups. Works by setting an
 // expiration date in the past, which apparently is the recommended way to
 // remove cookies.
-export function clearCookie(req: Request & { universalCookies?: any }, res: Response<any, Record<string, any>> | undefined, cookieName: string) {
-  if ((req.cookies && req.cookies[cookieName])
-    || (req.universalCookies && req.universalCookies.get(cookieName)))
-  {
-    res?.setHeader("Set-Cookie", `${cookieName}= ; expires=${new Date(0).toUTCString()};`)   
+export function clearCookie(
+  req: Request & { universalCookies?: any },
+  res: Response<any, Record<string, any>> | undefined,
+  cookieName: string,
+) {
+  if ((req.cookies && req.cookies[cookieName]) || (req.universalCookies && req.universalCookies.get(cookieName))) {
+    res?.setHeader("Set-Cookie", `${cookieName}= ; expires=${new Date(0).toUTCString()};`);
   }
 }
 
@@ -44,10 +46,18 @@ export function getPathFromReq(req: Request): string {
   else return untypedReq.url;
 }
 
-export function setCookieOnResponse({req, res, cookieName, cookieValue, maxAge}: {
-  req: Request, res: Response,
-  cookieName: string, cookieValue: string,
-  maxAge: number
+export function setCookieOnResponse({
+  req,
+  res,
+  cookieName,
+  cookieValue,
+  maxAge,
+}: {
+  req: Request;
+  res: Response;
+  cookieName: string;
+  cookieValue: string;
+  maxAge: number;
 }) {
   // universalCookies should be defined here, but it isn't
   // @see https://github.com/meteor/meteor-feature-requests/issues/174#issuecomment-441047495
@@ -80,8 +90,7 @@ export function getAllCookiesFromReq(req: Request) {
       return new Cookies(returnCookies);
     }
     return untypedReq.universalCookies;
-  }
-  else {
+  } else {
     return new Cookies(untypedReq.cookies); // req.universalCookies;
   }
 }

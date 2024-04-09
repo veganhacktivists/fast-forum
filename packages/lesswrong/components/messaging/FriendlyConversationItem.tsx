@@ -39,13 +39,13 @@ const styles = (theme: ThemeType): JssStyles => ({
     color: theme.palette.grey[1000],
     fontSize: "1.1rem",
     fontWeight: 600,
-    lineHeight: '21px'
+    lineHeight: "21px",
   },
   date: {
     color: theme.palette.grey[600],
     fontSize: "13px",
     fontWeight: 500,
-    lineHeight: '21px',
+    lineHeight: "21px",
     marginLeft: 4,
     marginRight: 4,
   },
@@ -57,7 +57,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     fontSize: "13px",
     fontWeight: 500,
     marginTop: 2,
-  }
+  },
 });
 
 const FriendlyConversationItem = ({
@@ -80,41 +80,35 @@ const FriendlyConversationItem = ({
 
   if (!conversation) return null;
 
-  const otherParticipants = conversation.participants.filter((u)=> u._id !== currentUser._id)
+  const otherParticipants = conversation.participants.filter((u) => u._id !== currentUser._id);
   // Handle case of conversation with yourself
   const firstParticipant = otherParticipants[0] ?? conversation.participants[0];
-  const title = conversationGetFriendlyTitle(conversation, currentUser)
+  const title = conversationGetFriendlyTitle(conversation, currentUser);
 
-  const latestMessagePlaintext = conversation.latestMessage?.contents?.plaintextMainText ?? ""
+  const latestMessagePlaintext = conversation.latestMessage?.contents?.plaintextMainText ?? "";
   // This will be truncated further by webkit-line-clamp. This truncation is just to avoid padding
   // the html with too much junk
-  const previewText = truncate(latestMessagePlaintext, 400)
+  const previewText = truncate(latestMessagePlaintext, 400);
 
   return (
-    <div onClick={onClick} className={classNames(classes.root, {[classes.rootSelected]: isSelected})}>
-      <UsersProfileImage
-        user={firstParticipant}
-        size={40}
-        className={classes.profileImage}
-      />
+    <div onClick={onClick} className={classNames(classes.root, { [classes.rootSelected]: isSelected })}>
+      <UsersProfileImage user={firstParticipant} size={40} className={classes.profileImage} />
       <div className={classes.content}>
         <div className={classes.titleRow}>
-          <div className={classes.title}>
-            {title}
-          </div>
+          <div className={classes.title}>{title}</div>
           <div className={classes.date}>
             <FormatDate date={conversation.latestActivity} />
           </div>
         </div>
-        <div className={classes.preview}>
-          {previewText}
-        </div>
+        <div className={classes.preview}>{previewText}</div>
       </div>
     </div>
   );
 };
 
-const FriendlyConversationItemComponent = registerComponent("FriendlyConversationItem", FriendlyConversationItem, { styles });
+const FriendlyConversationItemComponent = registerComponent("FriendlyConversationItem", FriendlyConversationItem, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {

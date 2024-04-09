@@ -72,10 +72,10 @@ const styles = (theme: ThemeType) => ({
  *        description: "Don't show the EA Forum survey banner",
  *      });
  */
-const EASurveyBanner = ({classes}: {classes: ClassesType}) => {
+const EASurveyBanner = ({ classes }: { classes: ClassesType }) => {
   const cookieName = ""; // TODO: Insert new cookie name
   const [cookies, setCookie] = useCookiesWithConsent([cookieName]);
-  const {captureEvent} = useTracking();
+  const { captureEvent } = useTracking();
   const currentUser = useCurrentUser();
 
   const hideBanner = useCallback(() => {
@@ -100,7 +100,7 @@ const EASurveyBanner = ({classes}: {classes: ClassesType}) => {
 
   const Wrapper = currentUser ? Fragment : NoSSR;
 
-  const {ForumIcon} = Components;
+  const { ForumIcon } = Components;
   return (
     <Wrapper>
       <div className={classes.root}>
@@ -113,24 +113,16 @@ const EASurveyBanner = ({classes}: {classes: ClassesType}) => {
           onSubmit={onSubmitSurvey}
           className={classes.button}
         />
-        <ForumIcon
-          icon="Close"
-          onClick={onDismissBanner}
-          className={classes.close}
-        />
+        <ForumIcon icon="Close" onClick={onDismissBanner} className={classes.close} />
       </div>
     </Wrapper>
   );
-}
+};
 
-const EASurveyBannerComponent = registerComponent(
-  "EASurveyBanner",
-  EASurveyBanner,
-  {styles},
-);
+const EASurveyBannerComponent = registerComponent("EASurveyBanner", EASurveyBanner, { styles });
 
 declare global {
   interface ComponentTypes {
-    EASurveyBanner: typeof EASurveyBannerComponent
+    EASurveyBanner: typeof EASurveyBannerComponent;
   }
 }

@@ -1,17 +1,17 @@
-import { addGraphQLSchema, addGraphQLResolvers, addGraphQLMutation } from '../lib/vulcan-lib/graphql';
-import { performVoteServer, clearVotesServer } from './voteServer';
-import { VoteableCollections, VoteableCollectionOptions } from '../lib/make_voteable';
-import { getCollection } from '../lib/vulcan-lib/getCollection';
+import { addGraphQLSchema, addGraphQLResolvers, addGraphQLMutation } from "../lib/vulcan-lib/graphql";
+import { performVoteServer, clearVotesServer } from "./voteServer";
+import { VoteableCollections, VoteableCollectionOptions } from "../lib/make_voteable";
+import { getCollection } from "../lib/vulcan-lib/getCollection";
 
 export function createVoteableUnionType() {
-  const voteableSchema = VoteableCollections.length ? `union Voteable = ${VoteableCollections.map(collection => collection.typeName).join(' | ')}` : '';
+  const voteableSchema = VoteableCollections.length
+    ? `union Voteable = ${VoteableCollections.map((collection) => collection.typeName).join(" | ")}`
+    : "";
   addGraphQLSchema(voteableSchema);
-  
-  for (let collection of VoteableCollections)
-    addVoteMutations(collection);
-   
-  
-  return {}
+
+  for (let collection of VoteableCollections) addVoteMutations(collection);
+
+  return {};
 }
 
 const resolverMap = {
@@ -24,7 +24,7 @@ const resolverMap = {
 
 addGraphQLResolvers(resolverMap);
 
-addGraphQLMutation('vote(documentId: String, voteType: String, collectionName: String, voteId: String) : Voteable');
+addGraphQLMutation("vote(documentId: String, voteType: String, collectionName: String, voteId: String) : Voteable");
 
 const voteResolver = {
   Mutation: {
@@ -38,8 +38,12 @@ const voteResolver = {
     // compatibility.
     //
     // Returns the document that was voted upon, with its score updated.
-    async vote(root: void, args: {documentId: string, voteType: string, collectionName: CollectionNameString, voteId?: string}, context: ResolverContext) {
-      const {documentId, voteType, collectionName} = args;
+    async vote(
+      root: void,
+      args: { documentId: string; voteType: string; collectionName: CollectionNameString; voteId?: string },
+      context: ResolverContext,
+    ) {
+      const { documentId, voteType, collectionName } = args;
       const { currentUser } = context;
       const collection = getCollection(collectionName);
 
@@ -48,13 +52,15 @@ const voteResolver = {
       if (!currentUser) throw new Error("Error casting vote: Not logged in.");
 
       const document = await performVoteServer({
-        documentId, voteType: voteType||"neutral", collection, user: currentUser,
+        documentId,
+        voteType: voteType || "neutral",
+        collection,
+        user: currentUser,
         toggleIfAlreadyVoted: true,
         skipRateLimits: false,
       });
       return document;
     },
-    
   },
 };
 
@@ -71,9 +77,13 @@ function addVoteMutations(collection: CollectionBase<VoteableCollectionName>) {
   const typeName = collection.options.typeName;
   const backCompatMutationName = `setVote${typeName}`;
   const mutationName = `performVote${typeName}`;
-  
-  addGraphQLMutation(`${backCompatMutationName}(documentId: String, voteType: String, extendedVote: JSON): ${typeName}`);
-  addGraphQLMutation(`${mutationName}(documentId: String, voteType: String, extendedVote: JSON): VoteResult${typeName}`);
+
+  addGraphQLMutation(
+    `${backCompatMutationName}(documentId: String, voteType: String, extendedVote: JSON): ${typeName}`,
+  );
+  addGraphQLMutation(
+    `${mutationName}(documentId: String, voteType: String, extendedVote: JSON): VoteResult${typeName}`,
+  );
   addGraphQLSchema(`
     type VoteResult${typeName} {
       document: ${typeName}!
@@ -81,47 +91,62 @@ function addVoteMutations(collection: CollectionBase<VoteableCollectionName>) {
       
     }
   `);
-  
-  const performVoteMutation = async (args: {documentId: string, voteType: string|null, extendedVote?: any}, context: ResolverContext) => {
-    const {documentId, voteType, extendedVote} = args;
-    const {currentUser} = context;
-    const document = await collection.findOne({_id: documentId});
-    
+
+  const performVoteMutation = async (
+    args: { documentId: string; voteType: string | null; extendedVote?: any },
+    context: ResolverContext,
+  ) => {
+    const { documentId, voteType, extendedVote } = args;
+    const { currentUser } = context;
+    const document = await collection.findOne({ _id: documentId });
+
     if (!currentUser) throw new Error("Error casting vote: Not logged in.");
     if (!document) throw new Error("No such document ID");
 
-    const {userCanVoteOn} = VoteableCollectionOptions[collection.collectionName] ?? {};
-    const permissionResult = userCanVoteOn &&
-      await userCanVoteOn(currentUser, document, voteType, extendedVote, context);
+    const { userCanVoteOn } = VoteableCollectionOptions[collection.collectionName] ?? {};
+    const permissionResult =
+      userCanVoteOn && (await userCanVoteOn(currentUser, document, voteType, extendedVote, context));
     if (permissionResult && permissionResult.fail) {
       throw new Error(permissionResult.reason);
     }
 
     if (!voteType && !extendedVote) {
-      const modifiedDocument = await clearVotesServer({document, user: currentUser, collection, context});
+      const modifiedDocument = await clearVotesServer({ document, user: currentUser, collection, context });
       return { modifiedDocument, showVotingPatternWarning: false };
     } else {
       return await performVoteServer({
         toggleIfAlreadyVoted: false,
-        document, voteType: voteType||"neutral", extendedVote, collection, user: currentUser,
+        document,
+        voteType: voteType || "neutral",
+        extendedVote,
+        collection,
+        user: currentUser,
         skipRateLimits: false,
         context,
       });
     }
-  }
+  };
   addGraphQLResolvers({
     Mutation: {
-      [backCompatMutationName]: async (root: void, args: {documentId: string, voteType: string|null, extendedVote?: any}, context: ResolverContext) => {
-        const {modifiedDocument, showVotingPatternWarning} = await performVoteMutation(args, context);
+      [backCompatMutationName]: async (
+        root: void,
+        args: { documentId: string; voteType: string | null; extendedVote?: any },
+        context: ResolverContext,
+      ) => {
+        const { modifiedDocument, showVotingPatternWarning } = await performVoteMutation(args, context);
         return modifiedDocument;
       },
-      [mutationName]: async (root: void, args: {documentId: string, voteType: string|null, extendedVote?: any}, context: ResolverContext) => {
-        const {modifiedDocument, showVotingPatternWarning} = await performVoteMutation(args, context);
+      [mutationName]: async (
+        root: void,
+        args: { documentId: string; voteType: string | null; extendedVote?: any },
+        context: ResolverContext,
+      ) => {
+        const { modifiedDocument, showVotingPatternWarning } = await performVoteMutation(args, context);
         return {
           document: modifiedDocument,
           showVotingPatternWarning,
-        }
+        };
       },
-    }
+    },
   });
 }

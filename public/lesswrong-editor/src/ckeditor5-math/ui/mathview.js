@@ -9,13 +9,13 @@ export default class MathView extends View {
 		this.engine = engine;
 		this.previewUid = previewUid;
 
-		this.set( 'value', '' );
-		this.set( 'display', false );
+		this.set( "value", '');
+		this.set( "display", false );
 
-		this.on( 'change', async () => {
+		this.on( "change", async () => {
 			if ( this.isRendered ) {
 				this.updateMath().then( () => {
-					this.fire( 'updatedMath' );
+					this.fire( "updatedMath" );
 				} );
 			}
 		} );
@@ -24,16 +24,13 @@ export default class MathView extends View {
 			tag: 'div',
 			attributes: {
 				id: 'ck-math-preview',
-				class: [
-					'ck',
-					'ck-math-preview'
-				],
+				class: [ "ck", 'ck-math-preview'],
 			}
-		} );
+		});
 	}
 
 	async updateMath() {
-		await renderEquation( this.value, this.element, this.engine, this.display, true, 'ck-math-preview' );
+		await renderEquation( this.value, this.element, this.engine, this.display, true, 'ck-math-preview');
 	}
 
 	render() {

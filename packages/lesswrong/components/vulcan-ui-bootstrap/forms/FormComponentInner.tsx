@@ -1,9 +1,9 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import { registerComponent, instantiateComponent } from '../../../lib/vulcan-lib';
-import classNames from 'classnames';
-import { HIGHLIGHT_DURATION } from '../../comments/CommentFrame';
-import { withLocation } from '../../../lib/routeUtil';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import { registerComponent, instantiateComponent } from "../../../lib/vulcan-lib";
+import classNames from "classnames";
+import { HIGHLIGHT_DURATION } from "../../comments/CommentFrame";
+import { withLocation } from "../../../lib/routeUtil";
 
 const styles = (theme: ThemeType): JssStyles => ({
   formComponentClear: {
@@ -13,7 +13,7 @@ const styles = (theme: ThemeType): JssStyles => ({
       padding: 10,
     },
   },
-  '@keyframes higlight-animation': {
+  "@keyframes higlight-animation": {
     from: {
       // In most cases it would look better with a border. But because this has to support so many different components, it's hard to know what the border should be, so instead just use a background color.
       backgroundColor: theme.palette.panelBackground.commentHighlightAnimation,
@@ -22,21 +22,21 @@ const styles = (theme: ThemeType): JssStyles => ({
     to: {
       backgroundColor: "none",
       borderRadius: 5,
-    }
+    },
   },
   highlightAnimation: {
-    animation: `higlight-animation ${HIGHLIGHT_DURATION}s ease-in-out 0s;`
+    animation: `higlight-animation ${HIGHLIGHT_DURATION}s ease-in-out 0s;`,
   },
 });
 
-class FormComponentInner extends PureComponent<any, {highlight: boolean}> {
+class FormComponentInner extends PureComponent<any, { highlight: boolean }> {
   scrollRef: React.RefObject<HTMLDivElement>;
 
   constructor(props: AnyBecauseTodo) {
     super(props);
 
-    this.state = {highlight: false};
-    this.scrollRef = React.createRef<HTMLDivElement>()
+    this.state = { highlight: false };
+    this.scrollRef = React.createRef<HTMLDivElement>();
   }
 
   componentDidMount(): void {
@@ -49,22 +49,18 @@ class FormComponentInner extends PureComponent<any, {highlight: boolean}> {
     // support highlighting (see packages/lesswrong/components/vulcan-forms/FormComponent.tsx for where these fields are rendered)
     if (name && name === query?.highlightField) {
       this.scrollRef.current?.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
-      this.setState({highlight: true});
+      this.setState({ highlight: true });
       setTimeout(() => {
-        this.setState({highlight: false});
+        this.setState({ highlight: false });
       }, HIGHLIGHT_DURATION * 1000);
     }
   }
 
   renderClear = () => {
     const { classes } = this.props;
-    if (['datetime', 'time', 'select', 'radiogroup', 'SelectLocalgroup'].includes(this.props.input)) {
+    if (["datetime", "time", "select", "radiogroup", "SelectLocalgroup"].includes(this.props.input)) {
       return (
-        <a
-          className={classes.formComponentClear}
-          title="Clear field"
-          onClick={this.props.clearField}
-        >
+        <a className={classes.formComponentClear} title="Clear field" onClick={this.props.clearField}>
           <span>✕</span>
         </a>
       );
@@ -83,7 +79,7 @@ class FormComponentInner extends PureComponent<any, {highlight: boolean}> {
       label,
       onChange: (event: AnyBecauseTodo) => {
         // FormComponent's handleChange expects value as argument; look in target.checked or target.value
-        const inputValue = inputType === 'checkbox' ? event.target.checked : event.target.value;
+        const inputValue = inputType === "checkbox" ? event.target.checked : event.target.value;
         onChange(inputValue);
       },
       value,
@@ -115,26 +111,29 @@ class FormComponentInner extends PureComponent<any, {highlight: boolean}> {
 
     const hasErrors = errors && errors.length;
 
-    const inputName = typeof input === 'function' ? input.name : input;
+    const inputName = typeof input === "function" ? input.name : input;
     const inputClass = classNames(
-      'form-input',
+      "form-input",
       inputClassName,
       `input-${name}`,
-      `form-component-${inputName || 'default'}`,
-      { 'input-error': hasErrors }
+      `form-component-${inputName || "default"}`,
+      { "input-error": hasErrors },
     );
     const properties = this.getProperties();
 
     const FormInput = this.props.formInput;
 
     return (
-      <div className={classNames(inputClass, {[classes.highlightAnimation]: this.state.highlight})} ref={this.scrollRef}>
+      <div
+        className={classNames(inputClass, { [classes.highlightAnimation]: this.state.highlight })}
+        ref={this.scrollRef}
+      >
         {instantiateComponent(beforeComponent, properties)}
-        <FormInput {...properties}/>
+        <FormInput {...properties} />
         {hasErrors ? <FormComponents.FieldErrors errors={errors} /> : null}
         {this.renderClear()}
         {showCharsRemaining && (
-          <div className={classNames('form-control-limit', { danger: charsRemaining < 10 })}>{charsRemaining}</div>
+          <div className={classNames("form-control-limit", { danger: charsRemaining < 10 })}>{charsRemaining}</div>
         )}
         {instantiateComponent(afterComponent, properties)}
       </div>
@@ -160,10 +159,13 @@ class FormComponentInner extends PureComponent<any, {highlight: boolean}> {
   classes: PropTypes.any,
 };
 
-const FormComponentInnerComponent = registerComponent('FormComponentInner', FormComponentInner, {styles, hocs: [withLocation]});
+const FormComponentInnerComponent = registerComponent("FormComponentInner", FormComponentInner, {
+  styles,
+  hocs: [withLocation],
+});
 
 declare global {
   interface ComponentTypes {
-    FormComponentInner: typeof FormComponentInnerComponent
+    FormComponentInner: typeof FormComponentInnerComponent;
   }
 }

@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { useMulti } from '../../lib/crud/withMulti';
-import { getReviewPhase, REVIEW_YEAR } from '../../lib/reviewUtils';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import sortBy from 'lodash/sortBy';
-import { preferredHeadingCase } from '../../themes/forumTheme';
-
+import React, { useState } from "react";
+import { useMulti } from "../../lib/crud/withMulti";
+import { getReviewPhase, REVIEW_YEAR } from "../../lib/reviewUtils";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import sortBy from "lodash/sortBy";
+import { preferredHeadingCase } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   grid: {
-    display: 'grid',
+    display: "grid",
     gridTemplateColumns: `
       minmax(10px, 0.5fr) minmax(100px, 740px) minmax(30px, 0.5fr) minmax(300px, 740px) minmax(30px, 0.5fr)
     `,
@@ -17,9 +16,9 @@ const styles = (theme: ThemeType): JssStyles => ({
     `,
     paddingBottom: 175,
     alignItems: "start",
-    [theme.breakpoints.down('sm')]: {
-      display: "block"
-    }
+    [theme.breakpoints.down("sm")]: {
+      display: "block",
+    },
   },
   leftColumn: {
     gridArea: "leftColumn",
@@ -27,27 +26,27 @@ const styles = (theme: ThemeType): JssStyles => ({
     top: 72,
     paddingLeft: 24,
     paddingRight: 36,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       gridArea: "unset",
       paddingLeft: 0,
       paddingRight: 0,
       overflow: "unset",
       height: "unset",
-      position: "unset"
-    }
+      position: "unset",
+    },
   },
   rightColumn: {
     gridArea: "rightColumn",
-    [theme.breakpoints.down('sm')]: {
-      gridArea: "unset"
+    [theme.breakpoints.down("sm")]: {
+      gridArea: "unset",
     },
   },
   root: {
-    display: "flex"
+    display: "flex",
   },
   menu: {
     position: "sticky",
-    top:0,
+    top: 0,
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -57,18 +56,18 @@ const styles = (theme: ThemeType): JssStyles => ({
     padding: 10,
     marginBottom: 2,
     // background: theme.palette.grey[310],
-    flexWrap: "wrap"
+    flexWrap: "wrap",
   },
   sortingOptions: {
     whiteSpace: "pre",
     display: "flex",
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       paddingTop: 12,
-      paddingLeft: 4
-    }
+      paddingLeft: 4,
+    },
   },
   reviewProgressBar: {
-    marginRight: "auto"
+    marginRight: "auto",
   },
   postRoot: {
     position: "relative",
@@ -78,102 +77,112 @@ const styles = (theme: ThemeType): JssStyles => ({
     borderBottom: theme.palette.border.itemSeparatorBottom,
   },
   loading: {
-    opacity: .5
-  },  
+    opacity: 0.5,
+  },
   loadMore: {
     ...theme.typography.body2,
     color: theme.palette.primary.main,
-    marginRight: "auto"
-  }
+    marginRight: "auto",
+  },
 });
 
-export const ReviewQuickPage = ({classes}: {
-  classes: ClassesType,
-}) => {
-  const reviewYear = REVIEW_YEAR
-  const [expandedPost, setExpandedPost] = useState<PostsReviewVotingList|null>(null)
-  const [truncatePosts, setTruncatePosts] = useState<boolean>(true)
+export const ReviewQuickPage = ({ classes }: { classes: ClassesType }) => {
+  const reviewYear = REVIEW_YEAR;
+  const [expandedPost, setExpandedPost] = useState<PostsReviewVotingList | null>(null);
+  const [truncatePosts, setTruncatePosts] = useState<boolean>(true);
 
-  const { results: posts, loadMore, loading, totalCount } = useMulti({
+  const {
+    results: posts,
+    loadMore,
+    loading,
+    totalCount,
+  } = useMulti({
     terms: {
       view: "reviewQuickPage",
-      before: `${reviewYear+1}-01-01`,
+      before: `${reviewYear + 1}-01-01`,
       after: `${reviewYear}-01-01`,
       limit: 25,
     },
     collectionName: "Posts",
-    fragmentName: 'PostsReviewVotingList',
-    fetchPolicy: 'cache-and-network',
+    fragmentName: "PostsReviewVotingList",
+    fetchPolicy: "cache-and-network",
     enableTotal: true,
     itemsPerPage: 1000,
-    skip: !reviewYear
+    skip: !reviewYear,
   });
 
-  const { PostsItem, ReviewVotingExpandedPost, FrontpageReviewWidget, SectionFooter, Loading, ReviewPhaseInformation, ReviewDashboardButtons, KarmaVoteStripe } = Components
+  const {
+    PostsItem,
+    ReviewVotingExpandedPost,
+    FrontpageReviewWidget,
+    SectionFooter,
+    Loading,
+    ReviewPhaseInformation,
+    ReviewDashboardButtons,
+    KarmaVoteStripe,
+  } = Components;
 
-  const sortedPostsResults = !!posts ? sortBy(posts, (post1,post2) => {
-    return post1.currentUserVote === null
-  }) : []
+  const sortedPostsResults = !!posts
+    ? sortBy(posts, (post1, post2) => {
+        return post1.currentUserVote === null;
+      })
+    : [];
 
-  const truncatedPostsResults = truncatePosts ? sortedPostsResults.slice(0,12) : sortedPostsResults
+  const truncatedPostsResults = truncatePosts ? sortedPostsResults.slice(0, 12) : sortedPostsResults;
 
   const handleLoadMore = () => {
     if (truncatePosts) {
-      setTruncatePosts(false)
+      setTruncatePosts(false);
     } else {
-      loadMore()
+      loadMore();
     }
-  }
+  };
 
   const loadMoreText = preferredHeadingCase("Load More");
 
-  return <div className={classes.grid}>
-    <div className={classes.leftColumn}>
-      {!expandedPost && <div>
-        <FrontpageReviewWidget showFrontpageItems={false} reviewYear={reviewYear}/>
-        <ReviewPhaseInformation reviewYear={reviewYear} reviewPhase={"REVIEWS"}/>
-        <ReviewDashboardButtons 
-          reviewYear={reviewYear} 
-          reviewPhase={getReviewPhase()}
-          showAdvancedDashboard
-        />
-      </div>}
-      {expandedPost && <ReviewVotingExpandedPost
-        showReviewButton={false}
-        post={expandedPost}
-        setExpandedPost={setExpandedPost}
-      />}
-    </div>
-    <div className={classes.rightColumn}>
-      <div className={classes.menu}>
-        Top Unreviewed Posts
-      </div>
-      <div className={loading ? classes.loading : undefined}>
-        {truncatedPostsResults.map(post => {
-          return <div key={post._id} onClick={() => setExpandedPost(post)} className={classes.postRoot}>
-            <PostsItem 
-              post={post} 
-              showKarma={false}
-              showPostedAt={false}
-            />
-            <KarmaVoteStripe post={post}/>
+  return (
+    <div className={classes.grid}>
+      <div className={classes.leftColumn}>
+        {!expandedPost && (
+          <div>
+            <FrontpageReviewWidget showFrontpageItems={false} reviewYear={reviewYear} />
+            <ReviewPhaseInformation reviewYear={reviewYear} reviewPhase={"REVIEWS"} />
+            <ReviewDashboardButtons reviewYear={reviewYear} reviewPhase={getReviewPhase()} showAdvancedDashboard />
           </div>
-        })}
+        )}
+        {expandedPost && (
+          <ReviewVotingExpandedPost showReviewButton={false} post={expandedPost} setExpandedPost={setExpandedPost} />
+        )}
       </div>
-      <SectionFooter>
-        <div className={classes.loadMore}>
-          {loading && <Loading/>}
-          <a onClick={() => handleLoadMore()}>{loadMoreText} ({truncatedPostsResults.length}/{totalCount})</a>
+      <div className={classes.rightColumn}>
+        <div className={classes.menu}>Top Unreviewed Posts</div>
+        <div className={loading ? classes.loading : undefined}>
+          {truncatedPostsResults.map((post) => {
+            return (
+              <div key={post._id} onClick={() => setExpandedPost(post)} className={classes.postRoot}>
+                <PostsItem post={post} showKarma={false} showPostedAt={false} />
+                <KarmaVoteStripe post={post} />
+              </div>
+            );
+          })}
         </div>
-      </SectionFooter>
+        <SectionFooter>
+          <div className={classes.loadMore}>
+            {loading && <Loading />}
+            <a onClick={() => handleLoadMore()}>
+              {loadMoreText} ({truncatedPostsResults.length}/{totalCount})
+            </a>
+          </div>
+        </SectionFooter>
+      </div>
     </div>
-  </div>;
-}
+  );
+};
 
-const ReviewQuickPageComponent = registerComponent('ReviewQuickPage', ReviewQuickPage, {styles});
+const ReviewQuickPageComponent = registerComponent("ReviewQuickPage", ReviewQuickPage, { styles });
 
 declare global {
   interface ComponentTypes {
-    ReviewQuickPage: typeof ReviewQuickPageComponent
+    ReviewQuickPage: typeof ReviewQuickPageComponent;
   }
 }

@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useQuery, gql } from '@apollo/client';
-import { useOnNavigate } from '../hooks/useOnNavigate';
-import { useOnFocusTab } from '../hooks/useOnFocusTab';
-import { useMulti } from '../../lib/crud/withMulti';
-import { useCurrentUser } from '../common/withUser';
-import { useUpdateCurrentUser } from './useUpdateCurrentUser';
-import { faviconUrlSetting, faviconWithBadgeSetting } from '../../lib/instanceSettings';
-import type { NotificationCountsResult } from '../../lib/collections/notifications/schema';
+import { useCallback, useEffect, useState } from "react";
+import { useQuery, gql } from "@apollo/client";
+import { useOnNavigate } from "../hooks/useOnNavigate";
+import { useOnFocusTab } from "../hooks/useOnFocusTab";
+import { useMulti } from "../../lib/crud/withMulti";
+import { useCurrentUser } from "../common/withUser";
+import { useUpdateCurrentUser } from "./useUpdateCurrentUser";
+import { faviconUrlSetting, faviconWithBadgeSetting } from "../../lib/instanceSettings";
+import type { NotificationCountsResult } from "../../lib/collections/notifications/schema";
 
 /**
  * Provided by the client (if this is running on the client not the server),
@@ -14,48 +14,48 @@ import type { NotificationCountsResult } from '../../lib/collections/notificatio
  * prior to React hydration.
  */
 type ServerSentEventsAPI = {
-  setServerSentEventsActive: ((active:boolean)=>void)|null
-}
+  setServerSentEventsActive: ((active: boolean) => void) | null;
+};
 export const serverSentEventsAPI: ServerSentEventsAPI = {
   setServerSentEventsActive: null,
 };
 
 export type ActiveDialogueServer = {
-  _id: string,
-  userId: string,
-  title: string,
-  coauthorStatuses: {userId: string, confirmed: string, rejected: string}[],
-  activeUserIds: string[],
-  mostRecentEditedAt?: Date,
-}
+  _id: string;
+  userId: string;
+  title: string;
+  coauthorStatuses: { userId: string; confirmed: string; rejected: string }[];
+  activeUserIds: string[];
+  mostRecentEditedAt?: Date;
+};
 
 export type ActiveDialogue = {
-  userIds: string[],
-  postId: string,
-  title: string,
-  mostRecentEditedAt?: Date,
-  anyoneRecentlyActive: boolean,
-}
+  userIds: string[];
+  postId: string;
+  title: string;
+  mostRecentEditedAt?: Date;
+  anyoneRecentlyActive: boolean;
+};
 
 export type ActiveDialogueData = {
   [userId: string]: ActiveDialogue[];
 };
 
 export type ActiveDialoguePartnersMessage = {
-  eventType: 'activeDialoguePartners',
-  data: ActiveDialogue[]
-}
+  eventType: "activeDialoguePartners";
+  data: ActiveDialogue[];
+};
 
 export type TypingIndicatorMessage = {
-  eventType: 'typingIndicator',
-  typingIndicators: TypingIndicatorInfo[]
-}
+  eventType: "typingIndicator";
+  typingIndicators: TypingIndicatorInfo[];
+};
 
 export type NotificationCheckMessage = {
-  eventType: 'notificationCheck',
-  stop?: boolean,
-  newestNotificationTime?: string //stringified date
-}
+  eventType: "notificationCheck";
+  stop?: boolean;
+  newestNotificationTime?: string; //stringified date
+};
 
 export type ServerSentEventsMessage = ActiveDialoguePartnersMessage | TypingIndicatorMessage | NotificationCheckMessage;
 
@@ -74,15 +74,15 @@ const notificationsCheckedAtLocalStorageKey = "notificationsCheckedAt";
  * lastNotificationsCheck would cause a spurious unread-notification count.
  */
 export function useUnreadNotifications(): {
-  unreadNotifications: number
-  unreadPrivateMessages: number
-  checkedAt: Date|null,
-  notificationsOpened: ()=>Promise<void>
-  faviconBadgeNumber: number
+  unreadNotifications: number;
+  unreadPrivateMessages: number;
+  checkedAt: Date | null;
+  notificationsOpened: () => Promise<void>;
+  faviconBadgeNumber: number;
 } {
   const currentUser = useCurrentUser();
   const updateCurrentUser = useUpdateCurrentUser();
-  
+
   function updateFavicon(result: { unreadNotificationCounts: NotificationCountsResult }) {
     /*
      * TODO: this is disabled right now because it's not a great experience showing up on all tabs for all notifications.
@@ -92,26 +92,29 @@ export function useUnreadNotifications(): {
     // const faviconBadgeNumber = result.unreadNotificationCounts?.faviconBadgeNumber;
     // setFaviconBadge(faviconBadgeNumber);
   }
-  
-  const { data, refetch: refetchCounts } = useQuery(gql`
-    query UnreadNotificationCountQuery {
-      unreadNotificationCounts {
-        unreadNotifications
-        unreadPrivateMessages
-        faviconBadgeNumber
-        checkedAt
+
+  const { data, refetch: refetchCounts } = useQuery(
+    gql`
+      query UnreadNotificationCountQuery {
+        unreadNotificationCounts {
+          unreadNotifications
+          unreadPrivateMessages
+          faviconBadgeNumber
+          checkedAt
+        }
       }
-    }
-  `, {
-    ssr: true,
-    onCompleted: updateFavicon,
-  });
+    `,
+    {
+      ssr: true,
+      onCompleted: updateFavicon,
+    },
+  );
 
   const unreadNotifications = data?.unreadNotificationCounts?.unreadNotifications ?? 0;
   const unreadPrivateMessages = data?.unreadNotificationCounts?.unreadPrivateMessages ?? 0;
   const faviconBadgeNumber = data?.unreadNotificationCounts?.faviconBadgeNumber ?? 0;
   const checkedAt = data?.unreadNotificationCounts?.checkedAt || null;
-  
+
   // Prefetch notifications. This matches the view that the notifications sidebar
   // opens to by default (in `NotificationsMenu`); it isn't actually *used* here
   // but having fetched it puts it into the cache, which saves a load-spinner
@@ -122,12 +125,12 @@ export function useUnreadNotifications(): {
       userId: currentUser?._id,
     },
     collectionName: "Notifications",
-    fragmentName: 'NotificationsList',
+    fragmentName: "NotificationsList",
     limit: 20,
     enableTotal: false,
     skip: !currentUser?._id,
   });
-  
+
   const refetchBoth = useCallback(async () => {
     if (currentUser?._id) {
       void refetchNotifications();
@@ -143,12 +146,9 @@ export function useUnreadNotifications(): {
   // other tabs handle the event by clearing the badge.
   useEffect(() => {
     const storageEventListener = (event: StorageEvent) => {
-      if (
-        event.key === notificationsCheckedAtLocalStorageKey
-        && event.newValue
-      ) {
+      if (event.key === notificationsCheckedAtLocalStorageKey && event.newValue) {
         const newCheckedAt = new Date(event.newValue);
-        if (checkedAt && newCheckedAt>checkedAt) {
+        if (checkedAt && newCheckedAt > checkedAt) {
           void refetchCounts();
         }
       }
@@ -162,18 +162,21 @@ export function useUnreadNotifications(): {
 
   useOnNavigate(refetchBoth);
   useOnFocusTab(refetchBoth);
-  
-  const refetchIfNewNotifications = useCallback((message: ServerSentEventsMessage) => {
-    if (message.eventType === 'notificationCheck') {
-      const timestamp = message.newestNotificationTime;
-      if (!checkedAt || (timestamp && new Date(timestamp) > new Date(checkedAt))) {
-        void refetchBoth();
+
+  const refetchIfNewNotifications = useCallback(
+    (message: ServerSentEventsMessage) => {
+      if (message.eventType === "notificationCheck") {
+        const timestamp = message.newestNotificationTime;
+        if (!checkedAt || (timestamp && new Date(timestamp) > new Date(checkedAt))) {
+          void refetchBoth();
+        }
       }
-    }
-  }, [checkedAt, refetchBoth]);
-  
+    },
+    [checkedAt, refetchBoth],
+  );
+
   useOnNotificationsChanged(currentUser, refetchIfNewNotifications);
-  
+
   const notificationsOpened = useCallback(async () => {
     const now = new Date();
     await updateCurrentUser({
@@ -188,33 +191,34 @@ export function useUnreadNotifications(): {
     unreadPrivateMessages,
     faviconBadgeNumber,
     checkedAt,
-    notificationsOpened
+    notificationsOpened,
   };
 }
 
-export const useOnNotificationsChanged = (currentUser: UsersCurrent|null, cb: (message: ServerSentEventsMessage)=>void) => {
+export const useOnNotificationsChanged = (
+  currentUser: UsersCurrent | null,
+  cb: (message: ServerSentEventsMessage) => void,
+) => {
   useEffect(() => {
-    if (!currentUser)
-      return;
+    if (!currentUser) return;
     const onServerSentNotification = (message: ServerSentEventsMessage) => {
       void cb(message);
-    }
+    };
     notificationEventListeners.push(onServerSentNotification);
     serverSentEventsAPI.setServerSentEventsActive?.(true);
-    
+
     return () => {
-      notificationEventListeners = notificationEventListeners.filter(l=>l!==onServerSentNotification);
-      
+      notificationEventListeners = notificationEventListeners.filter((l) => l !== onServerSentNotification);
+
       // When removing a server-sent event listener, wait 200ms (just in case this
       // is a rerender with a remove-and-immediately-add-back) then check whether
       // there are zero event listeners.
       setTimeout(() => {
-        if (!notificationEventListeners.length)
-          serverSentEventsAPI.setServerSentEventsActive?.(false);
+        if (!notificationEventListeners.length) serverSentEventsAPI.setServerSentEventsActive?.(false);
       }, 200);
-    }
+    };
   }, [currentUser, cb]);
-}
+};
 
 /**
  * Set whether or not this tab's favicon has a badge (indicating unread
@@ -239,7 +243,7 @@ function setFaviconBadge(notificationCount: number) {
   }
 }
 
-let notificationEventListeners: Array<(message: ServerSentEventsMessage)=>void> = [];
+let notificationEventListeners: Array<(message: ServerSentEventsMessage) => void> = [];
 
 export function onServerSentNotificationEvent(message: ServerSentEventsMessage) {
   for (let listener of [...notificationEventListeners]) {

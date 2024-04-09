@@ -6,18 +6,18 @@ import { inspect } from "util";
 import { getCollationType } from "./collation";
 
 export type SimpleLookup = {
-  from: string,
-  localField: string,
-  foreignField: string,
-  as: string,
-}
+  from: string;
+  localField: string;
+  foreignField: string;
+  as: string;
+};
 
 export type PipelineLookup = {
-  from: string,
-  let: Record<string, any>,
-  pipeline: Record<string, any>[],
-  as: string,
-}
+  from: string;
+  let: Record<string, any>;
+  pipeline: Record<string, any>[];
+  as: string;
+};
 
 /**
  * The Mongo $lookup aggregation stage supports two different argument signatures,
@@ -33,31 +33,31 @@ export type SelectSqlOptions = Partial<{
   /**
    * Set the maximum number of records that can be returned.
    */
-  count: boolean,
+  count: boolean;
   /**
    * Defined extra syntheticFields using Mongo syntax - these can be arbitrarily
    * complex expressions and have full access to the current scope.
    */
-  addFields: any // TODO typing
+  addFields: any; // TODO typing
   /**
    * Perform a Mongo aggregation $lookup. This is similar to a join, but actually
    * has quite a different output format which is actually implemented using
    * Postgres' `LATERAL` statement in combination with `jsonb_agg()`.
    */
-  lookup: Lookup,
+  lookup: Lookup;
   /**
    * Perform a Mongo aggregation $unwind which works like Postgres' `unnest`.
    */
-  unwind: any, // TODO typing
+  unwind: any; // TODO typing
   /**
    * This provides a hook for the called to insert a raw SQL string into the query,
    * in a suitable position for a join (for example usage, see server/recommendations.ts).
    */
-  joinHook: string,
+  joinHook: string;
   /**
    * Select for an atomic update.
    */
-  forUpdate: boolean,
+  forUpdate: boolean;
   /**
    * Perform a Mongo aggregation $group, which is translated to a Postgres `GROUP BY`.
    * Because this emulates Mongo's behaviour, the fields defined here also act as an
@@ -65,13 +65,13 @@ export type SelectSqlOptions = Partial<{
    * a combination of $match and $group stages in a pipeline rather than using this
    * directly.
    */
-  group: Record<string, any>, // TODO Better typing
+  group: Record<string, any>; // TODO Better typing
   /**
    * Perform a Mongo $sample aggregation where we select `sampleSize` random elements
    * from the result.
    */
-  sampleSize: number,
-}>
+  sampleSize: number;
+}>;
 
 /**
  * Grouping with aggregation expressions is a little unintuative in Postgres as we need
@@ -91,7 +91,7 @@ export const isGroupByAggregateExpression = (value: any) => {
     default:
       throw new Error(`Invalid group-by value: ${inspect(value)}`);
   }
-}
+};
 
 /**
  * Builds a Postgres query to select some specific data from the given table.
@@ -102,7 +102,7 @@ export const isGroupByAggregateExpression = (value: any) => {
  */
 class SelectQuery<T extends DbObject> extends Query<T> {
   private hasLateralJoin = false;
-  private sqlComment: string|null
+  private sqlComment: string | null;
 
   constructor(
     table: Table<T> | Query<T>,
@@ -121,14 +121,14 @@ class SelectQuery<T extends DbObject> extends Query<T> {
       this.appendGroup(sqlOptions.group);
       return;
     }
-    
+
     if (options?.comment) {
       this.sqlComment = sanitizeSqlComment(options.comment);
     }
 
     this.hasLateralJoin = !!sqlOptions?.lookup;
 
-    const {addFields, projection} = this.disambiguateSyntheticFields(sqlOptions?.addFields, options?.projection);
+    const { addFields, projection } = this.disambiguateSyntheticFields(sqlOptions?.addFields, options?.projection);
     this.atoms = this.atoms.concat(this.getProjectedFields(table, sqlOptions?.count, projection));
     if (addFields) {
       this.atoms = this.atoms.concat(this.getSyntheticFields(addFields));
@@ -144,7 +144,7 @@ class SelectQuery<T extends DbObject> extends Query<T> {
     }
 
     if (typeof selector === "string") {
-      selector = {_id: selector};
+      selector = { _id: selector };
     }
 
     if (!this.selectorIsEmpty(selector)) {
@@ -160,7 +160,7 @@ class SelectQuery<T extends DbObject> extends Query<T> {
       this.atoms.push("FOR UPDATE");
     }
   }
-  
+
   getSqlComment() {
     return this.sqlComment;
   }
@@ -175,35 +175,34 @@ class SelectQuery<T extends DbObject> extends Query<T> {
     }
 
     const keys = Object.keys(selector);
-    return keys.length === 1
-      ? keys[0] === "$comment"
-      : keys.length === 0;
+    return keys.length === 1 ? keys[0] === "$comment" : keys.length === 0;
   }
 
   private appendGroup<U extends {}>(group: U) {
     this.atoms = this.atoms.concat(this.getProjectedFields(this.table, undefined, group, false));
     this.atoms = this.atoms.concat(["FROM", this.table, "GROUP BY"]);
-    const keys = Object.keys(group).filter((key: string) => !isGroupByAggregateExpression((group as AnyBecauseTodo)[key]));
-    const fields = keys.map((key) =>
-      `"${typeof (group as AnyBecauseTodo)[key] === "string" && (group as AnyBecauseTodo)[key][0] === "$" ? (group as AnyBecauseTodo)[key].slice(1) : key}"`
+    const keys = Object.keys(group).filter(
+      (key: string) => !isGroupByAggregateExpression((group as AnyBecauseTodo)[key]),
+    );
+    const fields = keys.map(
+      (key) =>
+        `"${typeof (group as AnyBecauseTodo)[key] === "string" && (group as AnyBecauseTodo)[key][0] === "$" ? (group as AnyBecauseTodo)[key].slice(1) : key}"`,
     );
     this.atoms.push(fields.join(", "));
   }
 
   private getStarSelector() {
-    return this.table instanceof Table && !this.hasLateralJoin
-      ? `"${this.table.getName()}".*`
-      : "*";
+    return this.table instanceof Table && !this.hasLateralJoin ? `"${this.table.getName()}".*` : "*";
   }
 
   private appendLateralJoin(lookup: Lookup): void {
-    const {from, as} = lookup;
+    const { from, as } = lookup;
     if (!from || !as) {
       throw new Error("Invalid $lookup");
     }
 
     if ("localField" in lookup && "foreignField" in lookup) {
-      const {localField, foreignField} = lookup;
+      const { localField, foreignField } = lookup;
       const table = getCollectionByTableName(from).collectionName;
       this.atoms.push(`, LATERAL (SELECT jsonb_agg("${table}".*) AS "${as}" FROM "${table}" WHERE`);
       this.atoms.push(`${this.resolveTableName()}"${localField}" = "${table}"."${foreignField}") Q`);
@@ -219,9 +218,9 @@ class SelectQuery<T extends DbObject> extends Query<T> {
     for (const field in addFields) {
       this.syntheticFields[field] = new UnknownType();
     }
-    return Object.keys(addFields).flatMap((field) =>
-      [",", ...this.compileExpression(addFields[field]), "AS", `"${field}"`]
-    ).slice(leadingComma ? 0 : 1);
+    return Object.keys(addFields)
+      .flatMap((field) => [",", ...this.compileExpression(addFields[field]), "AS", `"${field}"`])
+      .slice(leadingComma ? 0 : 1);
   }
 
   private disambiguateSyntheticFields(addFields?: any, projection?: MongoProjection<T>) {
@@ -237,7 +236,7 @@ class SelectQuery<T extends DbObject> extends Query<T> {
         }
       }
     }
-    return {addFields, projection};
+    return { addFields, projection };
   }
 
   private getProjectedFields(
@@ -270,10 +269,7 @@ class SelectQuery<T extends DbObject> extends Query<T> {
       }
     }
 
-    if (
-      this.table instanceof SelectQuery &&
-      (!this.table.syntheticFields._id || projection._id)
-    ) {
+    if (this.table instanceof SelectQuery && (!this.table.syntheticFields._id || projection._id)) {
       autoIncludeId = false;
     }
 
@@ -298,7 +294,7 @@ class SelectQuery<T extends DbObject> extends Query<T> {
       fields = [];
     }
 
-    const compiledFields = fields.map((field) => field.indexOf("*") > -1 ? field : `"${field}"`).join(", ");
+    const compiledFields = fields.map((field) => (field.indexOf("*") > -1 ? field : `"${field}"`)).join(", ");
     let projectedAtoms: Atom<T>[] = compiledFields ? [compiledFields] : [];
     if (Object.keys(addFields).length) {
       projectedAtoms = projectedAtoms.concat(this.getSyntheticFields(addFields, !!projectedAtoms.length));
@@ -307,20 +303,19 @@ class SelectQuery<T extends DbObject> extends Query<T> {
   }
 
   private appendOptions(options: MongoFindOptions<T>, sampleSize?: number): void {
-    const {sort, limit, skip} = options;
+    const { sort, limit, skip } = options;
 
     if (sort && Object.keys(sort).length) {
       this.atoms.push("ORDER BY");
       const sorts: string[] = [];
       for (const field in sort) {
-        const pgSorting = sort[field] === 1
-            ? "ASC NULLS FIRST"
-            : "DESC NULLS LAST"
+        const pgSorting = sort[field] === 1 ? "ASC NULLS FIRST" : "DESC NULLS LAST";
         sorts.push(`${this.resolveFieldName(field)} ${pgSorting}`);
       }
       this.atoms.push(sorts.join(", "));
-    } else if (this.nearbySort) { // Nearby sort is overriden by a sort in `options`
-      const {field, lng, lat} = this.nearbySort;
+    } else if (this.nearbySort) {
+      // Nearby sort is overriden by a sort in `options`
+      const { field, lng, lat } = this.nearbySort;
       this.atoms = this.atoms.concat([
         "ORDER BY EARTH_DISTANCE(LL_TO_EARTH((",
         field,

@@ -1,13 +1,12 @@
-import { arrayOfForeignKeysField } from '../../utils/schemaUtils'
+import { arrayOfForeignKeysField } from "../../utils/schemaUtils";
 
 const schema: SchemaType<"Books"> = {
-
   // default properties
 
   postedAt: {
     type: Date,
     optional: true,
-    canRead: ['guests'],
+    canRead: ["guests"],
     onInsert: () => new Date(),
   },
 
@@ -16,17 +15,17 @@ const schema: SchemaType<"Books"> = {
   title: {
     type: String,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['members'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canUpdate: ["members"],
+    canCreate: ["members"],
   },
 
   subtitle: {
     type: String,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['members'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canUpdate: ["members"],
+    canCreate: ["members"],
   },
 
   // this overrides the book title in the CollectionsPage table of contents,
@@ -35,26 +34,26 @@ const schema: SchemaType<"Books"> = {
     type: String,
     optional: true,
     nullable: true,
-    canRead: ['guests'],
-    canUpdate: ['members'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canUpdate: ["members"],
+    canCreate: ["members"],
   },
 
   collectionId: {
     type: String,
     foreignKey: "Collections",
     optional: false,
-    canRead: ['guests'],
-    canUpdate: ['admins'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canUpdate: ["admins"],
+    canCreate: ["members"],
   },
 
   number: {
     type: Number,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['admins'],
-    canCreate: ['admins'],
+    canRead: ["guests"],
+    canUpdate: ["admins"],
+    canCreate: ["admins"],
   },
 
   postIds: {
@@ -62,16 +61,16 @@ const schema: SchemaType<"Books"> = {
       idFieldName: "postIds",
       resolverName: "posts",
       collectionName: "Posts",
-      type: "Post"
+      type: "Post",
     }),
     optional: true,
     nullable: false,
-    canRead: ['guests'],
-    canUpdate: ['members'],
-    canCreate: ['members'],
-    control: 'PostsListEditor',
+    canRead: ["guests"],
+    canUpdate: ["members"],
+    canCreate: ["members"],
+    control: "PostsListEditor",
   },
-  'postIds.$': {
+  "postIds.$": {
     type: String,
     foreignKey: "Posts",
     optional: true,
@@ -82,16 +81,16 @@ const schema: SchemaType<"Books"> = {
       idFieldName: "sequenceIds",
       resolverName: "sequences",
       collectionName: "Sequences",
-      type: "Sequence"
+      type: "Sequence",
     }),
     optional: true,
     nullable: false,
     canRead: ["guests"],
-    canUpdate: ['members'],
-    canCreate: ['members'],
-    control: 'SequencesListEditor',
+    canUpdate: ["members"],
+    canCreate: ["members"],
+    control: "SequencesListEditor",
   },
-  'sequenceIds.$': {
+  "sequenceIds.$": {
     type: String,
     foreignKey: "Sequences",
     optional: true,
@@ -99,26 +98,24 @@ const schema: SchemaType<"Books"> = {
   displaySequencesAsGrid: {
     type: Boolean,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['admins'],
-    canCreate: ['admins'],
+    canRead: ["guests"],
+    canUpdate: ["admins"],
+    canCreate: ["admins"],
   },
   hideProgressBar: {
     type: Boolean,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['admins'],
-    canCreate: ['admins'],
+    canRead: ["guests"],
+    canUpdate: ["admins"],
+    canCreate: ["admins"],
   },
   showChapters: {
     type: Boolean,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['admins'],
-    canCreate: ['admins'],
+    canRead: ["guests"],
+    canUpdate: ["admins"],
+    canCreate: ["admins"],
   },
-
-}
-
+};
 
 export default schema;

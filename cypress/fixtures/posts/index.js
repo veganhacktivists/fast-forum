@@ -1,7 +1,4 @@
-const testPost = require('./testPost');
-const testAdminPost = require('./testAdminPost');
+const testPost = require("./testPost");
+const testAdminPost = require("./testAdminPost");
 
-module.exports = [
-  testPost,
-  testAdminPost,
-];
+module.exports = [testPost, testAdminPost];

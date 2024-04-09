@@ -1,7 +1,6 @@
-import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
-import { updatePostDenormalizedTags } from '../tagging/tagCallbacks';
-import { Posts } from '../../lib/collections/posts/collection';
-
+import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
+import { updatePostDenormalizedTags } from "../tagging/tagCallbacks";
+import { Posts } from "../../lib/collections/posts/collection";
 
 registerMigration({
   name: "denormalizeTagRelevance",
@@ -14,8 +13,8 @@ registerMigration({
       callback: async (posts: DbPost[]) => {
         // eslint-disable-next-line no-console
         console.log("Migrating post batch");
-        await Promise.all(posts.map(post => updatePostDenormalizedTags(post._id)));
-      }
+        await Promise.all(posts.map((post) => updatePostDenormalizedTags(post._id)));
+      },
     });
-  }
-})
+  },
+});

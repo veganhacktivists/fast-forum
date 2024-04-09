@@ -5,16 +5,13 @@ import { isEAForum } from "../../lib/instanceSettings";
 import { sequenceGetPageUrl } from "../../lib/collections/sequences/helpers";
 import { AnalyticsContext } from "../../lib/analyticsEvents";
 
-const EASequenceCard = ({sequence, className}: {
-  sequence: SequencesPageFragment,
-  className?: string,
-}) => {
+const EASequenceCard = ({ sequence, className }: { sequence: SequencesPageFragment; className?: string }) => {
   // Note: this is not a real slug, it's just so we can recognise the sequence
   // in the analytics, without risking any weirdness due to titles having spaces
   // in them.
   const slug = slugify(sequence?.title ?? "unknown-slug");
 
-  const {eventHandlers} = useHover({
+  const { eventHandlers } = useHover({
     pageElementContext: "sequenceCard",
     documentId: sequence._id,
     documentSlug: slug,
@@ -29,7 +26,7 @@ const EASequenceCard = ({sequence, className}: {
     (isEAForum ? "Banner/yeldubyolqpl3vqqy0m6.jpg" : "sequences/vnyzzznenju0hzdv6pqb.jpg");
   const href = sequenceGetPageUrl(sequence);
 
-  const {EASequenceOrCollectionCard, SequencesHoverOver} = Components;
+  const { EASequenceOrCollectionCard, SequencesHoverOver } = Components;
   return (
     <AnalyticsContext documentSlug={slug}>
       <EASequenceOrCollectionCard
@@ -47,10 +44,7 @@ const EASequenceCard = ({sequence, className}: {
   );
 };
 
-const EASequenceCardComponent = registerComponent(
-  "EASequenceCard",
-  EASequenceCard,
-);
+const EASequenceCardComponent = registerComponent("EASequenceCard", EASequenceCard);
 
 declare global {
   interface ComponentTypes {

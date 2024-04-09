@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 import { Components, registerComponent } from "../../lib/vulcan-lib";
 import type { ConnectedUserInfo } from "./CKPostEditor";
-import keyBy from 'lodash/keyBy';
-import { useSingle } from '../../lib/crud/withSingle';
-import classNames from 'classnames';
+import keyBy from "lodash/keyBy";
+import { useSingle } from "../../lib/crud/withSingle";
+import classNames from "classnames";
 import CloudOff from "@material-ui/icons/CloudOff";
 
 const styles = (theme: ThemeType): JssStyles => ({
@@ -11,12 +11,11 @@ const styles = (theme: ThemeType): JssStyles => ({
     ...theme.typography.body2,
     marginRight: 8,
   },
-  connected: {
-  },
+  connected: {},
   disconnected: {
     color: theme.palette.text.dim40,
-    '& $activeDot': {
-      display: 'none',
+    "& $activeDot": {
+      display: "none",
     },
   },
   offlineIcon: {
@@ -31,64 +30,81 @@ const styles = (theme: ThemeType): JssStyles => ({
     height: 7,
     width: 7,
     backgroundColor: theme.palette.secondary.light,
-    borderRadius: '50%',
-    display: 'inline-block',
+    borderRadius: "50%",
+    display: "inline-block",
     boxShadow: `0 0 5px ${theme.palette.secondary.light}, 0 0 8px ${theme.palette.secondary.light}`,
     marginRight: 4,
-    marginLeft: 9
+    marginLeft: 9,
   },
-})
+});
 
 /**
  * UI for displaying who's currently connected, in the collaborative editor.
  * This is used inside fo EditorTopBar. If alwaysShownUserIds is provided, those
  * users will be shown even if they're not connected (but grayed out).
  */
-const PresenceList = ({connectedUsers, alwaysShownUserIds, classes}: {
-  connectedUsers: ConnectedUserInfo[],
-  alwaysShownUserIds?: string[],
-  classes: ClassesType,
+const PresenceList = ({
+  connectedUsers,
+  alwaysShownUserIds,
+  classes,
+}: {
+  connectedUsers: ConnectedUserInfo[];
+  alwaysShownUserIds?: string[];
+  classes: ClassesType;
 }) => {
-  const connectedUsersById = keyBy(connectedUsers, u=>u._id);
+  const connectedUsersById = keyBy(connectedUsers, (u) => u._id);
   const disconnectedUserIds: string[] = alwaysShownUserIds
-    ? alwaysShownUserIds.filter(userId => !connectedUsersById[userId])
+    ? alwaysShownUserIds.filter((userId) => !connectedUsersById[userId])
     : [];
 
-  return <div>
-    {connectedUsers.map(u => <PresenceListUser key={u._id} connected={true} userId={u._id} classes={classes}/>)}
-    {disconnectedUserIds.map(userId => <PresenceListUser key={userId} connected={false} userId={userId} classes={classes}/>)}
-  </div>
-}
+  return (
+    <div>
+      {connectedUsers.map((u) => (
+        <PresenceListUser key={u._id} connected={true} userId={u._id} classes={classes} />
+      ))}
+      {disconnectedUserIds.map((userId) => (
+        <PresenceListUser key={userId} connected={false} userId={userId} classes={classes} />
+      ))}
+    </div>
+  );
+};
 
-const PresenceListUser = ({userId, connected, classes}: {
-  userId: string,
-  connected: boolean,
-  classes: ClassesType,
+const PresenceListUser = ({
+  userId,
+  connected,
+  classes,
+}: {
+  userId: string;
+  connected: boolean;
+  classes: ClassesType;
 }) => {
   const { document: user } = useSingle({
     collectionName: "Users",
     fragmentName: "UsersMinimumInfo",
-    documentId: userId
+    documentId: userId,
   });
 
   if (!user) {
-    return <span/>
+    return <span />;
   }
-  return <span className={classNames(classes.user, {
-    [classes.connected]: connected,
-    [classes.disconnected]: !connected,
-  })}>
-    <div className={classes.activeDot}>
-    </div>
-    <span className={classes.offlineIcon}>{!connected && <CloudOff/>}</span>
-    <Components.UsersName user={user}/>
-  </span>
-}
+  return (
+    <span
+      className={classNames(classes.user, {
+        [classes.connected]: connected,
+        [classes.disconnected]: !connected,
+      })}
+    >
+      <div className={classes.activeDot}></div>
+      <span className={classes.offlineIcon}>{!connected && <CloudOff />}</span>
+      <Components.UsersName user={user} />
+    </span>
+  );
+};
 
-const PresenceListComponent = registerComponent('PresenceList', PresenceList, {styles});
+const PresenceListComponent = registerComponent("PresenceList", PresenceList, { styles });
 
 declare global {
   interface ComponentTypes {
-    PresenceList: typeof PresenceListComponent
+    PresenceList: typeof PresenceListComponent;
   }
 }

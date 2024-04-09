@@ -1,2 +1,1 @@
-
-export const myKeyBindingFn: AnyBecauseTodo
+export const myKeyBindingFn: AnyBecauseTodo;

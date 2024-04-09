@@ -1,6 +1,14 @@
 import { useCookies } from "react-cookie";
 import { CookieSetOptions } from "universal-cookie/cjs/types";
-import { ALL_COOKIES, COOKIE_CONSENT_TIMESTAMP_COOKIE, COOKIE_PREFERENCES_COOKIE, CookieType, ONLY_NECESSARY_COOKIES, isCookieAllowed, isValidCookieTypeArray } from "../../lib/cookies/utils";
+import {
+  ALL_COOKIES,
+  COOKIE_CONSENT_TIMESTAMP_COOKIE,
+  COOKIE_PREFERENCES_COOKIE,
+  CookieType,
+  ONLY_NECESSARY_COOKIES,
+  isCookieAllowed,
+  isValidCookieTypeArray,
+} from "../../lib/cookies/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { cookiePreferencesChangedCallbacks } from "../../lib/cookies/callbacks";
 import { getExplicitConsentRequiredAsync, getExplicitConsentRequiredSync } from "../common/CookieBanner/geolocation";
@@ -8,10 +16,13 @@ import { useTracking } from "../../lib/analyticsEvents";
 import moment from "moment";
 import { DatabasePublicSetting } from "../../lib/publicSettings";
 
-const disableCookiePreferenceAutoUpdateSetting = new DatabasePublicSetting<boolean>('disableCookiePreferenceAutoUpdate', false)
+const disableCookiePreferenceAutoUpdateSetting = new DatabasePublicSetting<boolean>(
+  "disableCookiePreferenceAutoUpdate",
+  false,
+);
 /** Global variable storing the last time the cookie preferences were updated automatically, to prevent several instances
  * of this hook from updating the cookie preferences at the same time. */
-let cookiePreferencesAutoUpdatedTime: Date | null = null
+let cookiePreferencesAutoUpdatedTime: Date | null = null;
 
 /**
  * Fetches the current cookie preferences and allows the user to update them.
@@ -27,15 +38,21 @@ export function useCookiePreferences(): {
   explicitConsentGiven: boolean;
   explicitConsentRequired: boolean | "unknown";
 } {
-  const { captureEvent } = useTracking()
-  const [explicitConsentRequired, setExplicitConsentRequired] = useState<boolean | "unknown">(getExplicitConsentRequiredSync());
+  const { captureEvent } = useTracking();
+  const [explicitConsentRequired, setExplicitConsentRequired] = useState<boolean | "unknown">(
+    getExplicitConsentRequiredSync(),
+  );
 
   const [cookies, setCookie] = useCookies([COOKIE_PREFERENCES_COOKIE, COOKIE_CONSENT_TIMESTAMP_COOKIE]);
   const preferencesCookieValue = cookies[COOKIE_PREFERENCES_COOKIE];
-  const explicitConsentGiven = !!cookies[COOKIE_CONSENT_TIMESTAMP_COOKIE] && isValidCookieTypeArray(preferencesCookieValue)
+  const explicitConsentGiven =
+    !!cookies[COOKIE_CONSENT_TIMESTAMP_COOKIE] && isValidCookieTypeArray(preferencesCookieValue);
 
-  const fallbackPreferences: CookieType[] = useMemo(() => explicitConsentRequired !== false ? ONLY_NECESSARY_COOKIES : ALL_COOKIES, [explicitConsentRequired]);
-  const cookiePreferences = explicitConsentGiven ? preferencesCookieValue : fallbackPreferences
+  const fallbackPreferences: CookieType[] = useMemo(
+    () => (explicitConsentRequired !== false ? ONLY_NECESSARY_COOKIES : ALL_COOKIES),
+    [explicitConsentRequired],
+  );
+  const cookiePreferences = explicitConsentGiven ? preferencesCookieValue : fallbackPreferences;
 
   // If we can't determine whether explicit consent is required synchronously (from localStorage), check via the geolocation API
   useEffect(() => {
@@ -52,29 +69,39 @@ export function useCookiePreferences(): {
   useEffect(() => {
     // TODO: this was previously causing an infinite loop for an unknown reason, if this happens again, we should
     // turn this setting on. Remove this once the bug is definitely fixed.
-    if (disableCookiePreferenceAutoUpdateSetting.get()) return
+    if (disableCookiePreferenceAutoUpdateSetting.get()) return;
 
-    const canAutoUpdate = cookiePreferencesAutoUpdatedTime === null || moment().diff(cookiePreferencesAutoUpdatedTime, 'seconds') > 30
+    const canAutoUpdate =
+      cookiePreferencesAutoUpdatedTime === null || moment().diff(cookiePreferencesAutoUpdatedTime, "seconds") > 30;
     if (!canAutoUpdate || explicitConsentRequired === "unknown" || explicitConsentGiven) return;
 
     if (JSON.stringify(fallbackPreferences) !== JSON.stringify(preferencesCookieValue)) {
       cookiePreferencesAutoUpdatedTime = new Date();
-      setCookie(COOKIE_PREFERENCES_COOKIE, cookiePreferences, { path: "/", expires: moment().add(2, 'years').toDate()  });
-      void cookiePreferencesChangedCallbacks.runCallbacks({iterator: { cookiePreferences, explicitlyChanged: false }, properties: []});
+      setCookie(COOKIE_PREFERENCES_COOKIE, cookiePreferences, {
+        path: "/",
+        expires: moment().add(2, "years").toDate(),
+      });
+      void cookiePreferencesChangedCallbacks.runCallbacks({
+        iterator: { cookiePreferences, explicitlyChanged: false },
+        properties: [],
+      });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [explicitConsentRequired, JSON.stringify(cookiePreferences), JSON.stringify(preferencesCookieValue), setCookie]);
-  
+
   const updateCookiePreferences = useCallback(
     (newPreferences: CookieType[]) => {
       captureEvent("cookiePreferencesUpdated", {
         cookiePreferences: newPreferences,
-      })
-      setCookie(COOKIE_CONSENT_TIMESTAMP_COOKIE, new Date(), { path: "/", expires: moment().add(2, 'years').toDate() });
-      setCookie(COOKIE_PREFERENCES_COOKIE, newPreferences, { path: "/", expires: moment().add(2, 'years').toDate() });
-      void cookiePreferencesChangedCallbacks.runCallbacks({iterator: { cookiePreferences: newPreferences, explicitlyChanged: true }, properties: []});
+      });
+      setCookie(COOKIE_CONSENT_TIMESTAMP_COOKIE, new Date(), { path: "/", expires: moment().add(2, "years").toDate() });
+      setCookie(COOKIE_PREFERENCES_COOKIE, newPreferences, { path: "/", expires: moment().add(2, "years").toDate() });
+      void cookiePreferencesChangedCallbacks.runCallbacks({
+        iterator: { cookiePreferences: newPreferences, explicitlyChanged: true },
+        properties: [],
+      });
     },
-    [captureEvent, setCookie]
+    [captureEvent, setCookie],
   );
   return { cookiePreferences, updateCookiePreferences, explicitConsentGiven, explicitConsentRequired };
 }
@@ -83,10 +110,12 @@ export type Cookies = {
   [name: string]: AnyBecauseTodo;
 };
 
-export function useCookiesWithConsent(dependencies?: string[]): [
+export function useCookiesWithConsent(
+  dependencies?: string[],
+): [
   Cookies,
   (name: string, value: AnyBecauseTodo, options?: CookieSetOptions) => void,
-  (name: string, options?: CookieSetOptions) => void
+  (name: string, options?: CookieSetOptions) => void,
 ] {
   const { cookiePreferences } = useCookiePreferences();
 
@@ -103,7 +132,7 @@ export function useCookiesWithConsent(dependencies?: string[]): [
       setCookieBase(name, value, options);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(cookiePreferences), setCookieBase]
+    [JSON.stringify(cookiePreferences), setCookieBase],
   );
 
   return [cookies, setCookie, removeCookieBase];

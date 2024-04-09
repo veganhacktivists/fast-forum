@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-08-07T23:01:23.000Z by 20230807T230123.add_hideHomeRHS_to_Users.ts
  * +-- Overall schema hash: 4aca6d1717b9bb1f98fa154bd99ea8a5
- *  
+ *
  * @@ -1003,3 +1001,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * --- Schema for "Users", hash: 6af340dca1e5f32d30449abd73726b6f
  * +-- Schema for "Users", hash: 269813160b5b2c5562d86035253bf007
  *  CREATE TABLE "Users" (
@@ -22,7 +22,7 @@
  *      "hideFrontpageBook2019Ad" bool,
  * +    "hideFrontpageBook2020Ad" bool,
  *      "sunshineNotes" text DEFAULT '',
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -36,10 +36,10 @@ export const acceptsSchemaHash = "4aca6d1717b9bb1f98fa154bd99ea8a5";
 import Users from "../../lib/collections/users/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Users, "hideFrontpageBook2020Ad");
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Users, "hideFrontpageBook2020Ad");
-}
+};

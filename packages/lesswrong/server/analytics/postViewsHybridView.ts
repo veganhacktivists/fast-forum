@@ -14,7 +14,7 @@ const viewQuery = (crossoverTime: Date, materialized = false) => `
       page_view
     WHERE
       timestamp > '${crossoverTime.toISOString()}'
-      ${materialized ? 'AND timestamp < NOW()' : ''}
+      ${materialized ? "AND timestamp < NOW()" : ""}
     GROUP BY
       post_id,
       date_trunc('day', timestamp)
@@ -29,7 +29,6 @@ const postIndexGenerator = (viewName: string) => `
   -- postViewsHybridView.postIndexGenerator
   CREATE INDEX IF NOT EXISTS "${viewName}_post_index" ON "${viewName}" (post_id);
 `;
-
 
 const windowEndIndexGenerator = (viewName: string) => `
   -- postViewsHybridView.windowEndIndexGenerator

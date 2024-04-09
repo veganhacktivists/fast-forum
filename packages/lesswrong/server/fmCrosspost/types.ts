@@ -1,4 +1,4 @@
-import * as t from 'io-ts';
+import * as t from "io-ts";
 
 /**
  */
@@ -6,24 +6,26 @@ interface PartialWithNullC<P extends t.Props>
   extends t.PartialType<
     P,
     {
-      [K in keyof P]?: t.TypeOf<P[K]> | null
+      [K in keyof P]?: t.TypeOf<P[K]> | null;
     },
     {
-      [K in keyof P]?: t.OutputOf<P[K]> | null
+      [K in keyof P]?: t.OutputOf<P[K]> | null;
     },
     unknown
   > {}
 
 export const partialWithNull = <P extends t.Props>(props: P): PartialWithNullC<P> => {
-  return t.partial(Object.fromEntries(
-    Object.entries(props).map(([key, validator]: [string, t.Type<any> | t.PartialType<any>]) => {
-      if ('props' in validator) {
-        return [key, t.union([t.null, partialWithNull(validator.props)])] as const;
-      } else {
-        return [key, t.union([t.null, validator])] as const;
-      }
-    })
-  )) as unknown as PartialWithNullC<P>;
+  return t.partial(
+    Object.fromEntries(
+      Object.entries(props).map(([key, validator]: [string, t.Type<any> | t.PartialType<any>]) => {
+        if ("props" in validator) {
+          return [key, t.union([t.null, partialWithNull(validator.props)])] as const;
+        } else {
+          return [key, t.union([t.null, validator])] as const;
+        }
+      }),
+    ),
+  ) as unknown as PartialWithNullC<P>;
 };
 
 type Writeable<T> = {
@@ -61,16 +63,16 @@ export const DenormalizedCrosspostValidator = t.intersection([
 ]);
 
 export const CrosspostTokenResponseValidator = t.strict({
-  token: t.string
+  token: t.string,
 });
 
 export const ConnectCrossposterRequestValidator = t.strict({
   token: t.string,
-  localUserId: t.string
+  localUserId: t.string,
 });
 
 export const ConnectCrossposterPayloadValidator = t.strict({
-  userId: t.string
+  userId: t.string,
 });
 
 export type ConnectCrossposterRequest = t.TypeOf<typeof ConnectCrossposterRequestValidator>;
@@ -79,43 +81,41 @@ export type ConnectCrossposterPayload = t.TypeOf<typeof ConnectCrossposterPayloa
 export const ConnectCrossposterResponseValidator = t.strict({
   foreignUserId: t.string,
   localUserId: t.string,
-  status: t.literal('connected')
+  status: t.literal("connected"),
 });
 
 export type ConnectCrossposterResponse = t.TypeOf<typeof ConnectCrossposterResponseValidator>;
 
 export type ConnectCrossposterArgs = {
-  token: string,
-}
+  token: string;
+};
 
 export const UnlinkCrossposterRequestValidator = t.strict({
-  token: t.string
+  token: t.string,
 });
 
-
 export const UnlinkCrossposterPayloadValidator = t.strict({
-  userId: t.string
-}); 
+  userId: t.string,
+});
 
 export type UnlinkCrossposterRequest = t.TypeOf<typeof UnlinkCrossposterRequestValidator>;
 export type UnlinkCrossposterPayload = t.TypeOf<typeof UnlinkCrossposterPayloadValidator>;
 
 export const UnlinkedCrossposterResponseValidator = t.strict({
-  status: t.literal('unlinked')
+  status: t.literal("unlinked"),
 });
 
 export type UnlinkedCrossposterResponse = t.TypeOf<typeof UnlinkedCrossposterResponseValidator>;
 
 export const UpdateCrosspostRequestValidator = t.strict({
-  token: t.string
+  token: t.string,
 });
 
 export type UpdateCrosspostRequest = t.TypeOf<typeof UpdateCrosspostRequestValidator>;
 
 export const UpdateCrosspostResponseValidator = t.strict({
-  status: t.literal('updated')
+  status: t.literal("updated"),
 });
-
 
 /**
  * Intersesction creates an intersection of types (i.e. type A & type B)
@@ -124,21 +124,21 @@ export const UpdateCrosspostPayloadValidator = t.intersection([
   t.strict({
     postId: t.string,
   }),
-  DenormalizedCrosspostValidator
+  DenormalizedCrosspostValidator,
 ]);
 
 export type UpdateCrosspostResponse = t.TypeOf<typeof UpdateCrosspostResponseValidator>;
 export type UpdateCrosspostPayload = t.TypeOf<typeof UpdateCrosspostPayloadValidator>;
 
 export const CrosspostRequestValidator = t.strict({
-  token: t.string
+  token: t.string,
 });
 
 export type CrosspostRequest = t.TypeOf<typeof CrosspostRequestValidator>;
 
 export const CrosspostResponseValidator = t.strict({
   postId: t.string,
-  status: t.literal('posted')
+  status: t.literal("posted"),
 });
 
 /**
@@ -150,7 +150,7 @@ export const CrosspostPayloadValidator = t.intersection([
     foreignUserId: t.string,
     postId: t.string,
   }),
-  DenormalizedCrosspostValidator
+  DenormalizedCrosspostValidator,
 ]);
 
 export type CrosspostResponse = t.TypeOf<typeof CrosspostResponseValidator>;
@@ -164,22 +164,21 @@ export type Crosspost = Pick<DbPost, "_id" | "userId" | "fmCrosspost"> & Denorma
 export const GetCrosspostRequestValidator = t.intersection([
   t.strict({
     documentId: t.string,
-    collectionName: t.literal('Posts'),
+    collectionName: t.literal("Posts"),
     // This is a more performant way of representing a union of string literals
-    fragmentName: t.keyof({ 'PostsWithNavigation': null, 'PostsWithNavigationAndRevision': null, 'PostsList': null }),
+    fragmentName: t.keyof({ PostsWithNavigation: null, PostsWithNavigationAndRevision: null, PostsList: null }),
   }),
   t.partial({
     extraVariables: t.strict({
-      sequenceId: t.literal('String')
+      sequenceId: t.literal("String"),
     }),
     extraVariablesValues: t.strict({
-      sequenceId: t.union([t.string, t.null])
+      sequenceId: t.union([t.string, t.null]),
     }),
-  })
+  }),
 ]);
 
 export type GetCrosspostRequest = t.TypeOf<typeof GetCrosspostRequestValidator>;
-
 
 /**
  * Partial, in addition to treating all of the specified fields as optional, is permissive with respect to fields not specified
@@ -190,7 +189,7 @@ export type GetCrosspostRequest = t.TypeOf<typeof GetCrosspostRequestValidator>;
 //   // _id, slug, and isEvent are specified separately because `postGetPageUrl` requires those 3 fields to not have `null` as a possible value
 //   t.strict({
 //     _id: t.string,
-//     slug: t.string,  
+//     slug: t.string,
 //   }),
 //   t.partial({
 //     isEvent: t.boolean,
@@ -281,8 +280,7 @@ export type GetCrosspostRequest = t.TypeOf<typeof GetCrosspostRequestValidator>;
 
 export const GetCrosspostResponseValidator = t.strict({
   // document: CrosspostValidator,
-  document: t.UnknownRecord
+  document: t.UnknownRecord,
 });
-
 
 export type GetCrosspostResponse = t.TypeOf<typeof GetCrosspostResponseValidator>;

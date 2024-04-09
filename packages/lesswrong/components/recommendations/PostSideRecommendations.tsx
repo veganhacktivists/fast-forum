@@ -57,35 +57,33 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const PostSideRecommendations = ({post, className, classes}: {
-  post: PostsWithNavigation|PostsWithNavigationAndRevision,
-  className?: string,
-  classes: ClassesType,
+const PostSideRecommendations = ({
+  post,
+  className,
+  classes,
+}: {
+  post: PostsWithNavigation | PostsWithNavigationAndRevision;
+  className?: string;
+  classes: ClassesType;
 }) => {
-  const {captureEvent} = useTracking();
+  const { captureEvent } = useTracking();
   const currentUser = useCurrentUser();
-  const {
-    loading,
-    title,
-    Container = "div",
-    items,
-    hideCookieName,
-  } = usePostSideRecommendations(currentUser, post);
-  const [
-    cookies,
-    setCookie,
-  ] = useCookiesWithConsent(hideCookieName ? [hideCookieName] : []);
+  const { loading, title, Container = "div", items, hideCookieName } = usePostSideRecommendations(currentUser, post);
+  const [cookies, setCookie] = useCookiesWithConsent(hideCookieName ? [hideCookieName] : []);
 
-  const onHide = useCallback((ev: MouseEvent) => {
-    ev.preventDefault();
-    if (hideCookieName) {
-      setCookie(hideCookieName, "true", {
-        expires: moment().add(365, "days").toDate(),
-        path: "/",
-      });
-      captureEvent("hidePostSideRecommendations", {title, hideCookieName});
-    }
-  }, [hideCookieName, setCookie, captureEvent, title]);
+  const onHide = useCallback(
+    (ev: MouseEvent) => {
+      ev.preventDefault();
+      if (hideCookieName) {
+        setCookie(hideCookieName, "true", {
+          expires: moment().add(365, "days").toDate(),
+          path: "/",
+        });
+        captureEvent("hidePostSideRecommendations", { title, hideCookieName });
+      }
+    },
+    [hideCookieName, setCookie, captureEvent, title],
+  );
 
   if (hideCookieName && cookies[hideCookieName] === "true") {
     return null;
@@ -95,34 +93,36 @@ const PostSideRecommendations = ({post, className, classes}: {
     return null;
   }
 
-  const {Loading, IntercomFeedbackButton} = Components;
+  const { Loading, IntercomFeedbackButton } = Components;
   return (
     <AnalyticsContext pageSectionContext="postSideRecommendations">
       <div className={classNames(classes.root, className)}>
         <div className={classes.title}>{title}</div>
         {loading && <Loading />}
         <Container className={classes.list}>
-          {items.map((Item, i) => <Item key={i} />)}
+          {items.map((Item, i) => (
+            <Item key={i} />
+          ))}
         </Container>
         <div className={classes.buttons}>
           <IntercomFeedbackButton eventName="postSideRecommendationsFeedback" />
-          {hideCookieName &&
-            <a onClick={onHide} className={classes.hideButton}>Hide</a>
-          }
+          {hideCookieName && (
+            <a onClick={onHide} className={classes.hideButton}>
+              Hide
+            </a>
+          )}
         </div>
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const PostSideRecommendationsComponent = registerComponent(
-  "PostSideRecommendations",
-  PostSideRecommendations,
-  {styles},
-);
+const PostSideRecommendationsComponent = registerComponent("PostSideRecommendations", PostSideRecommendations, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    PostSideRecommendations: typeof PostSideRecommendationsComponent
+    PostSideRecommendations: typeof PostSideRecommendationsComponent;
   }
 }

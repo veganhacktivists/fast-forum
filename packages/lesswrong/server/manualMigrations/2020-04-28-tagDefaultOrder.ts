@@ -1,7 +1,6 @@
+import { registerMigration, fillDefaultValues } from "./migrationUtils";
 
-import { registerMigration, fillDefaultValues } from './migrationUtils';
-
-import { Tags } from '../../lib/collections/tags/collection';
+import { Tags } from "../../lib/collections/tags/collection";
 
 registerMigration({
   name: "defaultOrderTags",
@@ -10,7 +9,7 @@ registerMigration({
   action: async () => {
     await fillDefaultValues({
       collection: Tags,
-      fieldName: "defaultOrder"
+      fieldName: "defaultOrder",
     });
-  }
-})
+  },
+});

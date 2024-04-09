@@ -1,25 +1,30 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { captureException }from '@sentry/core';
-import { linkIsExcludedFromPreview } from '../linkPreview/HoverPreviewLink';
-import { toRange } from '../../lib/vendor/dom-anchor-text-quote';
-import { isLWorAF } from '../../lib/instanceSettings';
-import { rawExtractElementChildrenToReactComponent, reduceRangeToText, splitRangeIntoReplaceableSubRanges, wrapRangeWithSpan } from '../../lib/utils/rawDom';
+import React, { Component } from "react";
+import ReactDOM from "react-dom";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { captureException } from "@sentry/core";
+import { linkIsExcludedFromPreview } from "../linkPreview/HoverPreviewLink";
+import { toRange } from "../../lib/vendor/dom-anchor-text-quote";
+import { isLWorAF } from "../../lib/instanceSettings";
+import {
+  rawExtractElementChildrenToReactComponent,
+  reduceRangeToText,
+  splitRangeIntoReplaceableSubRanges,
+  wrapRangeWithSpan,
+} from "../../lib/utils/rawDom";
 
 interface ExternalProps {
   /**
-   * The content to show. This MUST come from a GraphQL resolver which does 
+   * The content to show. This MUST come from a GraphQL resolver which does
    * sanitization, such as post.contents.html
    */
   dangerouslySetInnerHTML: { __html: string };
-  
+
   /**
    * Type-annotation reflecting that you can make a ref of this and call its
    * methods. (Doing so is handled by React, not by anything inside of this
    * using the ref prop)
    */
-  ref?: React.RefObject<ContentItemBody>
+  ref?: React.RefObject<ContentItemBody>;
 
   // className: Name of an additional CSS class to apply to this element.
   className?: string;
@@ -54,17 +59,15 @@ interface ExternalProps {
    * Substrings to replace with an element. Used for highlighting inline
    * reactions.
    */
-  replacedSubstrings?: Record<string, ContentReplacedSubstringComponent>
+  replacedSubstrings?: Record<string, ContentReplacedSubstringComponent>;
 }
 
-export type ContentReplacedSubstringComponent = (props: {
-  children: React.ReactNode
-}) => React.ReactNode;
+export type ContentReplacedSubstringComponent = (props: { children: React.ReactNode }) => React.ReactNode;
 
 interface ContentItemBodyProps extends ExternalProps, WithStylesProps, WithUserProps, WithLocationProps {}
 interface ContentItemBodyState {
-  updatedElements: boolean,
-  renderIndex: number
+  updatedElements: boolean;
+  renderIndex: number;
 }
 
 // The body of a post/comment/etc, created by taking server-side-processed HTML
@@ -79,28 +82,28 @@ interface ContentItemBodyState {
 //    dangerouslySetInnerHTML: Follows the same convention as
 //      dangerouslySetInnerHTML on a div, ie, you set the HTML content of this
 //      by passing dangerouslySetInnerHTML={{__html: "<p>foo</p>"}}.
-export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemBodyState> {
-  private bodyRef: React.RefObject<HTMLDivElement>
+export class ContentItemBody extends Component<ContentItemBodyProps, ContentItemBodyState> {
+  private bodyRef: React.RefObject<HTMLDivElement>;
 
   private replacedElements: Array<{
-    replacementElement: React.ReactNode
-    container: HTMLElement
-  }>
-  
+    replacementElement: React.ReactNode;
+    container: HTMLElement;
+  }>;
+
   constructor(props: ContentItemBodyProps) {
     super(props);
     this.bodyRef = React.createRef<HTMLDivElement>();
     this.replacedElements = [];
     this.state = {
-      updatedElements:false,
+      updatedElements: false,
       renderIndex: 0,
-    }
+    };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.applyLocalModifications();
   }
-  
+
   componentDidUpdate(prevProps: ContentItemBodyProps) {
     if (this.state.updatedElements) {
       const htmlChanged = prevProps.dangerouslySetInnerHTML?.__html !== this.props.dangerouslySetInnerHTML?.__html;
@@ -109,19 +112,19 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
         this.replacedElements = [];
         this.setState({
           updatedElements: false,
-          renderIndex: this.state.renderIndex+1,
+          renderIndex: this.state.renderIndex + 1,
         });
       }
     } else {
       this.applyLocalModifications();
     }
   }
-  
+
   applyLocalModifications() {
     const element = this.bodyRef.current;
     if (element) {
       this.applyLocalModificationsTo(element);
-      this.setState({updatedElements: true})
+      this.setState({ updatedElements: true });
     }
   }
 
@@ -138,7 +141,7 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
       this.markElicitBlocks(element);
       this.wrapStrawPoll(element);
       this.applyIdInsertions(element);
-    } catch(e) {
+    } catch (e) {
       // Don't let exceptions escape from here. This ensures that, if client-side
       // modifications crash, the post/comment text still remains visible.
       captureException(e);
@@ -146,8 +149,7 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
       console.error(e);
     }
   }
-  
-  
+
   /**
    * Return whether a given node from the DOM is inside this ContentItemBody.
    * Used for checking the selection-anchor in a mouse event, for inline reacts.
@@ -155,7 +157,7 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
   containsNode(node: Node): boolean {
     return !!this.bodyRef.current?.contains(node);
   }
-  
+
   /**
    * Return a text stringified version of the contents (by stringifying from the
    * DOM). This is currently used only for warning that an inline-react
@@ -164,35 +166,32 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
    * get a markdown version).
    */
   getText(): string {
-    return this.bodyRef.current?.textContent ?? ""
-  }
-  
-  getAnchorEl(): HTMLDivElement|null {
-    return this.bodyRef.current;
-  }
-  
-  
-  render() {
-    const html = this.props.nofollow ? addNofollowToHTML(this.props.dangerouslySetInnerHTML.__html) : this.props.dangerouslySetInnerHTML.__html
-    
-    return (<React.Fragment>
-      <div
-        key={this.state.renderIndex}
-        className={this.props.className}
-        ref={this.bodyRef}
-        dangerouslySetInnerHTML={{__html: html}}
-      />
-      {
-        this.replacedElements.map(replaced => {
-          return ReactDOM.createPortal(
-            replaced.replacementElement,
-            replaced.container
-          );
-        })
-      }
-    </React.Fragment>);
+    return this.bodyRef.current?.textContent ?? "";
   }
 
+  getAnchorEl(): HTMLDivElement | null {
+    return this.bodyRef.current;
+  }
+
+  render() {
+    const html = this.props.nofollow
+      ? addNofollowToHTML(this.props.dangerouslySetInnerHTML.__html)
+      : this.props.dangerouslySetInnerHTML.__html;
+
+    return (
+      <React.Fragment>
+        <div
+          key={this.state.renderIndex}
+          className={this.props.className}
+          ref={this.bodyRef}
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+        {this.replacedElements.map((replaced) => {
+          return ReactDOM.createPortal(replaced.replacementElement, replaced.container);
+        })}
+      </React.Fragment>
+    );
+  }
 
   /**
    * Given an HTMLCollection, return an array of the elements inside it. Note
@@ -202,22 +201,21 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
   htmlCollectionToArray(collection: HTMLCollectionOf<HTMLElement>): HTMLElement[] {
     if (!collection) return [];
     let ret: Array<HTMLElement> = [];
-    for (let i=0; i<collection.length; i++)
-      ret.push(collection.item(i)!);
+    for (let i = 0; i < collection.length; i++) ret.push(collection.item(i)!);
     return ret;
   }
-  
+
   /**
    * Find elements inside the contents with the given classname, and return them
    * as an array.
    */
   getElementsByClassname(element: HTMLElement, classname: string): HTMLElement[] {
     const elementCollection = element.getElementsByClassName(classname);
-    
+
     if (!elementCollection) return [];
-    
+
     let ret: Array<HTMLElement> = [];
-    for (let i=0; i<elementCollection.length; i++) {
+    for (let i = 0; i < elementCollection.length; i++) {
       // Downcast Element->HTMLElement because the HTMLCollectionOf type doesn't
       // know that getElementsByClassName only returns elements, not text
       // nodes/etc
@@ -225,7 +223,7 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
     }
     return ret;
   }
-  
+
   // Find elements that are too wide, and wrap them in HorizScrollBlock.
   // This is client-only because it requires measuring widths.
   markScrollableBlocks = (element: HTMLElement) => {
@@ -233,27 +231,30 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
     // of them overflow the container, they'll get replaced by a
     // ScrollableBlock.
     const allTopLevelBlocks = element.childNodes;
-    for (let i=0; i<allTopLevelBlocks.length; i++) {
+    for (let i = 0; i < allTopLevelBlocks.length; i++) {
       const block = allTopLevelBlocks[i];
       if (block.nodeType === Node.ELEMENT_NODE) {
         const blockAsElement = block as HTMLElement;
-        if (blockAsElement.scrollWidth > this.bodyRef.current!.clientWidth+1) {
+        if (blockAsElement.scrollWidth > this.bodyRef.current!.clientWidth + 1) {
           this.addHorizontalScrollIndicators(blockAsElement);
         }
       }
     }
-  }
-  
+  };
+
   // Given an HTML block element which has horizontal scroll, wrap it in a
   // <HorizScrollBlock>.
   addHorizontalScrollIndicators = (block: HTMLElement) => {
-    const ScrollableContents = rawExtractElementChildrenToReactComponent(block)
-    this.replaceElement(block, <Components.HorizScrollBlock>
-      <ScrollableContents/>
-    </Components.HorizScrollBlock>);
+    const ScrollableContents = rawExtractElementChildrenToReactComponent(block);
+    this.replaceElement(
+      block,
+      <Components.HorizScrollBlock>
+        <ScrollableContents />
+      </Components.HorizScrollBlock>,
+    );
   };
 
-  forwardAttributes = (node: HTMLElement|Element) => {
+  forwardAttributes = (node: HTMLElement | Element) => {
     const result: Record<string, unknown> = {};
     const attrs = node.attributes ?? [];
     for (let i = 0; i < attrs.length; i++) {
@@ -265,8 +266,7 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
       }
     }
     return result;
-  }
-
+  };
 
   collapseFootnotes = (body: HTMLElement) => {
     if (isLWorAF || !body) {
@@ -280,47 +280,45 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
         innerHTML = `<section>${innerHTML}</section>`;
       }
       const collapsedFootnotes = (
-        <Components.CollapsedFootnotes
-          footnotesHtml={innerHTML}
-          attributes={this.forwardAttributes(footnotes)}
-        />
+        <Components.CollapsedFootnotes footnotesHtml={innerHTML} attributes={this.forwardAttributes(footnotes)} />
       );
       this.replaceElement(footnotes, collapsedFootnotes);
     }
-  }
+  };
 
   markHoverableLinks = (element: HTMLElement) => {
     const linkTags = this.htmlCollectionToArray(element.getElementsByTagName("a"));
     for (let linkTag of linkTags) {
       const href = linkTag.getAttribute("href");
-      if (!href || linkIsExcludedFromPreview(href))
-        continue;
+      if (!href || linkIsExcludedFromPreview(href)) continue;
 
       const TagLinkContents = rawExtractElementChildrenToReactComponent(linkTag);
       const id = linkTag.getAttribute("id") ?? undefined;
       const rel = linkTag.getAttribute("rel") ?? undefined;
-      const replacementElement = <Components.HoverPreviewLink
-        href={href}
-        contentSourceDescription={this.props.description}
-        id={id}
-        rel={rel}
-        noPrefetch={this.props.noHoverPreviewPrefetch}
-      >
-        <TagLinkContents/>
-      </Components.HoverPreviewLink>
+      const replacementElement = (
+        <Components.HoverPreviewLink
+          href={href}
+          contentSourceDescription={this.props.description}
+          id={id}
+          rel={rel}
+          noPrefetch={this.props.noHoverPreviewPrefetch}
+        >
+          <TagLinkContents />
+        </Components.HoverPreviewLink>
+      );
       this.replaceElement(linkTag, replacementElement);
     }
-  }
+  };
 
   markElicitBlocks = (element: HTMLElement) => {
     const elicitBlocks = this.getElementsByClassname(element, "elicit-binary-prediction");
     for (const elicitBlock of elicitBlocks) {
       if (elicitBlock.dataset?.elicitId) {
-        const replacementElement = <Components.ElicitBlock questionId={elicitBlock.dataset.elicitId}/>
-        this.replaceElement(elicitBlock, replacementElement)
+        const replacementElement = <Components.ElicitBlock questionId={elicitBlock.dataset.elicitId} />;
+        this.replaceElement(elicitBlock, replacementElement);
       }
     }
-  }
+  };
 
   /**
    * Find embedded Strawpoll blocks (an iframe integration to a polling site),
@@ -343,13 +341,13 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
       const id = strawpollBlock.getAttribute("id");
       const iframe = strawpollBlock.getElementsByTagName("iframe");
       const iframeSrc = iframe[0]?.getAttribute("src") ?? "";
-      const replacementElement = <Components.WrappedStrawPoll id={id} src={iframeSrc} />
-      this.replaceElement(strawpollBlock, replacementElement)
+      const replacementElement = <Components.WrappedStrawPoll id={id} src={iframeSrc} />;
+      this.replaceElement(strawpollBlock, replacementElement);
     }
-  }
-  
+  };
+
   replaceSubstrings = (element: HTMLElement) => {
-    if(this.props.replacedSubstrings) {
+    if (this.props.replacedSubstrings) {
       for (let str of Object.keys(this.props.replacedSubstrings)) {
         const replacement: ContentReplacedSubstringComponent = this.props.replacedSubstrings[str]!;
 
@@ -360,7 +358,7 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
           // We're using the dom-anchor-text-quote library for this search,
           // which is a thin wrapper around diff-match-patch, which is a diffing
           // library with a full suite of fuzzy matching heuristics.
-          const range: Range|null = toRange(
+          const range: Range | null = toRange(
             element,
             { exact: str.trim() },
             { hint: 0 }, //TODO: store offsets with text, make use for resolving match ambiguity
@@ -371,11 +369,11 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
             for (let subRange of subRanges) {
               const reducedRange = reduceRangeToText(subRange);
               if (reducedRange) {
-                const span = wrapRangeWithSpan(reducedRange)
+                const span = wrapRangeWithSpan(reducedRange);
                 if (span) {
                   const InlineReactedSpan = rawExtractElementChildrenToReactComponent(span);
                   const replacementNode = replacement({
-                    children: <InlineReactedSpan/>
+                    children: <InlineReactedSpan />,
                   });
                   this.replaceElement(span, replacementNode);
                 }
@@ -388,8 +386,8 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
         }
       }
     }
-  }
-  
+  };
+
   applyIdInsertions = (element: HTMLElement) => {
     if (!this.props.idInsertions) return;
     for (let id of Object.keys(this.props.idInsertions)) {
@@ -398,10 +396,9 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
       // TODO: Check that it's inside this ContentItemBody
       if (container) this.insertElement(container, <>{addedElement}</>);
     }
-  }
+  };
 
-
-  replaceElement = (replacedElement: HTMLElement|Element, replacementElement: React.ReactNode) => {
+  replaceElement = (replacedElement: HTMLElement | Element, replacementElement: React.ReactNode) => {
     const replacementContainer = document.createElement("span");
     if (replacementContainer) {
       this.replacedElements.push({
@@ -410,8 +407,8 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
       });
       replacedElement.parentElement?.replaceChild(replacementContainer, replacedElement);
     }
-  }
-  
+  };
+
   insertElement = (container: HTMLElement, insertedElement: React.ReactNode) => {
     const insertionContainer = document.createElement("span");
     this.replacedElements.push({
@@ -419,14 +416,12 @@ export class ContentItemBody extends Component<ContentItemBodyProps,ContentItemB
       container: insertionContainer,
     });
     container.prepend(insertionContainer);
-  }
+  };
 }
-
 
 const addNofollowToHTML = (html: string): string => {
-  return html.replace(/<a /g, '<a rel="nofollow" ')
-}
-
+  return html.replace(/<a /g, '<a rel="nofollow" ');
+};
 
 const ContentItemBodyComponent = registerComponent<ExternalProps>("ContentItemBody", ContentItemBody, {
   // This component can't have HoCs because it's used with a ref, to call
@@ -435,6 +430,6 @@ const ContentItemBodyComponent = registerComponent<ExternalProps>("ContentItemBo
 
 declare global {
   interface ComponentTypes {
-    ContentItemBody: typeof ContentItemBodyComponent
+    ContentItemBody: typeof ContentItemBodyComponent;
   }
 }

@@ -30,19 +30,24 @@ const styles = (theme: ThemeType) => ({
 
 type PreVoteProps = VotingProps<ElectionCandidateBasicInfo>;
 
-const PreVoteButton = ({vote, document, className, classes}: PreVoteProps & {
-  className?: string,
-  classes: ClassesType,
+const PreVoteButton = ({
+  vote,
+  document,
+  className,
+  classes,
+}: PreVoteProps & {
+  className?: string;
+  classes: ClassesType;
 }) => {
-  const {hover, everHovered, anchorEl, eventHandlers} = useHover();
-  const {openDialog} = useDialog();
-  const {flash} = useMessages();
+  const { hover, everHovered, anchorEl, eventHandlers } = useHover();
+  const { openDialog } = useDialog();
+  const { flash } = useMessages();
   const currentUser = useCurrentUser();
   const { captureEvent } = useTracking();
 
   const hasVoted = !!document.currentUserExtendedVote?.preVote;
   const icon = hasVoted || (hover && !isMobile()) ? "Heart" : "HeartOutline";
-  const tooltip = 'Prevoting has closed, as has the Donation Election. Results will be announced soon.';
+  const tooltip = "Prevoting has closed, as has the Donation Election. Results will be announced soon.";
 
   const onVote = useCallback(async () => {
     // TODO: Uncomment below if we run another election and want to allow pre-voting
@@ -66,10 +71,10 @@ const PreVoteButton = ({vote, document, className, classes}: PreVoteProps & {
     // }
   }, []);
 
-  const {LWPopper, ForumIcon} = Components;
+  const { LWPopper, ForumIcon } = Components;
   return (
     <>
-      {everHovered &&
+      {everHovered && (
         <LWPopper
           placement="bottom"
           open={hover}
@@ -80,22 +85,13 @@ const PreVoteButton = ({vote, document, className, classes}: PreVoteProps & {
         >
           {tooltip}
         </LWPopper>
-      }
-      <ForumIcon
-        {...eventHandlers}
-        onClick={onVote}
-        icon={icon}
-        className={classNames(classes.root, className)}
-      />
+      )}
+      <ForumIcon {...eventHandlers} onClick={onVote} icon={icon} className={classNames(classes.root, className)} />
     </>
   );
-}
+};
 
-const PreVoteButtonComponent = registerComponent(
-  "PreVoteButton",
-  PreVoteButton,
-  {styles},
-);
+const PreVoteButtonComponent = registerComponent("PreVoteButton", PreVoteButton, { styles });
 
 declare global {
   interface ComponentTypes {

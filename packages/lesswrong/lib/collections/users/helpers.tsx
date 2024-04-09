@@ -1,32 +1,40 @@
-import bowser from 'bowser';
-import { isClient, isServer } from '../../executionEnvironment';
-import { forumTypeSetting, isEAForum, isLW, lowKarmaUserVotingCutoffDateSetting, lowKarmaUserVotingCutoffKarmaSetting } from "../../instanceSettings";
-import { getSiteUrl } from '../../vulcan-lib/utils';
-import { userOwns, userCanDo, userIsMemberOf } from '../../vulcan-users/permissions';
-import React, { useEffect, useState } from 'react';
-import * as _ from 'underscore';
-import { getBrowserLocalStorage } from '../../../components/editor/localStorageHandlers';
-import { Components } from '../../vulcan-lib';
-import type { PermissionResult } from '../../make_voteable';
-import { DatabasePublicSetting } from '../../publicSettings';
-import moment from 'moment';
-import { MODERATOR_ACTION_TYPES } from '../moderatorActions/schema';
+import bowser from "bowser";
+import { isClient, isServer } from "../../executionEnvironment";
+import {
+  forumTypeSetting,
+  isEAForum,
+  isLW,
+  lowKarmaUserVotingCutoffDateSetting,
+  lowKarmaUserVotingCutoffKarmaSetting,
+} from "../../instanceSettings";
+import { getSiteUrl } from "../../vulcan-lib/utils";
+import { userOwns, userCanDo, userIsMemberOf } from "../../vulcan-users/permissions";
+import React, { useEffect, useState } from "react";
+import * as _ from "underscore";
+import { getBrowserLocalStorage } from "../../../components/editor/localStorageHandlers";
+import { Components } from "../../vulcan-lib";
+import type { PermissionResult } from "../../make_voteable";
+import { DatabasePublicSetting } from "../../publicSettings";
+import moment from "moment";
+import { MODERATOR_ACTION_TYPES } from "../moderatorActions/schema";
 
-const newUserIconKarmaThresholdSetting = new DatabasePublicSetting<number|null>('newUserIconKarmaThreshold', null)
+const newUserIconKarmaThresholdSetting = new DatabasePublicSetting<number | null>("newUserIconKarmaThreshold", null);
 
 // Get a user's display name (not unique, can take special characters and spaces)
-export const userGetDisplayName = (user: { username: string | null, fullName?: string | null, displayName: string | null } | null): string => {
+export const userGetDisplayName = (
+  user: { username: string | null; fullName?: string | null; displayName: string | null } | null,
+): string => {
   if (!user) {
     return "";
   } else {
-    return forumTypeSetting.get() === 'AlignmentForum' ? 
-      (user.fullName || user.displayName) ?? "" :
-      (user.displayName || getUserName(user)) ?? ""
+    return forumTypeSetting.get() === "AlignmentForum"
+      ? (user.fullName || user.displayName) ?? ""
+      : (user.displayName || getUserName(user)) ?? "";
   }
 };
 
 // Get a user's username (unique, no special characters or spaces)
-export const getUserName = function(user: {username: string | null } | null): string|null {
+export const getUserName = function (user: { username: string | null } | null): string | null {
   try {
     if (user?.username) return user.username;
   } catch (error) {
@@ -37,15 +45,15 @@ export const getUserName = function(user: {username: string | null } | null): st
 
 export const userOwnsAndInGroup = (group: PermissionGroups) => {
   return (user: DbUser, document: HasUserIdType): boolean => {
-    return userOwns(user, document) && userIsMemberOf(user, group)
-  }
-}
+    return userOwns(user, document) && userIsMemberOf(user, group);
+  };
+};
 
 /**
  * Count a user as "new" if they have low karma or joined less than a week ago
  */
 export const isNewUser = (user: UsersMinimumInfo): boolean => {
-  const karmaThreshold = newUserIconKarmaThresholdSetting.get()
+  const karmaThreshold = newUserIconKarmaThresholdSetting.get();
   const userKarma = user.karma;
   const userBelowKarmaThreshold = karmaThreshold && userKarma < karmaThreshold;
 
@@ -60,24 +68,24 @@ export const isNewUser = (user: UsersMinimumInfo): boolean => {
   if (userBelowKarmaThreshold) {
     return moment(user.createdAt).isAfter(moment().subtract(1, "year"));
   }
-  
+
   // But continue to return true for a week even if they pass the karma threshold
   return moment(user.createdAt).isAfter(moment().subtract(1, "week"));
-}
+};
 
 export interface SharableDocument {
-  coauthorStatuses?: DbPost["coauthorStatuses"]
-  shareWithUsers?: DbPost["shareWithUsers"]
-  sharingSettings?: DbPost["sharingSettings"]
+  coauthorStatuses?: DbPost["coauthorStatuses"];
+  shareWithUsers?: DbPost["shareWithUsers"];
+  sharingSettings?: DbPost["sharingSettings"];
 }
 
-export const userIsSharedOn = (currentUser: DbUser|UsersMinimumInfo|null, document: SharableDocument): boolean => {
+export const userIsSharedOn = (currentUser: DbUser | UsersMinimumInfo | null, document: SharableDocument): boolean => {
   if (!currentUser) return false;
-  
+
   // Shared as a coauthor? Always give access
-  const coauthorStatuses = document.coauthorStatuses ?? []
-  if (coauthorStatuses.findIndex(({ userId }) => userId === currentUser._id) >= 0) return true
-  
+  const coauthorStatuses = document.coauthorStatuses ?? [];
+  if (coauthorStatuses.findIndex(({ userId }) => userId === currentUser._id) >= 0) return true;
+
   // Explicitly shared?
   if (document.shareWithUsers && document.shareWithUsers.includes(currentUser._id)) {
     return !document.sharingSettings || document.sharingSettings.explicitlySharedUsersCan !== "none";
@@ -86,39 +94,36 @@ export const userIsSharedOn = (currentUser: DbUser|UsersMinimumInfo|null, docume
     // (1) link sharing is enabled and (2) the user's ID is in
     // linkSharingKeyUsedBy.
     return (
-      document.sharingSettings?.anyoneWithLinkCan
-      && document.sharingSettings.anyoneWithLinkCan !== "none"
-      && ((document as DbPost).linkSharingKeyUsedBy)?.includes(currentUser._id)
-    )
+      document.sharingSettings?.anyoneWithLinkCan &&
+      document.sharingSettings.anyoneWithLinkCan !== "none" &&
+      (document as DbPost).linkSharingKeyUsedBy?.includes(currentUser._id)
+    );
   }
-}
+};
 
-export const userCanEditUsersBannedUserIds = (currentUser: DbUser|null, targetUser: DbUser): boolean => {
-  if (userCanDo(currentUser,"posts.moderate.all")) {
-    return true
+export const userCanEditUsersBannedUserIds = (currentUser: DbUser | null, targetUser: DbUser): boolean => {
+  if (userCanDo(currentUser, "posts.moderate.all")) {
+    return true;
   }
   if (!currentUser || !targetUser) {
-    return false
+    return false;
   }
-  return !!(
-    userCanDo(currentUser,"posts.moderate.own") &&
-    targetUser.moderationStyle
-  )
-}
+  return !!(userCanDo(currentUser, "posts.moderate.own") && targetUser.moderationStyle);
+};
 
 const postHasModerationGuidelines = (post: PostsBase | DbPost) => {
   // Because of a bug in Vulcan that doesn't adequately deal with nested fields
   // in document validation, we check for originalContents instead of html here,
   // which causes some problems with empty strings, but should overall be fine
-  return ('moderationGuidelines' in post && post.moderationGuidelines?.originalContents) || post.moderationStyle
-}
+  return ("moderationGuidelines" in post && post.moderationGuidelines?.originalContents) || post.moderationStyle;
+};
 
-export const userCanModeratePost = (user: UsersProfile|DbUser|null, post?: PostsBase|DbPost|null): boolean => {
-  if (userCanDo(user,"posts.moderate.all")) {
-    return true
+export const userCanModeratePost = (user: UsersProfile | DbUser | null, post?: PostsBase | DbPost | null): boolean => {
+  if (userCanDo(user, "posts.moderate.all")) {
+    return true;
   }
   if (!user || !post) {
-    return false
+    return false;
   }
   // Users who can moderate their personal posts can moderate any post that
   // meets all of the following:
@@ -131,7 +136,7 @@ export const userCanModeratePost = (user: UsersProfile|DbUser|null, post?: Posts
     postHasModerationGuidelines(post) &&
     !post.frontpageDate
   ) {
-    return true
+    return true;
   }
   // Users who can moderate all of their own posts (even those on the frontpage)
   // can moderate any post that meets all of the following:
@@ -139,83 +144,100 @@ export const userCanModeratePost = (user: UsersProfile|DbUser|null, post?: Posts
   //  2) has moderation guidelines
   // We have now checked all the possible conditions for posting, if they fail
   // this, check they cannot moderate this post
-  return !!(
-    userCanDo(user,"posts.moderate.own") &&
-    userOwns(user, post) &&
-    postHasModerationGuidelines(post)
-  )
-}
+  return !!(userCanDo(user, "posts.moderate.own") && userOwns(user, post) && postHasModerationGuidelines(post));
+};
 
-export const userCanModerateComment = (user: UsersProfile|DbUser|null, post: PostsBase|DbPost|null , tag: TagBasicInfo|DbTag|null, comment: CommentsList|DbComment) => {
+export const userCanModerateComment = (
+  user: UsersProfile | DbUser | null,
+  post: PostsBase | DbPost | null,
+  tag: TagBasicInfo | DbTag | null,
+  comment: CommentsList | DbComment,
+) => {
   if (!user || !comment) {
     return false;
   }
   if (post) {
-    if (userCanModeratePost(user, post)) return true 
-    if (userOwns(user, comment) && !comment.directChildrenCount) return true 
-    return false
+    if (userCanModeratePost(user, post)) return true;
+    if (userOwns(user, comment) && !comment.directChildrenCount) return true;
+    return false;
   } else if (tag) {
     if (userIsMemberOf(user, "sunshineRegiment")) {
       return true;
     } else if (userOwns(user, comment) && !comment.directChildrenCount) {
-      return true 
+      return true;
     } else {
-      return false
+      return false;
     }
   } else {
-    return false
+    return false;
   }
-}
+};
 
-export const userCanCommentLock = (user: UsersCurrent|DbUser|null, post: PostsBase|DbPost|null): boolean => {
-  if (userCanDo(user,"posts.commentLock.all")) {
-    return true
+export const userCanCommentLock = (user: UsersCurrent | DbUser | null, post: PostsBase | DbPost | null): boolean => {
+  if (userCanDo(user, "posts.commentLock.all")) {
+    return true;
   }
   if (!user || !post) {
-    return false
+    return false;
   }
-  return !!(
-    userCanDo(user,"posts.commentLock.own") &&
-    userOwns(user, post)
-  )
-}
+  return !!(userCanDo(user, "posts.commentLock.own") && userOwns(user, post));
+};
 
-export const userIsBannedFromPost = (user: UsersMinimumInfo|DbUser, post: PostsDetails|DbPost, postAuthor: PostsAuthors_user|DbUser|null): boolean => {
+export const userIsBannedFromPost = (
+  user: UsersMinimumInfo | DbUser,
+  post: PostsDetails | DbPost,
+  postAuthor: PostsAuthors_user | DbUser | null,
+): boolean => {
   if (!post) return false;
-  return !!(
-    post.bannedUserIds?.includes(user._id) &&
-    postAuthor && userOwns(postAuthor, post)
-  )
-}
+  return !!(post.bannedUserIds?.includes(user._id) && postAuthor && userOwns(postAuthor, post));
+};
 
-export const userIsBannedFromAllPosts = (user: UsersCurrent|DbUser, post: PostsDetails|DbPost, postAuthor: PostsAuthors_user|DbUser|null): boolean => {
-  return !!(
-    // @ts-ignore FIXME: Not enforcing that the fragment includes bannedUserIds
-    postAuthor?.bannedUserIds?.includes(user._id) &&
-    // @ts-ignore FIXME: Not enforcing that the fragment includes user.groups
-    userCanDo(postAuthor, 'posts.moderate.own') &&
-    postAuthor && userOwns(postAuthor, post)
-  )
-}
-
-export const userIsBannedFromAllPersonalPosts = (user: UsersCurrent|DbUser, post: PostsDetails|DbPost, postAuthor: PostsAuthors_user|DbUser|null): boolean => {
+export const userIsBannedFromAllPosts = (
+  user: UsersCurrent | DbUser,
+  post: PostsDetails | DbPost,
+  postAuthor: PostsAuthors_user | DbUser | null,
+): boolean => {
   return !!(
     // @ts-ignore FIXME: Not enforcing that the fragment includes bannedUserIds
-    postAuthor?.bannedPersonalUserIds?.includes(user._id) &&
-    // @ts-ignore FIXME: Not enforcing that the fragment includes user.groups
-    userCanDo(postAuthor, 'posts.moderate.own.personal') &&
-    postAuthor && userOwns(postAuthor, post)
-  )
-}
+    (
+      postAuthor?.bannedUserIds?.includes(user._id) &&
+      // @ts-ignore FIXME: Not enforcing that the fragment includes user.groups
+      userCanDo(postAuthor, "posts.moderate.own") &&
+      postAuthor &&
+      userOwns(postAuthor, post)
+    )
+  );
+};
 
-export const userIsAllowedToComment = (user: UsersCurrent|DbUser|null, post: PostsDetails|DbPost|null, postAuthor: PostsAuthors_user|DbUser|null, isReply: boolean): boolean => {
-  if (!user) return false
-  if (user.deleted) return false
-  if (user.allCommentingDisabled) return false
+export const userIsBannedFromAllPersonalPosts = (
+  user: UsersCurrent | DbUser,
+  post: PostsDetails | DbPost,
+  postAuthor: PostsAuthors_user | DbUser | null,
+): boolean => {
+  return !!(
+    // @ts-ignore FIXME: Not enforcing that the fragment includes bannedUserIds
+    (
+      postAuthor?.bannedPersonalUserIds?.includes(user._id) &&
+      // @ts-ignore FIXME: Not enforcing that the fragment includes user.groups
+      userCanDo(postAuthor, "posts.moderate.own.personal") &&
+      postAuthor &&
+      userOwns(postAuthor, post)
+    )
+  );
+};
+
+export const userIsAllowedToComment = (
+  user: UsersCurrent | DbUser | null,
+  post: PostsDetails | DbPost | null,
+  postAuthor: PostsAuthors_user | DbUser | null,
+  isReply: boolean,
+): boolean => {
+  if (!user) return false;
+  if (user.deleted) return false;
+  if (user.allCommentingDisabled) return false;
 
   // this has to check for post.userId because that isn't consisently provided to CommentsNewForm components, which resulted in users failing to be able to comment on their own shortform post
-  if (user.commentingOnOtherUsersDisabled && post?.userId && (post.userId !== user._id))
-    return false
+  if (user.commentingOnOtherUsersDisabled && post?.userId && post.userId !== user._id) return false;
 
   if (post) {
     if (post.shortform && post.userId && post.userId !== user._id && !isReply) {
@@ -223,177 +245,183 @@ export const userIsAllowedToComment = (user: UsersCurrent|DbUser|null, post: Pos
     }
 
     if (post.commentsLocked) {
-      return false
+      return false;
     }
     if (post.rejected) {
-      return false
+      return false;
     }
     if ((post.commentsLockedToAccountsCreatedAfter ?? new Date()) < user.createdAt) {
-      return false
+      return false;
     }
-  
+
     if (userIsBannedFromPost(user, post, postAuthor)) {
-      return false
+      return false;
     }
-  
+
     if (userIsBannedFromAllPosts(user, post, postAuthor)) {
-      return false
+      return false;
     }
-  
+
     if (userIsBannedFromAllPersonalPosts(user, post, postAuthor) && !post.frontpageDate) {
-      return false
+      return false;
     }
   }
 
-  return true
-}
+  return true;
+};
 
-export const userBlockedCommentingReason = (user: UsersCurrent|DbUser|null, post: PostsDetails|DbPost, postAuthor: PostsAuthors_user|null): JSX.Element => {
+export const userBlockedCommentingReason = (
+  user: UsersCurrent | DbUser | null,
+  post: PostsDetails | DbPost,
+  postAuthor: PostsAuthors_user | null,
+): JSX.Element => {
   if (!user) {
-    return <>Can't recognize user</>
+    return <>Can't recognize user</>;
   }
 
   if (userIsBannedFromPost(user, post, postAuthor)) {
-    return <>This post's author has blocked you from commenting.</>
+    return <>This post's author has blocked you from commenting.</>;
   }
 
   if (userIsBannedFromAllPosts(user, post, postAuthor)) {
-    return <>This post's author has blocked you from commenting.</>
+    return <>This post's author has blocked you from commenting.</>;
   }
 
   if (userIsBannedFromAllPersonalPosts(user, post, postAuthor)) {
-    return <>This post's author has blocked you from commenting on any of their personal blog posts.</>
+    return <>This post's author has blocked you from commenting on any of their personal blog posts.</>;
   }
 
   if (post?.commentsLocked) {
-    return <>Comments on this post are disabled.</>
+    return <>Comments on this post are disabled.</>;
   }
 
   if (post?.commentsLockedToAccountsCreatedAfter) {
-    return <>Comments on this post are disabled to accounts created after <Components.CalendarDate date={post.commentsLockedToAccountsCreatedAfter}/></>
+    return (
+      <>
+        Comments on this post are disabled to accounts created after{" "}
+        <Components.CalendarDate date={post.commentsLockedToAccountsCreatedAfter} />
+      </>
+    );
   }
 
-  return <>You cannot comment at this time</>
-}
+  return <>You cannot comment at this time</>;
+};
 
 // Return true if the user's account has at least one verified email address.
-export const userEmailAddressIsVerified = (user: UsersCurrent|DbUser|null): boolean => {
+export const userEmailAddressIsVerified = (user: UsersCurrent | DbUser | null): boolean => {
   // EA Forum does not do its own email verification
-  if (forumTypeSetting.get() === 'EAForum') {
-    return true
+  if (forumTypeSetting.get() === "EAForum") {
+    return true;
   }
-  if (!user || !user.emails)
-    return false;
+  if (!user || !user.emails) return false;
   for (let email of user.emails) {
-    if (email && email.verified)
-      return true;
+    if (email && email.verified) return true;
   }
   return false;
 };
 
-export const userHasEmailAddress = (user: UsersCurrent|DbUser|null): boolean => {
+export const userHasEmailAddress = (user: UsersCurrent | DbUser | null): boolean => {
   return !!(user?.emails && user.emails.length > 0) || !!user?.email;
-}
+};
 
 type UserMaybeWithEmail = {
-  email: string | null
-  emails: UsersCurrent["emails"] | null
-}
+  email: string | null;
+  emails: UsersCurrent["emails"] | null;
+};
 
-export function getUserEmail (user: UserMaybeWithEmail|null): string | undefined {
-  return user?.emails?.[0]?.address ?? user?.email
+export function getUserEmail(user: UserMaybeWithEmail | null): string | undefined {
+  return user?.emails?.[0]?.address ?? user?.email;
 }
 
 type DatadogUser = {
-  id: string,
-  email?: string,
-  name?: string,
-  slug?: string,
-}
-export function getDatadogUser (user: UsersCurrent | UsersEdit | DbUser): DatadogUser {
+  id: string;
+  email?: string;
+  name?: string;
+  slug?: string;
+};
+export function getDatadogUser(user: UsersCurrent | UsersEdit | DbUser): DatadogUser {
   return {
     id: user._id,
     email: getUserEmail(user),
-    name: user.displayName ?? user.username ?? '[missing displayName and username]', 
-    slug: user.slug ?? 'missing slug',
-  }
+    name: user.displayName ?? user.username ?? "[missing displayName and username]",
+    slug: user.slug ?? "missing slug",
+  };
 }
 
 // Replaces Users.getProfileUrl from the vulcan-users package.
-export const userGetProfileUrl = (user: DbUser|UsersMinimumInfo|SearchUser|null, isAbsolute=false): string => {
+export const userGetProfileUrl = (user: DbUser | UsersMinimumInfo | SearchUser | null, isAbsolute = false): string => {
   if (!user) return "";
-  
+
   if (user.slug) {
     return userGetProfileUrlFromSlug(user.slug, isAbsolute);
   } else {
     return "";
   }
-}
+};
 
-export const userGetProfileUrlFromSlug = (userSlug: string, isAbsolute=false): string => {
+export const userGetProfileUrlFromSlug = (userSlug: string, isAbsolute = false): string => {
   if (!userSlug) return "";
-  
-  const prefix = isAbsolute ? getSiteUrl().slice(0,-1) : '';
+
+  const prefix = isAbsolute ? getSiteUrl().slice(0, -1) : "";
   return `${prefix}/users/${userSlug}`;
-}
-
-
+};
 
 const clientRequiresMarkdown = (): boolean => {
-  if (isClient &&
-      window &&
-      window.navigator &&
-      window.navigator.userAgent) {
-
-      return (bowser.mobile || bowser.tablet)
+  if (isClient && window && window.navigator && window.navigator.userAgent) {
+    return bowser.mobile || bowser.tablet;
   }
-  return false
-}
+  return false;
+};
 
-export const userUseMarkdownPostEditor = (user: UsersCurrent|null): boolean => {
+export const userUseMarkdownPostEditor = (user: UsersCurrent | null): boolean => {
   if (clientRequiresMarkdown()) {
-    return true
+    return true;
   }
   if (!user) {
     return false;
   }
-  return user.markDownPostEditor
-}
+  return user.markDownPostEditor;
+};
 
-export const userCanEditUser = (currentUser: UsersCurrent|DbUser|null, user: HasIdType|HasSlugType|UsersMinimumInfo|DbUser) => {
+export const userCanEditUser = (
+  currentUser: UsersCurrent | DbUser | null,
+  user: HasIdType | HasSlugType | UsersMinimumInfo | DbUser,
+) => {
   // We allow users to call this function with basically "pretend" user objects
   // as the second argument. We know from inspecting userOwns that those pretend
   // user objects are safe, but if userOwns allowed them it would make the type
   // checks much less safe.
-  return userOwns(currentUser, user as UsersMinimumInfo|DbUser) || userCanDo(currentUser, 'users.edit.all')
-}
+  return userOwns(currentUser, user as UsersMinimumInfo | DbUser) || userCanDo(currentUser, "users.edit.all");
+};
 
 interface UserLocation {
-  lat: number,
-  lng: number,
-  loading: boolean,
-  known: boolean,
+  lat: number;
+  lng: number;
+  loading: boolean;
+  known: boolean;
 }
 
 // Return the current user's location, as a latitude-longitude pair, plus the boolean field `known`.
 // If `known` is false, the lat/lng are invalid placeholders.
 // If the user is logged in, we try to return the location specified in their account settings.
-export const userGetLocation = (currentUser: UsersCurrent|DbUser|null): {
-  lat: number,
-  lng: number,
-  known: boolean
+export const userGetLocation = (
+  currentUser: UsersCurrent | DbUser | null,
+): {
+  lat: number;
+  lng: number;
+  known: boolean;
 } => {
   const placeholderLat = 37.871853;
   const placeholderLng = -122.258423;
 
-  const currentUserLat = currentUser && currentUser.mongoLocation && currentUser.mongoLocation.coordinates[1]
-  const currentUserLng = currentUser && currentUser.mongoLocation && currentUser.mongoLocation.coordinates[0]
+  const currentUserLat = currentUser && currentUser.mongoLocation && currentUser.mongoLocation.coordinates[1];
+  const currentUserLng = currentUser && currentUser.mongoLocation && currentUser.mongoLocation.coordinates[0];
 
   if (currentUserLat && currentUserLng) {
-    return {lat: currentUserLat, lng: currentUserLng, known: true}
+    return { lat: currentUserLat, lng: currentUserLng, known: true };
   }
-  return {lat: placeholderLat, lng: placeholderLng, known: false}
-}
+  return { lat: placeholderLat, lng: placeholderLng, known: false };
+};
 
 /**
  * Return the current user's location, by checking a few places.
@@ -419,54 +447,63 @@ export const userGetLocation = (currentUser: UsersCurrent|DbUser|null): {
  * @returns {string} locationData.label - The string description of the location (ex: Cambridge, MA, USA).
  * @returns {Function} locationData.setLocationData - Function to set the location directly.
  */
-export const useUserLocation = (currentUser: UsersCurrent|DbUser|null, dontAsk?: boolean): {
-  lat: number,
-  lng: number,
-  loading: boolean,
-  known: boolean,
-  label: string,
-  setLocationData: Function
+export const useUserLocation = (
+  currentUser: UsersCurrent | DbUser | null,
+  dontAsk?: boolean,
+): {
+  lat: number;
+  lng: number;
+  loading: boolean;
+  known: boolean;
+  label: string;
+  setLocationData: Function;
 } => {
   // default is Berkeley, CA
-  const placeholderLat = 37.871853
-  const placeholderLng = -122.258423
-  const defaultLocation = {lat: placeholderLat, lng: placeholderLng, loading: false, known: false, label: null}
-  
-  const currentUserLat = currentUser && currentUser.mongoLocation && currentUser.mongoLocation.coordinates[1]
-  const currentUserLng = currentUser && currentUser.mongoLocation && currentUser.mongoLocation.coordinates[0]
+  const placeholderLat = 37.871853;
+  const placeholderLng = -122.258423;
+  const defaultLocation = { lat: placeholderLat, lng: placeholderLng, loading: false, known: false, label: null };
+
+  const currentUserLat = currentUser && currentUser.mongoLocation && currentUser.mongoLocation.coordinates[1];
+  const currentUserLng = currentUser && currentUser.mongoLocation && currentUser.mongoLocation.coordinates[0];
 
   const [locationData, setLocationData] = useState(() => {
     if (currentUserLat && currentUserLng) {
       // First return a location from the user profile, if set
-      return {lat: currentUserLat, lng: currentUserLng, loading: false, known: true, label: currentUser?.location}
+      return { lat: currentUserLat, lng: currentUserLng, loading: false, known: true, label: currentUser?.location };
     } else if (isServer) {
       // If there's no location in the user profile, we may still be able to get
       // a location from the browser--but not in SSR.
-      return {lat: placeholderLat, lng: placeholderLng, loading: true, known: false, label: null}
+      return { lat: placeholderLat, lng: placeholderLng, loading: true, known: false, label: null };
     } else {
       // If we're on the browser, and the user isn't logged in, see if we saved it in local storage
-      const ls = getBrowserLocalStorage()
+      const ls = getBrowserLocalStorage();
       if (!currentUser && ls) {
         try {
-          const lsLocation = JSON.parse(ls.getItem('userlocation'))
+          const lsLocation = JSON.parse(ls.getItem("userlocation"));
           if (lsLocation) {
-            return {...lsLocation, loading: false}
+            return { ...lsLocation, loading: false };
           }
-        } catch(e) {
+        } catch (e) {
           // eslint-disable-next-line no-console
-          console.error(e)
+          console.error(e);
         }
       }
       // If we couldn't get it from local storage, we'll try to get a location using the browser
       // geolocation API. This is not always available.
-      if (!dontAsk && typeof window !== 'undefined' && typeof navigator !== 'undefined' && navigator && navigator.geolocation) {
-        return {lat: placeholderLat, lng: placeholderLng, loading: true, known: false, label: null}
+      if (
+        !dontAsk &&
+        typeof window !== "undefined" &&
+        typeof navigator !== "undefined" &&
+        navigator &&
+        navigator.geolocation
+      ) {
+        return { lat: placeholderLat, lng: placeholderLng, loading: true, known: false, label: null };
       }
     }
-  
-    return defaultLocation
-  })
-  
+
+    return defaultLocation;
+  });
+
   useEffect(() => {
     // if we don't yet have a location for the user and we're on the browser,
     // try to get the browser location
@@ -474,52 +511,53 @@ export const useUserLocation = (currentUser: UsersCurrent|DbUser|null, dontAsk?:
       !dontAsk &&
       !locationData.known &&
       !isServer &&
-      typeof window !== 'undefined' &&
-      typeof navigator !== 'undefined' &&
+      typeof window !== "undefined" &&
+      typeof navigator !== "undefined" &&
       navigator &&
       navigator.geolocation
     ) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        if (position && position.coords) {
-          const navigatorLat = position.coords.latitude
-          const navigatorLng = position.coords.longitude
-          // label (location name) needs to be filled in by the caller
-          setLocationData({lat: navigatorLat, lng: navigatorLng, loading: false, known: true, label: ''})
-        } else {
-          setLocationData(defaultLocation)
-        }
-      },
-      (error) => {
-        setLocationData(defaultLocation)
-      }
-    )
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          if (position && position.coords) {
+            const navigatorLat = position.coords.latitude;
+            const navigatorLng = position.coords.longitude;
+            // label (location name) needs to be filled in by the caller
+            setLocationData({ lat: navigatorLat, lng: navigatorLng, loading: false, known: true, label: "" });
+          } else {
+            setLocationData(defaultLocation);
+          }
+        },
+        (error) => {
+          setLocationData(defaultLocation);
+        },
+      );
     }
     //No exhaustive deps because this is supposed to run only on mount
     //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  
-  return {...locationData, setLocationData}
-}
+  }, []);
 
-export const userGetPostCount = (user: UsersMinimumInfo|DbUser): number => {
-  if (forumTypeSetting.get() === 'AlignmentForum') {
+  return { ...locationData, setLocationData };
+};
+
+export const userGetPostCount = (user: UsersMinimumInfo | DbUser): number => {
+  if (forumTypeSetting.get() === "AlignmentForum") {
     return user.afPostCount;
   } else {
     return user.postCount;
   }
-}
+};
 
-export const userGetCommentCount = (user: UsersMinimumInfo|DbUser): number => {
-  if (forumTypeSetting.get() === 'AlignmentForum') {
+export const userGetCommentCount = (user: UsersMinimumInfo | DbUser): number => {
+  if (forumTypeSetting.get() === "AlignmentForum") {
     return user.afCommentCount;
   } else {
     return user.commentCount;
   }
-}
+};
 
-export const isMod = (user: UsersProfile|DbUser): boolean => {
-  return (user.isAdmin || user.groups?.includes('sunshineRegiment')) ?? false
-}
+export const isMod = (user: UsersProfile | DbUser): boolean => {
+  return (user.isAdmin || user.groups?.includes("sunshineRegiment")) ?? false;
+};
 
 // TODO: I (JP) think this should be configurable in the function parameters
 /** Warning! Only returns *auth0*-provided auth0 Ids. If a user has an ID that
@@ -533,22 +571,20 @@ export const getAuth0Id = (user: DbUser) => {
     }
   }
   throw new Error("User does not have an Auth0 user ID");
-}
+};
 
-const SHOW_NEW_USER_GUIDELINES_AFTER = new Date('10-07-2022');
+const SHOW_NEW_USER_GUIDELINES_AFTER = new Date("10-07-2022");
 export const requireNewUserGuidelinesAck = (user: UsersCurrent) => {
-  if (forumTypeSetting.get() !== 'LessWrong') return false;
+  if (forumTypeSetting.get() !== "LessWrong") return false;
 
-  const userCreatedAfterCutoff = user.createdAt
-    ? new Date(user.createdAt) > SHOW_NEW_USER_GUIDELINES_AFTER
-    : false;
+  const userCreatedAfterCutoff = user.createdAt ? new Date(user.createdAt) > SHOW_NEW_USER_GUIDELINES_AFTER : false;
 
   return !user.acknowledgedNewUserGuidelines && userCreatedAfterCutoff;
 };
 
 export const getSignature = (name: string) => {
   const today = new Date();
-  const todayString = today.toLocaleString('default', { month: 'short', day: 'numeric'});
+  const todayString = today.toLocaleString("default", { month: "short", day: "numeric" });
   return `${todayString}, ${name}`;
 };
 
@@ -556,34 +592,39 @@ export const getSignatureWithNote = (name: string, note: string) => {
   return `${getSignature(name)}: ${note}\n`;
 };
 
-export async function appendToSunshineNotes({moderatedUserId, adminName, text, context}: {
-  moderatedUserId: string,
-  adminName: string,
-  text: string,
-  context: ResolverContext,
+export async function appendToSunshineNotes({
+  moderatedUserId,
+  adminName,
+  text,
+  context,
+}: {
+  moderatedUserId: string;
+  adminName: string;
+  text: string;
+  context: ResolverContext;
 }): Promise<void> {
-  const moderatedUser = await context.Users.findOne({_id: moderatedUserId});
+  const moderatedUser = await context.Users.findOne({ _id: moderatedUserId });
   if (!moderatedUser) throw "Invalid userId in appendToSunshineNotes";
   const newNote = getSignatureWithNote(adminName, text);
   const oldNotes = moderatedUser.sunshineNotes ?? "";
   const updatedNotes = `${newNote}${oldNotes}`;
-  await context.Users.rawUpdateOne({_id: moderatedUserId}, {$set: {sunshineNotes: updatedNotes}});
+  await context.Users.rawUpdateOne({ _id: moderatedUserId }, { $set: { sunshineNotes: updatedNotes } });
 }
 
 /**
  * At one point, we disabled voting for users with less than 1 karma
  * Keeping this function and its uses around will make it easier to do that kind of thing in the future
  */
-export const voteButtonsDisabledForUser = (user: UsersMinimumInfo|DbUser|null): PermissionResult => {
+export const voteButtonsDisabledForUser = (user: UsersMinimumInfo | DbUser | null): PermissionResult => {
   return { fail: false };
 };
 
-export const showDonatedFlair = (user: UsersMinimumInfo|DbUser|null): boolean => {
+export const showDonatedFlair = (user: UsersMinimumInfo | DbUser | null): boolean => {
   // Fundraiser closes on 2023-12-20
-  return isEAForum && !!user?.givingSeason2023DonatedFlair && new Date() < new Date('2023-12-21');
-}
+  return isEAForum && !!user?.givingSeason2023DonatedFlair && new Date() < new Date("2023-12-21");
+};
 
-export const showVotedFlair = (user: UsersMinimumInfo|DbUser|null): boolean => {
+export const showVotedFlair = (user: UsersMinimumInfo | DbUser | null): boolean => {
   // Fundraiser closes on 2023-12-20
-  return isEAForum && !!user?.givingSeason2023VotedFlair && new Date() < new Date('2023-12-21');
-}
+  return isEAForum && !!user?.givingSeason2023VotedFlair && new Date() < new Date("2023-12-21");
+};

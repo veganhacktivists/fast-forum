@@ -8,21 +8,25 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const EARecentDiscussionElectionVote = ({electionVote, classes}: {
-  electionVote: ElectionVoteRecentDiscussion,
-  classes: ClassesType,
+const EARecentDiscussionElectionVote = ({
+  electionVote,
+  classes,
+}: {
+  electionVote: ElectionVoteRecentDiscussion;
+  classes: ClassesType;
 }) => {
   if (!electionVote.submittedAt) {
     return null;
   }
-  const {EARecentDiscussionItem} = Components;
+  const { EARecentDiscussionItem } = Components;
   return (
     <EARecentDiscussionItem
       icon="Voted"
       iconVariant="givingSeason"
       action={
         <>
-          voted in the <Link to="/voting-portal" className={classes.link}>
+          voted in the{" "}
+          <Link to="/voting-portal" className={classes.link}>
             Donation Election
           </Link>
         </>
@@ -31,16 +35,16 @@ const EARecentDiscussionElectionVote = ({electionVote, classes}: {
       anonymous
     />
   );
-}
+};
 
 const EARecentDiscussionElectionVoteComponent = registerComponent(
   "EARecentDiscussionElectionVote",
   EARecentDiscussionElectionVote,
-  {styles},
+  { styles },
 );
 
 declare global {
   interface ComponentTypes {
-    EARecentDiscussionElectionVote: typeof EARecentDiscussionElectionVoteComponent,
+    EARecentDiscussionElectionVote: typeof EARecentDiscussionElectionVoteComponent;
   }
 }

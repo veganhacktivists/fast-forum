@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 import { useMulti } from "../../lib/crud/withMulti";
 import { REVIEW_YEAR } from "../../lib/reviewUtils";
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { Link } from '../../lib/reactRouterWrapper';
-import { commentGetPageUrlFromIds } from '../../lib/collections/comments/helpers';
-import { AnalyticsContext } from '../../lib/analyticsEvents';
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { Link } from "../../lib/reactRouterWrapper";
+import { commentGetPageUrlFromIds } from "../../lib/collections/comments/helpers";
+import { AnalyticsContext } from "../../lib/analyticsEvents";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -15,33 +15,33 @@ const styles = (theme: ThemeType): JssStyles => ({
     padding: 6,
     whiteSpace: "nowrap",
     marginRight: 15,
-    [theme.breakpoints.down('xs')]: {
-      display: "none"
-    }
+    [theme.breakpoints.down("xs")]: {
+      display: "none",
+    },
   },
   lastReview: {
     ...theme.typography.commentStyle,
     color: theme.palette.grey[600],
     position: "relative",
-    top: -2
+    top: -2,
   },
   title: {
     color: theme.palette.primary.main,
-    display: "block"
-  }
-})
+    display: "block",
+  },
+});
 
-const LatestReview = ({classes}: { classes: ClassesType }) => {
+const LatestReview = ({ classes }: { classes: ClassesType }) => {
   const { results: commentResults } = useMulti({
-    terms:{ view: "reviews", reviewYear: REVIEW_YEAR, sortBy: "new"},
+    terms: { view: "reviews", reviewYear: REVIEW_YEAR, sortBy: "new" },
     collectionName: "Comments",
-    fragmentName: 'CommentsListWithParentMetadata',
-    limit: 1
+    fragmentName: "CommentsListWithParentMetadata",
+    limit: 1,
   });
 
-  if (!commentResults?.length) return null
-  const comment = commentResults[0]
-  if (!comment.post) return null
+  if (!commentResults?.length) return null;
+  const comment = commentResults[0];
+  if (!comment.post) return null;
 
   const href = commentGetPageUrlFromIds({
     postId: comment.postId,
@@ -49,7 +49,7 @@ const LatestReview = ({classes}: { classes: ClassesType }) => {
     postSlug: comment.post.slug,
   });
 
-  const {ErrorBoundary, PostsTooltip} = Components;
+  const { ErrorBoundary, PostsTooltip } = Components;
   return (
     <ErrorBoundary>
       <AnalyticsContext pageSubsectionContext="latestReview">
@@ -63,21 +63,19 @@ const LatestReview = ({classes}: { classes: ClassesType }) => {
         >
           <div className={classes.root}>
             <Link to={href} className={classes.lastReview}>
-              Latest Review: <span className={classes.title}>
-                {comment.post.title}
-              </span>
+              Latest Review: <span className={classes.title}>{comment.post.title}</span>
             </Link>
           </div>
         </PostsTooltip>
       </AnalyticsContext>
     </ErrorBoundary>
   );
-}
+};
 
-const LatestReviewComponent = registerComponent('LatestReview', LatestReview, {styles});
+const LatestReviewComponent = registerComponent("LatestReview", LatestReview, { styles });
 
 declare global {
   interface ComponentTypes {
-    LatestReview: typeof LatestReviewComponent
+    LatestReview: typeof LatestReviewComponent;
   }
 }

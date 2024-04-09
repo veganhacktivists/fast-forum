@@ -1,4 +1,4 @@
-import { ContentBlock, ContentState, EditorState } from 'draft-js';
+import { ContentBlock, ContentState, EditorState } from "draft-js";
 
 /*
 Returns default block-level metadata for various block type. Empty object otherwise.
@@ -26,11 +26,7 @@ export const getCurrentBlock = (editorState: EditorState) => {
 Adds a new block (currently replaces an empty block) at the current cursor position
 of the given `newType`.
 */
-export const addNewBlock = (
-  editorState: EditorState,
-  newType = 'unstyled',
-  initialData = {},
-) => {
+export const addNewBlock = (editorState: EditorState, newType = "unstyled", initialData = {}) => {
   const selectionState = editorState.getSelection();
   if (!selectionState.isCollapsed()) {
     return editorState;
@@ -55,16 +51,9 @@ export const addNewBlock = (
       selectionAfter: selectionState,
     }) as ContentState;
 
-    const newEditorState = EditorState.push(
-      editorState,
-      newContentState,
-      'change-block-type',
-    );
+    const newEditorState = EditorState.push(editorState, newContentState, "change-block-type");
 
-    return EditorState.forceSelection(
-      newEditorState,
-      contentState.getSelectionAfter(),
-    );
+    return EditorState.forceSelection(newEditorState, contentState.getSelectionAfter());
   }
 
   return editorState;
@@ -85,11 +74,7 @@ export const isLastBlock = (editorState: EditorState) => {
 /*
 Changes the block type of the current block.
 */
-export const resetBlockWithType = (
-  editorState: EditorState,
-  newType = 'unstyled',
-  overrides = {},
-) => {
+export const resetBlockWithType = (editorState: EditorState, newType = "unstyled", overrides = {}) => {
   const contentState = editorState.getCurrentContent();
   const selectionState = editorState.getSelection();
   const key = selectionState.getStartKey();
@@ -106,5 +91,5 @@ export const resetBlockWithType = (
       focusOffset: 0,
     }),
   }) as ContentState;
-  return EditorState.push(editorState, newContentState, 'change-block-type');
+  return EditorState.push(editorState, newContentState, "change-block-type");
 };

@@ -1,11 +1,10 @@
-import { randomId } from '../lib/random';
-import { getCookieFromReq, setCookieOnResponse } from './utils/httpUtil';
-import { createMutator } from './vulcan-lib/mutators';
-import { ClientIds } from '../lib/collections/clientIds/collection';
-import type { AddMiddlewareType } from './apolloServer';
+import { randomId } from "../lib/random";
+import { getCookieFromReq, setCookieOnResponse } from "./utils/httpUtil";
+import { createMutator } from "./vulcan-lib/mutators";
+import { ClientIds } from "../lib/collections/clientIds/collection";
+import type { AddMiddlewareType } from "./apolloServer";
 
-const isApplicableUrl = (url: string) =>
-  url !== "/robots.txt" && url.indexOf("/api/") < 0;
+const isApplicableUrl = (url: string) => url !== "/robots.txt" && url.indexOf("/api/") < 0;
 
 // Middleware for assigning a client ID, if one is not currently assigned.
 export const addClientIdMiddleware = (addMiddleware: AddMiddlewareType) => {
@@ -13,17 +12,18 @@ export const addClientIdMiddleware = (addMiddleware: AddMiddlewareType) => {
     if (!getCookieFromReq(req, "clientId")) {
       const newClientId = randomId();
       setCookieOnResponse({
-        req, res,
+        req,
+        res,
         cookieName: "clientId",
         cookieValue: newClientId,
-        maxAge: 315360000
+        maxAge: 315360000,
       });
-      
+
       try {
         if (isApplicableUrl(req.url)) {
           const referrer = req.headers?.["referer"] ?? null;
           const url = req.url;
-          
+
           void ClientIds.rawInsert({
             clientId: newClientId,
             firstSeenReferrer: referrer,
@@ -31,12 +31,12 @@ export const addClientIdMiddleware = (addMiddleware: AddMiddlewareType) => {
             userIds: undefined,
           });
         }
-      } catch(e) {
+      } catch (e) {
         //eslint-disable-next-line no-console
         console.error(e);
       }
     }
-    
+
     next();
   });
-}
+};

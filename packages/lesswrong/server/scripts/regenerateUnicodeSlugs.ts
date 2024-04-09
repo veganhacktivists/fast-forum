@@ -9,18 +9,18 @@ Globals.regenerateUnicodeSlugs = async () => {
     WHERE "slug" LIKE 'unicode-%' OR "slug" = '{}'
   `);
 
-  for (const {_id, title, slug} of posts) {
+  for (const { _id, title, slug } of posts) {
     const newSlug = slugify(title);
     if (newSlug !== "unicode" && slug !== newSlug) {
-      const uniqueSlug = await Utils.getUnusedSlugByCollectionName(
-        "Posts",
-        newSlug,
-      );
-      await db.none(`
+      const uniqueSlug = await Utils.getUnusedSlugByCollectionName("Posts", newSlug);
+      await db.none(
+        `
         UPDATE "Posts"
         SET "slug" = $1
         WHERE "_id" = $2
-      `, [uniqueSlug, _id]);
+      `,
+        [uniqueSlug, _id],
+      );
     }
   }
-}
+};

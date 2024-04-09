@@ -4,20 +4,9 @@ import { useTimezone } from "../common/withTimezone";
 import { useLocation } from "../../lib/routeUtil";
 import { AllowHidingFrontPagePostsContext } from "../dropdowns/posts/PostActions";
 import { AnalyticsContext } from "../../lib/analyticsEvents";
-import {
-  DEFAULT_LOW_KARMA_THRESHOLD,
-  MAX_LOW_KARMA_THRESHOLD,
-} from "../../lib/collections/posts/views";
-import {
-  getBeforeDefault,
-  getAfterDefault,
-  timeframeToTimeBlock,
-  TimeframeType,
-} from "./timeframeUtils";
-import {
-  forumAllPostsNumDaysSetting,
-  DatabasePublicSetting,
-} from "../../lib/publicSettings";
+import { DEFAULT_LOW_KARMA_THRESHOLD, MAX_LOW_KARMA_THRESHOLD } from "../../lib/collections/posts/views";
+import { getBeforeDefault, getAfterDefault, timeframeToTimeBlock, TimeframeType } from "./timeframeUtils";
+import { forumAllPostsNumDaysSetting, DatabasePublicSetting } from "../../lib/publicSettings";
 import type { PostsTimeBlockShortformOption } from "./PostsTimeBlock";
 
 // Number of weeks to display in the timeframe view
@@ -32,7 +21,7 @@ const timeframeToNumTimeBlocks = {
   weekly: forumAllPostsNumWeeksSetting.get(),
   monthly: forumAllPostsNumMonthsSetting.get(),
   yearly: forumAllPostsNumYearsSetting.get(),
-}
+};
 
 const AllPostsList = ({
   currentTimeframe,
@@ -43,21 +32,20 @@ const AllPostsList = ({
   currentHideCommunity,
   showSettings,
 }: {
-  currentTimeframe: string,
-  currentFilter: string,
-  currentSorting: PostSortingMode,
-  currentShowLowKarma: boolean,
-  currentIncludeEvents: boolean,
-  currentHideCommunity: boolean,
-  showSettings: boolean,
+  currentTimeframe: string;
+  currentFilter: string;
+  currentSorting: PostSortingMode;
+  currentShowLowKarma: boolean;
+  currentIncludeEvents: boolean;
+  currentHideCommunity: boolean;
+  showSettings: boolean;
 }) => {
-  const {timezone} = useTimezone();
-  const {query} = useLocation();
+  const { timezone } = useTimezone();
+  const { query } = useLocation();
 
   const baseTerms: PostsViewTerms = {
-    karmaThreshold: query.karmaThreshold || (currentShowLowKarma
-      ? MAX_LOW_KARMA_THRESHOLD
-      : DEFAULT_LOW_KARMA_THRESHOLD),
+    karmaThreshold:
+      query.karmaThreshold || (currentShowLowKarma ? MAX_LOW_KARMA_THRESHOLD : DEFAULT_LOW_KARMA_THRESHOLD),
     excludeEvents: !currentIncludeEvents && currentFilter !== "events",
     hideCommunity: currentHideCommunity,
     filter: currentFilter,
@@ -66,18 +54,15 @@ const AllPostsList = ({
     before: query.before,
   };
 
-  const {PostsTimeframeList, PostsList2} = Components;
+  const { PostsTimeframeList, PostsList2 } = Components;
 
   if (currentTimeframe === "allTime") {
     return (
-      <AnalyticsContext
-        listContext={"allPostsPage"}
-        terms={{view: "allTime" as PostsViewName, ...baseTerms}}
-      >
+      <AnalyticsContext listContext={"allPostsPage"} terms={{ view: "allTime" as PostsViewName, ...baseTerms }}>
         <PostsList2
           terms={{
             ...baseTerms,
-            limit: 50
+            limit: 50,
           }}
           dimWhenLoading={showSettings}
         />
@@ -97,17 +82,21 @@ const AllPostsList = ({
     postListParameters.limit = parseInt(query.limit);
   }
 
-  const after = query.after || getAfterDefault({
-    numTimeBlocks,
-    timeBlock,
-    timezone,
-    before: query.before,
-  });
-  const before = query.before  || getBeforeDefault({
-    timeBlock,
-    timezone,
-    after: query.after,
-  });
+  const after =
+    query.after ||
+    getAfterDefault({
+      numTimeBlocks,
+      timeBlock,
+      timezone,
+      before: query.before,
+    });
+  const before =
+    query.before ||
+    getBeforeDefault({
+      timeBlock,
+      timezone,
+      after: query.after,
+    });
 
   const hideTags = currentFilter !== "all";
 
@@ -120,13 +109,9 @@ const AllPostsList = ({
 
   return (
     <div>
-      <AnalyticsContext
-        listContext={"allPostsPage"}
-        terms={postListParameters}
-        capturePostItemOnMount
-      >
+      <AnalyticsContext listContext={"allPostsPage"} terms={postListParameters} capturePostItemOnMount>
         {/* Allow unhiding posts from all posts menu to allow recovery of hiding
-          * the wrong post */}
+         * the wrong post */}
         <AllowHidingFrontPagePostsContext.Provider value={true}>
           <PostsTimeframeList
             // TODO: this doesn't seem to be guaranteed, actually?  Since it can
@@ -145,12 +130,12 @@ const AllPostsList = ({
       </AnalyticsContext>
     </div>
   );
-}
+};
 
 const AllPostsListComponent = registerComponent("AllPostsList", AllPostsList);
 
 declare global {
   interface ComponentTypes {
-    AllPostsList: typeof AllPostsListComponent
+    AllPostsList: typeof AllPostsListComponent;
   }
 }

@@ -1,34 +1,34 @@
-import React, {useState, useRef} from 'react';
-import { useMessages } from '../common/withMessages';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import withErrorBoundary from '../common/withErrorBoundary'
-import { useGoogleMaps, geoSuggestStyles } from '../form-components/LocationFormComponent'
-import { useUpdateCurrentUser } from '../hooks/useUpdateCurrentUser';
-import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
-import Input from '@material-ui/core/Input';
-import Geosuggest from 'react-geosuggest';
-import { pickBestReverseGeocodingResult } from '../../lib/geocoding';
+import React, { useState, useRef } from "react";
+import { useMessages } from "../common/withMessages";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import withErrorBoundary from "../common/withErrorBoundary";
+import { useGoogleMaps, geoSuggestStyles } from "../form-components/LocationFormComponent";
+import { useUpdateCurrentUser } from "../hooks/useUpdateCurrentUser";
+import Button from "@material-ui/core/Button";
+import Checkbox from "@material-ui/core/Checkbox";
+import Input from "@material-ui/core/Input";
+import Geosuggest from "react-geosuggest";
+import { pickBestReverseGeocodingResult } from "../../lib/geocoding";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
-    marginBottom: theme.spacing.unit*4,
+    marginBottom: theme.spacing.unit * 4,
     position: "relative",
     minHeight: 58,
     backgroundColor: theme.palette.panelBackground.recentDiscussionThread,
-    
+
     padding: 16,
     ...theme.typography.body2,
-    
+
     border: `1px solid ${theme.palette.grey["A200"]}`,
     borderRadius: 10,
     boxShadow: theme.palette.boxShadow.recentDiscussionMeetupsPoke,
-    
+
     marginLeft: "auto",
     marginRight: "auto",
     maxWidth: 500,
   },
-  
+
   locationInputWrapper: {
     display: "flex",
   },
@@ -39,65 +39,62 @@ const styles = (theme: ThemeType): JssStyles => ({
     marginTop: 40,
     marginBottom: 40,
     position: "relative",
-    
+
     ...geoSuggestStyles(theme),
   },
-  
-  geolocateButton: {
-  },
-  
+
+  geolocateButton: {},
+
   checkbox: {
     padding: 4,
   },
-  
+
   radiusInput: {
     maxWidth: 35,
   },
-  
+
   buttons: {
     marginTop: 16,
     textAlign: "right",
   },
 });
 
-const RecentDiscussionMeetupsPoke = ({classes}: {
-  classes: ClassesType,
-}) => {
-  const [mapsLoaded, googleMaps] = useGoogleMaps()
+const RecentDiscussionMeetupsPoke = ({ classes }: { classes: ClassesType }) => {
+  const [mapsLoaded, googleMaps] = useGoogleMaps();
   const [geolocationLoading, setGeolocationLoading] = useState(false);
-  const [label, setLabel] = useState<any>(null)
+  const [label, setLabel] = useState<any>(null);
   const [location, setLocation] = useState<any>(null);
   const { flash } = useMessages();
   const { Loading } = Components;
   const [hidden, setHidden] = useState(false);
-  const [notificationRadius, setNotificationRadius] = useState(30)
+  const [notificationRadius, setNotificationRadius] = useState(30);
   const updateCurrentUser = useUpdateCurrentUser();
   const geosuggestElement = useRef<any>(null);
   const [enableNotificationsChecked, setEnableNotificationsChecked] = useState(true);
   const [locationOnPublicProfileChecked, setLocationOnPublicProfileChecked] = useState(false);
-  
+
   const dontAskAgain = () => {
     setHidden(true);
-    void updateCurrentUser({hideMeetupsPoke: true});
-  }
+    void updateCurrentUser({ hideMeetupsPoke: true });
+  };
   const onSetLocation = (location?: google.maps.GeocoderResult) => {
     setLocation(location);
-    
+
     // Re-apply the two checkboxes
     onSetEnableNotificationsChecked(enableNotificationsChecked);
     onSetLocationOnPublicProfileChecked(locationOnPublicProfileChecked);
-  }
+  };
   const setPublicProfileLocation = (location?: google.maps.GeocoderResult) => {
     void updateCurrentUser({
       location: location?.formatted_address,
     });
-  }
+  };
   const clearPublicProfileLocation = () => {
     void updateCurrentUser({
-      location: ""
+      location: "",
     });
-  }
-  
+  };
+
   const onSetEnableNotificationsChecked = (checked: boolean) => {
     setEnableNotificationsChecked(checked);
     if (checked) {
@@ -113,7 +110,7 @@ const RecentDiscussionMeetupsPoke = ({classes}: {
         nearbyEventsNotificationsRadius: null,
       });
     }
-  }
+  };
   const onSetLocationOnPublicProfileChecked = (checked: boolean) => {
     setLocationOnPublicProfileChecked(checked);
     if (checked) {
@@ -121,19 +118,19 @@ const RecentDiscussionMeetupsPoke = ({classes}: {
     } else {
       clearPublicProfileLocation();
     }
-  }
+  };
   const requestGeolocation = () => {
     setGeolocationLoading(true);
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         try {
-          if(position?.coords) {
+          if (position?.coords) {
             const geocoder = new googleMaps.Geocoder();
             const geocodingResponse = await geocoder.geocode({
               location: {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude,
-              }
+              },
             });
             const geocoderResults = geocodingResponse?.results;
             if (geocoderResults?.length > 0) {
@@ -141,7 +138,7 @@ const RecentDiscussionMeetupsPoke = ({classes}: {
               if (geosuggestElement.current) {
                 geosuggestElement.current!.update(bestResult.formatted_address);
               }
-              onSetLocation(bestResult)
+              onSetLocation(bestResult);
             }
           }
         } finally {
@@ -150,75 +147,94 @@ const RecentDiscussionMeetupsPoke = ({classes}: {
       },
       (err) => {
         setGeolocationLoading(false);
-      }
+      },
     );
-  }
+  };
   const changeNotificationRadius = (radius: string) => {
     const radiusNumber = parseFloat(radius);
     if (!isNaN(radiusNumber)) {
       setNotificationRadius(radiusNumber);
       void updateCurrentUser({ nearbyEventsNotificationsRadius: radiusNumber });
     }
-  }
-  
-  if (hidden)
-    return null;
-  
-  return <div className={classes.root}>
-    <div>Did you know that there are LessWrong meetups? To get email notification
-    of meetups near you, enter your location:</div>
-    
-    <div className={classes.locationInputWrapper}>
-      {mapsLoaded ? <Geosuggest
-        ref={geosuggestElement}
-        placeholder="My Location"
-        className={classes.locationInput}
-        onSuggestSelect={(suggestion) => {
-          onSetLocation(suggestion?.gmaps)
-          setLabel(suggestion?.label)
-        }}
-        initialValue={label}
-      /> : <Loading/>}
-      
-      {geolocationLoading
-        ? <Loading/>
-        : <Button className={classes.geolocateButton} onClick={requestGeolocation}>Geolocate</Button>
-      }
+  };
+
+  if (hidden) return null;
+
+  return (
+    <div className={classes.root}>
+      <div>
+        Did you know that there are LessWrong meetups? To get email notification of meetups near you, enter your
+        location:
+      </div>
+
+      <div className={classes.locationInputWrapper}>
+        {mapsLoaded ? (
+          <Geosuggest
+            ref={geosuggestElement}
+            placeholder="My Location"
+            className={classes.locationInput}
+            onSuggestSelect={(suggestion) => {
+              onSetLocation(suggestion?.gmaps);
+              setLabel(suggestion?.label);
+            }}
+            initialValue={label}
+          />
+        ) : (
+          <Loading />
+        )}
+
+        {geolocationLoading ? (
+          <Loading />
+        ) : (
+          <Button className={classes.geolocateButton} onClick={requestGeolocation}>
+            Geolocate
+          </Button>
+        )}
+      </div>
+
+      <div>
+        <Checkbox
+          className={classes.checkbox}
+          checked={enableNotificationsChecked}
+          onChange={(ev) => onSetEnableNotificationsChecked(ev.target.checked)}
+        />
+        Notify me of events within{" "}
+        <Input
+          type="number"
+          className={classes.radiusInput}
+          value={notificationRadius}
+          onChange={(ev) => changeNotificationRadius(ev.target.value)}
+        />{" "}
+        miles
+      </div>
+      <div>
+        <Checkbox
+          className={classes.checkbox}
+          checked={locationOnPublicProfileChecked}
+          onChange={(e) => onSetLocationOnPublicProfileChecked(e.target.checked)}
+        />
+        Show this location on my public profile
+      </div>
+
+      <div className={classes.buttons}>
+        <Button onClick={() => setHidden(true)}>Maybe Later</Button>
+        <Button onClick={() => dontAskAgain()}>Don't Ask Again</Button>
+      </div>
     </div>
-    
-    <div>
-      <Checkbox className={classes.checkbox}
-        checked={enableNotificationsChecked}
-        onChange={(ev) => onSetEnableNotificationsChecked(ev.target.checked)}
-      />
-      Notify me of events within{" "}
-      <Input type="number" className={classes.radiusInput} value={notificationRadius} onChange={(ev) => changeNotificationRadius(ev.target.value)}/>
-      {" "}miles
-    </div>
-    <div>
-      <Checkbox className={classes.checkbox}
-        checked={locationOnPublicProfileChecked}
-        onChange={(e) => onSetLocationOnPublicProfileChecked(e.target.checked)}
-      />
-      Show this location on my public profile
-    </div>
-    
-    <div className={classes.buttons}>
-      <Button onClick={() => setHidden(true)}>Maybe Later</Button>
-      <Button onClick={() => dontAskAgain()}>Don't Ask Again</Button>
-    </div>
-  </div>
-}
+  );
+};
 
 const RecentDiscussionMeetupsPokeComponent = registerComponent(
-  'RecentDiscussionMeetupsPoke', RecentDiscussionMeetupsPoke, {
+  "RecentDiscussionMeetupsPoke",
+  RecentDiscussionMeetupsPoke,
+  {
     styles,
     hocs: [withErrorBoundary],
-  }
+  },
 );
 
 declare global {
   interface ComponentTypes {
-    RecentDiscussionMeetupsPoke: typeof RecentDiscussionMeetupsPokeComponent,
+    RecentDiscussionMeetupsPoke: typeof RecentDiscussionMeetupsPokeComponent;
   }
 }

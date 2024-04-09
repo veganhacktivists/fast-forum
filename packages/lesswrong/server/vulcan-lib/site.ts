@@ -1,6 +1,6 @@
-import { forumTitleSetting, siteUrlSetting } from '../../lib/instanceSettings';
-import { addGraphQLQuery, addGraphQLResolvers, addGraphQLSchema } from '../../lib/vulcan-lib/graphql';
-import { getLogoUrl } from '../../lib/vulcan-lib/utils';
+import { forumTitleSetting, siteUrlSetting } from "../../lib/instanceSettings";
+import { addGraphQLQuery, addGraphQLResolvers, addGraphQLSchema } from "../../lib/vulcan-lib/graphql";
+import { getLogoUrl } from "../../lib/vulcan-lib/utils";
 
 const siteSchema = `type Site {
   title: String
@@ -23,4 +23,4 @@ const siteResolvers = {
 
 addGraphQLResolvers(siteResolvers);
 
-addGraphQLQuery('SiteData: Site');
+addGraphQLQuery("SiteData: Site");

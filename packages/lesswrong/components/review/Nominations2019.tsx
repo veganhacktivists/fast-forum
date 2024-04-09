@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
+import React, { useState } from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
 
 const styles = (theme: ThemeType): JssStyles => ({
   setting: {
     ...theme.typography.body2,
-    color: theme.palette.grey[600]
+    color: theme.palette.grey[600],
   },
   meta: {
     display: "flex",
@@ -14,21 +14,19 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   info: {
     ...theme.typography.body2,
-    ...theme.typography.commentStyle
-  }
-})
+    ...theme.typography.commentStyle,
+  },
+});
 
-const Nominations2019 = ({classes}: {
-  classes: ClassesType,
-}) => {
+const Nominations2019 = ({ classes }: { classes: ClassesType }) => {
   const [sortByMost, setSortBy] = useState(false);
 
-  const { SingleColumnSection, SectionTitle, PostsList2, RecentDiscussionThreadsList } = Components
+  const { SingleColumnSection, SectionTitle, PostsList2, RecentDiscussionThreadsList } = Components;
 
   return (
     <div>
       <SingleColumnSection>
-        <SectionTitle title="Nominated Posts for the 2019 Review"/>
+        <SectionTitle title="Nominated Posts for the 2019 Review" />
         <div className={classes.meta}>
           <div className={classes.info}>
             <div>Posts need at least 2 nominations to continue into the Review Phase.</div>
@@ -38,8 +36,8 @@ const Nominations2019 = ({classes}: {
             Sort by: {sortByMost ? "most" : "fewest"} nominations
           </a>
         </div>
-        <PostsList2 
-          terms={{view:"nominations2019", sortByMost: sortByMost, limit: 50}} 
+        <PostsList2
+          terms={{ view: "nominations2019", sortByMost: sortByMost, limit: 50 }}
           showNominationCount
           showReviewCount
           enableTotal
@@ -50,21 +48,20 @@ const Nominations2019 = ({classes}: {
         <RecentDiscussionThreadsList
           title="2019 Review Discussion"
           shortformButton={false}
-          terms={{view: '2019reviewRecentDiscussionThreadsList', limit:20}}
+          terms={{ view: "2019reviewRecentDiscussionThreadsList", limit: 20 }}
           commentsLimit={4}
-          maxAgeHours={100} 
+          maxAgeHours={100}
           af={false}
         />
       </SingleColumnSection>
     </div>
-  )
-}
+  );
+};
 
-const Nominations2019Component = registerComponent('Nominations2019', Nominations2019, {styles});
+const Nominations2019Component = registerComponent("Nominations2019", Nominations2019, { styles });
 
 declare global {
   interface ComponentTypes {
-    Nominations2019: typeof Nominations2019Component
+    Nominations2019: typeof Nominations2019Component;
   }
 }
-

@@ -49,16 +49,16 @@ const styles = (theme: ThemeType): JssStyles => ({
     },
     "&:hover": {
       opacity: 1,
-      textDecoration: 'underline',
+      textDecoration: "underline",
     },
   },
 });
 
 type HowToGuide = {
-  icon: ForumIconName,
-  label: string,
-  url: string,
-}
+  icon: ForumIconName;
+  label: string;
+  url: string;
+};
 
 const guides: HowToGuide[] = [
   {
@@ -78,52 +78,44 @@ const guides: HowToGuide[] = [
   },
 ];
 
-export const NewPostHowToGuides = ({classes}: {
-  classes: ClassesType,
-}) => {
-  const {dismissed, dismiss} = useDismissable(HIDE_NEW_POST_HOW_TO_GUIDE_COOKIE);
+export const NewPostHowToGuides = ({ classes }: { classes: ClassesType }) => {
+  const { dismissed, dismiss } = useDismissable(HIDE_NEW_POST_HOW_TO_GUIDE_COOKIE);
   if (dismissed) {
     return null;
   }
 
-  const {ForumIcon} = Components;
+  const { ForumIcon } = Components;
   return (
     <AnalyticsContext pageElementContext="newPostHowToGuides">
       <div className={classes.root}>
         <div className={classes.title}>Important</div>
-        <div
-          className={classes.dismissButton}
-          onClick={dismiss}
-          role="button"
-          aria-label="Close"
-        >
+        <div className={classes.dismissButton} onClick={dismiss} role="button" aria-label="Close">
           <ForumIcon icon="Close" />
         </div>
-        <p style={{ lineHeight: '20px' }}>
-        Please read our&nbsp;
-          <a href="https://forum.fastcommunity.org/posts/gTBQ9APGmxcizgorA/our-community-guidelines" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            style={{ textDecoration: 'underline' }}>
+        <p style={{ lineHeight: "20px" }}>
+          Please read our&nbsp;
+          <a
+            href="https://forum.fastcommunity.org/posts/gTBQ9APGmxcizgorA/our-community-guidelines"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: "underline" }}
+          >
             Community Guidelines
-          </a> thoroughly before contributing in our community— we appreciate it!
-          <p style={{ lineHeight: '20px' }}>
-          <b>Note: This forum and your post is available to the public.</b>
+          </a>{" "}
+          thoroughly before contributing in our community— we appreciate it!
+          <p style={{ lineHeight: "20px" }}>
+            <b>Note: This forum and your post is available to the public.</b>
           </p>
         </p>
       </div>
-    </AnalyticsContext> 
+    </AnalyticsContext>
   );
-}
+};
 
-const NewPostHowToGuidesComponent = registerComponent(
-  "NewPostHowToGuides",
-  NewPostHowToGuides,
-  {styles},
-);
+const NewPostHowToGuidesComponent = registerComponent("NewPostHowToGuides", NewPostHowToGuides, { styles });
 
 declare global {
   interface ComponentTypes {
-    NewPostHowToGuides: typeof NewPostHowToGuidesComponent
+    NewPostHowToGuides: typeof NewPostHowToGuidesComponent;
   }
 }

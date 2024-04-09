@@ -6,20 +6,20 @@ const styles = (theme: ThemeType): JssStyles => ({
     overflow: "visible",
   },
   datePickers: {
-    display: 'flex',
-    justifyContent: 'space-between',
+    display: "flex",
+    justifyContent: "space-between",
     gap: "8px",
-    padding: '24px 24px 16px 24px',
-    [theme.breakpoints.down('xs')]: {
-      flexDirection: 'column',
-    }
+    padding: "24px 24px 16px 24px",
+    [theme.breakpoints.down("xs")]: {
+      flexDirection: "column",
+    },
   },
   buttons: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    padding: '8px 24px 12px 24px',
+    display: "flex",
+    justifyContent: "flex-end",
+    padding: "8px 24px 12px 24px",
     gap: "8px",
-  }
+  },
 });
 
 const DateRangeModal = ({
@@ -50,7 +50,7 @@ const DateRangeModal = ({
       open={true}
       onClose={onClose}
       dialogClasses={{
-        paper: classes.paper
+        paper: classes.paper,
       }}
     >
       <div className={classes.datePickers}>
@@ -58,18 +58,10 @@ const DateRangeModal = ({
         <DatePicker label="End date" value={endDateInternal} onChange={setEndDateInternal} />
       </div>
       <div className={classes.buttons}>
-        <EAButton
-          id="date-range-modal-cancel-btn"
-          style="grey"
-          onClick={onClose}
-        >
+        <EAButton id="date-range-modal-cancel-btn" style="grey" onClick={onClose}>
           Cancel
         </EAButton>
-        <EAButton
-          type="submit"
-          id="date-range-modal-submit-btn"
-          onClick={onConfirm}
-        >
+        <EAButton type="submit" id="date-range-modal-submit-btn" onClick={onConfirm}>
           Confirm
         </EAButton>
       </div>

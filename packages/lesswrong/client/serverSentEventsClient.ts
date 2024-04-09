@@ -4,19 +4,17 @@ const notificationEventsApiVersion = 2;
 
 let serverRequestedStop = false;
 let serverSentEventsActive = false;
-let serverSentEventSource: EventSource|null = null;
+let serverSentEventSource: EventSource | null = null;
 let reconnectPending = false;
 
 export function initServerSentEvents() {
   serverSentEventsAPI.setServerSentEventsActive = setServerSentEventsActive;
 }
 
-function setServerSentEventsActive(active: boolean)
-{
+function setServerSentEventsActive(active: boolean) {
   if (active) {
     serverSentEventsActive = true;
-    if (!serverSentEventSource && !reconnectPending)
-      connectServerSentEvents();
+    if (!serverSentEventSource && !reconnectPending) connectServerSentEvents();
   } else {
     serverSentEventsActive = false;
     disconnectServerSentEvents();
@@ -32,7 +30,7 @@ function disconnectServerSentEvents() {
 
 function connectServerSentEvents() {
   reconnectPending = false;
-  
+
   if (!serverSentEventsActive || serverRequestedStop) {
     return;
   }
@@ -41,7 +39,10 @@ function connectServerSentEvents() {
     if (serverSentEventSource.readyState === EventSource.CLOSED) {
       // If there's an EventSource but it's closed, we're recreating it.
       serverSentEventSource = null;
-    } else if (serverSentEventSource.readyState === EventSource.OPEN || serverSentEventSource.readyState === EventSource.CONNECTING) {
+    } else if (
+      serverSentEventSource.readyState === EventSource.OPEN ||
+      serverSentEventSource.readyState === EventSource.CONNECTING
+    ) {
       // If it's already connected or connecting, don't try to reconnect again.
       return;
     }
@@ -61,7 +62,7 @@ function connectServerSentEvents() {
         connectServerSentEvents();
       }, 15000);
     }
-  }
+  };
   serverSentEventSource.onmessage = (event) => {
     const parsedEventData = JSON.parse(event.data);
     if (parsedEventData?.stop) {
@@ -72,5 +73,5 @@ function connectServerSentEvents() {
     } else {
       onServerSentNotificationEvent(parsedEventData);
     }
-  }
+  };
 }

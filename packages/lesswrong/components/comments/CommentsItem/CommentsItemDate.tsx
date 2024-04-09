@@ -1,8 +1,8 @@
-import React from 'react';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
-import { useCommentLink, UseCommentLinkProps } from './useCommentLink';
-import classNames from 'classnames';
-import { isBookUI, isFriendlyUI } from '../../../themes/forumTheme';
+import React from "react";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
+import { useCommentLink, UseCommentLinkProps } from "./useCommentLink";
+import classNames from "classnames";
+import { isBookUI, isFriendlyUI } from "../../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -35,8 +35,7 @@ const styles = (theme: ThemeType): JssStyles => ({
   postTitle: {
     marginRight: 5,
   },
-  link: {
-  },
+  link: {},
   icon: {
     fontSize: "0.9rem",
     verticalAlign: "middle",
@@ -48,15 +47,15 @@ const styles = (theme: ThemeType): JssStyles => ({
 });
 
 type CommentsItemDateProps = UseCommentLinkProps & {
-  comment: CommentsList,
-  classes: ClassesType
+  comment: CommentsList;
+  classes: ClassesType;
 };
 
-const CommentsItemDate = ({comment, classes, ...rest}: CommentsItemDateProps) => {
-  const { FormatDate, ForumIcon } = Components
-  
-  const LinkWrapper = useCommentLink({comment, ...rest});
-  
+const CommentsItemDate = ({ comment, classes, ...rest }: CommentsItemDateProps) => {
+  const { FormatDate, ForumIcon } = Components;
+
+  const LinkWrapper = useCommentLink({ comment, ...rest });
+
   let dateFormat: string | undefined;
   if (comment.answer) {
     dateFormat = "MMM DD, YYYY";
@@ -65,30 +64,26 @@ const CommentsItemDate = ({comment, classes, ...rest}: CommentsItemDateProps) =>
   } else {
     dateFormat = undefined;
   }
-  
+
   return (
-    <span className={classNames(classes.root, {
-      [classes.date]: !comment.answer,
-      [classes.answerDate]: comment.answer,
-    })}>
+    <span
+      className={classNames(classes.root, {
+        [classes.date]: !comment.answer,
+        [classes.answerDate]: comment.answer,
+      })}
+    >
       <LinkWrapper>
-        <FormatDate
-          date={comment.postedAt}
-          format={dateFormat}
-        />
+        <FormatDate date={comment.postedAt} format={dateFormat} />
         {isBookUI && <ForumIcon icon="Link" className={classes.icon} />}
       </LinkWrapper>
     </span>
   );
-}
+};
 
-const CommentsItemDateComponent = registerComponent(
-  'CommentsItemDate', CommentsItemDate, {styles}
-);
+const CommentsItemDateComponent = registerComponent("CommentsItemDate", CommentsItemDate, { styles });
 
 declare global {
   interface ComponentTypes {
-    CommentsItemDate: typeof CommentsItemDateComponent,
+    CommentsItemDate: typeof CommentsItemDateComponent;
   }
 }
-

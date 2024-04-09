@@ -1,4 +1,2 @@
-
-const testPosts: DbPost[]
-export default testPosts
-
+const testPosts: DbPost[];
+export default testPosts;

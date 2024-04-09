@@ -1,9 +1,9 @@
-import { runStartupFunctions } from '../lib/executionEnvironment';
-import { filterConsoleLogSpam } from '../lib/consoleFilters';
+import { runStartupFunctions } from "../lib/executionEnvironment";
+import { filterConsoleLogSpam } from "../lib/consoleFilters";
 
 async function clientStartup() {
   filterConsoleLogSpam();
-  require('../client.js');
+  require("../client.js");
   await runStartupFunctions();
 }
 

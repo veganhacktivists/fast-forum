@@ -1,10 +1,10 @@
-import React from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import { useSingle } from '../../lib/crud/withSingle';
-import { useHover } from '../common/withHover';
-import { useCurrentUser } from '../common/withUser';
-import { shouldHideTagForVoting } from '../../lib/collections/tags/permissions';
-import { usePostsPageContext } from '../posts/PostsPage/PostsPageContext';
+import React from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import { useSingle } from "../../lib/crud/withSingle";
+import { useHover } from "../common/withHover";
+import { useCurrentUser } from "../common/withUser";
+import { shouldHideTagForVoting } from "../../lib/collections/tags/permissions";
+import { usePostsPageContext } from "../posts/PostsPage/PostsPageContext";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -13,40 +13,46 @@ const styles = (theme: ThemeType): JssStyles => ({
     cursor: "pointer",
     ...theme.typography.commentStyle,
     color: theme.palette.grey[900],
-    '&:hover': {
-      color: theme.palette.lwTertiary.main
-    }
+    "&:hover": {
+      color: theme.palette.lwTertiary.main,
+    },
   },
   card: {
     // No hover-preview on small phone screens
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       display: "none",
     },
   },
   tagDescription: {
-    marginBottom: 12
+    marginBottom: 12,
   },
   postCount: {
     fontSize: ".85em",
-    color: theme.palette.grey[500]
-  }
+    color: theme.palette.grey[500],
+  },
 });
 
-const TagSearchHit = ({hit, onClick, hidePostCount=false, isVotingContext, classes}: {
-  hit: any,
-  onClick?: (ev: any) => void,
-  hidePostCount?: boolean,
-  isVotingContext?: boolean,
-  classes: ClassesType,
+const TagSearchHit = ({
+  hit,
+  onClick,
+  hidePostCount = false,
+  isVotingContext,
+  classes,
+}: {
+  hit: any;
+  onClick?: (ev: any) => void;
+  hidePostCount?: boolean;
+  isVotingContext?: boolean;
+  classes: ClassesType;
 }) => {
   const { PopperCard, TagPreview, Loading } = Components;
   const { document: tag } = useSingle({
     documentId: hit._id,
     collectionName: "Tags",
     fragmentName: "TagPreviewFragment",
-    fetchPolicy: 'cache-then-network' as any, //TODO
+    fetchPolicy: "cache-then-network" as any, //TODO
   });
-  const {eventHandlers, hover, anchorEl} = useHover();
+  const { eventHandlers, hover, anchorEl } = useHover();
   const currentUser = useCurrentUser();
   const post = usePostsPageContext();
 
@@ -61,22 +67,21 @@ const TagSearchHit = ({hit, onClick, hidePostCount=false, isVotingContext, class
     <span {...eventHandlers}>
       <PopperCard open={hover} anchorEl={anchorEl} placement="right-start">
         <div className={classes.card}>
-          {!tag && <Loading/>}
-          {tag && <TagPreview tag={tag} postCount={3}/>}
+          {!tag && <Loading />}
+          {tag && <TagPreview tag={tag} postCount={3} />}
         </div>
       </PopperCard>
-      <span className={classes.root} onClick={(e) => onClick?.(e)} >
+      <span className={classes.root} onClick={(e) => onClick?.(e)}>
         {hit.name} {!hidePostCount && <span className={classes.postCount}>({hit.postCount || 0})</span>}
       </span>
     </span>
   );
-}
+};
 
-const TagSearchHitComponent = registerComponent("TagSearchHit", TagSearchHit, {styles});
+const TagSearchHitComponent = registerComponent("TagSearchHit", TagSearchHit, { styles });
 
 declare global {
   interface ComponentTypes {
-    TagSearchHit: typeof TagSearchHitComponent
+    TagSearchHit: typeof TagSearchHitComponent;
   }
 }
-

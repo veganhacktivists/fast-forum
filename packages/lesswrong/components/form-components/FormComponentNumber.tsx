@@ -1,23 +1,25 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
+import React from "react";
+import PropTypes from "prop-types";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
 
 const FormComponentNumber = (props: FormComponentProps<number>) => {
-  return <Components.MuiTextField
-    type="number"
-    {...props}
-    value={""+props.value}
-    updateCurrentValues={
-      // MuiTextField returns a string - convert it into a number to avoid database errors
-      (values: any, options?: any) => {
-        for (const key in values) {
-          values[key] = parseInt(values[key]);
+  return (
+    <Components.MuiTextField
+      type="number"
+      {...props}
+      value={"" + props.value}
+      updateCurrentValues={
+        // MuiTextField returns a string - convert it into a number to avoid database errors
+        (values: any, options?: any) => {
+          for (const key in values) {
+            values[key] = parseInt(values[key]);
+          }
+          return props.updateCurrentValues(values, options);
         }
-        return props.updateCurrentValues(values, options);
       }
-    }
-  />
-}
+    />
+  );
+};
 
 (FormComponentNumber as any).contextTypes = {
   updateCurrentValues: PropTypes.func,
@@ -31,6 +33,6 @@ const FormComponentNumberComponent = registerComponent("FormComponentNumber", Fo
 
 declare global {
   interface ComponentTypes {
-    FormComponentNumber: typeof FormComponentNumberComponent
+    FormComponentNumber: typeof FormComponentNumberComponent;
   }
 }

@@ -1,3 +1,2 @@
-
-const createMarkdownShortcutsPlugin: AnyBecauseTodo
-export default createMarkdownShortcutsPlugin
+const createMarkdownShortcutsPlugin: AnyBecauseTodo;
+export default createMarkdownShortcutsPlugin;

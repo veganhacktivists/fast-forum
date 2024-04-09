@@ -11,11 +11,15 @@ import { validateCrosspostingKarmaThreshold } from "./helpers";
 import type { GetRouteOf, PostRouteOf } from "./routes";
 import { signToken, verifyToken } from "./tokens";
 import {
-  ConnectCrossposterPayload, ConnectCrossposterPayloadValidator, CrosspostPayloadValidator, UnlinkCrossposterPayloadValidator, UpdateCrosspostPayloadValidator
+  ConnectCrossposterPayload,
+  ConnectCrossposterPayloadValidator,
+  CrosspostPayloadValidator,
+  UnlinkCrossposterPayloadValidator,
+  UpdateCrosspostPayloadValidator,
 } from "./types";
 
-export const onCrosspostTokenRequest: GetRouteOf<'crosspostToken'> = async (req: Request) => {
-  const {user} = req;
+export const onCrosspostTokenRequest: GetRouteOf<"crosspostToken"> = async (req: Request) => {
+  const { user } = req;
   if (!user) {
     throw new UnauthorizedError();
   }
@@ -24,16 +28,19 @@ export const onCrosspostTokenRequest: GetRouteOf<'crosspostToken'> = async (req:
   validateCrosspostingKarmaThreshold(user);
 
   const token = await signToken<ConnectCrossposterPayload>({ userId: user._id });
-  return {token};
+  return { token };
 };
 
-export const onConnectCrossposterRequest: PostRouteOf<'connectCrossposter'> = async (req) => {
+export const onConnectCrossposterRequest: PostRouteOf<"connectCrossposter"> = async (req) => {
   const { token, localUserId } = req;
   const payload = await verifyToken(token, ConnectCrossposterPayloadValidator.is);
-  const {userId: foreignUserId} = payload;
-  await Users.rawUpdateOne({_id: foreignUserId}, {
-    $set: {fmCrosspostUserId: localUserId},
-  });
+  const { userId: foreignUserId } = payload;
+  await Users.rawUpdateOne(
+    { _id: foreignUserId },
+    {
+      $set: { fmCrosspostUserId: localUserId },
+    },
+  );
   return {
     status: "connected",
     foreignUserId,
@@ -41,29 +48,32 @@ export const onConnectCrossposterRequest: PostRouteOf<'connectCrossposter'> = as
   };
 };
 
-export const onUnlinkCrossposterRequest: PostRouteOf<'unlinkCrossposter'> = async (req) => {
+export const onUnlinkCrossposterRequest: PostRouteOf<"unlinkCrossposter"> = async (req) => {
   const { token } = req;
   const payload = await verifyToken(token, UnlinkCrossposterPayloadValidator.is);
-  const {userId} = payload;
-  await Users.rawUpdateOne({_id: userId}, {
-    $unset: {fmCrosspostUserId: ""},
-  });
-  return { status: 'unlinked' };
+  const { userId } = payload;
+  await Users.rawUpdateOne(
+    { _id: userId },
+    {
+      $unset: { fmCrosspostUserId: "" },
+    },
+  );
+  return { status: "unlinked" };
 };
 
-export const onCrosspostRequest: PostRouteOf<'crosspost'> = async (req) => {
+export const onCrosspostRequest: PostRouteOf<"crosspost"> = async (req) => {
   const { token } = req;
   const payload = await verifyToken(token, CrosspostPayloadValidator.is);
-  const {localUserId, foreignUserId, postId, ...rest} = payload;
+  const { localUserId, foreignUserId, postId, ...rest } = payload;
   const denormalizedData = extractDenormalizedData(rest);
 
-  const user = await Users.findOne({_id: foreignUserId});
+  const user = await Users.findOne({ _id: foreignUserId });
   if (!user || user.fmCrosspostUserId !== localUserId) {
     throw new InvalidUserError();
   }
 
   /**
-   * TODO: Null is made legal value for fields but database types are incorrectly generated without null. 
+   * TODO: Null is made legal value for fields but database types are incorrectly generated without null.
    * Hacky fix for now. Search 84b2 to find all instances of this casting.
    */
   const document: Partial<DbPost> = {
@@ -76,7 +86,7 @@ export const onCrosspostRequest: PostRouteOf<'crosspost'> = async (req) => {
     ...denormalizedData,
   } as Partial<DbPost>;
 
-  const {data: post} = await Utils.createMutator({
+  const { data: post } = await Utils.createMutator({
     document,
     collection: Posts,
     validate: false,
@@ -87,7 +97,7 @@ export const onCrosspostRequest: PostRouteOf<'crosspost'> = async (req) => {
       currentUser: user,
       isFMCrosspostRequest: true,
       Users,
-    } as Partial<ResolverContext> as  ResolverContext,
+    } as Partial<ResolverContext> as ResolverContext,
   });
 
   return {
@@ -97,15 +107,15 @@ export const onCrosspostRequest: PostRouteOf<'crosspost'> = async (req) => {
 };
 
 //TODO: clean up typecast `as Partial<DbPost>` below, Code: 84b2
-export const onUpdateCrosspostRequest: PostRouteOf<'updateCrosspost'> = async (req) => {
+export const onUpdateCrosspostRequest: PostRouteOf<"updateCrosspost"> = async (req) => {
   const { token } = req;
-  const {postId, ...rest} = await verifyToken(token, UpdateCrosspostPayloadValidator.is);
+  const { postId, ...rest } = await verifyToken(token, UpdateCrosspostPayloadValidator.is);
   const denormalizedData: Partial<DbPost> = extractDenormalizedData(rest) as Partial<DbPost>;
-  await Posts.rawUpdateOne({_id: postId}, {$set: denormalizedData});
-  return { status: 'updated' };
+  await Posts.rawUpdateOne({ _id: postId }, { $set: denormalizedData });
+  return { status: "updated" };
 };
 
-export const onGetCrosspostRequest: PostRouteOf<'getCrosspost'> = async (req) => {
+export const onGetCrosspostRequest: PostRouteOf<"getCrosspost"> = async (req) => {
   const { collectionName, extraVariables, extraVariablesValues, fragmentName, documentId } = req;
   const apolloClient = await createClient(createAnonymousContext());
   const collection = getCollection(collectionName);
@@ -121,9 +131,9 @@ export const onGetCrosspostRequest: PostRouteOf<'getCrosspost'> = async (req) =>
     query,
     variables: {
       input: {
-        selector: { documentId }
+        selector: { documentId },
       },
-      ...extraVariablesValues
+      ...extraVariablesValues,
     },
   });
 

@@ -24,16 +24,16 @@ const makeBackground = (leftColor?: string | null, rightColor?: string | null) =
   )`;
 
 type CurrentEvent = {
-  title: string,
-  link: string,
-  background: string,
-}
+  title: string;
+  link: string;
+  background: string;
+};
 
 const useCurrentEvent = (): CurrentEvent | null => {
   const spotlight = useCurrentFrontpageSpotlight({
     fragmentName: "SpotlightHeaderEventSubtitle",
   });
-  
+
   if (!spotlight?.headerTitle) {
     return null;
   }
@@ -41,36 +41,23 @@ const useCurrentEvent = (): CurrentEvent | null => {
   return {
     title: spotlight.headerTitle,
     link: getSpotlightUrl(spotlight),
-    background: makeBackground(
-      spotlight.headerTitleLeftColor,
-      spotlight.headerTitleRightColor,
-    ),
+    background: makeBackground(spotlight.headerTitleLeftColor, spotlight.headerTitleRightColor),
   };
-}
+};
 
-const HeaderEventSubtitle = ({classes}: {classes: ClassesType}) => {
+const HeaderEventSubtitle = ({ classes }: { classes: ClassesType }) => {
   const currentEvent = useCurrentEvent();
-  return currentEvent
-    ? (
-      <Link
-        to={currentEvent.link}
-        style={{background: currentEvent.background}}
-        className={classes.root}
-      >
-        {currentEvent.title}
-      </Link>
-    )
-    : null;
-}
+  return currentEvent ? (
+    <Link to={currentEvent.link} style={{ background: currentEvent.background }} className={classes.root}>
+      {currentEvent.title}
+    </Link>
+  ) : null;
+};
 
-const HeaderEventSubtitleComponent = registerComponent(
-  "HeaderEventSubtitle",
-  HeaderEventSubtitle,
-  {styles},
-);
+const HeaderEventSubtitleComponent = registerComponent("HeaderEventSubtitle", HeaderEventSubtitle, { styles });
 
 declare global {
   interface ComponentTypes {
-    HeaderEventSubtitle: typeof HeaderEventSubtitleComponent
+    HeaderEventSubtitle: typeof HeaderEventSubtitleComponent;
   }
 }

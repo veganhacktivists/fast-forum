@@ -22,6 +22,6 @@ export default class MentionEditing extends Plugin {
 	init() {
 		const editor = this.editor;
 
-		editor.commands.add( 'mention', new MentionCommand( editor ) );
+		editor.commands.add( "mention", new MentionCommand( editor ) );
 	}
 }

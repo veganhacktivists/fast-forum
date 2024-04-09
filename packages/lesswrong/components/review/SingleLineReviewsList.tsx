@@ -1,18 +1,19 @@
-import React from 'react';
-import { useMulti } from '../../lib/crud/withMulti';
-import { REVIEW_YEAR } from '../../lib/reviewUtils';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
+import React from "react";
+import { useMulti } from "../../lib/crud/withMulti";
+import { REVIEW_YEAR } from "../../lib/reviewUtils";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
 
 const SingleLineReviewsList = () => {
   const { results } = useMulti({
-    terms: { view: "reviews", reviewYear: REVIEW_YEAR, sortBy: "new"},
+    terms: { view: "reviews", reviewYear: REVIEW_YEAR, sortBy: "new" },
     collectionName: "Comments",
-    fragmentName: 'CommentsListWithParentMetadata',
+    fragmentName: "CommentsListWithParentMetadata",
     enableTotal: false,
-    limit: 3
+    limit: 3,
   });
-  return <div>
-    {results?.map(comment =>
+  return (
+    <div>
+      {results?.map((comment) => (
         <div key={comment._id}>
           <Components.CommentsNode
             treeOptions={{
@@ -22,19 +23,20 @@ const SingleLineReviewsList = () => {
               singleLinePostTitle: true,
               showPostTitle: true,
               post: comment.post || undefined,
-              forceSingleLine: true
+              forceSingleLine: true,
             }}
             comment={comment}
           />
         </div>
-      )}
-  </div>
-}
+      ))}
+    </div>
+  );
+};
 
-const SingleLineReviewsListComponent = registerComponent('SingleLineReviewsList', SingleLineReviewsList);
+const SingleLineReviewsListComponent = registerComponent("SingleLineReviewsList", SingleLineReviewsList);
 
 declare global {
   interface ComponentTypes {
-    SingleLineReviewsList: typeof SingleLineReviewsListComponent
+    SingleLineReviewsList: typeof SingleLineReviewsListComponent;
   }
 }

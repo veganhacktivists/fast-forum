@@ -19,7 +19,7 @@ const xsTitleWidth = 45;
 const valueWidth = (titleWidth: number) => (100 - titleWidth) / 4;
 const gridColumns = (titleWidth: number) =>
   `${titleWidth}% ${valueWidth(titleWidth)}% ${valueWidth(titleWidth)}% ${valueWidth(titleWidth)}% ${valueWidth(
-    titleWidth
+    titleWidth,
   )}%`;
 
 const styles = (theme: ThemeType): JssStyles => ({
@@ -27,7 +27,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     [theme.breakpoints.down("sm")]: {
       // Add the top padding back in for mobile
       paddingTop: theme.spacing.mainLayoutPaddingTop,
-    }
+    },
   },
   section: {
     background: theme.palette.grey[0],
@@ -230,10 +230,13 @@ const AuthorAnalyticsPage = ({ classes }: { classes: ClassesType }) => {
       ? {}
       : Object.keys(query)
           .filter((key) => key !== "sortBy" && key !== "sortDesc")
-          .reduce((obj, key) => {
-            obj[key] = query[key];
-            return obj;
-          }, {} as Record<string, string>);
+          .reduce(
+            (obj, key) => {
+              obj[key] = query[key];
+              return obj;
+            },
+            {} as Record<string, string>,
+          );
     const newQuery = {
       ...currentQuery,
       ...(newSortBy !== undefined && { sortBy: newSortBy }),
@@ -253,7 +256,8 @@ const AuthorAnalyticsPage = ({ classes }: { classes: ClassesType }) => {
     desc: sortDesc,
   });
 
-  const { SingleColumnSection, HeadTags, Typography, Loading, LoadMore, ForumIcon, AnalyticsGraph, LWTooltip } = Components;
+  const { SingleColumnSection, HeadTags, Typography, Loading, LoadMore, ForumIcon, AnalyticsGraph, LWTooltip } =
+    Components;
 
   if (!currentUser || (currentUser.slug !== slug && !userIsAdminOrMod(currentUser))) {
     return <SingleColumnSection>You don't have permission to view this page.</SingleColumnSection>;
@@ -284,21 +288,19 @@ const AuthorAnalyticsPage = ({ classes }: { classes: ClassesType }) => {
     <>
       <HeadTags title={title} />
       <SingleColumnSection className={classes.root}>
-      <div className={classes.pageHeader}>
-        <Typography variant="headline" className={classes.pageHeaderText}>
-          Your post stats
-        </Typography>
-      </div>
+        <div className={classes.pageHeader}>
+          <Typography variant="headline" className={classes.pageHeaderText}>
+            Your post stats
+          </Typography>
+        </div>
         <div className={classes.section}>
-          <AnalyticsGraph userId={user._id}/>
+          <AnalyticsGraph userId={user._id} />
         </div>
         <div className={classes.section}>
           <div className={classes.postsListHeader}>
             {/* TODO since removing the title here this now causes some layout shift. Try to fix this (or ideally make it fast enough that
                 this message isn't needed) */}
-            {maybeStale && <span className={classes.fetchingLatest}>
-              checking latest data...
-            </span>}
+            {maybeStale && <span className={classes.fetchingLatest}>checking latest data...</span>}
           </div>
           <div className={classNames(classes.grid, classes.gridHeader)}>
             <div onClick={() => onClickHeader("postedAt")} className={classes.dateHeader}>
@@ -314,7 +316,9 @@ const AuthorAnalyticsPage = ({ classes }: { classes: ClassesType }) => {
               </div>
             </div>
             {renderHeaderCell("views", "Views")}
-            <LWTooltip title="Unique views 30s or longer" placement="top">{renderHeaderCell("reads", "Reads")}</LWTooltip>
+            <LWTooltip title="Unique views 30s or longer" placement="top">
+              {renderHeaderCell("reads", "Reads")}
+            </LWTooltip>
             {renderHeaderCell("baseScore", "Karma")}
             {renderHeaderCell("commentCount", "Comments")}
           </div>

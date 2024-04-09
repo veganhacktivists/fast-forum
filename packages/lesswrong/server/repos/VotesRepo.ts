@@ -3,27 +3,34 @@ import Votes from "../../lib/collections/votes/collection";
 import type { RecentVoteInfo } from "../../lib/rateLimits/types";
 import groupBy from "lodash/groupBy";
 import { EAOrLWReactionsVote, UserVoteOnSingleReaction } from "../../lib/voting/namesAttachedReactions";
-import type { CommentKarmaChange, KarmaChangeBase, KarmaChangesArgs, PostKarmaChange, ReactionChange, TagRevisionKarmaChange } from "../../lib/collections/users/karmaChangesGraphQL";
+import type {
+  CommentKarmaChange,
+  KarmaChangeBase,
+  KarmaChangesArgs,
+  PostKarmaChange,
+  ReactionChange,
+  TagRevisionKarmaChange,
+} from "../../lib/collections/users/karmaChangesGraphQL";
 import { eaAnonymousEmojiPalette, eaEmojiNames } from "../../lib/voting/eaEmojiPalette";
 import { isEAForum } from "../../lib/instanceSettings";
 import { recordPerfMetrics } from "./perfMetricWrapper";
 
-export const RECENT_CONTENT_COUNT = 20
+export const RECENT_CONTENT_COUNT = 20;
 
 type PostVoteCounts = {
-  postId: string,
-  smallUpvoteCount: number,
-  bigUpvoteCount: number,
-  smallDownvoteCount: number
-  bigDownvoteCount: number
-}
+  postId: string;
+  smallUpvoteCount: number;
+  bigUpvoteCount: number;
+  smallDownvoteCount: number;
+  bigDownvoteCount: number;
+};
 
 export type React = {
-  documentId: string,
-  userId: string,
-  createdAt: Date,
-  reactionType?: string, // should this be a specific reaction type?
-}
+  documentId: string;
+  userId: string;
+  createdAt: Date;
+  reactionType?: string; // should this be a specific reaction type?
+};
 
 class VotesRepo extends AbstractRepo<"Votes"> {
   constructor() {
@@ -63,12 +70,10 @@ class VotesRepo extends AbstractRepo<"Votes"> {
    * gets react vote data, and the net changes to reacts on each document
    * are calculated in reactionVotesToReactionChanges().
    */
-  async getKarmaChanges(
-    {userId, startDate, endDate, af, showNegative}: KarmaChangesArgs,
-  ): Promise<{
-    changedComments: CommentKarmaChange[],
-    changedPosts: PostKarmaChange[],
-    changedTagRevisions: TagRevisionKarmaChange[],
+  async getKarmaChanges({ userId, startDate, endDate, af, showNegative }: KarmaChangesArgs): Promise<{
+    changedComments: CommentKarmaChange[];
+    changedPosts: PostKarmaChange[];
+    changedTagRevisions: TagRevisionKarmaChange[];
   }> {
     const powerField = af ? "afPower" : "power";
 
@@ -95,7 +100,8 @@ class VotesRepo extends AbstractRepo<"Votes"> {
       `;
 
     const [allScoreChanges, allReactionVotes] = await Promise.all([
-      this.getRawDb().any(`
+      this.getRawDb().any(
+        `
         -- VotesRepo.getKarmaChanges.allScoreChanges
         SELECT
           v.*,
@@ -114,7 +120,7 @@ class VotesRepo extends AbstractRepo<"Votes"> {
             COUNT(${reactionConditions}) AS "reactionVoteCount"
           FROM "Votes"
           WHERE
-            ${af ? '"afPower" IS NOT NULL AND' : ''}
+            ${af ? '"afPower" IS NOT NULL AND' : ""}
             "authorIds" @> ARRAY[$1::CHARACTER VARYING] AND
             "votedAt" >= $2 AND
             "votedAt" <= $3 AND
@@ -139,7 +145,7 @@ class VotesRepo extends AbstractRepo<"Votes"> {
           OR "reactionVoteCount" > 0
         `,
         [userId, startDate, endDate],
-        `getKarmaChanges(${userId}, ${startDate}, ${endDate})`
+        `getKarmaChanges(${userId}, ${startDate}, ${endDate})`,
       ),
       this.getRawDb().any<DbVote>(
         reactionVotesQuery,
@@ -148,7 +154,7 @@ class VotesRepo extends AbstractRepo<"Votes"> {
       ),
     ]);
 
-    const reactionVotesByDocument = groupBy(allReactionVotes, v=>v.documentId);
+    const reactionVotesByDocument = groupBy(allReactionVotes, (v) => v.documentId);
 
     let changedComments: CommentKarmaChange[] = [];
     let changedPosts: PostKarmaChange[] = [];
@@ -162,10 +168,10 @@ class VotesRepo extends AbstractRepo<"Votes"> {
       };
       // If we have no karma or reacts to display for this document, skip it
       if (!change.scoreChange && !change.addedReacts.length) {
-        continue
+        continue;
       }
 
-      if (votedContent.collectionName==="Comments") {
+      if (votedContent.collectionName === "Comments") {
         changedComments.push({
           ...change,
           description: votedContent.commentHtml,
@@ -173,60 +179,67 @@ class VotesRepo extends AbstractRepo<"Votes"> {
           tagId: votedContent.commentTagId,
           tagCommentType: votedContent.commentTagCommentType,
         });
-      } else if (votedContent.collectionName==="Posts") {
+      } else if (votedContent.collectionName === "Posts") {
         changedPosts.push({
           ...change,
           title: votedContent.postTitle,
           slug: votedContent.postSlug,
         });
-      } else if (votedContent.collectionName==="Revisions") {
+      } else if (votedContent.collectionName === "Revisions") {
         changedTagRevisions.push({
           ...change,
           tagId: votedContent.revisionTagId,
         });
       }
     }
-    return {changedComments, changedPosts, changedTagRevisions};
+    return { changedComments, changedPosts, changedTagRevisions };
   }
-  
+
   reactionVotesToReactionChanges(votes: DbVote[]): ReactionChange[] {
     if (!votes?.length) return [];
-    const votesByUser = groupBy(votes, v=>v.userId);
+    const votesByUser = groupBy(votes, (v) => v.userId);
     let reactionChanges: ReactionChange[] = [];
-    
+
     type FlattenedReaction = {
-        reactionType: string
-        quote: string|undefined
-        count: number
-      }
-    
-    function addNormalizedReact(flattenedReactions: FlattenedReaction[], reactionType: string, quote: string|undefined, isCancellation?: boolean) {
-      const idx = flattenedReactions.findIndex(r => r.reactionType===reactionType && r.quote===quote);
+      reactionType: string;
+      quote: string | undefined;
+      count: number;
+    };
+
+    function addNormalizedReact(
+      flattenedReactions: FlattenedReaction[],
+      reactionType: string,
+      quote: string | undefined,
+      isCancellation?: boolean,
+    ) {
+      const idx = flattenedReactions.findIndex((r) => r.reactionType === reactionType && r.quote === quote);
       if (idx !== -1) {
         flattenedReactions[idx].count += isCancellation ? -1 : 1;
       } else {
         if (!isCancellation) {
           flattenedReactions.push({
-            reactionType, quote,
-            count: 1
+            reactionType,
+            quote,
+            count: 1,
           });
         }
       }
     }
-    
+
     for (let userId of Object.keys(votesByUser)) {
       const flattenedReactions: Array<FlattenedReaction> = [];
-      
+
       // First pass: normalize to an array of the subset of reactions that aren't in unvotes, unmerge reactions of the same type on different quoted regions
       for (let vote of votesByUser[userId]) {
-        if (!vote.extendedVoteType)
-          continue;
-        const extendedVote = (vote.extendedVoteType as EAOrLWReactionsVote);
-        const eaReacts: UserVoteOnSingleReaction[] = eaEmojiNames.filter(emojiName => extendedVote[emojiName]).map(emojiName => ({
-          vote: "created",
-          react: emojiName,
-          "quotes": [],
-        }));
+        if (!vote.extendedVoteType) continue;
+        const extendedVote = vote.extendedVoteType as EAOrLWReactionsVote;
+        const eaReacts: UserVoteOnSingleReaction[] = eaEmojiNames
+          .filter((emojiName) => extendedVote[emojiName])
+          .map((emojiName) => ({
+            vote: "created",
+            react: emojiName,
+            quotes: [],
+          }));
         const formattedReacts = [...(extendedVote.reacts ?? []), ...eaReacts];
 
         if (!vote.isUnvote && formattedReacts) {
@@ -245,25 +258,26 @@ class VotesRepo extends AbstractRepo<"Votes"> {
           }
         }
       }
-      
+
       // Second pass: find reactions in unvotes, flatten them, cancel reactions that match unvotes
       for (let vote of votesByUser[userId]) {
-        if (!vote.extendedVoteType)
-          continue;
-        const extendedUnvote = (vote.extendedVoteType as EAOrLWReactionsVote);
-        const eaReacts: UserVoteOnSingleReaction[] = eaEmojiNames.filter(emojiName => extendedUnvote[emojiName]).map(emojiName => ({
-          vote: "created",
-          react: emojiName,
-          "quotes": [],
-        }));
+        if (!vote.extendedVoteType) continue;
+        const extendedUnvote = vote.extendedVoteType as EAOrLWReactionsVote;
+        const eaReacts: UserVoteOnSingleReaction[] = eaEmojiNames
+          .filter((emojiName) => extendedUnvote[emojiName])
+          .map((emojiName) => ({
+            vote: "created",
+            react: emojiName,
+            quotes: [],
+          }));
         const formattedReacts = [...(extendedUnvote.reacts ?? []), ...eaReacts];
-        
+
         if (vote.isUnvote && formattedReacts) {
           for (let react of formattedReacts) {
             if (react.vote === "disagreed") {
               continue;
             }
-            if (react.quotes && react.quotes.length>0) {
+            if (react.quotes && react.quotes.length > 0) {
               for (let quote of react.quotes) {
                 addNormalizedReact(flattenedReactions, react.react, quote, true);
               }
@@ -273,7 +287,7 @@ class VotesRepo extends AbstractRepo<"Votes"> {
           }
         }
       }
-      
+
       for (let reaction of flattenedReactions) {
         if (reaction.count > 0) {
           reactionChanges.push({
@@ -283,22 +297,23 @@ class VotesRepo extends AbstractRepo<"Votes"> {
         }
       }
     }
-    
+
     // On EAF, some reacts are anonymous (currently agree and disagree). For those, remove the userId.
     if (isEAForum) {
-      reactionChanges = reactionChanges.map(change => {
-        if (eaAnonymousEmojiPalette.some(emoji => emoji.name === change.reactionType)) {
-          return {reactionType: change.reactionType}
+      reactionChanges = reactionChanges.map((change) => {
+        if (eaAnonymousEmojiPalette.some((emoji) => emoji.name === change.reactionType)) {
+          return { reactionType: change.reactionType };
         }
-        return change
-      })
+        return change;
+      });
     }
-    
+
     return reactionChanges;
   }
 
   getSelfVotes(tagRevisionIds: string[]): Promise<DbVote[]> {
-    return this.any(`
+    return this.any(
+      `
       -- VotesRepo.getSelfVotes
       SELECT * FROM "Votes" WHERE
         $1::TEXT[] @> ARRAY["documentId"]::TEXT[] AND
@@ -306,16 +321,21 @@ class VotesRepo extends AbstractRepo<"Votes"> {
         "cancelled" = FALSE AND
         "isUnvote" = FALSE AND
         "authorIds" @> ARRAY["userId"]
-    `, [tagRevisionIds]);
+    `,
+      [tagRevisionIds],
+    );
   }
 
   transferVotesTargetingUser(oldUserId: string, newUserId: string): Promise<null> {
-    return this.none(`
+    return this.none(
+      `
       -- VotesRepo.transferVotesTargetingUser
       UPDATE "Votes"
       SET "authorIds" = ARRAY_APPEND(ARRAY_REMOVE("authorIds", $1), $2)
       WHERE ARRAY_POSITION("authorIds", $1) IS NOT NULL
-    `, [oldUserId, newUserId]);
+    `,
+      [oldUserId, newUserId],
+    );
   }
 
   private votesOnContentVoteFields = `"Votes"._id, "Votes"."userId", "Votes"."power", "Votes"."documentId", "Votes"."collectionName", "Votes"."votedAt"`;
@@ -339,7 +359,8 @@ class VotesRepo extends AbstractRepo<"Votes"> {
   // (note: needs to get the user's own self-upvotes so that
   // it doesn't skip posts with no other votes)
   async getVotesOnRecentContent(userId: string): Promise<RecentVoteInfo[]> {
-    const votes = await this.getRawDb().any(`
+    const votes = await this.getRawDb().any(
+      `
       -- VotesRepo.getVotesOnRecentContent
       (
         ${this.selectVotesOnPostsJoin}
@@ -374,13 +395,16 @@ class VotesRepo extends AbstractRepo<"Votes"> {
           "cancelled" IS NOT true
         ORDER BY "Comments"."postedAt" DESC
       )
-    `, [userId])
-    return votes
+    `,
+      [userId],
+    );
+    return votes;
   }
 
-  async getVotesOnPreviousContentItem(userId: string, collectionName: 'Posts' | 'Comments', before: Date) {
-    if (collectionName === 'Posts') {
-      return this.getRawDb().any(`
+  async getVotesOnPreviousContentItem(userId: string, collectionName: "Posts" | "Comments", before: Date) {
+    if (collectionName === "Posts") {
+      return this.getRawDb().any(
+        `
         -- VotesRepo.getVotesOnPreviousContentItem
         ${this.selectVotesOnPostsJoin}
         WHERE
@@ -398,9 +422,12 @@ class VotesRepo extends AbstractRepo<"Votes"> {
         AND 
           "cancelled" IS NOT true
         ORDER BY "Posts"."postedAt" DESC
-      `, [userId, before]);
+      `,
+        [userId, before],
+      );
     } else {
-      return this.getRawDb().any(`
+      return this.getRawDb().any(
+        `
         -- VotesRepo.getVotesOnPreviousContentItem
         ${this.selectVotesOnCommentsJoin}
         WHERE
@@ -416,12 +443,15 @@ class VotesRepo extends AbstractRepo<"Votes"> {
         AND
           "cancelled" IS NOT true
         ORDER BY "Comments"."postedAt" DESC
-      `, [userId, before]);
+      `,
+        [userId, before],
+      );
     }
   }
 
   async getDigestPlannerVotesForPosts(postIds: string[]): Promise<Array<PostVoteCounts>> {
-    return this.getRawDb().manyOrNone(`
+    return this.getRawDb().manyOrNone(
+      `
       -- VotesRepo.getDigestPlannerVotesForPosts
       SELECT p._id as "postId",
         count(v._id) FILTER(WHERE v."voteType" = 'smallUpvote') as "smallUpvoteCount",
@@ -434,13 +464,25 @@ class VotesRepo extends AbstractRepo<"Votes"> {
         AND v."collectionName" = 'Posts'
         AND v.cancelled = false
       GROUP BY p._id
-    `, [postIds], "getDigestPlannerVotesForPosts");
+    `,
+      [postIds],
+      "getDigestPlannerVotesForPosts",
+    );
   }
 
-  async getDocumentKarmaChangePerDay({ documentIds, startDate, endDate }: { documentIds: string[]; startDate?: Date; endDate: Date; }): Promise<{ window_start_key: string; karma_change: string }[]> {
-    if (!documentIds.length) return []
-    
-    return await this.getRawDb().any<{window_start_key: string, karma_change: string}>(`
+  async getDocumentKarmaChangePerDay({
+    documentIds,
+    startDate,
+    endDate,
+  }: {
+    documentIds: string[];
+    startDate?: Date;
+    endDate: Date;
+  }): Promise<{ window_start_key: string; karma_change: string }[]> {
+    if (!documentIds.length) return [];
+
+    return await this.getRawDb().any<{ window_start_key: string; karma_change: string }>(
+      `
       -- VotesRepo.getDocumentKarmaChangePerDay
       SELECT
         -- Format as YYYY-MM-DD to make grouping easier
@@ -459,15 +501,17 @@ class VotesRepo extends AbstractRepo<"Votes"> {
         window_start_key
       ORDER BY
         window_start_key;
-    `, [documentIds, startDate, endDate]);
+    `,
+      [documentIds, startDate, endDate],
+    );
   }
 
   /**
    * Get the ids of all votes where user1 and user2 have voted on the same document. This is mainly
    * for the purpose of nullifying votes where a user has double-voted from an alt.
    */
-  async getSharedVoteIds({ user1Id, user2Id }: { user1Id: string; user2Id: string; }): Promise<string[]> {
-    const results = await this.getRawDb().any<{vote_id: string}>(
+  async getSharedVoteIds({ user1Id, user2Id }: { user1Id: string; user2Id: string }): Promise<string[]> {
+    const results = await this.getRawDb().any<{ vote_id: string }>(
       `-- VotesRepo.getSharedVoteIds
       WITH JoinedVotes AS (
         SELECT
@@ -497,17 +541,23 @@ class VotesRepo extends AbstractRepo<"Votes"> {
         v2_id AS vote_id
       FROM
         JoinedVotes;
-      `, [user1Id, user2Id]
+      `,
+      [user1Id, user2Id],
     );
     return results.map(({ vote_id }) => vote_id);
   }
-  
-  async getVotesOnSamePost({userId, postId, excludedDocumentId}: {
-    userId: string,
-    postId: string,
-    excludedDocumentId: string,
+
+  async getVotesOnSamePost({
+    userId,
+    postId,
+    excludedDocumentId,
+  }: {
+    userId: string;
+    postId: string;
+    excludedDocumentId: string;
   }): Promise<DbVote[]> {
-    return await this.manyOrNone(`
+    return await this.manyOrNone(
+      `
       SELECT
         v.*
       FROM
@@ -521,7 +571,9 @@ class VotesRepo extends AbstractRepo<"Votes"> {
         AND v."userId" = $1
         AND v."documentId" != $3
         AND v."collectionName" = 'Comments'
-    `, [userId, postId, excludedDocumentId]);
+    `,
+      [userId, postId, excludedDocumentId],
+    );
   }
 }
 

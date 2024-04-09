@@ -1,24 +1,24 @@
-import React from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { Link } from '../../lib/reactRouterWrapper';
-import { userIsAdmin } from '../../lib/vulcan-users/permissions';
-import { useCurrentUser } from '../common/withUser';
-import { hasDigests } from '../../lib/betas';
-import { isEAForum, taggingNamePluralCapitalSetting, taggingNamePluralSetting } from '../../lib/instanceSettings';
+import React from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { Link } from "../../lib/reactRouterWrapper";
+import { userIsAdmin } from "../../lib/vulcan-users/permissions";
+import { useCurrentUser } from "../common/withUser";
+import { hasDigests } from "../../lib/betas";
+import { isEAForum, taggingNamePluralCapitalSetting, taggingNamePluralSetting } from "../../lib/instanceSettings";
 
 // Also used in ModerationLog
 export const styles = (theme: ThemeType): JssStyles => ({
   adminHomeOrModerationLogPage: {
     fontFamily: theme.typography.fontFamily,
-  
+
     "& h1": {
       ...theme.typography.display3,
     },
-  
+
     "& h2": {
       ...theme.typography.display2,
     },
-  
+
     "& h3": {
       ...theme.typography.display1,
       marginTop: 0,
@@ -30,66 +30,162 @@ export const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const AdminHome = ({ classes }: {
-  classes: ClassesType
-}) => {
+const AdminHome = ({ classes }: { classes: ClassesType }) => {
   const { SingleColumnSection, AdminMetadata } = Components;
   const currentUser = useCurrentUser();
-  
+
   if (!userIsAdmin(currentUser)) {
-    return <SingleColumnSection>
-      <p>Sorry, you do not have permission to do this at this time.</p>
-    </SingleColumnSection>
+    return (
+      <SingleColumnSection>
+        <p>Sorry, you do not have permission to do this at this time.</p>
+      </SingleColumnSection>
+    );
   }
-  
-  return <SingleColumnSection>
-    <div className={classes.adminHomeOrModerationLogPage}>
-      <h1>Admin Console</h1>
-      
-      <h3>Moderation</h3>
-      <ul>
-        <li><Link className={classes.link} to="/admin/moderation">Moderation Dashboard</Link></li>
-        <li><Link className={classes.link} to="/moderation/altAccounts">Alt-Accounts Investigator</Link></li>
-        <li><Link className={classes.link} to="/admin/recentlyActiveUsers">Recently Active Users</Link></li>
-        <li><Link className={classes.link} to="/admin/moderationTemplates">Moderation Templates</Link></li>
-        <li><Link className={classes.link} to="/admin/modgpt">ModGPT Dashboard</Link></li>
-        <li><Link className={classes.link} to="/admin/random-user">Random User</Link></li>
-        <li><Link className={classes.link} to="/moderatorComments">Moderator Comments</Link></li>
-        <li><Link className={classes.link} to="/moderation">Moderation Log</Link></li>
-        <li><Link className={classes.link} to={`/${taggingNamePluralSetting.get()}/dashboard`}>{taggingNamePluralCapitalSetting.get()} Dashboard</Link></li>
-      </ul>
 
-      <h3>Site Admin</h3>
-      <ul>
-        {hasDigests && <li><Link className={classes.link} to="/admin/digests">Digests</Link></li>}
-        {isEAForum && <li><Link className={classes.link} to="/admin/election-candidates">Donation Election Candidates</Link></li>}
-        {isEAForum && <li><Link className={classes.link} to="/admin/election-votes">Donation Election results</Link></li>}
-        <li><Link className={classes.link} to="/spotlights">Spotlights</Link></li>
-        <li><Link className={classes.link} to="/reviewAdmin">Review Admin (current year)</Link></li>
-        <li><Link className={classes.link} to="/admin/migrations">Migrations</Link></li>
-        <li><Link className={classes.link} to="/admin/synonyms">Search Synonyms</Link></li>
-      </ul>
-      
-      <h3>Debug Tools</h3>
-      <ul>
-        <li><Link className={classes.link} to="/debug/emailHistory">Email History</Link></li>
-        <li><Link className={classes.link} to="/debug/notificationEmailPreview">Notification Email Preview</Link></li>
-        <li><Link className={classes.link} to="/searchTest">Search Test</Link></li>
-        <li><Link className={classes.link} to="/postListEditorTest">Post List Editor Test</Link></li>
-        <li><Link className={classes.link} to="/imageUpload">Image Upload Test</Link></li>
-        <li><Link className={classes.link} to="/admin/recommendationsSample">Recommendations Explorer</Link></li>
-      </ul>
+  return (
+    <SingleColumnSection>
+      <div className={classes.adminHomeOrModerationLogPage}>
+        <h1>Admin Console</h1>
 
-      <h3>Server Information</h3>
-      <AdminMetadata/>
-    </div>
-  </SingleColumnSection>
-}
+        <h3>Moderation</h3>
+        <ul>
+          <li>
+            <Link className={classes.link} to="/admin/moderation">
+              Moderation Dashboard
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/moderation/altAccounts">
+              Alt-Accounts Investigator
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/admin/recentlyActiveUsers">
+              Recently Active Users
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/admin/moderationTemplates">
+              Moderation Templates
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/admin/modgpt">
+              ModGPT Dashboard
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/admin/random-user">
+              Random User
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/moderatorComments">
+              Moderator Comments
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/moderation">
+              Moderation Log
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to={`/${taggingNamePluralSetting.get()}/dashboard`}>
+              {taggingNamePluralCapitalSetting.get()} Dashboard
+            </Link>
+          </li>
+        </ul>
 
-const AdminHomeComponent = registerComponent('AdminHome', AdminHome, {styles});
+        <h3>Site Admin</h3>
+        <ul>
+          {hasDigests && (
+            <li>
+              <Link className={classes.link} to="/admin/digests">
+                Digests
+              </Link>
+            </li>
+          )}
+          {isEAForum && (
+            <li>
+              <Link className={classes.link} to="/admin/election-candidates">
+                Donation Election Candidates
+              </Link>
+            </li>
+          )}
+          {isEAForum && (
+            <li>
+              <Link className={classes.link} to="/admin/election-votes">
+                Donation Election results
+              </Link>
+            </li>
+          )}
+          <li>
+            <Link className={classes.link} to="/spotlights">
+              Spotlights
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/reviewAdmin">
+              Review Admin (current year)
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/admin/migrations">
+              Migrations
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/admin/synonyms">
+              Search Synonyms
+            </Link>
+          </li>
+        </ul>
+
+        <h3>Debug Tools</h3>
+        <ul>
+          <li>
+            <Link className={classes.link} to="/debug/emailHistory">
+              Email History
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/debug/notificationEmailPreview">
+              Notification Email Preview
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/searchTest">
+              Search Test
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/postListEditorTest">
+              Post List Editor Test
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/imageUpload">
+              Image Upload Test
+            </Link>
+          </li>
+          <li>
+            <Link className={classes.link} to="/admin/recommendationsSample">
+              Recommendations Explorer
+            </Link>
+          </li>
+        </ul>
+
+        <h3>Server Information</h3>
+        <AdminMetadata />
+      </div>
+    </SingleColumnSection>
+  );
+};
+
+const AdminHomeComponent = registerComponent("AdminHome", AdminHome, { styles });
 
 declare global {
   interface ComponentTypes {
-    AdminHome: typeof AdminHomeComponent
+    AdminHome: typeof AdminHomeComponent;
   }
 }

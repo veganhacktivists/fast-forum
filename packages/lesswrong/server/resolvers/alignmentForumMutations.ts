@@ -1,61 +1,61 @@
-import { addGraphQLMutation, addGraphQLResolvers } from '../../lib/vulcan-lib';
-import { CallbackHook } from '../../lib/vulcan-lib/callbacks';
-import { userCanDo } from '../../lib/vulcan-users/permissions';
-import { userCanMakeAlignmentPost } from '../../lib/alignment-forum/users/helpers';
-import { accessFilterSingle } from '../../lib/utils/schemaUtils';
+import { addGraphQLMutation, addGraphQLResolvers } from "../../lib/vulcan-lib";
+import { CallbackHook } from "../../lib/vulcan-lib/callbacks";
+import { userCanDo } from "../../lib/vulcan-users/permissions";
+import { userCanMakeAlignmentPost } from "../../lib/alignment-forum/users/helpers";
+import { accessFilterSingle } from "../../lib/utils/schemaUtils";
 
-export const commentsAlignmentAsync = new CallbackHook<[DbComment,DbComment,ResolverContext]>("comments.alignment.async");
-export const postsAlignmentAsync = new CallbackHook<[DbPost,DbPost,ResolverContext]>("posts.alignment.async");
+export const commentsAlignmentAsync = new CallbackHook<[DbComment, DbComment, ResolverContext]>(
+  "comments.alignment.async",
+);
+export const postsAlignmentAsync = new CallbackHook<[DbPost, DbPost, ResolverContext]>("posts.alignment.async");
 
 const alignmentCommentResolvers = {
   Mutation: {
-    async alignmentComment(root: void, {commentId, af}: {commentId: string, af: boolean}, context: ResolverContext) {
-      const comment = await context.Comments.findOne(commentId)
+    async alignmentComment(
+      root: void,
+      { commentId, af }: { commentId: string; af: boolean },
+      context: ResolverContext,
+    ) {
+      const comment = await context.Comments.findOne(commentId);
       if (!comment) throw new Error("Invalid comment ID");
 
       if (userCanDo(context.currentUser, "comments.alignment.move.all")) {
-        let modifier = { $set: {af: af} };
-        await context.Comments.rawUpdateOne({_id: commentId}, modifier);
-        const updatedComment = (await context.Comments.findOne(commentId))!
-        await commentsAlignmentAsync.runCallbacksAsync(
-          [updatedComment, comment, context]
-        );
+        let modifier = { $set: { af: af } };
+        await context.Comments.rawUpdateOne({ _id: commentId }, modifier);
+        const updatedComment = (await context.Comments.findOne(commentId))!;
+        await commentsAlignmentAsync.runCallbacksAsync([updatedComment, comment, context]);
         return await accessFilterSingle(context.currentUser, context.Comments, updatedComment, context);
       } else {
-        throw new Error({id: `app.user_cannot_edit_comment_alignment_forum_status`} as any);
+        throw new Error({ id: `app.user_cannot_edit_comment_alignment_forum_status` } as any);
       }
-    }
-  }
+    },
+  },
 };
 
 addGraphQLResolvers(alignmentCommentResolvers);
-addGraphQLMutation('alignmentComment(commentId: String, af: Boolean): Comment');
-
+addGraphQLMutation("alignmentComment(commentId: String, af: Boolean): Comment");
 
 const alignmentPostResolvers = {
   Mutation: {
-    async alignmentPost(root: void, {postId, af}: {postId: string, af: boolean}, context: ResolverContext) {
-      const post = await context.Posts.findOne(postId)
+    async alignmentPost(root: void, { postId, af }: { postId: string; af: boolean }, context: ResolverContext) {
+      const post = await context.Posts.findOne(postId);
       if (!post) throw new Error("Invalid post ID");
 
       if (userCanMakeAlignmentPost(context.currentUser, post)) {
-        let modifier = { $set: {af: af} };
-        await context.Posts.rawUpdateOne({_id: postId}, modifier);
-        const updatedPost = (await context.Posts.findOne(postId))!
-        await postsAlignmentAsync.runCallbacksAsync(
-          [updatedPost, post, context]
-        );
+        let modifier = { $set: { af: af } };
+        await context.Posts.rawUpdateOne({ _id: postId }, modifier);
+        const updatedPost = (await context.Posts.findOne(postId))!;
+        await postsAlignmentAsync.runCallbacksAsync([updatedPost, post, context]);
         return await accessFilterSingle(context.currentUser, context.Posts, updatedPost, context);
       } else {
         throw new Error(`app.user_cannot_edit_post_alignment_forum_status`);
       }
-    }
-  }
+    },
+  },
 };
 
 addGraphQLResolvers(alignmentPostResolvers);
-addGraphQLMutation('alignmentPost(postId: String, af: Boolean): Post');
-
+addGraphQLMutation("alignmentPost(postId: String, af: Boolean): Post");
 
 // const suggestAlignmentPostResolvers = {
 //   Mutation: {

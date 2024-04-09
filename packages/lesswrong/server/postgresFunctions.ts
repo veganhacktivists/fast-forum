@@ -166,4 +166,4 @@ export const postgresFunctions = [
   `,
 ] as const;
 
-export type PostgresFunction = typeof postgresFunctions[number];
+export type PostgresFunction = (typeof postgresFunctions)[number];

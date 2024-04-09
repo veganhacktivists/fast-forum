@@ -4,13 +4,13 @@ import { useNotifyMe } from "../hooks/useNotifyMe";
 import type { SubscriptionType } from "../../lib/collections/subscriptions/schema";
 
 export type NotifyMeDropdownItemProps = {
-  document: AnyBecauseTodo,
-  enabled?: boolean,
-  subscribeMessage: string,
-  unsubscribeMessage: string,
-  subscriptionType?: SubscriptionType,
-  tooltip?: string,
-}
+  document: AnyBecauseTodo;
+  enabled?: boolean;
+  subscribeMessage: string;
+  unsubscribeMessage: string;
+  subscriptionType?: SubscriptionType;
+  tooltip?: string;
+};
 
 const NotifyMeDropdownItemInternal: FC<NotifyMeDropdownItemProps> = ({
   document,
@@ -19,7 +19,7 @@ const NotifyMeDropdownItemInternal: FC<NotifyMeDropdownItemProps> = ({
   subscriptionType,
   tooltip,
 }) => {
-  const {loading, disabled, isSubscribed, onSubscribe} = useNotifyMe({
+  const { loading, disabled, isSubscribed, onSubscribe } = useNotifyMe({
     document,
     overrideSubscriptionType: subscriptionType,
   });
@@ -29,7 +29,7 @@ const NotifyMeDropdownItemInternal: FC<NotifyMeDropdownItemProps> = ({
 
   const message = isSubscribed ? unsubscribeMessage : subscribeMessage;
 
-  const {DropdownItem} = Components;
+  const { DropdownItem } = Components;
   return (
     <DropdownItem
       title={message}
@@ -39,20 +39,15 @@ const NotifyMeDropdownItemInternal: FC<NotifyMeDropdownItemProps> = ({
       tooltip={tooltip}
     />
   );
-}
+};
 
 const NotifyMeDropdownItem = (props: NotifyMeDropdownItemProps) =>
-  props.document && (props.enabled ?? true)
-    ? <NotifyMeDropdownItemInternal {...props} />
-    : null;
+  props.document && (props.enabled ?? true) ? <NotifyMeDropdownItemInternal {...props} /> : null;
 
-const NotifyMeDropdownItemComponent = registerComponent(
-  "NotifyMeDropdownItem",
-  NotifyMeDropdownItem,
-);
+const NotifyMeDropdownItemComponent = registerComponent("NotifyMeDropdownItem", NotifyMeDropdownItem);
 
 declare global {
   interface ComponentTypes {
-    NotifyMeDropdownItem: typeof NotifyMeDropdownItemComponent
+    NotifyMeDropdownItem: typeof NotifyMeDropdownItemComponent;
   }
 }

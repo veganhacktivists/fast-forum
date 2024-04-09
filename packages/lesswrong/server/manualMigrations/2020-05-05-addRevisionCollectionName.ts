@@ -1,7 +1,7 @@
-import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
-import { editableCollections } from '../../lib/editor/make_editable';
-import { getCollection } from '../../lib/vulcan-lib';
-import Revisions from '../../lib/collections/revisions/collection'
+import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
+import { editableCollections } from "../../lib/editor/make_editable";
+import { getCollection } from "../../lib/vulcan-lib";
+import Revisions from "../../lib/collections/revisions/collection";
 
 registerMigration({
   name: "addRevisionCollectionName",
@@ -18,12 +18,12 @@ registerMigration({
           // eslint-disable-next-line no-console
           console.log(`Migrating a batch of ${documents.length} documents`);
           await Revisions.rawUpdateMany(
-            { documentId: { $in: documents.map(doc => doc._id) } },
-            { $set: {collectionName} },
-            { multi: true }
+            { documentId: { $in: documents.map((doc) => doc._id) } },
+            { $set: { collectionName } },
+            { multi: true },
           );
-        }
-      })
+        },
+      });
     }
-  }
+  },
 });

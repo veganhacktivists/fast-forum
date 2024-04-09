@@ -1,9 +1,9 @@
-import 'regenerator-runtime/runtime';
-import { filterConsoleLogSpam } from '../lib/consoleFilters';
+import "regenerator-runtime/runtime";
+import { filterConsoleLogSpam } from "../lib/consoleFilters";
 import { AbortSignal } from "node-abort-controller";
 // See https://github.com/openai/openai-node#customizing-the-fetch-client
 import "openai/shims/node";
-import { refreshSettingsCaches } from '../server/loadDatabaseSettings';
+import { refreshSettingsCaches } from "../server/loadDatabaseSettings";
 
 // Fix for Reference error AbortSignal in `lru-cache`
 // See https://github.com/isaacs/node-lru-cache/issues/239

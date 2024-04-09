@@ -1,34 +1,36 @@
-import React from 'react';
-import { registerComponent } from '../../lib/vulcan-lib';
-import { useSingle } from '../../lib/crud/withSingle';
-import { useLocation } from '../../lib/routeUtil';
-import { Helmet } from 'react-helmet';
-import { styles } from '../common/HeaderSubtitle';
+import React from "react";
+import { registerComponent } from "../../lib/vulcan-lib";
+import { useSingle } from "../../lib/crud/withSingle";
+import { useLocation } from "../../lib/routeUtil";
+import { Helmet } from "react-helmet";
+import { styles } from "../common/HeaderSubtitle";
 
-const PostsPageHeaderTitle = ({siteName}: {
-  siteName: string,
-}) => {
-  const { params: {_id, postId} } = useLocation();
+const PostsPageHeaderTitle = ({ siteName }: { siteName: string }) => {
+  const {
+    params: { _id, postId },
+  } = useLocation();
   const { document: post, loading } = useSingle({
     documentId: _id || postId,
     collectionName: "Posts",
     fragmentName: "PostsBase",
-    fetchPolicy: 'cache-only',
+    fetchPolicy: "cache-only",
   });
 
   if (!post || loading) return null;
-  const titleString = `${post.title} — ${siteName}`
+  const titleString = `${post.title} — ${siteName}`;
 
-  return <Helmet>
-    <title>{titleString}</title>
-    <meta property='og:title' content={titleString}/>
-  </Helmet>
-}
+  return (
+    <Helmet>
+      <title>{titleString}</title>
+      <meta property="og:title" content={titleString} />
+    </Helmet>
+  );
+};
 
-const PostsPageHeaderTitleComponent = registerComponent("PostsPageHeaderTitle", PostsPageHeaderTitle, {styles});
+const PostsPageHeaderTitleComponent = registerComponent("PostsPageHeaderTitle", PostsPageHeaderTitle, { styles });
 
 declare global {
   interface ComponentTypes {
-    PostsPageHeaderTitle: typeof PostsPageHeaderTitleComponent
+    PostsPageHeaderTitle: typeof PostsPageHeaderTitleComponent;
   }
 }

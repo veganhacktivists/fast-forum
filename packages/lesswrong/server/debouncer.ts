@@ -1,21 +1,21 @@
-import { captureException } from '@sentry/core';
-import { DebouncerEvents } from '../lib/collections/debouncerEvents/collection';
-import { isAF, testServerSetting } from '../lib/instanceSettings';
-import moment from '../lib/moment-timezone';
-import { addCronJob } from './cronUtil';
-import { Vulcan } from '../lib/vulcan-lib/config';
-import { DebouncerEventsRepo } from './repos';
-import { isAnyTest } from '../lib/executionEnvironment';
+import { captureException } from "@sentry/core";
+import { DebouncerEvents } from "../lib/collections/debouncerEvents/collection";
+import { isAF, testServerSetting } from "../lib/instanceSettings";
+import moment from "../lib/moment-timezone";
+import { addCronJob } from "./cronUtil";
+import { Vulcan } from "../lib/vulcan-lib/config";
+import { DebouncerEventsRepo } from "./repos";
+import { isAnyTest } from "../lib/executionEnvironment";
 
-let eventDebouncersByName: Partial<Record<string,EventDebouncer<any>>> = {};
+let eventDebouncersByName: Partial<Record<string, EventDebouncer<any>>> = {};
 
 type DebouncerCallback<KeyType> = (key: KeyType, events: string[]) => void | Promise<void>;
 
 export type DebouncerTiming =
-    { type: "none" }
-  | { type: "delayed", delayMinutes: number, maxDelayMinutes?: number }
-  | { type: "daily", timeOfDayGMT: number }
-  | { type: "weekly", timeOfDayGMT: number, dayOfWeekGMT: string }
+  | { type: "none" }
+  | { type: "delayed"; delayMinutes: number; maxDelayMinutes?: number }
+  | { type: "daily"; timeOfDayGMT: number }
+  | { type: "weekly"; timeOfDayGMT: number; dayOfWeekGMT: string };
 
 /**
  * Defines a debouncable event type; that is, an event which, some time after
@@ -77,28 +77,29 @@ export type DebouncerTiming =
  *    then a timing rule is required when adding an event.
  *  * callback: (key:JSON, events: Array[JSONObject])=>None
  */
-export class EventDebouncer<KeyType = string>
-{
-  name: string
-  defaultTiming?: DebouncerTiming
-  callback: DebouncerCallback<KeyType>
+export class EventDebouncer<KeyType = string> {
+  name: string;
+  defaultTiming?: DebouncerTiming;
+  callback: DebouncerCallback<KeyType>;
 
-  constructor({ name, defaultTiming, callback }: {
-    name: string,
-    defaultTiming: DebouncerTiming,
-    callback: DebouncerCallback<KeyType>,
+  constructor({
+    name,
+    defaultTiming,
+    callback,
+  }: {
+    name: string;
+    defaultTiming: DebouncerTiming;
+    callback: DebouncerCallback<KeyType>;
   }) {
-    if (!name || !callback)
-      throw new Error("EventDebouncer constructor: missing required argument");
-    if (name in eventDebouncersByName)
-      throw new Error(`Duplicate name for EventDebouncer: ${name}`);
-    
+    if (!name || !callback) throw new Error("EventDebouncer constructor: missing required argument");
+    if (name in eventDebouncersByName) throw new Error(`Duplicate name for EventDebouncer: ${name}`);
+
     this.name = name;
     this.defaultTiming = defaultTiming;
     this.callback = callback;
     eventDebouncersByName[name] = this;
   }
-  
+
   // Add a debounced event.
   //
   // Parameters:
@@ -106,11 +107,16 @@ export class EventDebouncer<KeyType = string>
   //  * data: (JSON)
   //  * timing: (Object)
   //  * af: (bool)
-  recordEvent = async ({key, data, timing=null, af=false}: {
-    key: KeyType,
-    data?: string,
-    timing?: DebouncerTiming|null,
-    af?: boolean,
+  recordEvent = async ({
+    key,
+    data,
+    timing = null,
+    af = false,
+  }: {
+    key: KeyType;
+    data?: string;
+    timing?: DebouncerTiming | null;
+    af?: boolean;
   }) => {
     const timingRule = timing || this.defaultTiming;
     if (!timingRule) {
@@ -129,45 +135,45 @@ export class EventDebouncer<KeyType = string>
       JSON.stringify(key),
       data,
     );
-  }
+  };
 
   parseTiming = (timing: DebouncerTiming) => {
     const now = new Date();
-    const msPerMin = 60*1000;
-    
-    switch(timing.type) {
+    const msPerMin = 60 * 1000;
+
+    switch (timing.type) {
       default:
       case "none":
         return {
           newDelayTime: now,
-          newUpperBoundTime: now
-        }
+          newUpperBoundTime: now,
+        };
       case "delayed":
         return {
-          newDelayTime: new Date(now.getTime() + (timing.delayMinutes * msPerMin)),
-          newUpperBoundTime: new Date(now.getTime() + ((timing.maxDelayMinutes||timing.delayMinutes) * msPerMin)),
+          newDelayTime: new Date(now.getTime() + timing.delayMinutes * msPerMin),
+          newUpperBoundTime: new Date(now.getTime() + (timing.maxDelayMinutes || timing.delayMinutes) * msPerMin),
         };
       case "daily":
         const nextDailyBatchTime = getDailyBatchTimeAfter(now, timing.timeOfDayGMT);
         return {
           newDelayTime: nextDailyBatchTime,
           newUpperBoundTime: nextDailyBatchTime,
-        }
+        };
       case "weekly":
         const nextWeeklyBatchTime = getWeeklyBatchTimeAfter(now, timing.timeOfDayGMT, timing.dayOfWeekGMT);
         return {
           newDelayTime: nextWeeklyBatchTime,
           newUpperBoundTime: nextWeeklyBatchTime,
-        }
+        };
     }
-  }
-  
-  _dispatchEvent = async (key: KeyType, events: string[]|null) => {
+  };
+
+  _dispatchEvent = async (key: KeyType, events: string[] | null) => {
     if (!isAnyTest) {
       //eslint-disable-next-line no-console
       console.log(`Handling ${events?.length} grouped ${this.name} events`);
     }
-    await this.callback(key, events||[]);
+    await this.callback(key, events || []);
   };
 }
 
@@ -175,30 +181,30 @@ export class EventDebouncer<KeyType = string>
 // to one-minute precision.
 export const getDailyBatchTimeAfter = (now: Date, timeOfDayGMT: number) => {
   let todaysBatch = moment(now).tz("GMT");
-  todaysBatch.set('hour', Math.floor(timeOfDayGMT));
-  todaysBatch.set('minute', 60*(timeOfDayGMT%1));
-  todaysBatch.set('second', 0);
-  todaysBatch.set('millisecond', 0);
-  
+  todaysBatch.set("hour", Math.floor(timeOfDayGMT));
+  todaysBatch.set("minute", 60 * (timeOfDayGMT % 1));
+  todaysBatch.set("second", 0);
+  todaysBatch.set("millisecond", 0);
+
   if (todaysBatch.isBefore(now)) {
-    return moment(todaysBatch).add(1, 'days').toDate();
+    return moment(todaysBatch).add(1, "days").toDate();
   } else {
     return todaysBatch.toDate();
   }
-}
+};
 
 // Get the earliest time after now which matches the given time of day and day
 // of the week. One-minute precision.
 export const getWeeklyBatchTimeAfter = (now: Date, timeOfDayGMT: number, dayOfWeekGMT: string) => {
   const nextDailyBatch = moment(getDailyBatchTimeAfter(now, timeOfDayGMT)).tz("GMT");
-  
+
   // Target day of the week, as an integer 0-6
   const nextDailyBatchDayOfWeekNum = nextDailyBatch.day();
   const targetDayOfWeekNum = moment().day(dayOfWeekGMT).day();
-  const daysOfWeekDifference = ((targetDayOfWeekNum - nextDailyBatchDayOfWeekNum ) + 7) % 7;
-  const nextWeeklyBatch = nextDailyBatch.add(daysOfWeekDifference, 'days');
+  const daysOfWeekDifference = (targetDayOfWeekNum - nextDailyBatchDayOfWeekNum + 7) % 7;
+  const nextWeeklyBatch = nextDailyBatch.add(daysOfWeekDifference, "days");
   return nextWeeklyBatch.toDate();
-}
+};
 
 const dispatchEvent = async (event: DbDebouncerEvents) => {
   const eventDebouncer = eventDebouncersByName[event.name];
@@ -206,14 +212,14 @@ const dispatchEvent = async (event: DbDebouncerEvents) => {
     // eslint-disable-next-line no-console
     throw new Error(`Unrecognized event type: ${event.name}`);
   }
-  
+
   await eventDebouncer._dispatchEvent(JSON.parse(event.key), event.pendingEvents);
-}
+};
 
 export const dispatchPendingEvents = async () => {
   const now = new Date();
   let eventToHandle: any = null;
-  
+
   do {
     // Finds one grouped event that is ready to go, and marks it as handled in
     // the same operation (to prevent race conditions between multiple servers
@@ -225,31 +231,31 @@ export const dispatchPendingEvents = async () => {
       {
         dispatched: false,
         af: isAF,
-        $or: [
-          { delayTime: {$lt: now} },
-          { upperBoundTime: {$lt: now} }
-        ]
+        $or: [{ delayTime: { $lt: now } }, { upperBoundTime: { $lt: now } }],
       },
       {
-        $set: { dispatched: true }
-      }
+        $set: { dispatched: true },
+      },
     );
     eventToHandle = queryResult.value;
-    
+
     if (eventToHandle) {
       try {
         await dispatchEvent(eventToHandle);
       } catch (e) {
-        await DebouncerEvents.rawUpdateOne({
-          _id: eventToHandle._id
-        }, {
-          $set: { failed: true }
-        });
+        await DebouncerEvents.rawUpdateOne(
+          {
+            _id: eventToHandle._id,
+          },
+          {
+            $set: { failed: true },
+          },
+        );
         captureException(new Error(`Exception thrown while handling debouncer event ${eventToHandle._id}: ${e}`));
         captureException(e);
       }
     }
-    
+
     // Keep checking for more events to handle so long as one was handled.
   } while (eventToHandle);
 };
@@ -260,28 +266,25 @@ export const dispatchPendingEvents = async () => {
  * their timer. You would do this interactively if you're testing and don't
  * want to wait.
  */
-export const forcePendingEvents = async (
-  {upToDate, delay}:
-  {
-    upToDate?: string,
-    /** Delay between pending events in ms */
-    delay?: number
-  } = {}
-) => {
+export const forcePendingEvents = async ({
+  upToDate,
+  delay,
+}: {
+  upToDate?: string;
+  /** Delay between pending events in ms */
+  delay?: number;
+} = {}) => {
   let eventToHandle = null;
   let countHandled = 0;
   // Default time condition is nothing
-  let timeCondition: MongoFindOneOptions<DbDebouncerEvents> = {}
+  let timeCondition: MongoFindOneOptions<DbDebouncerEvents> = {};
   if (upToDate) {
     const upToDateTime = new Date(upToDate);
     timeCondition = {
-      $or: [
-        { delayTime: { $lt: upToDateTime } },
-        { upperBoundTime: { $lt: upToDateTime } },
-      ]
-    }
+      $or: [{ delayTime: { $lt: upToDateTime } }, { upperBoundTime: { $lt: upToDateTime } }],
+    };
   }
-  
+
   do {
     const queryResult = await DebouncerEvents.rawCollection().findOneAndUpdate(
       {
@@ -292,21 +295,21 @@ export const forcePendingEvents = async (
       { $set: { dispatched: true } },
     );
     eventToHandle = queryResult.value;
-    
+
     if (eventToHandle) {
       await dispatchEvent(eventToHandle);
       countHandled++;
     }
-    
+
     if (delay) {
-      await sleepWithVariance(delay)
+      await sleepWithVariance(delay);
     }
     // Keep checking for more events to handle so long as one was handled.
   } while (eventToHandle);
 
   // eslint-disable-next-line no-console
   console.log(`Forced ${countHandled} pending event${countHandled === 1 ? "" : "s"}`);
-}
+};
 
 Vulcan.forcePendingEvents = forcePendingEvents;
 
@@ -314,29 +317,29 @@ if (!testServerSetting.get()) {
   addCronJob({
     name: "Debounced event handler",
     // Once per minute, on the minute
-    cronStyleSchedule: '* * * * *',
+    cronStyleSchedule: "* * * * *",
     job() {
       void dispatchPendingEvents();
-    }
+    },
   });
 }
 
-function sleepWithVariance(ms: number)
-{
-  const variance = Math.sqrt(ms)
-  const randomizedSleepTimeMs = Math.round(normalDistribution(ms, variance))
-  return new Promise(resolve => setTimeout(resolve, randomizedSleepTimeMs));
+function sleepWithVariance(ms: number) {
+  const variance = Math.sqrt(ms);
+  const randomizedSleepTimeMs = Math.round(normalDistribution(ms, variance));
+  return new Promise((resolve) => setTimeout(resolve, randomizedSleepTimeMs));
 }
 
 // https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve
 function normalDistribution(mean: number, variance: number) {
-  let x=0, y=0
+  let x = 0,
+    y = 0;
   while (x === 0) {
     x = Math.random(); //Converting [0,1) to (0,1)
   }
   while (y === 0) {
     y = Math.random();
   }
-  const initialNormal = Math.sqrt( -2.0 * Math.log( x ) ) * Math.cos( 2.0 * Math.PI * y )
-  return (initialNormal * variance) + mean
+  const initialNormal = Math.sqrt(-2.0 * Math.log(x)) * Math.cos(2.0 * Math.PI * y);
+  return initialNormal * variance + mean;
 }

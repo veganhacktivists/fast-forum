@@ -1,6 +1,6 @@
-import { forEachDocumentBatchInCollection, registerMigration } from './migrationUtils';
-import { LWEvents } from '../../lib/collections/lwevents'
-import { ReadStatuses } from '../../lib/collections/readStatus/collection'
+import { forEachDocumentBatchInCollection, registerMigration } from "./migrationUtils";
+import { LWEvents } from "../../lib/collections/lwevents";
+import { ReadStatuses } from "../../lib/collections/readStatus/collection";
 
 registerMigration({
   name: "denormalizeReadStatus",
@@ -10,11 +10,11 @@ registerMigration({
     await forEachDocumentBatchInCollection({
       collection: LWEvents,
       batchSize: 1000,
-      filter: {name: "post-view"},
+      filter: { name: "post-view" },
       callback: async (postViews: DbLWEvent[]) => {
         // eslint-disable-next-line no-console
         console.log(`Updating batch of ${postViews.length} read statuses`);
-        const updates = postViews.map(view => ({
+        const updates = postViews.map((view) => ({
           updateOne: {
             filter: {
               postId: view.documentId,
@@ -25,14 +25,14 @@ registerMigration({
                 lastUpdated: view.createdAt,
               },
               $set: {
-                isRead: true
+                isRead: true,
               },
             },
             upsert: true,
-          }
+          },
         }));
         await ReadStatuses.rawCollection().bulkWrite(updates);
-      }
-    })
-  }
+      },
+    });
+  },
 });

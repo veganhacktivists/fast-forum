@@ -36,40 +36,32 @@ const styles = (theme: ThemeType) => ({
 });
 
 interface EAEmojisVoteOnPostSecondaryProps extends PostVotingComponentProps {
-  classes: ClassesType,
+  classes: ClassesType;
 }
 
-const EAEmojisVoteOnPostSecondary = ({
-  document,
-  votingSystem,
-  classes,
-}: EAEmojisVoteOnPostSecondaryProps) => {
+const EAEmojisVoteOnPostSecondary = ({ document, votingSystem, classes }: EAEmojisVoteOnPostSecondaryProps) => {
   const voteProps = useVote(document, "Posts", votingSystem);
 
-  const {SectionTitle, EAReactsSection} = Components;
+  const { SectionTitle, EAReactsSection } = Components;
   return (
     <div className={classes.root}>
       <div className={classes.divider} />
       <SectionTitle title="Reactions" className={classes.heading} />
       <div className={classes.reacts}>
-        <EAReactsSection
-          document={document}
-          voteProps={voteProps}
-          large
-        />
+        <EAReactsSection document={document} voteProps={voteProps} large />
       </div>
     </div>
   );
-}
+};
 
 const EAEmojisVoteOnPostSecondaryComponent = registerComponent(
   "EAEmojisVoteOnPostSecondary",
   EAEmojisVoteOnPostSecondary,
-  {styles},
+  { styles },
 );
 
 declare global {
   interface ComponentTypes {
-    EAEmojisVoteOnPostSecondary: typeof EAEmojisVoteOnPostSecondaryComponent
+    EAEmojisVoteOnPostSecondary: typeof EAEmojisVoteOnPostSecondaryComponent;
   }
 }

@@ -1,23 +1,23 @@
-import React, { useState, useCallback } from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { useCurrentUser } from '../common/withUser';
-import { Link } from '../../lib/reactRouterWrapper';
-import { getRecommendationSettings } from './RecommendationsAlgorithmPicker'
-import { useContinueReading } from './withContinueReading';
-import {AnalyticsContext, useTracking} from "../../lib/analyticsEvents";
-import type { RecommendationsAlgorithm } from '../../lib/collections/users/recommendationSettings';
-import classNames from 'classnames';
-import { DatabasePublicSetting } from '../../lib/publicSettings';
-import { hasCuratedPostsSetting } from '../../lib/instanceSettings';
+import React, { useState, useCallback } from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useCurrentUser } from "../common/withUser";
+import { Link } from "../../lib/reactRouterWrapper";
+import { getRecommendationSettings } from "./RecommendationsAlgorithmPicker";
+import { useContinueReading } from "./withContinueReading";
+import { AnalyticsContext, useTracking } from "../../lib/analyticsEvents";
+import type { RecommendationsAlgorithm } from "../../lib/collections/users/recommendationSettings";
+import classNames from "classnames";
+import { DatabasePublicSetting } from "../../lib/publicSettings";
+import { hasCuratedPostsSetting } from "../../lib/instanceSettings";
 
-export const curatedUrl = "/recommendations"
+export const curatedUrl = "/recommendations";
 
 const styles = (theme: ThemeType): JssStyles => ({
   section: {
     marginTop: -12,
   },
   continueReadingList: {
-    marginBottom: theme.spacing.unit*2,
+    marginBottom: theme.spacing.unit * 2,
   },
   subsection: {
     marginBottom: theme.spacing.unit,
@@ -26,9 +26,9 @@ const styles = (theme: ThemeType): JssStyles => ({
     display: "flex",
     justifyContent: "flex-end",
     marginTop: 12,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       justifyContent: "center",
-    }
+    },
   },
   footer: {
     color: theme.palette.grey[600],
@@ -40,103 +40,111 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   loggedOutFooter: {
     maxWidth: 450,
-    marginLeft: "auto"
+    marginLeft: "auto",
   },
   largeScreenLoggedOutSequences: {
     marginTop: 2,
     marginBottom: 2,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       display: "none",
     },
   },
   smallScreenLoggedOutSequences: {
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up("md")]: {
       display: "none",
     },
   },
   loggedOutCustomizeLabel: {
     fontSize: "1rem",
-    fontStyle: "italic"
+    fontStyle: "italic",
   },
   posts: {
     boxShadow: theme.palette.boxShadow.default,
   },
   curated: {
-    marginTop: 12
+    marginTop: 12,
   },
   expandIcon: {
-    position: 'relative',
+    position: "relative",
     top: 3,
     left: 10,
     fontSize: 16,
-    cursor: 'pointer',
-    '&:hover': {
+    cursor: "pointer",
+    "&:hover": {
       color: theme.palette.grey[800],
-    }
+    },
   },
   readMoreLink: {
     fontSize: 14,
     color: theme.palette.grey[600],
     fontWeight: 600,
-    '@media (max-width: 350px)': {
-      display: 'none'
-    }
+    "@media (max-width: 350px)": {
+      display: "none",
+    },
   },
 });
 
 const getFrontPageOverwrites = (haveCurrentUser: boolean): Partial<RecommendationsAlgorithm> => {
   return {
     lwRationalityOnly: true,
-    method: 'sample',
-    count: haveCurrentUser ? 3 : 2
-  }
-}
+    method: "sample",
+    count: haveCurrentUser ? 3 : 2,
+  };
+};
 
-export const bookDisplaySetting = new DatabasePublicSetting<boolean>('bookDisplaySetting', false)
+export const bookDisplaySetting = new DatabasePublicSetting<boolean>("bookDisplaySetting", false);
 
-const LWRecommendations = ({
-  configName,
-  classes,
-}: {
-  configName: string,
-  classes: ClassesType,
-}) => {
-
+const LWRecommendations = ({ configName, classes }: { configName: string; classes: ClassesType }) => {
   const currentUser = useCurrentUser();
   const [showSettings, setShowSettings] = useState(false);
   const [settingsState, setSettings] = useState<any>(null);
 
-  const { captureEvent } = useTracking({eventProps: {pageSectionContext: "recommendations"}});
-  const {continueReading} = useContinueReading();
+  const { captureEvent } = useTracking({ eventProps: { pageSectionContext: "recommendations" } });
+  const { continueReading } = useContinueReading();
 
   const toggleSettings = useCallback(() => {
-    captureEvent("toggleSettings", {action: !showSettings})
+    captureEvent("toggleSettings", { action: !showSettings });
     setShowSettings(!showSettings);
   }, [showSettings, captureEvent, setShowSettings]);
 
   const render = () => {
-    const { DismissibleSpotlightItem, RecommendationsAlgorithmPicker, SingleColumnSection, SettingsButton,
-      RecommendationsList, SectionTitle, LWTooltip, CuratedPostsList, Book2020FrontpageWidget, SectionSubtitle,
-      ContinueReadingList, BookmarksList } = Components;
+    const {
+      DismissibleSpotlightItem,
+      RecommendationsAlgorithmPicker,
+      SingleColumnSection,
+      SettingsButton,
+      RecommendationsList,
+      SectionTitle,
+      LWTooltip,
+      CuratedPostsList,
+      Book2020FrontpageWidget,
+      SectionSubtitle,
+      ContinueReadingList,
+      BookmarksList,
+    } = Components;
 
-    const settings = getRecommendationSettings({settings: settingsState, currentUser, configName})
+    const settings = getRecommendationSettings({ settings: settingsState, currentUser, configName });
     const frontpageRecommendationSettings: RecommendationsAlgorithm = {
       ...settings,
-      ...getFrontPageOverwrites(!!currentUser)
-    }
+      ...getFrontPageOverwrites(!!currentUser),
+    };
 
     // Disabled during 2018 Review [and coronavirus]
-    const recommendationsTooltip = <div>
+    const recommendationsTooltip = (
       <div>
-        Recently curated posts, as well as a random sampling of top-rated posts of all time
-        {settings.onlyUnread && " that you haven't read yet"}.
+        <div>
+          Recently curated posts, as well as a random sampling of top-rated posts of all time
+          {settings.onlyUnread && " that you haven't read yet"}.
+        </div>
+        <div>
+          <em>(Click to see more recommendations)</em>
+        </div>
       </div>
-      <div><em>(Click to see more recommendations)</em></div>
-    </div>
+    );
 
-    const renderRecommendations = !settings.hideFrontpage && !bookDisplaySetting.get()
+    const renderRecommendations = !settings.hideFrontpage && !bookDisplaySetting.get();
 
-    const titleText = "Recommendations"
+    const titleText = "Recommendations";
     const titleNode = (
       <div className={classes.title}>
         <SectionTitle
@@ -157,99 +165,111 @@ const LWRecommendations = ({
       </div>
     );
 
-    const continueReadingTooltip = <div>
-      <div>The next posts in sequences you've started reading, but not finished.</div>
-    </div>
+    const continueReadingTooltip = (
+      <div>
+        <div>The next posts in sequences you've started reading, but not finished.</div>
+      </div>
+    );
 
-    const bookmarksTooltip = <div>
-      <div>Individual posts that you've bookmarked</div>
-      <div><em>(Click to see all)</em></div>
-    </div>
+    const bookmarksTooltip = (
+      <div>
+        <div>Individual posts that you've bookmarked</div>
+        <div>
+          <em>(Click to see all)</em>
+        </div>
+      </div>
+    );
 
+    const bookmarksLimit = settings.hideFrontpage && settings.hideContinueReading ? 6 : 3;
+    const renderBookmarks = (currentUser?.bookmarkedPostsMetadata?.length || 0) > 0 && !settings.hideBookmarks;
 
-    const bookmarksLimit = (settings.hideFrontpage && settings.hideContinueReading) ? 6 : 3
-    const renderBookmarks = ((currentUser?.bookmarkedPostsMetadata?.length || 0) > 0) && !settings.hideBookmarks
+    const renderContinueReading = currentUser && continueReading?.length > 0 && !settings.hideContinueReading;
 
-    const renderContinueReading = currentUser && (continueReading?.length > 0) && !settings.hideContinueReading
+    return (
+      <SingleColumnSection className={classes.section}>
+        {bookDisplaySetting.get() && <Book2020FrontpageWidget />}
+        <AnalyticsContext pageSectionContext="recommendations">
+          {titleNode}
+          {showSettings && (
+            <RecommendationsAlgorithmPicker
+              configName={configName}
+              settings={frontpageRecommendationSettings}
+              onChange={(newSettings) => setSettings(newSettings)}
+            />
+          )}
+          {!bookDisplaySetting.get() && (
+            <AnalyticsContext pageSubSectionContext="frontpageCuratedCollections">
+              <DismissibleSpotlightItem current />
+            </AnalyticsContext>
+          )}
 
-    return <SingleColumnSection className={classes.section}>
-      {bookDisplaySetting.get() && <Book2020FrontpageWidget/>}
-      <AnalyticsContext pageSectionContext="recommendations">
-        {titleNode}
-        {showSettings &&
-          <RecommendationsAlgorithmPicker
-            configName={configName}
-            settings={frontpageRecommendationSettings}
-            onChange={(newSettings) => setSettings(newSettings)}
-          /> }
-        {!bookDisplaySetting.get() && <AnalyticsContext pageSubSectionContext="frontpageCuratedCollections">
-          <DismissibleSpotlightItem current />
-        </AnalyticsContext>}
+          <div className={classes.subsection}>
+            <div className={classes.posts}>
+              {renderRecommendations && (
+                <AnalyticsContext
+                  listContext="frontpageFromTheArchives"
+                  pageSubSectionContext="frontpageFromTheArchives"
+                  capturePostItemOnMount
+                >
+                  <RecommendationsList algorithm={frontpageRecommendationSettings} />
+                </AnalyticsContext>
+              )}
+              {hasCuratedPostsSetting.get() && (
+                <div className={classes.curated}>
+                  <CuratedPostsList />
+                </div>
+              )}
+            </div>
+          </div>
 
-        <div className={classes.subsection}>
-          <div className={classes.posts}>
-            {renderRecommendations && (
+          {renderContinueReading && (
+            <div className={currentUser ? classes.subsection : undefined}>
+              <AnalyticsContext pageSubSectionContext="continueReading">
+                <LWTooltip placement="top-start" title={continueReadingTooltip}>
+                  <Link to={"/library"}>
+                    <SectionSubtitle className={classNames(classes.subtitle, classes.continueReading)}>
+                      Continue Reading
+                    </SectionSubtitle>
+                  </Link>
+                </LWTooltip>
+                <ContinueReadingList continueReading={continueReading} />
+              </AnalyticsContext>
+            </div>
+          )}
+
+          {renderBookmarks && (
+            <div className={classes.subsection}>
               <AnalyticsContext
-                listContext="frontpageFromTheArchives"
-                pageSubSectionContext="frontpageFromTheArchives"
+                pageSubSectionContext="frontpageBookmarksList"
+                listContext={"frontpageBookmarksList"}
                 capturePostItemOnMount
               >
-                <RecommendationsList algorithm={frontpageRecommendationSettings} />
+                <LWTooltip placement="top-start" title={bookmarksTooltip}>
+                  <Link to="/bookmarks">
+                    <SectionSubtitle>Bookmarks</SectionSubtitle>
+                  </Link>
+                </LWTooltip>
+                <BookmarksList limit={bookmarksLimit} hideLoadMore={true} />
               </AnalyticsContext>
-            )}
-            {hasCuratedPostsSetting.get() && <div className={classes.curated}>
-              <CuratedPostsList />
-            </div>}
-          </div>
-        </div>
+            </div>
+          )}
 
-        {renderContinueReading && (
-          <div className={currentUser ? classes.subsection : undefined}>
-            <AnalyticsContext pageSubSectionContext="continueReading">
-              <LWTooltip placement="top-start" title={continueReadingTooltip}>
-                <Link to={"/library"}>
-                  <SectionSubtitle className={classNames(classes.subtitle, classes.continueReading)}>
-                    Continue Reading
-                  </SectionSubtitle>
-                </Link>
-              </LWTooltip>
-              <ContinueReadingList continueReading={continueReading} />
-            </AnalyticsContext>
-          </div>
-        )}
-
-        {renderBookmarks && (
-          <div className={classes.subsection}>
-            <AnalyticsContext
-              pageSubSectionContext="frontpageBookmarksList"
-              listContext={"frontpageBookmarksList"}
-              capturePostItemOnMount
-            >
-              <LWTooltip placement="top-start" title={bookmarksTooltip}>
-                <Link to="/bookmarks">
-                  <SectionSubtitle>Bookmarks</SectionSubtitle>
-                </Link>
-              </LWTooltip>
-              <BookmarksList limit={bookmarksLimit} hideLoadMore={true} />
-            </AnalyticsContext>
-          </div>
-        )}
-
-        {/* disabled except during review */}
-        {/* <AnalyticsContext pageSectionContext="LessWrong 2018 Review">
+          {/* disabled except during review */}
+          {/* <AnalyticsContext pageSectionContext="LessWrong 2018 Review">
           <FrontpageVotingPhase settings={frontpageRecommendationSettings} />
         </AnalyticsContext> */}
-      </AnalyticsContext>
-    </SingleColumnSection>
-  }
+        </AnalyticsContext>
+      </SingleColumnSection>
+    );
+  };
 
   return render();
-}
+};
 
-const LWRecommendationsComponent = registerComponent("LWRecommendations", LWRecommendations, {styles});
+const LWRecommendationsComponent = registerComponent("LWRecommendations", LWRecommendations, { styles });
 
 declare global {
   interface ComponentTypes {
-    LWRecommendations: typeof LWRecommendationsComponent
+    LWRecommendations: typeof LWRecommendationsComponent;
   }
 }

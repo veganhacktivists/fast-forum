@@ -1,7 +1,7 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import EmailPropTypes from '../PropTypes'
-import includeDataProps from '../includeDataProps'
+import React from "react";
+import PropTypes from "prop-types";
+import EmailPropTypes from "../PropTypes";
+import includeDataProps from "../includeDataProps";
 
 export default function Image(props: any) {
   return (
@@ -12,14 +12,14 @@ export default function Image(props: any) {
       width={props.width}
       height={props.height}
       style={{
-        display: 'block',
-        outline: 'none',
-        border: 'none',
-        textDecoration: 'none',
+        display: "block",
+        outline: "none",
+        border: "none",
+        textDecoration: "none",
         ...props.style,
       }}
     />
-  )
+  );
 }
 
 Image.propTypes = {
@@ -28,8 +28,8 @@ Image.propTypes = {
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   style: EmailPropTypes.style,
-}
+};
 
 Image.defaultProps = {
   style: undefined,
-}
+};

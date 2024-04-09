@@ -1,4 +1,4 @@
-import process from 'process';
+import process from "process";
 
 export function panic(message: string): never {
   //eslint-disable-next-line no-console

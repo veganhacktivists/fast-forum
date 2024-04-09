@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-12-19T21:37:59.000Z by 20231219T213759.add_hideactivedialogueusers_field.ts
  * +-- Overall schema hash: 4a1a03e638557cba881d59cb63b0ed02
- *  
+ *
  * @@ -1149,7 +1147,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * -<<<<<<< HEAD
  * --- Schema for "Users", hash: 424995d05e120393b3d73bec4d5d11e3
  * -=======
@@ -25,7 +25,7 @@
  * @@ -1561 +1555,2 @@ CREATE OR REPLACE FUNCTION fm_comment_confidence(
  *    ;
  * +
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -35,13 +35,13 @@
  */
 export const acceptsSchemaHash = "4a1a03e638557cba881d59cb63b0ed02";
 
-import Users from "../../lib/collections/users/collection"
-import { addField, dropField } from "./meta/utils"
+import Users from "../../lib/collections/users/collection";
+import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Users, "notificationYourTurnMatchForm")
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Users, "notificationYourTurnMatchForm");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Users, "notificationYourTurnMatchForm")
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Users, "notificationYourTurnMatchForm");
+};

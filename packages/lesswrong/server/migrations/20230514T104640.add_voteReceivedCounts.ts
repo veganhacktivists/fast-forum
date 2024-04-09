@@ -12,8 +12,8 @@
  * -
  * --- Accepted on 2023-05-10T14:23:44.000Z by 20230510T142344.create_PostRecommendations_table.ts
  * +-- Overall schema hash: 922ce375a3ed4de843e0f4f9cc50dd08
- *  
- * 
+ *
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -24,21 +24,21 @@
  */
 export const acceptsSchemaHash = "922ce375a3ed4de843e0f4f9cc50dd08";
 
-import Users from "../../lib/collections/users/collection"
-import { addField, dropField } from "./meta/utils"
+import Users from "../../lib/collections/users/collection";
+import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Users, 'voteReceivedCount')
-  await addField(db, Users, 'smallUpvoteReceivedCount')
-  await addField(db, Users, 'smallDownvoteReceivedCount')
-  await addField(db, Users, 'bigUpvoteReceivedCount')
-  await addField(db, Users, 'bigDownvoteReceivedCount')
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Users, "voteReceivedCount");
+  await addField(db, Users, "smallUpvoteReceivedCount");
+  await addField(db, Users, "smallDownvoteReceivedCount");
+  await addField(db, Users, "bigUpvoteReceivedCount");
+  await addField(db, Users, "bigDownvoteReceivedCount");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Users, 'voteReceivedCount')
-  await dropField(db, Users, 'smallUpvoteReceivedCount')
-  await dropField(db, Users, 'smallDownvoteReceivedCount')
-  await dropField(db, Users, 'bigUpvoteReceivedCount')
-  await dropField(db, Users, 'bigDownvoteReceivedCount')
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Users, "voteReceivedCount");
+  await dropField(db, Users, "smallUpvoteReceivedCount");
+  await dropField(db, Users, "smallDownvoteReceivedCount");
+  await dropField(db, Users, "bigUpvoteReceivedCount");
+  await dropField(db, Users, "bigDownvoteReceivedCount");
+};

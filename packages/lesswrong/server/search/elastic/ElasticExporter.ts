@@ -7,29 +7,14 @@ import {
   SearchIndexedCollection,
   searchIndexedCollectionNames,
 } from "../../../lib/search/searchUtil";
-import {
-  CommentsRepo,
-  PostsRepo,
-  SequencesRepo,
-  TagsRepo,
-  UsersRepo,
-} from "../../repos";
+import { CommentsRepo, PostsRepo, SequencesRepo, TagsRepo, UsersRepo } from "../../repos";
 import { getCollection } from "../../../lib/vulcan-lib/getCollection";
 import Globals from "../../../lib/vulcan-lib/config";
 
-const HTML_FIELDS = [
-  "body",
-  "bio",
-  "howOthersCanHelpMe",
-  "howICanHelpOthers",
-  "plaintextDescription",
-  "description",
-];
+const HTML_FIELDS = ["body", "bio", "howOthersCanHelpMe", "howICanHelpOthers", "plaintextDescription", "description"];
 
 class ElasticExporter {
-  constructor(
-    private client = new ElasticClient(),
-  ) {}
+  constructor(private client = new ElasticClient()) {}
 
   async configureIndexes() {
     for (const collectionName of searchIndexedCollectionNames) {
@@ -38,21 +23,16 @@ class ElasticExporter {
   }
 
   async exportAll() {
-    await Promise.all(searchIndexedCollectionNames.map(
-      (collectionName) => this.exportCollection(collectionName),
-    ));
+    await Promise.all(searchIndexedCollectionNames.map((collectionName) => this.exportCollection(collectionName)));
   }
 
   private isBackingIndexName(name: string): boolean {
     for (const collectionName of searchIndexedCollectionNames) {
-      if (
-        name.indexOf(collectionName.toLowerCase()) === 0 &&
-        /[a-z]+_\d+/.exec(name)?.length
-      ) {
+      if (name.indexOf(collectionName.toLowerCase()) === 0 && /[a-z]+_\d+/.exec(name)?.length) {
         return true;
       }
     }
-    return false
+    return false;
   }
 
   async deleteOrphanedIndexes() {
@@ -131,8 +111,8 @@ class ElasticExporter {
         refresh: true,
         wait_for_completion: false,
         body: {
-          source: {index: oldIndexName},
-          dest: {index: newIndexName},
+          source: { index: oldIndexName },
+          dest: { index: newIndexName },
         },
       });
       await client.indices.putSettings({
@@ -189,13 +169,10 @@ class ElasticExporter {
         document[field] = htmlToTextDefault(document[field] ?? "");
       }
     }
-    return {id, document};
+    return { id, document };
   }
 
-  async updateDocument(
-    collectionName: SearchIndexCollectionName,
-    documentId: string,
-  ): Promise<void> {
+  async updateDocument(collectionName: SearchIndexCollectionName, documentId: string): Promise<void> {
     const index = collectionName.toLowerCase();
     const repo = this.getRepoByCollectionName(collectionName);
     const searchDocument = await repo.getSearchDocumentById(documentId);
@@ -208,7 +185,7 @@ class ElasticExporter {
   private async getExistingAliasTarget(aliasName: string): Promise<string | null> {
     try {
       const client = this.client.getClient();
-      const existing = await client.indices.getAlias({name: aliasName});
+      const existing = await client.indices.getAlias({ name: aliasName });
       const oldIndexName = Object.keys(existing ?? {})[0];
       return oldIndexName ?? null;
     } catch {
@@ -216,10 +193,7 @@ class ElasticExporter {
     }
   }
 
-  private async createIndex(
-    indexName: string,
-    collectionName: SearchIndexCollectionName,
-  ): Promise<void> {
+  private async createIndex(indexName: string, collectionName: SearchIndexCollectionName): Promise<void> {
     const client = this.client.getClient();
     const mappings = this.getCollectionMappings(collectionName);
     await client.indices.create({
@@ -264,26 +238,14 @@ class ElasticExporter {
                 default: {
                   type: "custom",
                   tokenizer: "standard",
-                  filter: [
-                    "lowercase",
-                    "decimal_digit",
-                    "fm_english_stopwords",
-                    "fm_english_stemmer",
-                  ],
-                  char_filter: [
-                    "fm_punctuation_filter",
-                  ],
+                  filter: ["lowercase", "decimal_digit", "fm_english_stopwords", "fm_english_stemmer"],
+                  char_filter: ["fm_punctuation_filter"],
                 },
                 fm_exact_analyzer: {
                   type: "custom",
                   tokenizer: "standard",
-                  filter: [
-                    "lowercase",
-                    "decimal_digit",
-                  ],
-                  char_filter: [
-                    "fm_punctuation_filter",
-                  ],
+                  filter: ["lowercase", "decimal_digit"],
+                  char_filter: ["fm_punctuation_filter"],
                 },
                 fm_synonym_analyzer: {
                   type: "custom",
@@ -296,22 +258,13 @@ class ElasticExporter {
                     "fm_english_stopwords",
                     "fm_english_stemmer",
                   ],
-                  char_filter: [
-                    "fm_punctuation_filter",
-                  ],
+                  char_filter: ["fm_punctuation_filter"],
                 },
                 fm_shingle_analyzer: {
                   type: "custom",
                   tokenizer: "standard",
-                  filter: [
-                    "lowercase",
-                    "fm_synonym_filter",
-                    "fm_shingle_filter",
-                    "fm_whitespace_filter",
-                  ],
-                  char_filter: [
-                    "fm_punctuation_filter",
-                  ],
+                  filter: ["lowercase", "fm_synonym_filter", "fm_shingle_filter", "fm_whitespace_filter"],
+                  char_filter: ["fm_punctuation_filter"],
                 },
               },
             },
@@ -324,13 +277,11 @@ class ElasticExporter {
     });
   }
 
-  private getCollectionMappings(
-    collectionName: SearchIndexCollectionName,
-  ): Mappings {
+  private getCollectionMappings(collectionName: SearchIndexCollectionName): Mappings {
     const config = collectionNameToConfig(collectionName);
     const result: Mappings = {
-      objectID: {type: "keyword"},
-      publicDateMs: {type: "long"},
+      objectID: { type: "keyword" },
+      publicDateMs: { type: "long" },
       ...config.mappings,
     };
     return result;
@@ -338,18 +289,18 @@ class ElasticExporter {
 
   private getRepoByCollectionName(collectionName: SearchIndexCollectionName) {
     switch (collectionName) {
-    case "Posts":
-      return new PostsRepo();
-    case "Comments":
-      return new CommentsRepo();
-    case "Users":
-      return new UsersRepo();
-    case "Sequences":
-      return new SequencesRepo();
-    case "Tags":
-      return new TagsRepo();
-    default:
-      throw new Error("Can't find repo for collection " + collectionName);
+      case "Posts":
+        return new PostsRepo();
+      case "Comments":
+        return new CommentsRepo();
+      case "Users":
+        return new UsersRepo();
+      case "Sequences":
+        return new SequencesRepo();
+      case "Tags":
+        return new TagsRepo();
+      default:
+        throw new Error("Can't find repo for collection " + collectionName);
     }
   }
 
@@ -388,7 +339,7 @@ class ElasticExporter {
       console.error(`${collectionName} indexing errors:`, totalErrors);
     } else {
       // eslint-disable-next-line no-console
-      console.log("No errors found when indexing", collectionName)
+      console.log("No errors found when indexing", collectionName);
     }
   }
 
@@ -408,10 +359,10 @@ class ElasticExporter {
     await this.client.getClient().helpers.bulk({
       datasource: documents,
       onDocument: (document: SearchDocument) => {
-        const {id: _id} = this.formatDocument(document);
+        const { id: _id } = this.formatDocument(document);
         return [
           {
-            update: {_index, _id},
+            update: { _index, _id },
           },
           {
             doc_as_upsert: true,
@@ -438,15 +389,12 @@ class ElasticExporter {
   }
 
   async updateSynonyms(synonyms: string[]): Promise<void> {
-    await Promise.all(searchIndexedCollectionNames.map(
-      (collectionName) => this.updateSynonymsForCollection(collectionName, synonyms),
-    ));
+    await Promise.all(
+      searchIndexedCollectionNames.map((collectionName) => this.updateSynonymsForCollection(collectionName, synonyms)),
+    );
   }
 
-  private async updateSynonymsForCollection(
-    collectionName: SearchIndexCollectionName,
-    synonyms: string[],
-  ) {
+  private async updateSynonymsForCollection(collectionName: SearchIndexCollectionName, synonyms: string[]) {
     const collection = getCollection(collectionName) as SearchIndexedCollection;
     const index = this.getIndexName(collection);
     await this.updateSynonymsForIndex(index, synonyms);
@@ -454,7 +402,7 @@ class ElasticExporter {
 
   private async updateSynonymsForIndex(index: string, synonyms: string[]) {
     const client = this.client.getClient();
-    await client.indices.close({index});
+    await client.indices.close({ index });
     await client.indices.putSettings({
       index,
       body: {
@@ -472,29 +420,25 @@ class ElasticExporter {
         },
       },
     });
-    await client.indices.open({index});
+    await client.indices.open({ index });
   }
 }
 
 Globals.elasticConfigureIndex = (collectionName: SearchIndexCollectionName) =>
   new ElasticExporter().configureIndex(collectionName);
 
-Globals.elasticConfigureIndexes = () =>
-  new ElasticExporter().configureIndexes();
+Globals.elasticConfigureIndexes = () => new ElasticExporter().configureIndexes();
 
 Globals.elasticExportCollection = (collectionName: SearchIndexCollectionName) =>
   new ElasticExporter().exportCollection(collectionName);
 
-Globals.elasticExportAll = () =>
-  new ElasticExporter().exportAll();
+Globals.elasticExportAll = () => new ElasticExporter().exportAll();
 
 Globals.elasticDeleteIndex = (collectionName: SearchIndexCollectionName) =>
   new ElasticExporter().deleteIndex(collectionName);
 
-Globals.elasticDeleteIndexByName = (indexName: string) =>
-  new ElasticExporter().deleteIndexByName(indexName);
+Globals.elasticDeleteIndexByName = (indexName: string) => new ElasticExporter().deleteIndexByName(indexName);
 
-Globals.elasticDeleteOrphanedIndexes = () =>
-  new ElasticExporter().deleteOrphanedIndexes();
+Globals.elasticDeleteOrphanedIndexes = () => new ElasticExporter().deleteOrphanedIndexes();
 
 export default ElasticExporter;

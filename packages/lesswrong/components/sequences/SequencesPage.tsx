@@ -1,34 +1,34 @@
-import React, { useState, useCallback, useRef } from 'react';
-import { Components, registerComponent, } from '../../lib/vulcan-lib';
-import { useSingle } from '../../lib/crud/withSingle';
-import { sequenceGetPageUrl } from '../../lib/collections/sequences/helpers';
-import NoSSR from 'react-no-ssr';
-import { userCanDo, userOwns } from '../../lib/vulcan-users/permissions';
-import { useCurrentUser } from '../common/withUser';
-import { sectionFooterLeftStyles } from '../users/UsersProfile'
-import {AnalyticsContext} from "../../lib/analyticsEvents";
-import { DatabasePublicSetting, nofollowKarmaThreshold } from '../../lib/publicSettings';
-import { HEADER_HEIGHT, MOBILE_HEADER_HEIGHT } from '../common/Header';
-import { isFriendlyUI } from '../../themes/forumTheme';
-import { makeCloudinaryImageUrl } from '../common/CloudinaryImage2';
+import React, { useState, useCallback, useRef } from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useSingle } from "../../lib/crud/withSingle";
+import { sequenceGetPageUrl } from "../../lib/collections/sequences/helpers";
+import NoSSR from "react-no-ssr";
+import { userCanDo, userOwns } from "../../lib/vulcan-users/permissions";
+import { useCurrentUser } from "../common/withUser";
+import { sectionFooterLeftStyles } from "../users/UsersProfile";
+import { AnalyticsContext } from "../../lib/analyticsEvents";
+import { DatabasePublicSetting, nofollowKarmaThreshold } from "../../lib/publicSettings";
+import { HEADER_HEIGHT, MOBILE_HEADER_HEIGHT } from "../common/Header";
+import { isFriendlyUI } from "../../themes/forumTheme";
+import { makeCloudinaryImageUrl } from "../common/CloudinaryImage2";
 
 export const sequencesImageScrim = (theme: ThemeType) => ({
-  position: 'absolute',
+  position: "absolute",
   bottom: 0,
   height: 150,
-  width: '100%',
+  width: "100%",
   zIndex: theme.zIndexes.sequencesImageScrim,
   background: theme.palette.panelBackground.sequenceImageGradient,
-})
+});
 
-const defaultSequenceBannerIdSetting = new DatabasePublicSetting<string|null>("defaultSequenceBannerId", null)
+const defaultSequenceBannerIdSetting = new DatabasePublicSetting<string | null>("defaultSequenceBannerId", null);
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
-    paddingTop: isFriendlyUI ? (270 + HEADER_HEIGHT) : 380,
+    paddingTop: isFriendlyUI ? 270 + HEADER_HEIGHT : 380,
   },
   titleWrapper: {
-    paddingLeft: theme.spacing.unit/2
+    paddingLeft: theme.spacing.unit / 2,
   },
   title: {
     fontFamily: theme.typography.uiSecondary.fontFamily,
@@ -37,7 +37,7 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   description: {
     marginTop: theme.spacing.unit * 2,
-    marginLeft: theme.spacing.unit/2,
+    marginLeft: theme.spacing.unit / 2,
     marginBottom: theme.spacing.unit * 2,
   },
   banner: {
@@ -47,7 +47,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     width: "100vw",
     height: 380,
     zIndex: theme.zIndexes.sequenceBanner,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       top: MOBILE_HEADER_HEIGHT,
     },
     "& img": {
@@ -61,49 +61,46 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   meta: {
     ...theme.typography.body2,
-    ...sectionFooterLeftStyles
+    ...sectionFooterLeftStyles,
   },
   metaItem: {
-    marginRight: theme.spacing.unit
+    marginRight: theme.spacing.unit,
   },
   content: {
     padding: theme.spacing.unit * 4,
-    position: 'relative',
+    position: "relative",
     backgroundColor: theme.palette.panelBackground.default,
     borderRadius: theme.borderRadius.default,
     marginTop: -127,
     zIndex: theme.zIndexes.sequencesPageContent,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       marginTop: -100,
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       marginTop: isFriendlyUI ? undefined : theme.spacing.unit,
-      padding: isFriendlyUI ? 16 : theme.spacing.unit
+      padding: isFriendlyUI ? 16 : theme.spacing.unit,
     },
   },
   leftAction: {
-    [theme.breakpoints.down('xs')]: {
-      textAlign: 'left'
-    }
+    [theme.breakpoints.down("xs")]: {
+      textAlign: "left",
+    },
   },
   imageScrim: {
-    ...sequencesImageScrim(theme)
-  }
-})
+    ...sequencesImageScrim(theme),
+  },
+});
 
-const SequencesPage = ({ documentId, classes }: {
-  documentId: string,
-  classes: ClassesType
-}) => {
-  const [edit,setEdit] = useState(false);
-  const [showNewChapterForm,setShowNewChapterForm] = useState(false);
+const SequencesPage = ({ documentId, classes }: { documentId: string; classes: ClassesType }) => {
+  const [edit, setEdit] = useState(false);
+  const [showNewChapterForm, setShowNewChapterForm] = useState(false);
   const nextSuggestedNumberRef = useRef(1);
 
   const currentUser = useCurrentUser();
   const { document, loading } = useSingle({
     documentId,
     collectionName: "Sequences",
-    fragmentName: 'SequencesPageFragment',
+    fragmentName: "SequencesPageFragment",
   });
 
   const showEdit = useCallback(() => {
@@ -113,106 +110,142 @@ const SequencesPage = ({ documentId, classes }: {
     setEdit(false);
   }, []);
 
-  const { SequencesEditForm, HeadTags, CloudinaryImage, SingleColumnSection, SectionSubtitle,
-    ChaptersList, ChaptersNewForm, FormatDate, Loading, SectionFooter, UsersName,
-    ContentItemBody, Typography, SectionButton, ContentStyles,
-  } = Components
-  
-  if (document?.isDeleted) return <h3>This sequence has been deleted</h3>
-  if (loading) return <Loading />
-  
+  const {
+    SequencesEditForm,
+    HeadTags,
+    CloudinaryImage,
+    SingleColumnSection,
+    SectionSubtitle,
+    ChaptersList,
+    ChaptersNewForm,
+    FormatDate,
+    Loading,
+    SectionFooter,
+    UsersName,
+    ContentItemBody,
+    Typography,
+    SectionButton,
+    ContentStyles,
+  } = Components;
+
+  if (document?.isDeleted) return <h3>This sequence has been deleted</h3>;
+  if (loading) return <Loading />;
+
   if (!document) {
-    return <Components.Error404/>
+    return <Components.Error404 />;
   }
-  if (edit) return (
-    <SequencesEditForm
-      documentId={documentId}
-      successCallback={showSequence}
-      cancelCallback={showSequence}
-    />
-  )
+  if (edit)
+    return <SequencesEditForm documentId={documentId} successCallback={showSequence} cancelCallback={showSequence} />;
 
-  const canEdit = userCanDo(currentUser, 'sequences.edit.all') || (userCanDo(currentUser, 'sequences.edit.own') && userOwns(currentUser, document))
-  const canCreateChapter = userCanDo(currentUser, 'chapters.new.all')
-  const canEditChapter = userCanDo(currentUser, 'chapters.edit.all') || canEdit
-  const { html = "", plaintextDescription } = document.contents || {}
+  const canEdit =
+    userCanDo(currentUser, "sequences.edit.all") ||
+    (userCanDo(currentUser, "sequences.edit.own") && userOwns(currentUser, document));
+  const canCreateChapter = userCanDo(currentUser, "chapters.new.all");
+  const canEditChapter = userCanDo(currentUser, "chapters.edit.all") || canEdit;
+  const { html = "", plaintextDescription } = document.contents || {};
 
-  if (!canEdit && document.draft)
-    throw new Error('This sequence is a draft and is not publicly visible')
+  if (!canEdit && document.draft) throw new Error("This sequence is a draft and is not publicly visible");
 
   const bannerId = document.bannerImageId || defaultSequenceBannerIdSetting.get();
   const socialImageId = document.gridImageId || document.bannerImageId;
-  const socialImageUrl = socialImageId ? makeCloudinaryImageUrl(socialImageId, {
-    c: "fill",
-    dpr: "auto",
-    q: "auto",
-    f: "auto",
-    g: "auto:faces",
-  }) : undefined;
-    
-  return <div className={classes.root}>
-    <HeadTags
-      canonicalUrl={sequenceGetPageUrl(document, true)}
-      title={document.title}
-      description={plaintextDescription || undefined}
-      image={socialImageUrl}
-      noIndex={document.noindex}
-    />
-    {bannerId && <div className={classes.banner}>
-      <div className={classes.bannerWrapper}>
-        <NoSSR>
-          <div>
-            <CloudinaryImage
-              publicId={bannerId}
-              width="auto"
-              height="380"
-              imgProps={{quality: '100'}}
-            />
-            <div className={classes.imageScrim}/>
-          </div>
-        </NoSSR>
-      </div>
-    </div>}
-    <SingleColumnSection>
-      <div className={classes.content}>
-        <div className={classes.titleWrapper}>
-          <Typography variant='display2' className={classes.title}>
-            {document.draft && <span>[Draft] </span>}{document.title}
-          </Typography>
-        </div>
-        <SectionFooter>
-          <div className={classes.meta}>
-            <span className={classes.metaItem}><FormatDate date={document.createdAt} format="MMM DD, YYYY"/></span>
-            {document.user && <span className={classes.metaItem}> by <UsersName user={document.user} /></span>}
-          </div>
-          {canEdit && <span className={classes.leftAction}><SectionSubtitle>
-            <a onClick={showEdit}>edit</a>
-          </SectionSubtitle></span>}
-        </SectionFooter>
-        
-        <ContentStyles contentType="post" className={classes.description}>
-          {html && <ContentItemBody dangerouslySetInnerHTML={{__html: html}} description={`sequence ${document._id}`} nofollow={(document.user?.karma || 0) < nofollowKarmaThreshold.get()}/>}
-        </ContentStyles>
-        <div>
-          <AnalyticsContext listContext={"sequencePage"} sequenceId={document._id} capturePostItemOnMount>
-            <ChaptersList sequenceId={document._id} canEdit={canEditChapter} nextSuggestedNumberRef={nextSuggestedNumberRef} />
-          </AnalyticsContext>
-          {canCreateChapter && <SectionFooter>
-            <SectionButton>
-              <a onClick={() => setShowNewChapterForm(true)}>Add Chapter</a>
-            </SectionButton>
-          </SectionFooter>}
-          {showNewChapterForm && <ChaptersNewForm prefilledProps={{sequenceId: document._id, number: nextSuggestedNumberRef.current}}/>}
-        </div>
-      </div>
-    </SingleColumnSection>
-  </div>
-}
+  const socialImageUrl = socialImageId
+    ? makeCloudinaryImageUrl(socialImageId, {
+        c: "fill",
+        dpr: "auto",
+        q: "auto",
+        f: "auto",
+        g: "auto:faces",
+      })
+    : undefined;
 
-const SequencesPageComponent = registerComponent('SequencesPage', SequencesPage, {styles});
+  return (
+    <div className={classes.root}>
+      <HeadTags
+        canonicalUrl={sequenceGetPageUrl(document, true)}
+        title={document.title}
+        description={plaintextDescription || undefined}
+        image={socialImageUrl}
+        noIndex={document.noindex}
+      />
+      {bannerId && (
+        <div className={classes.banner}>
+          <div className={classes.bannerWrapper}>
+            <NoSSR>
+              <div>
+                <CloudinaryImage publicId={bannerId} width="auto" height="380" imgProps={{ quality: "100" }} />
+                <div className={classes.imageScrim} />
+              </div>
+            </NoSSR>
+          </div>
+        </div>
+      )}
+      <SingleColumnSection>
+        <div className={classes.content}>
+          <div className={classes.titleWrapper}>
+            <Typography variant="display2" className={classes.title}>
+              {document.draft && <span>[Draft] </span>}
+              {document.title}
+            </Typography>
+          </div>
+          <SectionFooter>
+            <div className={classes.meta}>
+              <span className={classes.metaItem}>
+                <FormatDate date={document.createdAt} format="MMM DD, YYYY" />
+              </span>
+              {document.user && (
+                <span className={classes.metaItem}>
+                  {" "}
+                  by <UsersName user={document.user} />
+                </span>
+              )}
+            </div>
+            {canEdit && (
+              <span className={classes.leftAction}>
+                <SectionSubtitle>
+                  <a onClick={showEdit}>edit</a>
+                </SectionSubtitle>
+              </span>
+            )}
+          </SectionFooter>
+
+          <ContentStyles contentType="post" className={classes.description}>
+            {html && (
+              <ContentItemBody
+                dangerouslySetInnerHTML={{ __html: html }}
+                description={`sequence ${document._id}`}
+                nofollow={(document.user?.karma || 0) < nofollowKarmaThreshold.get()}
+              />
+            )}
+          </ContentStyles>
+          <div>
+            <AnalyticsContext listContext={"sequencePage"} sequenceId={document._id} capturePostItemOnMount>
+              <ChaptersList
+                sequenceId={document._id}
+                canEdit={canEditChapter}
+                nextSuggestedNumberRef={nextSuggestedNumberRef}
+              />
+            </AnalyticsContext>
+            {canCreateChapter && (
+              <SectionFooter>
+                <SectionButton>
+                  <a onClick={() => setShowNewChapterForm(true)}>Add Chapter</a>
+                </SectionButton>
+              </SectionFooter>
+            )}
+            {showNewChapterForm && (
+              <ChaptersNewForm prefilledProps={{ sequenceId: document._id, number: nextSuggestedNumberRef.current }} />
+            )}
+          </div>
+        </div>
+      </SingleColumnSection>
+    </div>
+  );
+};
+
+const SequencesPageComponent = registerComponent("SequencesPage", SequencesPage, { styles });
 
 declare global {
   interface ComponentTypes {
-    SequencesPage: typeof SequencesPageComponent
+    SequencesPage: typeof SequencesPageComponent;
   }
 }

@@ -20,7 +20,7 @@ const styles = (theme: ThemeType) => ({
     fontFamily: theme.palette.fonts.sansSerifStack,
     color: theme.palette.givingPortal[1000],
     display: "flex",
-    alignItems: 'center',
+    alignItems: "center",
     gap: "16px",
     width: "100%",
     maxWidth: 360,
@@ -50,7 +50,7 @@ const styles = (theme: ThemeType) => ({
     flexDirection: "column",
     justifyContent: "center",
     gap: "2px",
-    paddingRight: 24
+    paddingRight: 24,
   },
   heartIcon: {
     fontSize: 14,
@@ -79,7 +79,7 @@ const styles = (theme: ThemeType) => ({
   },
   checkbox: {
     padding: 6,
-    marginRight: -12
+    marginRight: -12,
   },
   preVotes: {
     opacity: 0.8,
@@ -108,10 +108,10 @@ const styles = (theme: ThemeType) => ({
     borderRadius: `${theme.borderRadius.default}px !important`,
   },
   hoverUnderline: {
-    '&:hover': {
-      textUnderlineOffset: '3px',
-      textDecoration: 'underline',
-    }
+    "&:hover": {
+      textUnderlineOffset: "3px",
+      textDecoration: "underline",
+    },
   },
   tooltip: {
     maxWidth: 200,
@@ -123,24 +123,25 @@ const styles = (theme: ThemeType) => ({
 
 const checkboxColor = requireCssVar("palette", "givingPortal", 1000);
 
-const ElectionCandidate = ({candidate, type="preVote", selected, onSelect, classes}: {
-  candidate: ElectionCandidateBasicInfo,
-  type?: "preVote" | "select",
-  selected?: boolean,
-  onSelect?: (candidateIds: string[]) => void,
-  classes: ClassesType,
+const ElectionCandidate = ({
+  candidate,
+  type = "preVote",
+  selected,
+  onSelect,
+  classes,
+}: {
+  candidate: ElectionCandidateBasicInfo;
+  type?: "preVote" | "select";
+  selected?: boolean;
+  onSelect?: (candidateIds: string[]) => void;
+  classes: ClassesType;
 }) => {
   const isSelect = type === "select";
 
-  const votingProps = useVote(
-    candidate,
-    "ElectionCandidates",
-    getVotingSystemByName("eaDonationElection"),
-  );
+  const votingProps = useVote(candidate, "ElectionCandidates", getVotingSystemByName("eaDonationElection"));
 
-  const {
-    name, logoSrc, fundraiserLink, href, postCount, tag, extendedScore, currentUserExtendedVote, description,
-  } = votingProps.document;
+  const { name, logoSrc, fundraiserLink, href, postCount, tag, extendedScore, currentUserExtendedVote, description } =
+    votingProps.document;
   const preVoteCount = extendedScore?.preVoteCount ?? 0;
   const hasVoted = !!currentUserExtendedVote?.preVote;
 
@@ -154,7 +155,7 @@ const ElectionCandidate = ({candidate, type="preVote", selected, onSelect, class
 
   const linkUrl = isSelect ? href : fundraiserLink;
 
-  const {PreVoteButton, ForumIcon, LWTooltip} = Components;
+  const { PreVoteButton, ForumIcon, LWTooltip } = Components;
   return (
     <AnalyticsContext pageElementContext="electionCandidate">
       <div
@@ -166,7 +167,7 @@ const ElectionCandidate = ({candidate, type="preVote", selected, onSelect, class
         {isSelect && (
           <Checkbox
             className={classes.checkbox}
-            style={{color: checkboxColor}}
+            style={{ color: checkboxColor }}
             checked={selected}
             onChange={() => onSelect?.([candidate._id])}
           />
@@ -223,13 +224,9 @@ const ElectionCandidate = ({candidate, type="preVote", selected, onSelect, class
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const ElectionCandidateComponent = registerComponent(
-  "ElectionCandidate",
-  ElectionCandidate,
-  {styles,},
-);
+const ElectionCandidateComponent = registerComponent("ElectionCandidate", ElectionCandidate, { styles });
 
 declare global {
   interface ComponentTypes {

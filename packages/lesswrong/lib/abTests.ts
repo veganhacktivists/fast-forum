@@ -1,4 +1,4 @@
-import { ABTest, useABTest, useABTestProperties } from './abTestImpl';
+import { ABTest, useABTest, useABTestProperties } from "./abTestImpl";
 export { useABTest, useABTestProperties };
 
 /*
@@ -28,7 +28,7 @@ const noEffectABTest = new ABTest({
       description: "The larger test group",
       weight: 2,
     },
-  }
+  },
 });
 
 // A/B test for the new CollectionsPage
@@ -46,7 +46,7 @@ const collectionsPageABTest = new ABTest({
       description: "Group using LargeSequencesItem",
       weight: 1,
     },
-  }
+  },
 });
 
 // A/B test for the new BooksProgressBar
@@ -58,13 +58,13 @@ const booksProgressBarABTest = new ABTest({
   groups: {
     control: {
       description: "Original BooksItem without the progress bar",
-      weight: 1
+      weight: 1,
     },
     progressBar: {
       description: "Progress bar enabled",
-      weight: 1
-    }
-  }
+      weight: 1,
+    },
+  },
 });
 
 export const welcomeBoxABTest = new ABTest({
@@ -75,13 +75,13 @@ export const welcomeBoxABTest = new ABTest({
   groups: {
     control: {
       description: "Don't show Welcome Box on post pages",
-      weight: 1
+      weight: 1,
     },
     welcomeBox: {
       description: "Show Welcome Box on post pages",
-      weight: 1
-    }
-  }
+      weight: 1,
+    },
+  },
 });
 
 export const twoLineEventsSidebarABTest = new ABTest({
@@ -176,7 +176,8 @@ export const showRecommendedContentInMatchForm = new ABTest({
   name: "showRecommendedContentInMatchForm",
   active: true,
   affectsLoggedOut: false,
-  description: "Include a little card in the dialogue matchmaking form that lists a matched user's recent comments and posts, and potentially other user content",
+  description:
+    "Include a little card in the dialogue matchmaking form that lists a matched user's recent comments and posts, and potentially other user content",
   groups: {
     show: {
       description: "Show",

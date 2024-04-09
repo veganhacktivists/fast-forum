@@ -1,4 +1,2 @@
-
-const testMessages: DbMessage[]
-export default testMessages
-
+const testMessages: DbMessage[];
+export default testMessages;

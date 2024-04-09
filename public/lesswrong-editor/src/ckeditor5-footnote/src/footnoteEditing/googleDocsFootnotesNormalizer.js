@@ -27,7 +27,7 @@ export default class GoogleDocsFootnotesNormalizer {
 	isActive() {
 		return true;
 	}
-	
+
 	/**
 	 * preproceses incoming content for upcasting, adding
 	 * identifying attributes to footnoteReferences and footnotebackLinks,
@@ -37,11 +37,12 @@ export default class GoogleDocsFootnotesNormalizer {
 	 */
 	execute(data) {
 		const writer = new UpcastWriter( data.content.document );
+
 		/**
 		 * Creates a range that spans the entire pasted text. Used
 		 * for traversing.
 		 * @type {Range}
-		*/
+		 */
 		// @ts-ignore: DefinitelyTyped mistypes the return values of UpcastWriter's range events
 		// as TypeScript Ranges, rather than CKEditor Ranges.
 		const documentRange = writer.createRangeIn(data.content);
@@ -66,26 +67,22 @@ export default class GoogleDocsFootnotesNormalizer {
 			name: 'a',
 			attributes: {
 				id: idPattern,
-			}
+			},
 		});
-		return [...documentRange]
-			.reduce((acc, { item, type }) => {
-				if (
-					type === 'elementStart' &&
-					footnoteBackLinkMatcher.match(item)
-				) {
-					// @ts-ignore: matcher above eliminates the null / undefined cases here.
-					const index = item.getAttribute('id').match(idPattern)[1];
-					return {
-						...acc,
-						[index]: {
-							item,
-							id: Math.random().toString(36).slice(2),
-						}
-					};
-				}
-				return acc;
-			}, {});
+		return [...documentRange].reduce((acc, { item, type }) => {
+			if ( type === 'elementStart' && footnoteBackLinkMatcher.match( item ) ) {
+				// @ts-ignore: matcher above eliminates the null / undefined cases here.
+				const index = item.getAttribute( "id" ).match(idPattern)[1];
+				return {
+					...acc,
+					[index]: {
+						item,
+						id: Math.random().toString(36).slice(2),
+					}
+				};
+			}
+			return acc;
+		}, {});
 	}
 
 	/**
@@ -102,23 +99,19 @@ export default class GoogleDocsFootnotesNormalizer {
 			name: 'a',
 			attributes: {
 				id: idPattern
-			}
+			},
 		});
-		return [...documentRange]
-			.reduce((acc, { item, type }) => {
-				if (
-					type === 'elementStart' &&
-					footnoteReferenceMatcher.match(item)
-				) {
-					// ensure that a matching footnote exists for this reference
-					// @ts-ignore: matcher above eliminates the null / undefined cases here.
-					const index = item.getAttribute('id').match(idPattern)[1];
-					if(backLinks.hasOwnProperty(index)) {
-						return {...acc, [index]: { item, id: backLinks[index].id }};
-					}
+		return [...documentRange].reduce((acc, { item, type }) => {
+			if ( type === 'elementStart' && footnoteReferenceMatcher.match( item ) ) {
+				// ensure that a matching footnote exists for this reference
+				// @ts-ignore: matcher above eliminates the null / undefined cases here.
+				const index = item.getAttribute( "id" ).match(idPattern)[1];
+				if (backLinks.hasOwnProperty(index)) {
+					return { ...acc, [ index ]: { item, id: backLinks[ index ].id } };
 				}
-				return acc;
-			}, {});
+			}
+			return acc;
+		}, {});
 	}
 
 	/**
@@ -132,28 +125,32 @@ export default class GoogleDocsFootnotesNormalizer {
 	 * @returns {Element[]}
 	 */
 	_createFootnoteItems(writer, backLinks) {
-		return Object.entries(backLinks).map(([ index, {item, id}]) => {
-			if(!item.parent || !item.parent.parent || !item.parent.parent.is('element')) {
-				throw new Error("Unexpected Dom structure; expected footnote backLink to be nested within two parent tags.");
+		return Object.entries(backLinks).map(([index, { item, id }]) => {
+			if (!item.parent || !item.parent.parent || !item.parent.parent.is("element")) {
+				throw new Error(
+					"Unexpected Dom structure; expected footnote backLink to be nested within two parent tags.",
+				);
 			}
 			const footnoteContent = item.parent.parent;
+
 			/**
 			 * These range bounds (start after the backLink, end
 			 * after the footnote content) are used to capture
 			 * all of the footnote except the backLink, which we
 			 * generate ourselves.
 			 * @type {Range}
-			*/
+			 */
 			// @ts-ignore DefinitelyTyped mistyping of Range
 			const footnoteContentRange = writer.createRange(
 				writer.createPositionAfter(item),
 				writer.createPositionAfter(footnoteContent),
 			);
-			const newFootnoteBackLink = writer.createElement('span', {
+			const newFootnoteBackLink = writer.createElement("span", {
 				[ATTRIBUTES.footnoteBackLink]: '',
 				[ATTRIBUTES.footnoteId]: id,
-			});
-			const newFootnoteContent = writer.createElement('div',
+			} );
+			const newFootnoteContent = writer.createElement(
+				"div",
 				{
 					[ATTRIBUTES.footnoteContent]: '',
 					[ATTRIBUTES.footnoteId]: id,
@@ -161,16 +158,20 @@ export default class GoogleDocsFootnotesNormalizer {
 				},
 
 				// @ts-ignore: startPosition isn't required here.
-				[...footnoteContentRange.getItems({ shallow: true})]
-					.filter(item => item.is('element'))
+				[...footnoteContentRange.getItems({ shallow: true })]
+					.filter((item) => item.is("element"))
 					// @ts-ignore: previous line is a type guard.
-					.map(element => writer.clone(element, true)),
+					.map( ( element ) => writer.clone(element, true)),
 			);
-			return writer.createElement('div', {
-				[ATTRIBUTES.footnoteItem]: '',
-				[ATTRIBUTES.footnoteId]: id,
-				[ATTRIBUTES.footnoteIndex]: index,
-			}, [newFootnoteBackLink, newFootnoteContent]);
+			return writer.createElement(
+				"div",
+				{
+					[ATTRIBUTES.footnoteItem]: "",
+					[ATTRIBUTES.footnoteId]: id,
+					[ATTRIBUTES.footnoteIndex]: index,
+				},
+				[newFootnoteBackLink, newFootnoteContent],
+			);
 		});
 	}
 
@@ -181,8 +182,8 @@ export default class GoogleDocsFootnotesNormalizer {
 	 * @param {Object.<string, {item: Element, id: string}>} references
 	 */
 	_preprocessFootnoteReferences(writer, references) {
-		for (const [ index, { item, id } ] of Object.entries(references)) {
-			writer.setAttribute(ATTRIBUTES.footnoteReference, '', item);
+		for (const [index, { item, id }] of Object.entries(references)) {
+			writer.setAttribute(ATTRIBUTES.footnoteReference, "", item);
 			writer.setAttribute(ATTRIBUTES.footnoteIndex, index, item);
 			writer.setAttribute(ATTRIBUTES.footnoteId, id, item);
 		}
@@ -200,55 +201,55 @@ export default class GoogleDocsFootnotesNormalizer {
 	 * @param {Object.<string, {item: Element, id: string}>} backLinks
 	 */
 	_preprocessFootnoteItems(writer, documentRange, backLinks) {
-		if(!Object.keys(backLinks).length) {
+		if (!Object.keys(backLinks).length) {
 			return;
 		}
-		if(!backLinks[1] || !backLinks[1].item) {
+		if (!backLinks[1] || !backLinks[1].item) {
 			console.error("Unexpected DOM structure: missing footnote with index 1.");
 			return;
 		}
 		const firstBackLink = backLinks[1].item;
-		if(
-			!firstBackLink.parent ||
-			!firstBackLink.parent.parent ||
-			!firstBackLink.parent.parent.is('element')
-		) {
-			console.error("Unexpected DOM structure: expected footnote backLink to be nested within two parent tags.")
+		if (!firstBackLink.parent || !firstBackLink.parent.parent || !firstBackLink.parent.parent.is("element")) {
+			console.error("Unexpected DOM structure: expected footnote backLink to be nested within two parent tags.");
 			return;
 		}
 		const firstFootnote = firstBackLink.parent.parent;
+
 		/**
 		 * @type {number}
-		*/
+		 */
 		// @ts-ignore: null case only happens for unattached elements, which we know isn't true here.
 		const firstFootnoteIndex = firstFootnote.index;
 		const { previousSibling } = firstFootnote;
+
 		/**
 		 * @type {Range}
-		*/
+		 */
 		// @ts-ignore DefinitelyTyped mistyping of Range
 		const footnoteSectionRange = writer.createRange(
- 			writer.createPositionBefore(firstFootnote),
- 			writer.createPositionAt(documentRange.end),
+			writer.createPositionBefore(firstFootnote),
+			writer.createPositionAt(documentRange.end),
 		);
 		const footnoteSectionParent = firstFootnote.parent;
-		if(!footnoteSectionParent) {
-			console.error("Unexpected DOM structure: expected footnote to have a parent element.")
+		if (!footnoteSectionParent) {
+			console.error("Unexpected DOM structure: expected footnote to have a parent element.");
 			return;
 		}
 		try {
 			const footnoteItems = this._createFootnoteItems(writer, backLinks);
-			const footnoteSection = writer.createElement('div', {[ATTRIBUTES.footnoteSection]: ''}, footnoteItems);
+			const footnoteSection = writer.createElement("div", { [ATTRIBUTES.footnoteSection]: "" }, footnoteItems);
+
 			/**
 			 * getItems converted to an array here
 			 * because otherwise the iterator gets out of step
 			 * and misses elements.
 			 */
-			for(const item of [...footnoteSectionRange.getItems()]) {
-				if (item.is('element')) {
+			for (const item of [...footnoteSectionRange.getItems()]) {
+				if (item.is("element")) {
 					writer.remove(item);
 				}
 			}
+
 			/**
 			 * Google Docs' Publish to Web view adds an hr element
 			 * before the footnotes section. If that element exists,
@@ -256,11 +257,11 @@ export default class GoogleDocsFootnotesNormalizer {
 			 * the user pastes only part of the document, or if Google
 			 * Docs changes their layout.
 			 */
-			if(previousSibling && previousSibling.is('element') && previousSibling.name === 'hr') {
+			if (previousSibling && previousSibling.is("element") && previousSibling.name === "hr") {
 				writer.remove(previousSibling);
 			}
 			writer.insertChild(firstFootnoteIndex, footnoteSection, footnoteSectionParent);
-		} catch(error) {
+		} catch (error) {
 			console.log(error);
 		}
 	}

@@ -1,48 +1,53 @@
-import React from 'react';
-import { useSingle } from '../../lib/crud/withSingle';
-import { DatabasePublicSetting } from '../../lib/publicSettings';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
+import React from "react";
+import { useSingle } from "../../lib/crud/withSingle";
+import { DatabasePublicSetting } from "../../lib/publicSettings";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
 
-const postModerationWarningCommentIdSetting = new DatabasePublicSetting<string>('postModerationWarningCommentId', '')
+const postModerationWarningCommentIdSetting = new DatabasePublicSetting<string>("postModerationWarningCommentId", "");
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     border: theme.palette.border.commentBorder,
     padding: 24,
-    marginBottom: 40
-  }
+    marginBottom: 40,
+  },
 });
 
-export const NewPostModerationWarning = ({classes}: {
-  classes: ClassesType,
-}) => {
-  const { ContentStyles, ContentItemBody, Loading } = Components
+export const NewPostModerationWarning = ({ classes }: { classes: ClassesType }) => {
+  const { ContentStyles, ContentItemBody, Loading } = Components;
 
-  const documentId = postModerationWarningCommentIdSetting.get() 
-  
-  const {document, loading} = useSingle({
+  const documentId = postModerationWarningCommentIdSetting.get();
+
+  const { document, loading } = useSingle({
     documentId,
     collectionName: "Comments",
     fragmentName: "CommentsList",
-    skip: !documentId
+    skip: !documentId,
   });
 
-  const { html = "" } = document?.contents || {}
+  const { html = "" } = document?.contents || {};
 
-  return <div className={classes.root}>
-    <ContentStyles contentType="comment" className={classes.modNote}>
-      {loading && <Loading/>}
-      {html &&  <ContentItemBody dangerouslySetInnerHTML={{__html: html }} />}
-      {!html && !loading && <div><em>A moderator will need to review your account before your posts will appear publicly.</em></div>}
-    </ContentStyles>
-  </div>;
-}
+  return (
+    <div className={classes.root}>
+      <ContentStyles contentType="comment" className={classes.modNote}>
+        {loading && <Loading />}
+        {html && <ContentItemBody dangerouslySetInnerHTML={{ __html: html }} />}
+        {!html && !loading && (
+          <div>
+            <em>A moderator will need to review your account before your posts will appear publicly.</em>
+          </div>
+        )}
+      </ContentStyles>
+    </div>
+  );
+};
 
-const NewPostModerationWarningComponent = registerComponent('NewPostModerationWarning', NewPostModerationWarning, {styles});
+const NewPostModerationWarningComponent = registerComponent("NewPostModerationWarning", NewPostModerationWarning, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    NewPostModerationWarning: typeof NewPostModerationWarningComponent
+    NewPostModerationWarning: typeof NewPostModerationWarningComponent;
   }
 }
-

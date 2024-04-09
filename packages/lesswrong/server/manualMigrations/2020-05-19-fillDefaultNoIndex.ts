@@ -1,5 +1,5 @@
-import { registerMigration, fillDefaultValues } from './migrationUtils';
-import { Posts } from '../../lib/collections/posts/collection';
+import { registerMigration, fillDefaultValues } from "./migrationUtils";
+import { Posts } from "../../lib/collections/posts/collection";
 
 registerMigration({
   name: "fillDefaultNoIndex",
@@ -8,7 +8,7 @@ registerMigration({
   action: async () => {
     await fillDefaultValues({
       collection: Posts,
-      fieldName: "noIndex"
+      fieldName: "noIndex",
     });
-  }
-})
+  },
+});

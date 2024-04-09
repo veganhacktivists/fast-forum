@@ -1,16 +1,16 @@
-import { Utils, getTypeName } from '../vulcan-lib';
-import { userCanDo, userOwns } from '../vulcan-users/permissions';
-import isEmpty from 'lodash/isEmpty';
-import { loggerConstructor } from '../utils/logging';
+import { Utils, getTypeName } from "../vulcan-lib";
+import { userCanDo, userOwns } from "../vulcan-users/permissions";
+import isEmpty from "lodash/isEmpty";
+import { loggerConstructor } from "../utils/logging";
 
 export interface MutationOptions<T extends DbObject> {
-  newCheck?: (user: DbUser|null, document: T|null) => Promise<boolean>|boolean,
-  editCheck?: (user: DbUser|null, document: T|null) => Promise<boolean>|boolean,
-  removeCheck?: (user: DbUser|null, document: T|null) => Promise<boolean>|boolean,
-  create?: boolean,
-  update?: boolean,
-  upsert?: boolean,
-  delete?: boolean,
+  newCheck?: (user: DbUser | null, document: T | null) => Promise<boolean> | boolean;
+  editCheck?: (user: DbUser | null, document: T | null) => Promise<boolean> | boolean;
+  removeCheck?: (user: DbUser | null, document: T | null) => Promise<boolean> | boolean;
+  create?: boolean;
+  update?: boolean;
+  upsert?: boolean;
+  delete?: boolean;
 }
 
 const defaultOptions = { create: true, update: true, upsert: true, delete: true };
@@ -20,11 +20,14 @@ const getUpdateMutationName = (typeName: string): string => `update${typeName}`;
 const getDeleteMutationName = (typeName: string): string => `delete${typeName}`;
 const getUpsertMutationName = (typeName: string): string => `upsert${typeName}`;
 
-export function getDefaultMutations<N extends CollectionNameString>(collectionName: N, options?: MutationOptions<ObjectsByCollectionName[N]>) {
+export function getDefaultMutations<N extends CollectionNameString>(
+  collectionName: N,
+  options?: MutationOptions<ObjectsByCollectionName[N]>,
+) {
   type T = ObjectsByCollectionName[N];
   const typeName = getTypeName(collectionName);
-  const mutationOptions: MutationOptions<T> = {...defaultOptions, ...options};
-  const logger = loggerConstructor(`mutations-${collectionName.toLowerCase()}`)
+  const mutationOptions: MutationOptions<T> = { ...defaultOptions, ...options };
+  const logger = loggerConstructor(`mutations-${collectionName.toLowerCase()}`);
 
   const mutations: any = {};
 
@@ -38,7 +41,7 @@ export function getDefaultMutations<N extends CollectionNameString>(collectionNa
       name: mutationName,
 
       // check function called on a user to see if they can perform the operation
-      async check(user: DbUser|null, document: T|null): Promise<boolean> {
+      async check(user: DbUser | null, document: T | null): Promise<boolean> {
         // OpenCRUD backwards compatibility
         const check = mutationOptions.newCheck;
         if (check) {
@@ -46,15 +49,12 @@ export function getDefaultMutations<N extends CollectionNameString>(collectionNa
         }
         // check if they can perform "foo.new" operation (e.g. "movie.new")
         // OpenCRUD backwards compatibility
-        return userCanDo(user, [
-          `${typeName.toLowerCase()}.create`,
-          `${collectionName.toLowerCase()}.new`,
-        ]);
+        return userCanDo(user, [`${typeName.toLowerCase()}.create`, `${collectionName.toLowerCase()}.new`]);
       },
 
       async mutation(root: void, { data }: AnyBecauseTodo, context: ResolverContext) {
-        const startMutate = Date.now()
-        logger('create mutation()')
+        const startMutate = Date.now();
+        logger("create mutation()");
         const collection = context[collectionName];
 
         // check if current user can pass check function; else throw error
@@ -63,9 +63,9 @@ export function getDefaultMutations<N extends CollectionNameString>(collectionNa
           context.currentUser,
           data,
           context,
-          '',
+          "",
           `${typeName}.create`,
-          collectionName
+          collectionName,
         );
 
         // pass document to boilerplate createMutator function
@@ -76,7 +76,7 @@ export function getDefaultMutations<N extends CollectionNameString>(collectionNa
           validate: true,
           context,
         });
-        const timeElapsed = Date.now() - startMutate
+        const timeElapsed = Date.now() - startMutate;
         // Temporarily disabled to investigate performance issues
         // captureEvent("mutationCompleted", {mutationName, timeElapsed, documentId: returnValue.data._id}, true)
         return returnValue;
@@ -97,7 +97,7 @@ export function getDefaultMutations<N extends CollectionNameString>(collectionNa
       name: mutationName,
 
       // check function called on a user and document to see if they can perform the operation
-      async check(user: DbUser|null, document: T|null) {
+      async check(user: DbUser | null, document: T | null) {
         // OpenCRUD backwards compatibility
         const check = mutationOptions.editCheck;
         if (check) {
@@ -110,31 +110,23 @@ export function getDefaultMutations<N extends CollectionNameString>(collectionNa
         // if they don't, check if they can perform "foo.edit.all" action
         // OpenCRUD backwards compatibility
         return userOwns(user, document as HasUserIdType)
-          ? userCanDo(user, [
-            `${typeName.toLowerCase()}.update.own`,
-            `${collectionName.toLowerCase()}.edit.own`,
-          ])
-          : userCanDo(user, [
-            `${typeName.toLowerCase()}.update.all`,
-            `${collectionName.toLowerCase()}.edit.all`,
-          ]);
+          ? userCanDo(user, [`${typeName.toLowerCase()}.update.own`, `${collectionName.toLowerCase()}.edit.own`])
+          : userCanDo(user, [`${typeName.toLowerCase()}.update.all`, `${collectionName.toLowerCase()}.edit.all`]);
       },
 
       async mutation(root: void, { selector, data }: AnyBecauseTodo, context: ResolverContext) {
-        logger('update mutation()')
+        logger("update mutation()");
         const collection = context[collectionName];
 
         if (isEmpty(selector)) {
-          throw new Error('Selector cannot be empty');
+          throw new Error("Selector cannot be empty");
         }
 
         // get entire unmodified document from database
         const document = await Utils.Connectors.get(collection, selector);
 
         if (!document) {
-          throw new Error(
-            `Could not find document to update for selector: ${JSON.stringify(selector)}`
-          );
+          throw new Error(`Could not find document to update for selector: ${JSON.stringify(selector)}`);
         }
 
         // check if user can perform operation; if not throw error
@@ -142,11 +134,11 @@ export function getDefaultMutations<N extends CollectionNameString>(collectionNa
           this.check,
           context.currentUser,
           document,
-          
+
           context,
           document._id,
           `${typeName}.update`,
-          collectionName
+          collectionName,
         );
 
         // call updateMutator boilerplate function
@@ -168,7 +160,6 @@ export function getDefaultMutations<N extends CollectionNameString>(collectionNa
     mutations.update = updateMutation;
     // OpenCRUD backwards compatibility
     mutations.edit = updateMutation;
-
   }
   if (mutationOptions.upsert) {
     // mutation for upserting a specific document
@@ -186,11 +177,7 @@ export function getDefaultMutations<N extends CollectionNameString>(collectionNa
         });
 
         if (existingDocument) {
-          return await collection.options.mutations.update.mutation(
-            root,
-            { selector, data },
-            context
-          );
+          return await collection.options.mutations.update.mutation(root, { selector, data }, context);
         } else {
           return await collection.options.mutations.create.mutation(root, { data }, context);
         }
@@ -206,7 +193,7 @@ export function getDefaultMutations<N extends CollectionNameString>(collectionNa
       description: `Mutation for deleting a ${typeName} document`,
       name: mutationName,
 
-      async check(user: DbUser|null, document: T|null) {
+      async check(user: DbUser | null, document: T | null) {
         // OpenCRUD backwards compatibility
         const check = mutationOptions.removeCheck;
         if (check) {
@@ -216,30 +203,22 @@ export function getDefaultMutations<N extends CollectionNameString>(collectionNa
         if (!user || !document) return false;
         // OpenCRUD backwards compatibility
         return userOwns(user, document as HasUserIdType)
-          ? userCanDo(user, [
-            `${typeName.toLowerCase()}.delete.own`,
-            `${collectionName.toLowerCase()}.remove.own`,
-          ])
-          : userCanDo(user, [
-            `${typeName.toLowerCase()}.delete.all`,
-            `${collectionName.toLowerCase()}.remove.all`,
-          ]);
+          ? userCanDo(user, [`${typeName.toLowerCase()}.delete.own`, `${collectionName.toLowerCase()}.remove.own`])
+          : userCanDo(user, [`${typeName.toLowerCase()}.delete.all`, `${collectionName.toLowerCase()}.remove.all`]);
       },
 
       async mutation(root: void, { selector }: AnyBecauseTodo, context: ResolverContext) {
-        logger('delete mutation()')
+        logger("delete mutation()");
         const collection = context[collectionName];
 
         if (isEmpty(selector)) {
-          throw new Error('Selector cannot be empty');
+          throw new Error("Selector cannot be empty");
         }
 
         const document = await Utils.Connectors.get(collection, selector);
 
         if (!document) {
-          throw new Error(
-            `Could not find document to delete for selector: ${JSON.stringify(selector)}`
-          );
+          throw new Error(`Could not find document to delete for selector: ${JSON.stringify(selector)}`);
         }
 
         await Utils.performCheck(
@@ -249,7 +228,7 @@ export function getDefaultMutations<N extends CollectionNameString>(collectionNa
           context,
           document._id,
           `${typeName}.delete`,
-          collectionName
+          collectionName,
         );
 
         // TODO: A problem with deleteMutator types means that it demands a
@@ -269,7 +248,6 @@ export function getDefaultMutations<N extends CollectionNameString>(collectionNa
     mutations.delete = deleteMutation;
     // OpenCRUD backwards compatibility
     mutations.remove = deleteMutation;
-
   }
 
   return mutations;

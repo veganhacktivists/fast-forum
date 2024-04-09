@@ -1,12 +1,12 @@
-import { onStartup, getWebsocketPort } from '../lib/executionEnvironment';
-import type { MessageEvent, OpenEvent, CloseEvent } from 'ws';
+import { onStartup, getWebsocketPort } from "../lib/executionEnvironment";
+import type { MessageEvent, OpenEvent, CloseEvent } from "ws";
 
 // In development, make a websocket connection (on a different port) to get
 // notified when the server has restarted with a new version.
 
 const websocketPort = getWebsocketPort();
 let connectedWebsocket: any = null;
-let buildTimestamp: string|null = null;
+let buildTimestamp: string | null = null;
 
 function connectWebsocket() {
   if (connectedWebsocket) return;
@@ -14,7 +14,7 @@ function connectWebsocket() {
 
   connectedWebsocket.addEventListener("message", (event: MessageEvent) => {
     try {
-      const data = JSON.parse(event.data+"");
+      const data = JSON.parse(event.data + "");
       if (data.latestBuildTimestamp) {
         if (!buildTimestamp) {
           buildTimestamp = data.latestBuildTimestamp;
@@ -25,15 +25,14 @@ function connectWebsocket() {
         // eslint-disable-next-line no-console
         console.error("Websocket message is unrecognized");
       }
-    } catch(e) {
+    } catch (e) {
       // eslint-disable-next-line no-console
       console.error("Got invalid message on websocket", e);
       // eslint-disable-next-line no-console
       console.log(e);
     }
   });
-  connectedWebsocket.addEventListener("open", (event: OpenEvent) => {
-  });
+  connectedWebsocket.addEventListener("open", (event: OpenEvent) => {});
   connectedWebsocket.addEventListener("error", (event: CloseEvent) => {
     disconnectWebsocket();
   });
@@ -63,11 +62,11 @@ if (!bundleIsProduction) {
   onStartup(() => {
     setTimeout(() => {
       connectWebsocket();
-      
+
       setInterval(() => {
         try {
           connectWebsocket();
-        // eslint-disable-next-line no-empty
+          // eslint-disable-next-line no-empty
         } catch {
           // Deliberately swallow connection-failed errors from the auto-refresh
           // notification websocket, since the server might not actually be running.
@@ -76,8 +75,8 @@ if (!bundleIsProduction) {
         }
       }, 5000);
     }, 3000);
-    
-    document.addEventListener('visibilitychange', () => {
+
+    document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         disconnectWebsocket();
       } else {

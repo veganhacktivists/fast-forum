@@ -1,19 +1,13 @@
 import { accessFilterMultiple } from "../../lib/utils/schemaUtils";
-import {
-  addGraphQLQuery,
-  addGraphQLResolvers,
-  addGraphQLSchema,
-  getCollectionByTypeName
-} from "../vulcan-lib";
+import { addGraphQLQuery, addGraphQLResolvers, addGraphQLSchema, getCollectionByTypeName } from "../vulcan-lib";
 
 /**
  * Checks if a graphql type passed in as a string literal is one of those that corresponds a collection's DbObject type
  * If so, return the corresponding DbObject type.  If not, return the manually specified type.
  */
-type MaybeCollectionType<GraphQLType extends string, Fallback> =
-  GraphQLType extends keyof ObjectsByTypeName
-    ? ObjectsByTypeName[GraphQLType]
-    : Fallback;
+type MaybeCollectionType<GraphQLType extends string, Fallback> = GraphQLType extends keyof ObjectsByTypeName
+  ? ObjectsByTypeName[GraphQLType]
+  : Fallback;
 
 /**
  * Create a paginated resolver for use on the frontend with `usePaginatedResolver`.
@@ -22,7 +16,7 @@ type MaybeCollectionType<GraphQLType extends string, Fallback> =
 export const createPaginatedResolver = <
   FallbackReturnType,
   GraphQLType extends string,
-  ReturnType extends MaybeCollectionType<GraphQLType, FallbackReturnType>
+  ReturnType extends MaybeCollectionType<GraphQLType, FallbackReturnType>,
 >({
   name,
   graphQLType,
@@ -33,21 +27,21 @@ export const createPaginatedResolver = <
    * The name of the resolver - this should match `resolverName` in the call to
    * `usePaginatedResolver`
    */
-  name: string,
+  name: string;
   /**
    * The GraphQL type of the result (eg; "Comment"). Note that the result should
    * be an _array_ of this type.
    */
-  graphQLType: GraphQLType,
+  graphQLType: GraphQLType;
   /**
    * The callback to fetch results, which will generally call into a repo (all
    * repos are available in `context.repos`).
    */
-  callback: (context: ResolverContext, limit: number) => Promise<ReturnType[]>,
+  callback: (context: ResolverContext, limit: number) => Promise<ReturnType[]>;
   /**
    * Optional cache TTL in milliseconds - if undefined or 0 no cache is used
    */
-  cacheMaxAgeMs?: number,
+  cacheMaxAgeMs?: number;
 }) => {
   let cachedAt = Date.now();
   let cached: ReturnType[] = [];
@@ -65,26 +59,23 @@ export const createPaginatedResolver = <
     Query: {
       [name]: async (
         _: void,
-        {limit}: {limit: number},
+        { limit }: { limit: number },
         context: ResolverContext,
-      ): Promise<{results: ReturnType[]}> => {
+      ): Promise<{ results: ReturnType[] }> => {
         const accessFilterFunction = collection
-          ? (records: (ReturnType & DbObject)[]) => accessFilterMultiple(context.currentUser, collection!, records as AnyBecauseHard[], context)
+          ? (records: (ReturnType & DbObject)[]) =>
+              accessFilterMultiple(context.currentUser, collection!, records as AnyBecauseHard[], context)
           : undefined;
 
-        if (
-          cacheMaxAgeMs > 0 &&
-          Date.now() - cachedAt < cacheMaxAgeMs &&
-          cached.length >= limit
-        ) {
-          const filteredResults = await accessFilterFunction?.(cached as (ReturnType & DbObject)[]) ?? cached;
-          return {results: filteredResults.slice(0, limit) as ReturnType[]};
+        if (cacheMaxAgeMs > 0 && Date.now() - cachedAt < cacheMaxAgeMs && cached.length >= limit) {
+          const filteredResults = (await accessFilterFunction?.(cached as (ReturnType & DbObject)[])) ?? cached;
+          return { results: filteredResults.slice(0, limit) as ReturnType[] };
         }
         const results = await callback(context, limit);
         cachedAt = Date.now();
         cached = results;
-        const filteredResults = await accessFilterFunction?.(results as (ReturnType & DbObject)[]) ?? results;
-        return {results: filteredResults as ReturnType[]};
+        const filteredResults = (await accessFilterFunction?.(results as (ReturnType & DbObject)[])) ?? results;
+        return { results: filteredResults as ReturnType[] };
       },
     },
   });
@@ -96,4 +87,4 @@ export const createPaginatedResolver = <
   `);
 
   addGraphQLQuery(`${name}(limit: Int): ${name}Result`);
-}
+};

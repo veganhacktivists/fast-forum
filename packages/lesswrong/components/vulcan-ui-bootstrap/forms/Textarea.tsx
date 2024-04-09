@@ -1,6 +1,6 @@
-import React from 'react';
-import Form from 'react-bootstrap/Form';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
+import React from "react";
+import Form from "react-bootstrap/Form";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
 
 const TextareaComponent = ({ refFunction, inputProperties, itemProperties }: AnyBecauseTodo) => (
   <Components.FormItem path={inputProperties.path} label={inputProperties.label} {...itemProperties}>
@@ -8,11 +8,10 @@ const TextareaComponent = ({ refFunction, inputProperties, itemProperties }: Any
   </Components.FormItem>
 );
 
-const FormComponentTextareaComponent = registerComponent('FormComponentTextarea', TextareaComponent);
+const FormComponentTextareaComponent = registerComponent("FormComponentTextarea", TextareaComponent);
 
 declare global {
   interface ComponentTypes {
-    FormComponentTextarea: typeof FormComponentTextareaComponent
+    FormComponentTextarea: typeof FormComponentTextareaComponent;
   }
 }
-

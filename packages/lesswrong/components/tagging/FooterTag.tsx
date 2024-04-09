@@ -1,17 +1,17 @@
-import React from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import { Link } from '../../lib/reactRouterWrapper';
-import { useHover } from '../common/withHover';
+import React from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import { Link } from "../../lib/reactRouterWrapper";
+import { useHover } from "../common/withHover";
 import { AnalyticsContext } from "../../lib/analyticsEvents";
-import { DatabasePublicSetting } from '../../lib/publicSettings';
-import classNames from 'classnames';
-import { tagGetUrl } from '../../lib/collections/tags/helpers';
-import { RobotIcon } from '../icons/RobotIcon';
-import { useCurrentUser } from '../common/withUser';
-import { coreTagIconMap } from './CoreTagIcon';
-import { isBookUI, isFriendlyUI } from '../../themes/forumTheme';
+import { DatabasePublicSetting } from "../../lib/publicSettings";
+import classNames from "classnames";
+import { tagGetUrl } from "../../lib/collections/tags/helpers";
+import { RobotIcon } from "../icons/RobotIcon";
+import { useCurrentUser } from "../common/withUser";
+import { coreTagIconMap } from "./CoreTagIcon";
+import { isBookUI, isFriendlyUI } from "../../themes/forumTheme";
 
-const useExperimentalTagStyleSetting = new DatabasePublicSetting<boolean>('useExperimentalTagStyle', false)
+const useExperimentalTagStyleSetting = new DatabasePublicSetting<boolean>("useExperimentalTagStyle", false);
 
 export const tagStyle = (theme: ThemeType): JssStyles => ({
   marginRight: 3,
@@ -26,8 +26,8 @@ export const tagStyle = (theme: ThemeType): JssStyles => ({
   borderRadius: 3,
   ...theme.typography.commentStyle,
   cursor: "pointer",
-  whiteSpace: isFriendlyUI ? "nowrap": undefined,
-})
+  whiteSpace: isFriendlyUI ? "nowrap" : undefined,
+});
 
 const newTagStyle = (theme: ThemeType): JssStyles => ({
   marginRight: 4,
@@ -38,15 +38,15 @@ const newTagStyle = (theme: ThemeType): JssStyles => ({
   borderRadius: 4,
   boxShadow: theme.palette.tag.boxShadow,
   color: theme.palette.primary.main,
-  fontSize: 15
-})
+  fontSize: 15,
+});
 
 export const smallTagTextStyle = (theme: ThemeType): JssStyles => ({
   fontSize: 12,
   paddingTop: 1,
   paddingBottom: 2,
   fontWeight: theme.typography.body1.fontWeight,
-  marginBottom: 0
+  marginBottom: 0,
 });
 
 export const coreTagStyle = (theme: ThemeType): JssStyles => ({
@@ -68,11 +68,8 @@ const styles = (theme: ThemeType): JssStyles => ({
       opacity: 1,
       backgroundColor: theme.palette.tag.backgroundHover,
     },
-    "& a:hover": isFriendlyUI ? {opacity: 1} : {},
-    ...(useExperimentalTagStyleSetting.get() && isBookUI
-      ? newTagStyle(theme)
-      : tagStyle(theme)
-    )
+    "& a:hover": isFriendlyUI ? { opacity: 1 } : {},
+    ...(useExperimentalTagStyleSetting.get() && isBookUI ? newTagStyle(theme) : tagStyle(theme)),
   },
   core: {
     ...coreTagStyle(theme),
@@ -91,12 +88,12 @@ const styles = (theme: ThemeType): JssStyles => ({
       fill: theme.palette.tag.coreTagText,
     },
   },
-  score:  {
+  score: {
     paddingLeft: 5,
     color: theme.palette.text.slightlyDim2,
   },
   name: {
-    display: 'inline-block',
+    display: "inline-block",
   },
   smallText: {
     ...smallTagTextStyle(theme),
@@ -113,70 +110,89 @@ const styles = (theme: ThemeType): JssStyles => ({
 const FooterTag = ({
   tagRel,
   tag,
-  hideScore=false,
+  hideScore = false,
   smallText,
   popperCard,
-  link=true,
-  highlightAsAutoApplied=false,
-  neverCoreStyling=false,
+  link = true,
+  highlightAsAutoApplied = false,
+  neverCoreStyling = false,
   className,
   classes,
 }: {
-  tagRel?: TagRelMinimumFragment,
-  tag: TagBasicInfo,
-  hideScore?: boolean,
-  smallText?: boolean,
-  popperCard?: React.ReactNode,
-  link?: boolean
-  highlightAsAutoApplied?: boolean,
-  neverCoreStyling?: boolean,
-  className?: string,
-  classes: ClassesType,
+  tagRel?: TagRelMinimumFragment;
+  tag: TagBasicInfo;
+  hideScore?: boolean;
+  smallText?: boolean;
+  popperCard?: React.ReactNode;
+  link?: boolean;
+  highlightAsAutoApplied?: boolean;
+  neverCoreStyling?: boolean;
+  className?: string;
+  classes: ClassesType;
 }) => {
   const { hover, anchorEl, eventHandlers } = useHover({
     pageElementContext: "tagItem",
     tagId: tag._id,
     tagName: tag.name,
-    tagSlug: tag.slug
+    tagSlug: tag.slug,
   });
-  const { PopperCard, TagRelCard, CoreTagIcon } = Components
+  const { PopperCard, TagRelCard, CoreTagIcon } = Components;
 
-  const currentUser = useCurrentUser()
-  
-  if (tag.adminOnly && !currentUser?.isAdmin) { return null }
+  const currentUser = useCurrentUser();
+
+  if (tag.adminOnly && !currentUser?.isAdmin) {
+    return null;
+  }
 
   const showIcon = Boolean(tag.core && !smallText && coreTagIconMap[tag.slug]);
 
-  const tagName = isFriendlyUI && smallText
-    ? tag.shortName || tag.name
-    : tag.name;
+  const tagName = isFriendlyUI && smallText ? tag.shortName || tag.name : tag.name;
 
-  const renderedTag = <>
-    {showIcon && <span className={classes.coreIcon}><CoreTagIcon tag={tag} /></span>}
-    <span className={classes.name}>{tagName}</span>
-    {!hideScore && tagRel && <span className={classes.score}>{tagRel.baseScore}</span>}
-  </>
+  const renderedTag = (
+    <>
+      {showIcon && (
+        <span className={classes.coreIcon}>
+          <CoreTagIcon tag={tag} />
+        </span>
+      )}
+      <span className={classes.name}>{tagName}</span>
+      {!hideScore && tagRel && <span className={classes.score}>{tagRel.baseScore}</span>}
+    </>
+  );
 
   // Fall back to TagRelCard if no popperCard is provided
-  const popperCardToRender = popperCard ?? (tagRel ? <TagRelCard tagRel={tagRel} /> : <></>)
+  const popperCardToRender = popperCard ?? (tagRel ? <TagRelCard tagRel={tagRel} /> : <></>);
 
-  return (<AnalyticsContext tagName={tag.name} tagId={tag._id} tagSlug={tag.slug} pageElementContext="tagItem">
-    <span {...eventHandlers} className={classNames(classes.root, className, {
-      [classes.core]: !neverCoreStyling && tag.core,
-      [classes.smallText]: smallText,
-    })}>
-      {link ? <Link to={tagGetUrl(tag)}>
-        {renderedTag}
-        {highlightAsAutoApplied && <span className={classes.robotIcon}><RobotIcon/></span>}
-      </Link> : renderedTag}
-      {<PopperCard open={hover} anchorEl={anchorEl} allowOverflow>
-        <div>
-          {popperCardToRender}
-        </div>
-      </PopperCard>}
-    </span>
-  </AnalyticsContext>);
-}
+  return (
+    <AnalyticsContext tagName={tag.name} tagId={tag._id} tagSlug={tag.slug} pageElementContext="tagItem">
+      <span
+        {...eventHandlers}
+        className={classNames(classes.root, className, {
+          [classes.core]: !neverCoreStyling && tag.core,
+          [classes.smallText]: smallText,
+        })}
+      >
+        {link ? (
+          <Link to={tagGetUrl(tag)}>
+            {renderedTag}
+            {highlightAsAutoApplied && (
+              <span className={classes.robotIcon}>
+                <RobotIcon />
+              </span>
+            )}
+          </Link>
+        ) : (
+          renderedTag
+        )}
+        {
+          <PopperCard open={hover} anchorEl={anchorEl} allowOverflow>
+            <div>{popperCardToRender}</div>
+          </PopperCard>
+        }
+      </span>
+    </AnalyticsContext>
+  );
+};
 
 const FooterTagComponent = registerComponent("FooterTag", FooterTag, {
   styles,
@@ -185,6 +201,6 @@ const FooterTagComponent = registerComponent("FooterTag", FooterTag, {
 
 declare global {
   interface ComponentTypes {
-    FooterTag: typeof FooterTagComponent
+    FooterTag: typeof FooterTagComponent;
   }
 }

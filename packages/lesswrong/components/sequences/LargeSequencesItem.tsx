@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { cloudinaryCloudNameSetting } from '../../lib/publicSettings';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { Link } from '../../lib/reactRouterWrapper';
-import classNames from 'classnames';
-import { isFriendlyUI } from '../../themes/forumTheme';
+import React, { useState } from "react";
+import { cloudinaryCloudNameSetting } from "../../lib/publicSettings";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { Link } from "../../lib/reactRouterWrapper";
+import classNames from "classnames";
+import { isFriendlyUI } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -13,7 +13,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     borderRadius: theme.borderRadius.default,
     width: "100%",
     overflow: "hidden",
-    position: "relative"
+    position: "relative",
   },
   text: {
     padding: 16,
@@ -21,13 +21,13 @@ const styles = (theme: ThemeType): JssStyles => ({
     maxWidth: 600,
     marginTop: 90,
     marginBottom: 30,
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       marginTop: 60,
-      marginBottom: 0
+      marginBottom: 0,
     },
   },
   titleAndAuthor: {
-    marginBottom: 12
+    marginBottom: 12,
   },
   title: {
     ...theme.typography.display0,
@@ -38,20 +38,20 @@ const styles = (theme: ThemeType): JssStyles => ({
     color: theme.palette.grey[900],
     display: "block",
     textShadow: `0 0 25px ${theme.palette.panelBackground.default}, 0 0 25px ${theme.palette.panelBackground.default}, 0 0 25px ${theme.palette.panelBackground.default}, 0 0 25px ${theme.palette.panelBackground.default}, 0 0 25px ${theme.palette.panelBackground.default}, 0 0 25px ${theme.palette.panelBackground.default}, 0 0 25px ${theme.palette.panelBackground.default}, 0 0 25px ${theme.palette.panelBackground.default}, 0 0 25px ${theme.palette.panelBackground.default}, 0 0 25px ${theme.palette.panelBackground.default}, 0 0 25px ${theme.palette.panelBackground.default}, 0 0 25px ${theme.palette.panelBackground.default}`,
-    '&:hover': {
+    "&:hover": {
       opacity: 1,
       color: theme.palette.grey[600],
-    }
+    },
   },
   eaTitle: {
     fontFamily: theme.typography.fontFamily,
-    lineHeight: '1.4em',
-    fontWeight: 600
+    lineHeight: "1.4em",
+    fontWeight: 600,
   },
   description: {
     ...theme.typography.body2,
     ...theme.typography.postStyle,
-    marginBottom: 12
+    marginBottom: 12,
   },
   eaDescription: {
     fontSize: "1rem",
@@ -60,7 +60,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     ...theme.typography.body2,
     ...theme.typography.postStyle,
     color: theme.palette.text.dim,
-    fontStyle: "italic"
+    fontStyle: "italic",
   },
   sequenceImage: {
     position: "absolute",
@@ -68,8 +68,8 @@ const styles = (theme: ThemeType): JssStyles => ({
     left: 0,
     height: 125,
     width: "45%",
-    opacity: .85,
-    [theme.breakpoints.down('xs')]: {
+    opacity: 0.85,
+    [theme.breakpoints.down("xs")]: {
       width: "100%",
     },
 
@@ -82,12 +82,12 @@ const styles = (theme: ThemeType): JssStyles => ({
       left: 0,
       top: 0,
       background: `linear-gradient(to top, ${theme.palette.panelBackground.default} 0%, ${theme.palette.panelBackground.translucent4} 50%, transparent 100%)`,
-    }
+    },
   },
   sequenceImageImg: {
     width: "100%",
     height: 125,
-    objectFit: "cover"
+    objectFit: "cover",
   },
   chapterTitle: {
     fontSize: `${isFriendlyUI ? "1.2rem" : "1.25rem"} !important`,
@@ -97,18 +97,18 @@ const styles = (theme: ThemeType): JssStyles => ({
     height: 12,
     width: 12,
     marginRight: 4,
-    color: theme.palette.grey[500]
+    color: theme.palette.grey[500],
   },
   postTitle: {
     ...theme.typography.smallFont,
     ...theme.typography.commentStyle,
-    display: "block"
+    display: "block",
   },
   columns: {
     display: "flex",
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       flexDirection: "column",
-    }
+    },
   },
   left: {
     width: "45%",
@@ -116,125 +116,130 @@ const styles = (theme: ThemeType): JssStyles => ({
     flexDirection: "column",
     justifyContent: isFriendlyUI ? "flex-start" : "center",
     maxHeight: 600,
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       width: "100%",
-      justifyContent: "flex-start"
-    }
+      justifyContent: "flex-start",
+    },
   },
   right: {
     width: "55%",
     padding: 20,
     paddingLeft: 40,
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       width: "100%",
       paddingLeft: 16,
-      paddingTop: 0
-    }
+      paddingTop: 0,
+    },
   },
   wordcount: {
     ...theme.typography.commentStyle,
     color: theme.palette.grey[500],
-    fontSize: "1rem"
+    fontSize: "1rem",
   },
   imageLink: {
-    '&:hover': {
-      opacity: 1
-    }
-  }
+    "&:hover": {
+      opacity: 1,
+    },
+  },
 });
 
-export const LargeSequencesItem = ({sequence, showAuthor=false, showChapters=false, classes}: {
-  sequence: SequencesPageWithChaptersFragment,
-  showAuthor?: boolean,
-  showChapters?: boolean,
-  classes: ClassesType,
+export const LargeSequencesItem = ({
+  sequence,
+  showAuthor = false,
+  showChapters = false,
+  classes,
+}: {
+  sequence: SequencesPageWithChaptersFragment;
+  showAuthor?: boolean;
+  showChapters?: boolean;
+  classes: ClassesType;
 }) => {
-  const { UsersName, ContentStyles, SequencesSmallPostLink, ContentItemTruncated, LWTooltip, ChapterTitle } = Components
+  const { UsersName, ContentStyles, SequencesSmallPostLink, ContentItemTruncated, LWTooltip, ChapterTitle } =
+    Components;
 
-  const [expanded, setExpanded] = useState<boolean>(false)
+  const [expanded, setExpanded] = useState<boolean>(false);
 
-  const cloudinaryCloudName = cloudinaryCloudNameSetting.get()
+  const cloudinaryCloudName = cloudinaryCloudNameSetting.get();
 
+  const posts = sequence.chapters?.flatMap((chapter) => chapter.posts ?? []) ?? [];
+  const [totalWordCount, totalReadTime] = posts.reduce(
+    ([wordCount, readTime], curr) => [
+      wordCount + (curr?.contents?.wordCount ?? 0),
+      readTime + (curr?.readTimeMinutes ?? 0),
+    ],
+    [0, 0],
+  );
 
-  const posts = sequence.chapters?.flatMap(chapter => chapter.posts ?? []) ?? []
-  const [
-    totalWordCount,
-    totalReadTime,
-  ] = posts.reduce(([wordCount, readTime], curr) => ([
-    wordCount + (curr?.contents?.wordCount ?? 0),
-    readTime + (curr?.readTimeMinutes ?? 0),
-  ]), [0, 0]);
+  const highlight = sequence.contents?.htmlHighlight || "";
 
-  const highlight = sequence.contents?.htmlHighlight || ""
-
-  return <div className={classes.root} id={sequence._id}>
-
-    <div className={classes.columns}>
-      <div className={classes.left}>
-        <Link className={classes.imageLink} to={`/s/${sequence._id}`}>
-          <div className={classes.sequenceImage}>
-            <img className={classes.sequenceImageImg}
-              src={`https://res.cloudinary.com/${cloudinaryCloudName}/image/upload/c_fill,dpr_2.0,g_custom,h_96,q_auto,w_292/v1/${
-                sequence.gridImageId || "sequences/vnyzzznenju0hzdv6pqb.jpg"
-              }`}
+  return (
+    <div className={classes.root} id={sequence._id}>
+      <div className={classes.columns}>
+        <div className={classes.left}>
+          <Link className={classes.imageLink} to={`/s/${sequence._id}`}>
+            <div className={classes.sequenceImage}>
+              <img
+                className={classes.sequenceImageImg}
+                src={`https://res.cloudinary.com/${cloudinaryCloudName}/image/upload/c_fill,dpr_2.0,g_custom,h_96,q_auto,w_292/v1/${
+                  sequence.gridImageId || "sequences/vnyzzznenju0hzdv6pqb.jpg"
+                }`}
               />
+            </div>
+          </Link>
+          <div className={classes.text}>
+            <div className={classes.titleAndAuthor}>
+              <Link
+                to={`/s/${sequence._id}`}
+                className={classNames(classes.title, { [classes.eaTitle]: isFriendlyUI })}
+              >
+                {sequence.title}
+              </Link>
+              {showAuthor && sequence.user && (
+                <div className={classes.author}>
+                  by <UsersName user={sequence.user} />
+                </div>
+              )}
+            </div>
+            {highlight.length > 0 && (
+              <ContentStyles
+                contentType="postHighlight"
+                className={classNames(classes.description, { [classes.eaDescription]: isFriendlyUI })}
+              >
+                <ContentItemTruncated
+                  maxLengthWords={100}
+                  graceWords={20}
+                  rawWordCount={sequence.contents?.wordCount || 0}
+                  expanded={expanded}
+                  getTruncatedSuffix={() => null}
+                  dangerouslySetInnerHTML={{ __html: highlight }}
+                  description={`sequence ${sequence._id}`}
+                />
+              </ContentStyles>
+            )}
+            <LWTooltip title={<div> ({totalWordCount.toLocaleString("en-US")} words)</div>}>
+              <div className={classes.wordcount}>{totalReadTime} min read</div>
+            </LWTooltip>
           </div>
-        </Link>
-        <div className={classes.text}>
-          <div className={classes.titleAndAuthor}>
-            <Link
-              to={`/s/${sequence._id}`}
-              className={classNames(classes.title, {[classes.eaTitle]: isFriendlyUI})}
-            >
-              {sequence.title}
-            </Link>
-          { showAuthor && sequence.user &&
-            <div className={classes.author}>
-              by <UsersName user={sequence.user} />
-            </div>}
-          </div>
-          {(highlight.length > 0) && <ContentStyles
-            contentType="postHighlight"
-            className={classNames(classes.description, {[classes.eaDescription]: isFriendlyUI})}
-          >
-            <ContentItemTruncated
-              maxLengthWords={100}
-              graceWords={20}
-              rawWordCount={sequence.contents?.wordCount || 0}
-              expanded={expanded}
-              getTruncatedSuffix={() => null}
-              dangerouslySetInnerHTML={{__html: highlight}}
-              description={`sequence ${sequence._id}`}
-            />
-          </ContentStyles>}
-          <LWTooltip title={<div> ({totalWordCount.toLocaleString("en-US")} words)</div>}>
-            <div className={classes.wordcount}>{totalReadTime} min read</div>
-          </LWTooltip>
+        </div>
+        <div className={classes.right}>
+          {sequence.chapters?.flatMap(({ posts, title }, index) => (
+            <React.Fragment key={index}>
+              {title && <ChapterTitle title={title} />}
+              {posts.map((post) => (
+                <SequencesSmallPostLink key={sequence._id + post._id} post={post} sequenceId={sequence._id} />
+              ))}
+            </React.Fragment>
+          ))}
         </div>
       </div>
-      <div className={classes.right}>
-        {sequence.chapters?.flatMap(({posts, title}, index) =>
-          <React.Fragment key={index}>
-            {title && <ChapterTitle title={title}/>}
-            {posts.map((post) => (
-              <SequencesSmallPostLink
-                key={sequence._id + post._id}
-                post={post}
-                sequenceId={sequence._id}
-              />
-            ))}
-          </React.Fragment>
-        )}
-      </div>
     </div>
-  </div>
-}
+  );
+};
 
-const LargeSequencesItemComponent = registerComponent('LargeSequencesItem', LargeSequencesItem, {styles});
+const LargeSequencesItemComponent = registerComponent("LargeSequencesItem", LargeSequencesItem, { styles });
 
 declare global {
   interface ComponentTypes {
-    LargeSequencesItem: typeof LargeSequencesItemComponent
+    LargeSequencesItem: typeof LargeSequencesItemComponent;
   }
 }
-

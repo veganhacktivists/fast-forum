@@ -128,11 +128,10 @@ class Pipeline<T extends DbObject> {
     private table: Table<T>,
     private stages: MongoAggregationPipeline<T> = [],
     private options?: MongoAggregationOptions, // TODO: What can options be?
-    private sqlComment?: string
-  ) {
-  }
+    private sqlComment?: string,
+  ) {}
 
-  compile(): {sql: string, args: any[]} {
+  compile(): { sql: string; args: any[] } {
     return this.toQuery().compile();
   }
 
@@ -147,16 +146,35 @@ class Pipeline<T extends DbObject> {
       const name = keys[0];
       const data = stage[name];
       switch (name) {
-        case "$match":     unit = unit.addMatchStage(data);     break;
-        case "$addFields": unit = unit.addAddFieldsStage(data); break;
-        case "$sort":      unit = unit.addSortStage(data);      break;
-        case "$limit":     unit = unit.addLimitStage(data);     break;
-        case "$lookup":    unit = unit.addLookupStage(data);    break;
-        case "$project":   unit = unit.addProjectStage(data);   break;
-        case "$group":     unit = unit.addGroupStage(data);     break;
-        case "$unwind":    unit = unit.addUnwindStage(data);    break;
-        case "$sample":    unit = unit.addSampleStage(data);    break;
-        default:           throw new Error(`Invalid pipeline stage: ${name}`);
+        case "$match":
+          unit = unit.addMatchStage(data);
+          break;
+        case "$addFields":
+          unit = unit.addAddFieldsStage(data);
+          break;
+        case "$sort":
+          unit = unit.addSortStage(data);
+          break;
+        case "$limit":
+          unit = unit.addLimitStage(data);
+          break;
+        case "$lookup":
+          unit = unit.addLookupStage(data);
+          break;
+        case "$project":
+          unit = unit.addProjectStage(data);
+          break;
+        case "$group":
+          unit = unit.addGroupStage(data);
+          break;
+        case "$unwind":
+          unit = unit.addUnwindStage(data);
+          break;
+        case "$sample":
+          unit = unit.addSampleStage(data);
+          break;
+        default:
+          throw new Error(`Invalid pipeline stage: ${name}`);
       }
     }
 
@@ -166,7 +184,6 @@ class Pipeline<T extends DbObject> {
   getSqlComment() {
     return this.sqlComment;
   }
-
 }
 
 export default Pipeline;

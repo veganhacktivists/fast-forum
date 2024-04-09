@@ -10,15 +10,15 @@
 import { ListItemView } from 'ckeditor5/src/ui';
 
 export default class MentionListItemView extends ListItemView {
-  highlight() {
-	const child = this.children.first;
+	highlight() {
+		const child = this.children.first;
 
-	child.isOn = true;
-  }
+		child.isOn = true;
+	}
 
-  removeHighlight() {
-	const child = this.children.first;
+	removeHighlight() {
+		const child = this.children.first;
 
-	child.isOn = false;
-  }
+		child.isOn = false;
+	}
 }

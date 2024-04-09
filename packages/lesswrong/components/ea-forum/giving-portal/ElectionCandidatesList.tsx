@@ -45,8 +45,8 @@ const styles = (theme: ThemeType) => ({
     marginRight: 16,
   },
   checkbox: {
-    padding: '4px 6px',
-  }
+    padding: "4px 6px",
+  },
 });
 
 const selectSortOptions: Record<Exclude<ElectionCandidatesSort, "mostPreVoted"> | "random", SettingsOption> = {
@@ -70,25 +70,32 @@ export const sortOptions: Record<ElectionCandidatesSort | "random", SettingsOpti
 
 const checkboxColor = requireCssVar("palette", "givingPortal", 1000);
 
-const ElectionCandidatesList = ({type="preVote", selectedCandidateIds, onSelect, setTotalCount, className, classes}: {
+const ElectionCandidatesList = ({
+  type = "preVote",
+  selectedCandidateIds,
+  onSelect,
+  setTotalCount,
+  className,
+  classes,
+}: {
   /**
    * - "preVote": selecting a candidate (instantly) adds a pre-vote for it
    * - "select": selecting a candidate runs the onSelect callback
    */
-  type?: "preVote" | "select",
-  selectedCandidateIds?: string[],
-  onSelect?: (candidateIds: string[]) => void,
-  setTotalCount?: (count: number) => void,
-  className?: string,
-  classes: ClassesType,
+  type?: "preVote" | "select";
+  selectedCandidateIds?: string[];
+  onSelect?: (candidateIds: string[]) => void;
+  setTotalCount?: (count: number) => void;
+  className?: string;
+  classes: ClassesType;
 }) => {
   const isSelect = type === "select";
   const [sortBy, setSortBy] = useState<ElectionCandidatesSort | "random">(isSelect ? "random" : "mostPreVoted");
-  const {results, loading} = useElectionCandidates(sortBy);
+  const { results, loading } = useElectionCandidates(sortBy);
 
   const allSelected = useMemo(
     () => results?.every((candidate) => selectedCandidateIds?.includes(candidate._id)),
-    [results, selectedCandidateIds]
+    [results, selectedCandidateIds],
   );
 
   if (setTotalCount) {
@@ -101,30 +108,37 @@ const ElectionCandidatesList = ({type="preVote", selectedCandidateIds, onSelect,
     }
   }, []);
 
-  const {Loading, ElectionCandidate, ForumDropdown} = Components;
+  const { Loading, ElectionCandidate, ForumDropdown } = Components;
   return (
     <div className={classNames(classes.root, className)}>
       <div className={classes.controls}>
-        <ForumDropdown value={sortBy} options={isSelect ? selectSortOptions : sortOptions} onSelect={onSelectSort} className={classes.dropdown} />
-        {isSelect && <div className={classes.selectAll}>
-          <Checkbox
-            className={classes.checkbox}
-            style={{color: checkboxColor}}
-            checked={allSelected}
-            onChange={() => {
-              const allIds = results?.map((candidate) => candidate._id) || [];
-              const allUnselected = difference(allIds, selectedCandidateIds ?? []);
+        <ForumDropdown
+          value={sortBy}
+          options={isSelect ? selectSortOptions : sortOptions}
+          onSelect={onSelectSort}
+          className={classes.dropdown}
+        />
+        {isSelect && (
+          <div className={classes.selectAll}>
+            <Checkbox
+              className={classes.checkbox}
+              style={{ color: checkboxColor }}
+              checked={allSelected}
+              onChange={() => {
+                const allIds = results?.map((candidate) => candidate._id) || [];
+                const allUnselected = difference(allIds, selectedCandidateIds ?? []);
 
-              if (allUnselected.length === 0) {
-                // Clear selection
-                onSelect?.(allIds)
-              } else {
-                onSelect?.(allUnselected)
-              }
-            }}
-          />
-          Select all
-        </div>}
+                if (allUnselected.length === 0) {
+                  // Clear selection
+                  onSelect?.(allIds);
+                } else {
+                  onSelect?.(allUnselected);
+                }
+              }}
+            />
+            Select all
+          </div>
+        )}
       </div>
       <div className={classes.grid}>
         {loading && <Loading />}
@@ -140,13 +154,12 @@ const ElectionCandidatesList = ({type="preVote", selectedCandidateIds, onSelect,
       </div>
     </div>
   );
-}
+};
 
-const ElectionCandidatesListComponent = registerComponent(
-  "ElectionCandidatesList",
-  ElectionCandidatesList,
-  {styles, stylePriority: -1},
-);
+const ElectionCandidatesListComponent = registerComponent("ElectionCandidatesList", ElectionCandidatesList, {
+  styles,
+  stylePriority: -1,
+});
 
 declare global {
   interface ComponentTypes {

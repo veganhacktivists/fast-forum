@@ -1,18 +1,23 @@
-import React from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import { TAG_POSTS_SORT_ORDER_OPTIONS } from '../../lib/collections/tags/schema';
+import React from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import { TAG_POSTS_SORT_ORDER_OPTIONS } from "../../lib/collections/tags/schema";
 
 const styles = (theme: ThemeType): JssStyles => ({
-  root: {}
-})
+  root: {},
+});
 
 const defaultOptions = Object.keys(TAG_POSTS_SORT_ORDER_OPTIONS);
 
-const PostsListSortDropdown = ({value, options=defaultOptions, sortingParam="sortedBy", classes}:{
-  value: string
-  options?: string[],
-  sortingParam?: string,
-  classes: ClassesType,
+const PostsListSortDropdown = ({
+  value,
+  options = defaultOptions,
+  sortingParam = "sortedBy",
+  classes,
+}: {
+  value: string;
+  options?: string[];
+  sortingParam?: string;
+  classes: ClassesType;
 }) => {
   const { ForumDropdown } = Components;
 
@@ -26,12 +31,12 @@ const PostsListSortDropdown = ({value, options=defaultOptions, sortingParam="sor
     : TAG_POSTS_SORT_ORDER_OPTIONS;
 
   return <ForumDropdown value={value} options={filteredOptions} queryParam={sortingParam} />;
-}
+};
 
-const PostsListSortDropdownComponent = registerComponent('PostsListSortDropdown', PostsListSortDropdown, {styles});
+const PostsListSortDropdownComponent = registerComponent("PostsListSortDropdown", PostsListSortDropdown, { styles });
 
 declare global {
   interface ComponentTypes {
-    PostsListSortDropdown: typeof PostsListSortDropdownComponent
+    PostsListSortDropdown: typeof PostsListSortDropdownComponent;
   }
 }

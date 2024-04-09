@@ -13,13 +13,13 @@
  * -
  * --- Accepted on 2023-04-11T17:26:12.000Z by 20230411T172612.add_hideCommunitySection_to_users.ts
  * +-- Overall schema hash: 64c57945e3105d8daf5be8d51a1ee559
- *  
+ *
  * @@ -160,2 +157,4 @@ CREATE TABLE "Comments" (
  *      "rejected" bool DEFAULT false,
  * +    "modGPTAnalysis" text,
  * +    "modGPTRecommendation" text,
  *      "rejectedByUserId" varchar(27),
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -33,12 +33,12 @@ export const acceptsSchemaHash = "64c57945e3105d8daf5be8d51a1ee559";
 import Comments from "../../lib/collections/comments/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Comments, "modGPTAnalysis")
-  await addField(db, Comments, "modGPTRecommendation")
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Comments, "modGPTAnalysis");
+  await addField(db, Comments, "modGPTRecommendation");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Comments, "modGPTAnalysis")
-  await dropField(db, Comments, "modGPTRecommendation")
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Comments, "modGPTAnalysis");
+  await dropField(db, Comments, "modGPTRecommendation");
+};

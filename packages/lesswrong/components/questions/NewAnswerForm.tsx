@@ -1,121 +1,121 @@
-import { Components, registerComponent, getFragment } from '../../lib/vulcan-lib';
-import React from 'react';
-import { Comments } from '../../lib/collections/comments';
-import { commentDefaultToAlignment } from '../../lib/collections/comments/helpers';
-import { userIsAllowedToComment } from '../../lib/collections/users/helpers';
-import Button from '@material-ui/core/Button';
-import classNames from 'classnames';
-import { useCurrentUser } from '../common/withUser'
-import { useDialog } from '../common/withDialog';
+import { Components, registerComponent, getFragment } from "../../lib/vulcan-lib";
+import React from "react";
+import { Comments } from "../../lib/collections/comments";
+import { commentDefaultToAlignment } from "../../lib/collections/comments/helpers";
+import { userIsAllowedToComment } from "../../lib/collections/users/helpers";
+import Button from "@material-ui/core/Button";
+import classNames from "classnames";
+import { useCurrentUser } from "../common/withUser";
+import { useDialog } from "../common/withDialog";
 import { useUpdate } from "../../lib/crud/withUpdate";
 import { afNonMemberSuccessHandling } from "../../lib/alignment-forum/displayAFNonMemberPopups";
-import { BtnProps } from '../comments/CommentsNewForm';
-import { isFriendlyUI } from '../../themes/forumTheme';
+import { BtnProps } from "../comments/CommentsNewForm";
+import { isFriendlyUI } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   answersForm: {
-    padding: '0 12px 44px',
-    [theme.breakpoints.down('md')]: {
+    padding: "0 12px 44px",
+    [theme.breakpoints.down("md")]: {
       marginLeft: "auto",
-      marginRight: "auto"
-    }
-  },
-  formButton: isFriendlyUI ? {
-    float: "right",
-    backgroundColor: theme.palette.buttons.alwaysPrimary,
-    color: theme.palette.text.alwaysWhite,
-    fontSize: 14,
-    textTransform: 'none',
-    padding: '6px 12px',
-    borderRadius: 6,
-    boxShadow: 'none',
-    marginLeft: 8,
-  } : {
-    color: theme.palette.secondary.main,
-    float: "right",
-    paddingBottom: "2px",
-    fontSize: "16px",
-    marginLeft: "5px",
-    "&:hover": {
-      background: theme.palette.buttons.hoverGrayHighlight,
+      marginRight: "auto",
     },
   },
-})
+  formButton: isFriendlyUI
+    ? {
+        float: "right",
+        backgroundColor: theme.palette.buttons.alwaysPrimary,
+        color: theme.palette.text.alwaysWhite,
+        fontSize: 14,
+        textTransform: "none",
+        padding: "6px 12px",
+        borderRadius: 6,
+        boxShadow: "none",
+        marginLeft: 8,
+      }
+    : {
+        color: theme.palette.secondary.main,
+        float: "right",
+        paddingBottom: "2px",
+        fontSize: "16px",
+        marginLeft: "5px",
+        "&:hover": {
+          background: theme.palette.buttons.hoverGrayHighlight,
+        },
+      },
+});
 
-const NewAnswerForm = ({post, classes}: {
-  post: PostsDetails,
-  classes: ClassesType,
-}) => {
+const NewAnswerForm = ({ post, classes }: { post: PostsDetails; classes: ClassesType }) => {
   const currentUser = useCurrentUser();
   const { openDialog } = useDialog();
-  const {mutate: updateComment} = useUpdate({
+  const { mutate: updateComment } = useUpdate({
     collectionName: "Comments",
-    fragmentName: 'CommentsList',
+    fragmentName: "CommentsList",
   });
-  
-  const SubmitComponent = ({submitLabel = "Submit"}) => {
-    const submitBtnProps: BtnProps = isFriendlyUI ? {variant: 'contained', color: 'primary'} : {}
-    return <div className={classes.submit}>
-      <Button
-        type="submit"
-        className={classNames(classes.formButton)}
-        onClick={(ev) => {
-          if (!currentUser) {
-            openDialog({
-              componentName: "LoginPopup",
-              componentProps: {}
-            });
-            ev.preventDefault();
-          }
-        }}
-        {...submitBtnProps}
-      >
-        {submitLabel}
-      </Button>
-    </div>
+
+  const SubmitComponent = ({ submitLabel = "Submit" }) => {
+    const submitBtnProps: BtnProps = isFriendlyUI ? { variant: "contained", color: "primary" } : {};
+    return (
+      <div className={classes.submit}>
+        <Button
+          type="submit"
+          className={classNames(classes.formButton)}
+          onClick={(ev) => {
+            if (!currentUser) {
+              openDialog({
+                componentName: "LoginPopup",
+                componentProps: {},
+              });
+              ev.preventDefault();
+            }
+          }}
+          {...submitBtnProps}
+        >
+          {submitLabel}
+        </Button>
+      </div>
+    );
   };
 
   const prefilledProps = {
     postId: post._id,
     answer: true,
     af: commentDefaultToAlignment(currentUser, post),
-  }
-  const { FormWrapper } = Components
-  
+  };
+  const { FormWrapper } = Components;
+
   if (currentUser && !userIsAllowedToComment(currentUser, post, post.user, false)) {
-    return <span>Sorry, you do not have permission to comment at this time.</span>
+    return <span>Sorry, you do not have permission to comment at this time.</span>;
   }
-  
+
   return (
     <div className={classes.answersForm}>
       <FormWrapper
         collectionName="Comments"
         formComponents={{
           FormSubmit: SubmitComponent,
-          FormGroupLayout: Components.DefaultStyleFormGroup
+          FormGroupLayout: Components.DefaultStyleFormGroup,
         }}
-        mutationFragment={getFragment('CommentsList')}
+        mutationFragment={getFragment("CommentsList")}
         prefilledProps={prefilledProps}
         alignmentForumPost={post.af}
         layout="elementOnly"
-        addFields={currentUser?[]:["contents"]}
+        addFields={currentUser ? [] : ["contents"]}
         formProps={{
-          editorHintText: isFriendlyUI ? 'Write a new answer...' : undefined
+          editorHintText: isFriendlyUI ? "Write a new answer..." : undefined,
         }}
         successCallback={(comment: CommentsList, { form }: { form: any }) => {
-          afNonMemberSuccessHandling({currentUser, document: comment, openDialog, updateDocument: updateComment})
+          afNonMemberSuccessHandling({ currentUser, document: comment, openDialog, updateDocument: updateComment });
         }}
-        submitLabel={isFriendlyUI ? 'Add answer' : 'Submit'}
+        submitLabel={isFriendlyUI ? "Add answer" : "Submit"}
       />
     </div>
-  )
+  );
 };
 
-const NewAnswerFormComponent = registerComponent('NewAnswerForm', NewAnswerForm, {styles});
+const NewAnswerFormComponent = registerComponent("NewAnswerForm", NewAnswerForm, { styles });
 
 declare global {
   interface ComponentTypes {
-    NewAnswerForm: typeof NewAnswerFormComponent
+    NewAnswerForm: typeof NewAnswerFormComponent;
   }
 }
-

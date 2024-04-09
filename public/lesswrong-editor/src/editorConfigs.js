@@ -1,11 +1,10 @@
-
 const headingOptions = {
 	options: [
 		{ model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
 		{ model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
 		{ model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
-		{ model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' }	
-	]
+		{ model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' }
+	],
 };
 
 const mathConfig = {
@@ -13,12 +12,12 @@ const mathConfig = {
 	outputType: 'span',
 	forceOutputType: true,
 	enablePreview: true
-}
+};
 
 const embedConfig = {
-	toolbar: [ 'comment' ],
+	toolbar: [ "comment" ],
 	previewsInData: true,
-	removeProviders: [ 'instagram', 'twitter', 'googleMaps', 'flickr', 'facebook', 'spotify', 'vimeo', 'dailymotion'],
+	removeProviders: [ "instagram", 'twitter', 'googleMaps', 'flickr', 'facebook', 'spotify', 'vimeo', 'dailymotion'],
 	extraProviders: [
 		{
 			name: 'Elicit',
@@ -27,7 +26,7 @@ const embedConfig = {
 				<div data-elicit-id="${questionId}" style="position:relative;height:50px;background-color: rgba(0,0,0,0.05);display: flex;justify-content: center;align-items: center;" class="elicit-binary-prediction">
 					<div style=>Elicit Prediction (<a href="${match}">${match}</a>)</div>
 				</div>
-			`
+			`,
 		},
 		{
 			name: 'Metaculus',
@@ -36,16 +35,16 @@ const embedConfig = {
 				<div data-metaculus-id="${questionNumber}" style="background-color: #2c3947;" class="metaculus-preview">
 					<iframe style="height: 400px; width: 100%; border: none;" src="https://d3s0w6fek99l5b.cloudfront.net/s/1/questions/embed/${questionNumber}/?plot=pdf"/>
 				</div>
-			`
+			`,
 		},
 		{
-		  name: 'Thoughtsaver',
-		  url: /^app.thoughtsaver.com\/embed\/([a-zA-Z0-9?&_=-]*)/,
-		  html: ([match,urlParams]) => `
+			name: 'Thoughtsaver',
+			url: /^app.thoughtsaver.com\/embed\/([a-zA-Z0-9?&_=-]*)/,
+			html: ( [ match, urlParams]) => `
 		    <div class="thoughtSaverFrameWrapper">
 		      <iframe class="thoughtSaverFrame" title="Thought Saver flashcard quiz" src="https://app.thoughtsaver.com/embed/${urlParams}"></iframe>
 		    </div>
-		  `
+		  `,
 		},
 		{
 			name: "Manifold",
@@ -54,7 +53,7 @@ const embedConfig = {
 				<div data-manifold-id="${longslug}" class="manifold-preview">
 					<iframe style="height: 405px; width: 100%; border: 1px solid gray;" src="https://manifold.markets/embed/${longslug}"/>
 				</div>
-			`
+			`,
 		},
 		{
 			name: "StrawPoll",
@@ -64,9 +63,8 @@ const embedConfig = {
 					<iframe title="StrawPoll Embed" id="strawpoll_iframe_${pollId}" src="https://strawpoll.com/embed/polls/${pollId}" style="position: static; visibility: visible; display: block; width: 100%; flex-grow: 1;" frameborder="0" allowfullscreen allowtransparency>Loading...</iframe>
 					<script async src="https://cdn.strawpoll.com/dist/widgets.js" charset="utf-8"></script>
 				</div>
-			`
-		}
-		,
+			`,
+		},
 		{
 			name: "Metaforecast",
 			url: /^metaforecast\.org\/questions\/([\w-]+)$/,
@@ -74,7 +72,7 @@ const embedConfig = {
 				<div data-metaforecast-id="${slug}" class="metaforecast-preview">
 					<iframe style="height: 405px; width: 100%; border: 1px solid gray;" src="https://metaforecast.org/questions/embed/${slug}"/>
 				</div>
-			`
+			`,
 		},
 		{
 			name: 'OWID',
@@ -84,7 +82,7 @@ const embedConfig = {
 					<div data-owid-slug="${slug}" class="owid-preview">
 						<iframe style="height: 400px; width: 100%; border: none;" src="https://${match}"/>
 					</div>
-				`
+				`;
 			}
 		},
 		{
@@ -95,7 +93,7 @@ const embedConfig = {
 					<div class="estimaker-preview">
 						<iframe style="height: 400px; width: 100%; border: none;" src="https://${match}"/>
 					</div>
-				`
+				`;
 			}
 		},
 		{
@@ -106,7 +104,7 @@ const embedConfig = {
 					<div data-viewpoints-slug="${slug}" class="viewpoints-preview">
 						<iframe style="height: 400px; width: 100%; border: none;" src="https://viewpoints.xyz/embed/polls/${slug}"/>
 					</div>
-				`
+				`;
 			}
 		},
 		{
@@ -120,21 +118,14 @@ const embedConfig = {
 							src="https://${match}"
 						/>
 					</div>
-				`
+				`;
 			}
-		}
+		},
 	]
-}
+};
 
 export const postEditorConfig = {
-	blockToolbar: [
-		'imageUpload',
-		'insertTable',
-		'horizontalLine',
-		'mathDisplay',
-		'mediaEmbed',
-		'footnote'
-	],
+	blockToolbar: [ "imageUpload", 'insertTable', 'horizontalLine', 'mathDisplay', 'mediaEmbed', 'footnote'],
 	toolbar: {
 		items: [
 			'restyledCommentButton',
@@ -159,19 +150,12 @@ export const postEditorConfig = {
 		shouldNotGroupWhenFull: true,
 	},
 	image: {
-		toolbar: [
-			'imageTextAlternative',
-			'comment',
-			'toggleImageCaption',
-		],
+		toolbar: [ "imageTextAlternative", 'comment', 'toggleImageCaption'],
 	},
 	heading: headingOptions,
 	table: {
-		contentToolbar: [
-			'tableColumn', 'tableRow', 'mergeTableCells',
-			'tableProperties', 'tableCellProperties'
-		],
-		tableToolbar: [ 'comment' ]
+		contentToolbar: [ "tableColumn", 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties'],
+		tableToolbar: [ "comment" ],
 	},
 	math: mathConfig,
 	mediaEmbed: embedConfig,
@@ -195,17 +179,12 @@ export const commentEditorConfig = {
 		'footnote',
 	],
 	image: {
-		toolbar: [
-			'imageTextAlternative'
-		]
+		toolbar: [ "imageTextAlternative" ],
 	},
 	heading: headingOptions,
 	table: {
-		contentToolbar: [
-			'tableColumn', 'tableRow', 'mergeTableCells',
-			'tableProperties', 'tableCellProperties'
-		],
-		tableToolbar: [ 'comment' ]
+		contentToolbar: [ "tableColumn", 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties'],
+		tableToolbar: [ "comment" ],
 	},
 	math: mathConfig,
 	mediaEmbed: embedConfig,

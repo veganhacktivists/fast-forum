@@ -12,7 +12,13 @@ import Radio from "@material-ui/core/Radio";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { eaGivingSeason23ElectionName, userCanVoteInDonationElection } from "../../../lib/eaGivingSeason";
 import { useCurrentUser } from "../../common/withUser";
-import { ELECTION_EFFECT_OPTIONS, ELECTION_EFFECT_QUESTION, ELECTION_NOTE_QUESTION, formStateToSubmissionComments, submissionCommentsToFormState } from "../../../lib/collections/electionVotes/helpers";
+import {
+  ELECTION_EFFECT_OPTIONS,
+  ELECTION_EFFECT_QUESTION,
+  ELECTION_NOTE_QUESTION,
+  formStateToSubmissionComments,
+  submissionCommentsToFormState,
+} from "../../../lib/collections/electionVotes/helpers";
 
 const styles = (theme: ThemeType) => ({
   ...votingPortalStyles(theme),
@@ -27,7 +33,7 @@ const styles = (theme: ThemeType) => ({
     marginBottom: 32,
   },
   questionTitle: {
-    lineHeight: '1.4em',
+    lineHeight: "1.4em",
     fontSize: 16,
     fontWeight: 600,
     marginBottom: 12,
@@ -41,7 +47,7 @@ const styles = (theme: ThemeType) => ({
       color: theme.palette.grey[1000],
       zIndex: theme.zIndexes.singleColumnSection,
       fontSize: 16,
-      lineHeight: '1.4em',
+      lineHeight: "1.4em",
       fontWeight: 500,
     },
     "& .MuiNotchedOutline-focused": {
@@ -81,11 +87,11 @@ const styles = (theme: ThemeType) => ({
     color: `${theme.palette.givingPortal[1000]} !important`,
   },
   radioLabel: {
-    '& .MuiFormControlLabel-label': {
+    "& .MuiFormControlLabel-label": {
       fontWeight: 500,
       color: theme.palette.grey[1000],
       fontSize: 16,
-    }
+    },
   },
 });
 
@@ -112,13 +118,7 @@ const EAVotingPortalSubmitPageLoader = ({ classes }: { classes: ClassesType }) =
 
   if (!electionVote?.vote) return null;
 
-  return (
-    <EAVotingPortalSubmitPage
-      electionVote={electionVote}
-      updateVote={updateVote}
-      classes={classes}
-    />
-  );
+  return <EAVotingPortalSubmitPage electionVote={electionVote} updateVote={updateVote} classes={classes} />;
 };
 
 const EAVotingPortalSubmitPage = ({
@@ -134,14 +134,16 @@ const EAVotingPortalSubmitPage = ({
   const navigate = useNavigate();
   const { flash } = useMessages();
 
-  const {electionEffect: dbElectionEffect, note: dbNote} = submissionCommentsToFormState(electionVote.submissionComments);
+  const { electionEffect: dbElectionEffect, note: dbNote } = submissionCommentsToFormState(
+    electionVote.submissionComments,
+  );
 
   const [electionEffect, setElectionEffect] = useState<string>(dbElectionEffect);
   const [note, setNote] = useState<string>(dbNote);
 
   const handleSubmit = useCallback(async () => {
     try {
-      const submissionComments = formStateToSubmissionComments({electionEffect, note});
+      const submissionComments = formStateToSubmissionComments({ electionEffect, note });
       await updateVote({ submittedAt: new Date(), submissionComments });
     } catch (e) {
       flash(e.message);
@@ -161,8 +163,7 @@ const EAVotingPortalSubmitPage = ({
           </div>
           <div className={classes.explanationRow}>
             <div className={classes.questionTitle}>
-              {ELECTION_EFFECT_QUESTION}{" "}
-              <span className={classes.greyedOut}>(Optional)</span>
+              {ELECTION_EFFECT_QUESTION} <span className={classes.greyedOut}>(Optional)</span>
             </div>
             <div className={classes.radioWrapper}>
               <RadioGroup
@@ -206,7 +207,7 @@ const EAVotingPortalSubmitPage = ({
             />
           </div>
         </div>
-      <VotingPortalFooter
+        <VotingPortalFooter
           leftHref="/voting-portal/allocate-points"
           middleNode={<></>}
           buttonText={"Submit your vote"}
@@ -222,9 +223,13 @@ const EAVotingPortalSubmitPage = ({
   );
 };
 
-const EAVotingPortalSubmitPageComponent = registerComponent("EAVotingPortalSubmitPage", EAVotingPortalSubmitPageLoader, {
-  styles,
-});
+const EAVotingPortalSubmitPageComponent = registerComponent(
+  "EAVotingPortalSubmitPage",
+  EAVotingPortalSubmitPageLoader,
+  {
+    styles,
+  },
+);
 
 declare global {
   interface ComponentTypes {

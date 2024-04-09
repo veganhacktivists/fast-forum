@@ -3,43 +3,34 @@ import type { SearchQuery } from "./SearchQuery";
 import type { SearchResult } from "./SearchResult";
 import { algoliaPrefixSetting } from "../../../lib/publicSettings";
 import { indexNameToConfig } from "./ElasticConfig";
-import {
-  QueryFilter,
-  QueryFilterOperator,
-  SEARCH_ORIGIN_DATE,
-} from "./ElasticQuery";
+import { QueryFilter, QueryFilterOperator, SEARCH_ORIGIN_DATE } from "./ElasticQuery";
 import moment from "moment";
 
 type SanitizedIndexName = {
-  index: string,
-  sorting?: string,
-}
+  index: string;
+  sorting?: string;
+};
 
 type NamedHighlight = {
-  value?: string,
-  matchLevel: "full" | "none",
-}
+  value?: string;
+  matchLevel: "full" | "none";
+};
 
-const extractNamedHighlight = (
-  highlight: ElasticSearchHit["highlight"],
-  name: string,
-): NamedHighlight => {
+const extractNamedHighlight = (highlight: ElasticSearchHit["highlight"], name: string): NamedHighlight => {
   const value = highlight?.[name]?.[0] ?? highlight?.[name + ".exact"]?.[0];
   return {
     value,
     matchLevel: value ? "full" : "none",
   };
-}
+};
 
 class ElasticService {
-  constructor(
-    private client = new ElasticClient(),
-  ) {}
+  constructor(private client = new ElasticClient()) {}
 
-  async runQuery({indexName, params}: SearchQuery): Promise<SearchResult> {
+  async runQuery({ indexName, params }: SearchQuery): Promise<SearchResult> {
     const start = Date.now();
 
-    const {index, sorting} = this.sanitizeIndexName(indexName);
+    const { index, sorting } = this.sanitizeIndexName(indexName);
     const hitsPerPage = params.hitsPerPage ?? 10;
     const page = params.page ?? 0;
     const result = await this.client.search({
@@ -54,9 +45,7 @@ class ElasticService {
       coordinates: this.parseLatLng(params.aroundLatLng),
     });
 
-    const nbHits = typeof result.hits.total === "number"
-      ? result.hits.total
-      : result.hits.total?.value ?? 0;
+    const nbHits = typeof result.hits.total === "number" ? result.hits.total : result.hits.total?.value ?? 0;
 
     const end = Date.now();
     const timeMS = end - start;
@@ -111,11 +100,7 @@ class ElasticService {
     };
   }
 
-  parseFilters(
-    facetFilters?: string[][],
-    numericFilters?: string[],
-    existsFilters?: string[],
-  ): QueryFilter[] {
+  parseFilters(facetFilters?: string[][], numericFilters?: string[], existsFilters?: string[]): QueryFilter[] {
     const result: QueryFilter[] = [];
 
     for (const group of facetFilters ?? []) {
@@ -169,7 +154,7 @@ class ElasticService {
         op,
       });
     }
-    
+
     for (const filter of existsFilters ?? []) {
       result.push({
         type: "exists",
@@ -182,12 +167,12 @@ class ElasticService {
 
   private parseFacetValue(value: string): boolean | string {
     switch (value) {
-    case "true":
-      return true;
-    case "false":
-      return false;
-    default:
-      return value;
+      case "true":
+        return true;
+      case "false":
+        return false;
+      default:
+        return value;
     }
   }
 
@@ -227,7 +212,7 @@ class ElasticService {
   private sanitizeIndexName(indexName: string): SanitizedIndexName {
     const prefix = algoliaPrefixSetting.get();
     if (prefix && indexName.indexOf(prefix) === 0) {
-      indexName = indexName.slice(prefix.length)
+      indexName = indexName.slice(prefix.length);
     }
     const tokens = indexName.split("_");
     indexName = tokens[0];
@@ -240,7 +225,7 @@ class ElasticService {
 
   private getHits(indexName: string, hits: ElasticSearchHit[]): SearchDocument[] {
     const config = indexNameToConfig(indexName);
-    return hits.map(({_id, _source, highlight}) => ({
+    return hits.map(({ _id, _source, highlight }) => ({
       ..._source,
       _id,
       _snippetResult: {

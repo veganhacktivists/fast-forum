@@ -1,22 +1,21 @@
-import { Subscriptions } from './collection';
-import { subscriptionTypes } from './schema'
-import { Utils } from '../../vulcan-lib';
-import Users from '../users/collection';
+import { Subscriptions } from "./collection";
+import { subscriptionTypes } from "./schema";
+import { Utils } from "../../vulcan-lib";
+import Users from "../users/collection";
 
 export const defaultSubscriptionTypeTable = {
-  "Comments": subscriptionTypes.newReplies,
-  "Posts": subscriptionTypes.newComments,
-  "Users": subscriptionTypes.newPosts,
-  "Localgroups": subscriptionTypes.newEvents,
-  "Tags": subscriptionTypes.newTagPosts
+  Comments: subscriptionTypes.newReplies,
+  Posts: subscriptionTypes.newComments,
+  Users: subscriptionTypes.newPosts,
+  Localgroups: subscriptionTypes.newEvents,
+  Tags: subscriptionTypes.newTagPosts,
   // TODO: other subscription types?
-}
+};
 
 export type DefaultSubscriptionType = keyof typeof defaultSubscriptionTypeTable;
 
-export const isDefaultSubscriptionType =
-  (value: string): value is DefaultSubscriptionType =>
-    value in defaultSubscriptionTypeTable;
+export const isDefaultSubscriptionType = (value: string): value is DefaultSubscriptionType =>
+  value in defaultSubscriptionTypeTable;
 
 /**
  * @summary Perform the un/subscription after verification: update the collection item & the user
@@ -26,14 +25,19 @@ export const isDefaultSubscriptionType =
  * @param {Object} user: current user (xxx: legacy, to replace with this.userId)
  * @returns {Boolean}
  */
-export const performSubscriptionAction = async (action:"subscribe"|"unsubscribe", collection: CollectionBase<any>, itemId: string, user: DbUser) => {
-  const collectionName = collection.options.collectionName
+export const performSubscriptionAction = async (
+  action: "subscribe" | "unsubscribe",
+  collection: CollectionBase<any>,
+  itemId: string,
+  user: DbUser,
+) => {
+  const collectionName = collection.options.collectionName;
   const newSubscription: Partial<DbSubscription> = {
-    state: action === "subscribe" ? 'subscribed' : 'suppressed',
+    state: action === "subscribe" ? "subscribed" : "suppressed",
     documentId: itemId,
     collectionName,
-    type: (defaultSubscriptionTypeTable as any)[collectionName]
-  }
+    type: (defaultSubscriptionTypeTable as any)[collectionName],
+  };
   await Utils.createMutator({
     collection: Subscriptions,
     document: newSubscription,
@@ -44,5 +48,5 @@ export const performSubscriptionAction = async (action:"subscribe"|"unsubscribe"
       currentUser: user,
       Users: Users,
     } as any,
-  })
+  });
 };

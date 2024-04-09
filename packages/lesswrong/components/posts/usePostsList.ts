@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useMulti } from "../../lib/crud/withMulti";
 import { useCurrentUser } from "../common/withUser";
-import { sortBy } from 'underscore';
+import { sortBy } from "underscore";
 import { postGetLastCommentedAt } from "../../lib/collections/posts/helpers";
 import { useOnMountTracking } from "../../lib/analyticsEvents";
 import type { PopperPlacementType } from "@material-ui/core/Popper";
@@ -9,59 +9,57 @@ import { isFriendlyUI } from "../../themes/forumTheme";
 
 export type PostsListConfig = {
   /** Child elements will be put in a footer section */
-  children?: React.ReactNode,
+  children?: React.ReactNode;
   /** The search terms used to select the posts that will be shown. */
-  terms?: any,
+  terms?: any;
   /**
    * Apply a style that grays out the list while it's in a loading state
    * (default false)
    */
-  dimWhenLoading?: boolean,
+  dimWhenLoading?: boolean;
   /** Show the loading state at the top of the list in addition to the bottom */
-  topLoading?: boolean,
+  topLoading?: boolean;
   /** Display a loading spinner while loading (default true) */
-  showLoading?: boolean,
+  showLoading?: boolean;
   /**
    * Show a Load More link in the footer if there are potentially more posts
    * (default true)
    */
-  showLoadMore?: boolean,
-  alwaysShowLoadMore?: boolean,
+  showLoadMore?: boolean;
+  alwaysShowLoadMore?: boolean;
   /**
    * Show a placeholder if there are no results (otherwise render only whiteness)
    * (default true)
    */
-  showNoResults?: boolean,
+  showNoResults?: boolean;
   /**
    * If the list ends with N sequential read posts, hide them, except for the
    * first post in the list
    */
-  hideLastUnread?: boolean,
-  showPostedAt?: boolean,
-  enableTotal?: boolean,
-  showNominationCount?: boolean,
-  showReviewCount?: boolean,
-  showDraftTag?: boolean,
-  tagId?: string,
-  dense?: boolean,
-  defaultToShowUnreadComments?: boolean,
-  itemsPerPage?: number,
-  hideAuthor?: boolean,
-  hideTag?: boolean,
-  hideTrailingButtons?: boolean,
-  hideTagRelevance?: boolean,
-  tooltipPlacement?: PopperPlacementType,
-  boxShadow?: boolean
-  curatedIconLeft?: boolean,
-  showFinalBottomBorder?: boolean,
-  hideHiddenFrontPagePosts?: boolean
-  hideShortform?: boolean,
-  loadMoreMessage?: string,
-}
+  hideLastUnread?: boolean;
+  showPostedAt?: boolean;
+  enableTotal?: boolean;
+  showNominationCount?: boolean;
+  showReviewCount?: boolean;
+  showDraftTag?: boolean;
+  tagId?: string;
+  dense?: boolean;
+  defaultToShowUnreadComments?: boolean;
+  itemsPerPage?: number;
+  hideAuthor?: boolean;
+  hideTag?: boolean;
+  hideTrailingButtons?: boolean;
+  hideTagRelevance?: boolean;
+  tooltipPlacement?: PopperPlacementType;
+  boxShadow?: boolean;
+  curatedIconLeft?: boolean;
+  showFinalBottomBorder?: boolean;
+  hideHiddenFrontPagePosts?: boolean;
+  hideShortform?: boolean;
+  loadMoreMessage?: string;
+};
 
-const defaultTooltipPlacement = isFriendlyUI
-  ? "bottom-start"
-  : "bottom-end";
+const defaultTooltipPlacement = isFriendlyUI ? "bottom-start" : "bottom-end";
 
 export const usePostsList = ({
   children,
@@ -86,7 +84,7 @@ export const usePostsList = ({
   hideTag = false,
   hideTrailingButtons = false,
   hideTagRelevance = false,
-  tooltipPlacement=defaultTooltipPlacement,
+  tooltipPlacement = defaultTooltipPlacement,
   boxShadow = true,
   curatedIconLeft = false,
   showFinalBottomBorder = false,
@@ -98,23 +96,23 @@ export const usePostsList = ({
 
   const tagVariables = tagId
     ? {
-      extraVariables: {
-        tagId: "String"
-      },
-      extraVariablesValues: { tagId }
-    }
+        extraVariables: {
+          tagId: "String",
+        },
+        extraVariablesValues: { tagId },
+      }
     : {};
 
-  const {results, loading, error, loadMore, loadMoreProps, limit} = useMulti({
+  const { results, loading, error, loadMore, loadMoreProps, limit } = useMulti({
     terms,
     collectionName: "Posts",
-    fragmentName: !!tagId ? 'PostsListTagWithVotes' : 'PostsListWithVotes',
+    fragmentName: !!tagId ? "PostsListTagWithVotes" : "PostsListWithVotes",
     enableTotal,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
     itemsPerPage,
     alwaysShowLoadMore,
-    ...tagVariables
+    ...tagVariables,
   });
 
   // Map from post._id to whether to hide it. Used for client side post filtering
@@ -170,15 +168,14 @@ export const usePostsList = ({
 
   // We don't actually know if there are more posts here, but if this condition fails
   // to meet we know that there definitely are no more posts
-  const maybeMorePosts = !!(results?.length && (results.length >= limit)) ||
-    alwaysShowLoadMore;
+  const maybeMorePosts = !!(results?.length && results.length >= limit) || alwaysShowLoadMore;
 
   let orderedResults = results;
   if (defaultToShowUnreadComments && results) {
     orderedResults = sortBy(results, (post) => {
-      const postLastCommentedAt = postGetLastCommentedAt(post)
-      return !post.lastVisitedAt || !postLastCommentedAt || (post.lastVisitedAt >= postLastCommentedAt);
-    })
+      const postLastCommentedAt = postGetLastCommentedAt(post);
+      return !post.lastVisitedAt || !postLastCommentedAt || post.lastVisitedAt >= postLastCommentedAt;
+    });
   }
 
   const postIds = (orderedResults || []).map((post) => post._id);
@@ -186,33 +183,33 @@ export const usePostsList = ({
   // Analytics Tracking
   useOnMountTracking({
     eventType: "postList",
-    eventProps: {postIds, postVisibility: hiddenPosts},
+    eventProps: { postIds, postVisibility: hiddenPosts },
     captureOnMount: (eventProps) => eventProps.postIds.length > 0,
     skip: !postIds.length || loading,
   });
 
   const hasResults = orderedResults && orderedResults.length > 1;
 
-  const itemProps = orderedResults?.filter(
-    ({_id}) => !(_id in hiddenPosts),
-  ).map((post, i) => ({
-    post,
-    index: i,
-    terms,
-    showNominationCount,
-    showReviewCount,
-    showDraftTag,
-    dense,
-    hideAuthor,
-    hideTag,
-    hideTrailingButtons,
-    curatedIconLeft: curatedIconLeft,
-    tagRel: (tagId && !hideTagRelevance) ? (post as PostsListTag).tagRel : undefined,
-    defaultToShowUnreadComments, showPostedAt,
-    showBottomBorder: showFinalBottomBorder ||
-      (hasResults && i < (orderedResults!.length - 1)),
-    tooltipPlacement,
-  }));
+  const itemProps = orderedResults
+    ?.filter(({ _id }) => !(_id in hiddenPosts))
+    .map((post, i) => ({
+      post,
+      index: i,
+      terms,
+      showNominationCount,
+      showReviewCount,
+      showDraftTag,
+      dense,
+      hideAuthor,
+      hideTag,
+      hideTrailingButtons,
+      curatedIconLeft: curatedIconLeft,
+      tagRel: tagId && !hideTagRelevance ? (post as PostsListTag).tagRel : undefined,
+      defaultToShowUnreadComments,
+      showPostedAt,
+      showBottomBorder: showFinalBottomBorder || (hasResults && i < orderedResults!.length - 1),
+      tooltipPlacement,
+    }));
 
   const onLoadMore = useCallback(() => {
     loadMore();
@@ -238,4 +235,4 @@ export const usePostsList = ({
     orderedResults,
     itemProps,
   };
-}
+};

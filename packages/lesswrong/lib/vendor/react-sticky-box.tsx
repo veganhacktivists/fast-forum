@@ -59,18 +59,18 @@ if (typeof CSS !== "undefined" && CSS.supports) {
 }
 
 // Inspired by https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md#feature-detection
-let passiveArg: false | {passive: true} = false;
+let passiveArg: false | { passive: true } = false;
 try {
   const opts = Object.defineProperty({}, "passive", {
     // eslint-disable-next-line getter-return
     get() {
-      passiveArg = {passive: true};
+      passiveArg = { passive: true };
     },
   });
   const emptyHandler = () => {};
   window.addEventListener("testPassive", emptyHandler, opts);
   window.removeEventListener("testPassive", emptyHandler, opts);
-// eslint-disable-next-line no-empty
+  // eslint-disable-next-line no-empty
 } catch (e) {}
 
 /*
@@ -101,12 +101,7 @@ onScroll()
 */
 
 type UnsubList = (() => void)[];
-type MeasureFn<T extends object> = (opts: {
-  top: number;
-  left: number;
-  height: number;
-  width: number;
-}) => T;
+type MeasureFn<T extends object> = (opts: { top: number; left: number; height: number; width: number }) => T;
 
 const getDimensions = <T extends object>(opts: {
   el: HTMLElement | Window;
@@ -114,9 +109,9 @@ const getDimensions = <T extends object>(opts: {
   unsubs: UnsubList;
   measure: MeasureFn<T>;
 }): T => {
-  const {el, onChange, unsubs, measure} = opts;
+  const { el, onChange, unsubs, measure } = opts;
   if (el === window) {
-    const getRect = () => ({top: 0, left: 0, height: window.innerHeight, width: window.innerWidth});
+    const getRect = () => ({ top: 0, left: 0, height: window.innerHeight, width: window.innerWidth });
     const mResult = measure(getRect());
     const handler = () => {
       Object.assign(mResult, measure(getRect()));
@@ -143,7 +138,7 @@ const getVerticalPadding = (node: HTMLElement) => {
   const computedParentStyle = getComputedStyle(node, null);
   const parentPaddingTop = parseInt(computedParentStyle.getPropertyValue("padding-top"), 10);
   const parentPaddingBottom = parseInt(computedParentStyle.getPropertyValue("padding-bottom"), 10);
-  return {top: parentPaddingTop, bottom: parentPaddingBottom};
+  return { top: parentPaddingTop, bottom: parentPaddingBottom };
 };
 
 const enum MODES {
@@ -156,7 +151,7 @@ const enum MODES {
 type StickyMode = null | (typeof MODES)[keyof typeof MODES];
 
 const setup = (node: HTMLElement, unsubs: UnsubList, opts: Required<StickyBoxConfig>) => {
-  const {bottom, offsetBottom, offsetTop} = opts;
+  const { bottom, offsetBottom, offsetTop } = opts;
   const scrollPane = getScrollParent(node);
 
   let isScheduled = false;
@@ -171,26 +166,22 @@ const setup = (node: HTMLElement, unsubs: UnsubList, opts: Required<StickyBoxCon
     isScheduled = true;
   };
 
-  let latestScrollY =
-    scrollPane === window ? window.scrollY : (scrollPane as HTMLElement).scrollTop;
+  let latestScrollY = scrollPane === window ? window.scrollY : (scrollPane as HTMLElement).scrollTop;
 
   const isBoxTooLow = (scrollY: number) => {
-    const {offsetTop: scrollPaneOffset, height: viewPortHeight} = scrollPaneDims;
-    const {naturalTop} = parentDims;
-    const {height: nodeHeight} = nodeDims;
+    const { offsetTop: scrollPaneOffset, height: viewPortHeight } = scrollPaneDims;
+    const { naturalTop } = parentDims;
+    const { height: nodeHeight } = nodeDims;
 
-    if (
-      scrollY + scrollPaneOffset + viewPortHeight >=
-      naturalTop + nodeHeight + relativeOffset + offsetBottom
-    ) {
+    if (scrollY + scrollPaneOffset + viewPortHeight >= naturalTop + nodeHeight + relativeOffset + offsetBottom) {
       return true;
     }
     return false;
   };
 
   const onLayout = (): StickyMode => {
-    const {height: viewPortHeight} = scrollPaneDims;
-    const {height: nodeHeight} = nodeDims;
+    const { height: viewPortHeight } = scrollPaneDims;
+    const { height: nodeHeight } = nodeDims;
     if (nodeHeight + offsetTop + offsetBottom <= viewPortHeight) {
       return MODES.small;
     } else {
@@ -207,20 +198,19 @@ const setup = (node: HTMLElement, unsubs: UnsubList, opts: Required<StickyBoxCon
     el: scrollPane,
     onChange: scheduleOnLayout,
     unsubs,
-    measure: ({height, top}) => ({
+    measure: ({ height, top }) => ({
       height,
       offsetTop: scrollPaneIsOffsetEl ? top : 0,
     }),
   });
 
   const parentNode = getParentNode(node);
-  const parentPaddings =
-    parentNode === window ? {top: 0, bottom: 0} : getVerticalPadding(parentNode as HTMLElement);
+  const parentPaddings = parentNode === window ? { top: 0, bottom: 0 } : getVerticalPadding(parentNode as HTMLElement);
   const parentDims = getDimensions({
     el: parentNode,
     onChange: scheduleOnLayout,
     unsubs,
-    measure: ({height}) => ({
+    measure: ({ height }) => ({
       height: height - parentPaddings.top - parentPaddings.bottom,
       naturalTop:
         parentNode === window
@@ -235,7 +225,7 @@ const setup = (node: HTMLElement, unsubs: UnsubList, opts: Required<StickyBoxCon
     el: node,
     onChange: scheduleOnLayout,
     unsubs,
-    measure: ({height}) => ({height}),
+    measure: ({ height }) => ({ height }),
   });
 
   let relativeOffset = 0;
@@ -255,21 +245,15 @@ const setup = (node: HTMLElement, unsubs: UnsubList, opts: Required<StickyBoxCon
       return;
     }
 
-    const {height: viewPortHeight, offsetTop: scrollPaneOffset} = scrollPaneDims;
-    const {height: parentHeight, naturalTop} = parentDims;
-    const {height: nodeHeight} = nodeDims;
+    const { height: viewPortHeight, offsetTop: scrollPaneOffset } = scrollPaneDims;
+    const { height: parentHeight, naturalTop } = parentDims;
+    const { height: nodeHeight } = nodeDims;
     if (newMode === MODES.relative) {
       node.style.position = "relative";
       relativeOffset =
         prevMode === MODES.stickyTop
           ? Math.max(0, scrollPaneOffset + latestScrollY - naturalTop + offsetTop)
-          : Math.max(
-              0,
-              scrollPaneOffset +
-                latestScrollY +
-                viewPortHeight -
-                (naturalTop + nodeHeight + offsetBottom)
-            );
+          : Math.max(0, scrollPaneOffset + latestScrollY + viewPortHeight - (naturalTop + nodeHeight + offsetBottom));
       if (bottom) {
         const nextBottom = Math.max(0, parentHeight - nodeHeight - relativeOffset);
         node.style.bottom = `${nextBottom}px`;
@@ -302,19 +286,16 @@ const setup = (node: HTMLElement, unsubs: UnsubList, opts: Required<StickyBoxCon
     latestScrollY = scrollY;
     if (mode === MODES.small) return;
 
-    const {offsetTop: scrollPaneOffset, height: viewPortHeight} = scrollPaneDims;
-    const {naturalTop, height: parentHeight} = parentDims;
-    const {height: nodeHeight} = nodeDims;
+    const { offsetTop: scrollPaneOffset, height: viewPortHeight } = scrollPaneDims;
+    const { naturalTop, height: parentHeight } = parentDims;
+    const { height: nodeHeight } = nodeDims;
 
     if (scrollDelta > 0) {
       // scroll down
       if (mode === MODES.stickyTop) {
         if (scrollY + scrollPaneOffset + offsetTop > naturalTop) {
           const topOffset = Math.max(0, scrollPaneOffset + latestScrollY - naturalTop + offsetTop);
-          if (
-            scrollY + scrollPaneOffset + viewPortHeight <=
-            naturalTop + nodeHeight + topOffset + offsetBottom
-          ) {
+          if (scrollY + scrollPaneOffset + viewPortHeight <= naturalTop + nodeHeight + topOffset + offsetBottom) {
             changeMode(MODES.relative);
           } else {
             changeMode(MODES.stickyBottom);
@@ -326,16 +307,10 @@ const setup = (node: HTMLElement, unsubs: UnsubList, opts: Required<StickyBoxCon
     } else {
       // scroll up
       if (mode === MODES.stickyBottom) {
-        if (
-          scrollPaneOffset + scrollY + viewPortHeight <
-          naturalTop + parentHeight + offsetBottom
-        ) {
+        if (scrollPaneOffset + scrollY + viewPortHeight < naturalTop + parentHeight + offsetBottom) {
           const bottomOffset = Math.max(
             0,
-            scrollPaneOffset +
-              latestScrollY +
-              viewPortHeight -
-              (naturalTop + nodeHeight + offsetBottom)
+            scrollPaneOffset + latestScrollY + viewPortHeight - (naturalTop + nodeHeight + offsetBottom),
           );
           if (scrollPaneOffset + scrollY + offsetTop >= naturalTop + bottomOffset) {
             changeMode(MODES.relative);
@@ -352,15 +327,13 @@ const setup = (node: HTMLElement, unsubs: UnsubList, opts: Required<StickyBoxCon
   };
 
   const handleScroll =
-    scrollPane === window
-      ? () => onScroll(window.scrollY)
-      : () => onScroll((scrollPane as HTMLElement).scrollTop);
+    scrollPane === window ? () => onScroll(window.scrollY) : () => onScroll((scrollPane as HTMLElement).scrollTop);
 
   scrollPane.addEventListener("scroll", handleScroll, passiveArg);
   scrollPane.addEventListener("mousewheel", handleScroll, passiveArg);
   unsubs.push(
     () => scrollPane.removeEventListener("scroll", handleScroll),
-    () => scrollPane.removeEventListener("mousewheel", handleScroll)
+    () => scrollPane.removeEventListener("mousewheel", handleScroll),
   );
 };
 
@@ -372,16 +345,12 @@ export type StickyBoxConfig = {
 
 export type UseStickyBoxOptions = StickyBoxConfig;
 
-export const useStickyBox = ({
-  offsetTop = 0,
-  offsetBottom = 0,
-  bottom = false,
-}: StickyBoxConfig = {}) => {
+export const useStickyBox = ({ offsetTop = 0, offsetBottom = 0, bottom = false }: StickyBoxConfig = {}) => {
   const [node, setNode] = useState<HTMLElement | null>(null);
   useEffect(() => {
     if (!node || !stickyProp) return;
     const unsubs: UnsubList = [];
-    setup(node, unsubs, {offsetBottom, offsetTop, bottom});
+    setup(node, unsubs, { offsetBottom, offsetTop, bottom });
     return () => {
       unsubs.forEach((fn) => fn());
     };
@@ -390,12 +359,11 @@ export const useStickyBox = ({
   return setNode;
 };
 
-export type StickyBoxCompProps = StickyBoxConfig &
-  Pick<ComponentProps<"div">, "children" | "className" | "style">;
+export type StickyBoxCompProps = StickyBoxConfig & Pick<ComponentProps<"div">, "children" | "className" | "style">;
 
 const StickyBox = (props: StickyBoxCompProps) => {
-  const {offsetTop, offsetBottom, bottom, children, className, style} = props;
-  const ref = useStickyBox({offsetTop, offsetBottom, bottom});
+  const { offsetTop, offsetBottom, bottom, children, className, style } = props;
+  const ref = useStickyBox({ offsetTop, offsetBottom, bottom });
 
   return (
     <div className={className} style={style} ref={ref}>

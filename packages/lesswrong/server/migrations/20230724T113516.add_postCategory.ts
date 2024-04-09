@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-07-19T20:21:58.000Z by 20230719T202158.top_level_comment_count.ts
  * +-- Overall schema hash: edd4ae60c5320ea4aa4d4e87bf92cafe
- *  
+ *
  * @@ -533,3 +531,3 @@ CREATE TABLE "PostRelations" (
- *  
+ *
  * --- Schema for "Posts", hash: dd038517e1407f815e01db8a29b4a854
  * +-- Schema for "Posts", hash: 5bfebdec4ea08ba7e454089afd808c34
  *  CREATE TABLE "Posts" (
@@ -22,7 +22,7 @@
  *      "url" varchar(500),
  * +    "postCategory" text DEFAULT 'post',
  *      "title" varchar(500) NOT NULL,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -36,7 +36,7 @@ export const acceptsSchemaHash = "edd4ae60c5320ea4aa4d4e87bf92cafe";
 import Posts from "../../lib/collections/posts/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Posts, "postCategory");
   // set postCategory to 'post' for all existing posts
   // set postCategory to 'linkpost' if post.url is not null or empty
@@ -49,8 +49,8 @@ export const up = async ({db}: MigrationContext) => {
       ELSE 'post'
     END
   `);
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Posts, "postCategory");
-}
+};

@@ -1,19 +1,21 @@
-import React from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import {AnalyticsContext} from "../../lib/analyticsEvents";
-import { Link } from '../../lib/reactRouterWrapper';
-import { useCurrentUser } from '../common/withUser'
-import type { RecommendationsAlgorithm } from '../../lib/collections/users/recommendationSettings';
+import React from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { AnalyticsContext } from "../../lib/analyticsEvents";
+import { Link } from "../../lib/reactRouterWrapper";
+import { useCurrentUser } from "../common/withUser";
+import type { RecommendationsAlgorithm } from "../../lib/collections/users/recommendationSettings";
 
-const CoronavirusFrontpageWidget = ({settings}: {
-  settings: RecommendationsAlgorithm & { hideCoronavirus?: boolean }
+const CoronavirusFrontpageWidget = ({
+  settings,
+}: {
+  settings: RecommendationsAlgorithm & { hideCoronavirus?: boolean };
 }) => {
-  const { SectionSubtitle, RecommendationsList, LWTooltip, SectionFooter } = Components
+  const { SectionSubtitle, RecommendationsList, LWTooltip, SectionFooter } = Components;
 
   const currentUser = useCurrentUser();
 
   // if (settings.hideReview) return null
-  if (settings.hideCoronavirus) return null
+  if (settings.hideCoronavirus) return null;
 
   const samplingAlgorithm: RecommendationsAlgorithm = {
     method: "sample",
@@ -24,10 +26,10 @@ const CoronavirusFrontpageWidget = ({settings}: {
     personalBlogpostModifier: 0,
     frontpageModifier: 0,
     curatedModifier: 0,
-    coronavirus: true, 
+    coronavirus: true,
     onlyUnread: false,
-    excludeDefaultRecommendations: true
-  }
+    excludeDefaultRecommendations: true,
+  };
 
   return (
     <div>
@@ -39,19 +41,19 @@ const CoronavirusFrontpageWidget = ({settings}: {
       <AnalyticsContext listContext={"coronavirusWidget"} capturePostItemOnMount>
         <RecommendationsList algorithm={samplingAlgorithm} />
       </AnalyticsContext>
-      {!currentUser && <SectionFooter>
-        <Link to={"/tag/coronavirus"}>
-          View All Coronavirus Posts
-        </Link>
-      </SectionFooter>}
+      {!currentUser && (
+        <SectionFooter>
+          <Link to={"/tag/coronavirus"}>View All Coronavirus Posts</Link>
+        </SectionFooter>
+      )}
     </div>
-  )
-}
+  );
+};
 
-const CoronavirusFrontpageWidgetComponent = registerComponent('CoronavirusFrontpageWidget', CoronavirusFrontpageWidget);
+const CoronavirusFrontpageWidgetComponent = registerComponent("CoronavirusFrontpageWidget", CoronavirusFrontpageWidget);
 
 declare global {
   interface ComponentTypes {
-    CoronavirusFrontpageWidget: typeof CoronavirusFrontpageWidgetComponent
+    CoronavirusFrontpageWidget: typeof CoronavirusFrontpageWidgetComponent;
   }
 }

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
-import { POST_PREVIEW_WIDTH } from './helpers';
+import React from "react";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
+import { POST_PREVIEW_WIDTH } from "./helpers";
 
 export const notificationLoadingStyles = (theme: ThemeType): JssStyles => ({
   width: POST_PREVIEW_WIDTH,
@@ -18,23 +18,19 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const PostsPreviewLoading = ({classes}: {classes: ClassesType}) => {
-  const {Loading} = Components;
+const PostsPreviewLoading = ({ classes }: { classes: ClassesType }) => {
+  const { Loading } = Components;
   return (
     <div className={classes.loading}>
-      <Loading/>
+      <Loading />
     </div>
   );
-}
+};
 
-const PostsPreviewLoadingComponent = registerComponent(
-  'PostsPreviewLoading',
-  PostsPreviewLoading,
-  {styles},
-);
+const PostsPreviewLoadingComponent = registerComponent("PostsPreviewLoading", PostsPreviewLoading, { styles });
 
 declare global {
   interface ComponentTypes {
-    PostsPreviewLoading: typeof PostsPreviewLoadingComponent
+    PostsPreviewLoading: typeof PostsPreviewLoadingComponent;
   }
 }

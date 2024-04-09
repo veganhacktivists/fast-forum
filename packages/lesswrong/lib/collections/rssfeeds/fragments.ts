@@ -1,4 +1,4 @@
-import { registerFragment } from '../../vulcan-lib/fragments';
+import { registerFragment } from "../../vulcan-lib/fragments";
 
 registerFragment(`
   fragment RSSFeedMinimumInfo on RSSFeed {
@@ -29,8 +29,6 @@ registerFragment(`
     importAsDraft
   }
 `);
-
-
 
 registerFragment(`
   fragment RSSFeedMutationFragment on RSSFeed {

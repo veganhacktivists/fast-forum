@@ -33,24 +33,22 @@ const styles = (theme: ThemeType) => ({
     color: theme.palette.primary.main,
     fontFamily: theme.typography.fontFamily,
     fontSize: 16,
-    lineHeight: '22px',
+    lineHeight: "22px",
   },
 });
 
-const EditElectionCandidate = ({classes}: {
-  classes: ClassesType,
-}) => {
-  const {flash} = useMessages();
+const EditElectionCandidate = ({ classes }: { classes: ClassesType }) => {
+  const { flash } = useMessages();
   const navigate = useNavigate();
-  const {openDialog} = useDialog();
-  const {params} = useLocation();
+  const { openDialog } = useDialog();
+  const { params } = useLocation();
   const candidateId = params.id;
   const isNewForm = candidateId === "new";
   const fragment = getFragment("ElectionCandidateBasicInfo");
 
   const successCallback = useCallback(() => {
     flash("Success");
-    navigate({pathname: "/admin/election-candidates"});
+    navigate({ pathname: "/admin/election-candidates" });
   }, [flash, navigate]);
 
   const deleteCallback = useCallback(() => {
@@ -66,18 +64,14 @@ const EditElectionCandidate = ({classes}: {
 
   const currentUser = useCurrentUser();
   if (!userIsAdmin(currentUser)) {
-    const {Error404} = Components;
-    return (
-      <Error404 />
-    );
+    const { Error404 } = Components;
+    return <Error404 />;
   }
 
-  const {SectionTitle, WrappedSmartForm, EAButton} = Components;
+  const { SectionTitle, WrappedSmartForm, EAButton } = Components;
   return (
     <div className={classes.root}>
-      <SectionTitle
-        title={`${isNewForm ? "New" : "Edit"} election candidate`}
-      />
+      <SectionTitle title={`${isNewForm ? "New" : "Edit"} election candidate`} />
       <WrappedSmartForm
         key={candidateId}
         collectionName="ElectionCandidates"
@@ -86,11 +80,11 @@ const EditElectionCandidate = ({classes}: {
         mutationFragment={fragment}
         successCallback={successCallback}
       />
-      {!isNewForm &&
+      {!isNewForm && (
         <EAButton onClick={deleteCallback} variant="outlined">
           Delete
         </EAButton>
-      }
+      )}
       <div>
         <Link to="/admin/election-candidates" className={classes.link}>
           Back to election candidates
@@ -98,13 +92,9 @@ const EditElectionCandidate = ({classes}: {
       </div>
     </div>
   );
-}
+};
 
-const EditElectionCandidateComponent = registerComponent(
-  "EditElectionCandidate",
-  EditElectionCandidate,
-  {styles},
-);
+const EditElectionCandidateComponent = registerComponent("EditElectionCandidate", EditElectionCandidate, { styles });
 
 declare global {
   interface ComponentTypes {

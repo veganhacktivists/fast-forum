@@ -1,5 +1,3 @@
-const testComment = require('./testComment');
+const testComment = require("./testComment");
 
-module.exports = [
-  testComment,
-];
+module.exports = [testComment];

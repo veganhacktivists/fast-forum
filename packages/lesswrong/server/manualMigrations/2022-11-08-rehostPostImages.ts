@@ -15,14 +15,16 @@ registerMigration({
       callback: async (posts) => {
         const uploadCounts = await Promise.all(
           // To save cloudinary credits, only convert google docs images since those are the only ones with known problems
-          posts.map(post => convertImagesInObject("Posts", post._id, "contents", url => url.includes("googleusercontent")))
+          posts.map((post) =>
+            convertImagesInObject("Posts", post._id, "contents", (url) => url.includes("googleusercontent")),
+          ),
         );
         postCount += posts.length;
         uploadCount += uploadCounts.reduce((a, b) => a + b, 0);
 
         // eslint-disable-next-line no-console
         console.log(`Converted ${uploadCount} images in ${postCount} posts`);
-      }
+      },
     });
   },
 });

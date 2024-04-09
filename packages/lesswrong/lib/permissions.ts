@@ -1,4 +1,4 @@
-import { createGroup } from './vulcan-users/permissions';
+import { createGroup } from "./vulcan-users/permissions";
 
 export const sunshineRegimentGroup = createGroup("sunshineRegiment");
 export const podcasters = createGroup("podcasters");
@@ -21,18 +21,18 @@ export const realAdminsGroup = createGroup("realAdmins");
 // This is referenced by the schema so you must run `yarn generate` after
 // updating it
 export const permissionGroups = [
-  'guests',
-  'members',
-  'admins',
-  'sunshineRegiment',
-  'alignmentForumAdmins',
-  'alignmentForum',
-  'alignmentVoters',
-  'podcasters',
-  'canBypassPostRateLimit',
-  'trustLevel1',
-  'canModeratePersonal',
-  'canSuggestCuration',
-  'debaters',
-  'realAdmins',
+  "guests",
+  "members",
+  "admins",
+  "sunshineRegiment",
+  "alignmentForumAdmins",
+  "alignmentForum",
+  "alignmentVoters",
+  "podcasters",
+  "canBypassPostRateLimit",
+  "trustLevel1",
+  "canModeratePersonal",
+  "canSuggestCuration",
+  "debaters",
+  "realAdmins",
 ] as const;

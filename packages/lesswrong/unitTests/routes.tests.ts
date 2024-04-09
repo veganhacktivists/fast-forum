@@ -1,4 +1,4 @@
-import { Routes } from '../lib/vulcan-lib/routes';
+import { Routes } from "../lib/vulcan-lib/routes";
 
 describe("routes table", () => {
   it("doesn't have enableResourcePrefetch on routes with URL parameters or redirect", () => {
@@ -8,8 +8,8 @@ describe("routes table", () => {
         if (route.redirect) {
           throw new Error(`Route ${route.name} has enableResourcePrefetch set but is a server-side redirect`);
         }
-        if (route.path.indexOf(':')>=0) {
-          throw new Error(`Route ${route.name} has enableResourcePrefetch set but has a URL parameter.`); 
+        if (route.path.indexOf(":") >= 0) {
+          throw new Error(`Route ${route.name} has enableResourcePrefetch set but has a URL parameter.`);
         }
       }
     }

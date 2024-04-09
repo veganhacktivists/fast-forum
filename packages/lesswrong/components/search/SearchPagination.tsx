@@ -1,73 +1,78 @@
-import React from 'react';
-import { registerComponent } from '../../lib/vulcan-lib';
-import { Pagination } from 'react-instantsearch-dom';
+import React from "react";
+import { registerComponent } from "../../lib/vulcan-lib";
+import { Pagination } from "react-instantsearch-dom";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     fontFamily: theme.typography.fontFamily,
     ...theme.typography.smallCaps,
-    '& .ais-Pagination': {
-      width: 'auto',
-      display: 'inline-block',
-      padding: '8px 0px',
+    "& .ais-Pagination": {
+      width: "auto",
+      display: "inline-block",
+      padding: "8px 0px",
       boxShadow: "none",
       border: "none",
     },
-    '& .ais-Pagination-link:focus': {
+    "& .ais-Pagination-link:focus": {
       // Disable focused-link greying because it looks too much like a greyed
       // out link in this context
       opacity: "initial",
     },
-    '& .ais-Pagination-item': {
+    "& .ais-Pagination-item": {
       marginLeft: 10,
     },
-    '& .ais-Pagination-item--disabled': {
+    "& .ais-Pagination-item--disabled": {
       opacity: 0.5,
     },
-    '& .ais-Pagination-item--selected': {
+    "& .ais-Pagination-item--selected": {
       color: "inherit",
-      background: "inherit"
+      background: "inherit",
     },
-    '& .ais-Pagination-item:hover': {
+    "& .ais-Pagination-item:hover": {
       background: "transparent",
-      '& .ais-Pagination-link': {
+      "& .ais-Pagination-link": {
         color: theme.palette.text.normal,
-      }
+      },
     },
-    '& .ais-Pagination-item--nextPage .ais-Pagination-link':{
-      fontSize:0,
-      '&:before': {
+    "& .ais-Pagination-item--nextPage .ais-Pagination-link": {
+      fontSize: 0,
+      "&:before": {
         fontSize: theme.typography.body2.fontSize,
-        content: '"Next"'
-      }
+        content: '"Next"',
+      },
     },
-    '& .ais-Pagination-item--previousPage .ais-Pagination-link':{
-      fontSize:0,
-      '&:before': {
+    "& .ais-Pagination-item--previousPage .ais-Pagination-link": {
+      fontSize: 0,
+      "&:before": {
         fontSize: theme.typography.body2.fontSize,
-        content: '"Prev"'
-      }
+        content: '"Prev"',
+      },
     },
-    '& .ais-Pagination-link--selected': {
+    "& .ais-Pagination-link--selected": {
       cursor: "initial",
     },
-  }
-})
-const SearchPagination = ({classes, pagesPadding=0, showFirst=false}: {
-  classes: ClassesType,
-  pagesPadding?: number,
-  showFirst?: boolean,
+  },
+});
+const SearchPagination = ({
+  classes,
+  pagesPadding = 0,
+  showFirst = false,
+}: {
+  classes: ClassesType;
+  pagesPadding?: number;
+  showFirst?: boolean;
 }) => {
-  return <div className={classes.root}>
-    <Pagination padding={pagesPadding} showFirst={showFirst}/>
-  </div>
-}
+  return (
+    <div className={classes.root}>
+      <Pagination padding={pagesPadding} showFirst={showFirst} />
+    </div>
+  );
+};
 
-const SearchPaginationComponent = registerComponent("SearchPagination", SearchPagination, {styles});
+const SearchPaginationComponent = registerComponent("SearchPagination", SearchPagination, { styles });
 
 declare global {
   interface ComponentTypes {
-    SearchPagination: typeof SearchPaginationComponent
+    SearchPagination: typeof SearchPaginationComponent;
   }
 }
-

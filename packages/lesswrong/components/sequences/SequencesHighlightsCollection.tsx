@@ -1,15 +1,17 @@
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import React from 'react';
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import React from "react";
 
 const SequencesHighlightsCollection = () => {
-  return <Components.CollectionsPage documentId={'62bf5f5dc581cd211cc67d49'} />
+  return <Components.CollectionsPage documentId={"62bf5f5dc581cd211cc67d49"} />;
 };
 
-const SequencesHighlightsCollectionComponent = registerComponent('SequencesHighlightsCollection', SequencesHighlightsCollection);
+const SequencesHighlightsCollectionComponent = registerComponent(
+  "SequencesHighlightsCollection",
+  SequencesHighlightsCollection,
+);
 
 declare global {
   interface ComponentTypes {
-    SequencesHighlightsCollection: typeof SequencesHighlightsCollectionComponent
+    SequencesHighlightsCollection: typeof SequencesHighlightsCollectionComponent;
   }
 }
-

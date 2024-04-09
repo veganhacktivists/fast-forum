@@ -1,18 +1,18 @@
-import { arrayOfForeignKeysField } from '../../utils/schemaUtils';
+import { arrayOfForeignKeysField } from "../../utils/schemaUtils";
 
 const schema: SchemaType<"ClientIds"> = {
   clientId: {
     type: String,
-    canRead: ['sunshineRegiment','admins'],
+    canRead: ["sunshineRegiment", "admins"],
   },
   firstSeenReferrer: {
     type: String,
     nullable: true,
-    canRead: ['sunshineRegiment','admins'],
+    canRead: ["sunshineRegiment", "admins"],
   },
   firstSeenLandingPage: {
     type: String,
-    canRead: ['sunshineRegiment','admins'],
+    canRead: ["sunshineRegiment", "admins"],
   },
   userIds: {
     ...arrayOfForeignKeysField({
@@ -22,12 +22,12 @@ const schema: SchemaType<"ClientIds"> = {
       type: "User",
     }),
     nullable: true,
-    canRead: ['sunshineRegiment','admins'],
+    canRead: ["sunshineRegiment", "admins"],
   },
-  'userIds.$': {
+  "userIds.$": {
     type: String,
     optional: true,
   },
-}
+};
 
 export default schema;

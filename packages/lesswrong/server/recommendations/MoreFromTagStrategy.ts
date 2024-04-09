@@ -14,16 +14,14 @@ import { getSqlClientOrThrow } from "../../lib/sql/sqlClient";
  * more reliable fallback strategy.
  */
 class MoreFromTagStrategy extends RecommendationStrategy {
-  constructor(
-    private minTagPostCount = 10,
-  ) {
+  constructor(private minTagPostCount = 10) {
     super();
   }
 
   async recommend(
-    currentUser: DbUser|null,
+    currentUser: DbUser | null,
     count: number,
-    {postId}: StrategySpecification,
+    { postId }: StrategySpecification,
   ): Promise<RecommendationResult> {
     const tag = await this.chooseTagForPost(postId);
     if (!tag) {
@@ -34,14 +32,15 @@ class MoreFromTagStrategy extends RecommendationStrategy {
       count,
       postId,
       `("p"."tagRelevance"->$(tagId))::INTEGER >= 1`,
-      {tagId: tag._id},
+      { tagId: tag._id },
     );
-    return {posts, settings: {postId}};
-  };
+    return { posts, settings: { postId } };
+  }
 
-  private async chooseTagForPost(postId: string): Promise<{_id: string} | null> {
+  private async chooseTagForPost(postId: string): Promise<{ _id: string } | null> {
     const db = getSqlClientOrThrow();
-    return db.oneOrNone(`
+    return db.oneOrNone(
+      `
       SELECT t."_id" FROM "Tags" t
       JOIN "Posts" p ON p."_id" = $1
       WHERE
@@ -49,7 +48,9 @@ class MoreFromTagStrategy extends RecommendationStrategy {
         t."postCount" >= $2
       ORDER BY p."tagRelevance"->t."_id" DESC, t."postCount" ASC
       LIMIT 1
-    `, [postId, this.minTagPostCount]);
+    `,
+      [postId, this.minTagPostCount],
+    );
   }
 }
 

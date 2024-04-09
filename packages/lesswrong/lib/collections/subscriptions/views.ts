@@ -1,27 +1,26 @@
-import { Subscriptions } from "./collection"
-import { ensureIndex } from '../../collectionIndexUtils';
+import { Subscriptions } from "./collection";
+import { ensureIndex } from "../../collectionIndexUtils";
 
 declare global {
   interface SubscriptionsViewTerms extends ViewTermsBase {
-    view?: SubscriptionsViewName
-    userId?: string
-    collectionName?: string
-    subscriptionType?: string
-    documentId?: string
-    type?: string
+    view?: SubscriptionsViewName;
+    userId?: string;
+    collectionName?: string;
+    subscriptionType?: string;
+    documentId?: string;
+    type?: string;
   }
 }
 
-
 //Messages for a specific conversation
 Subscriptions.addView("subscriptionState", function (terms: SubscriptionsViewTerms) {
-  const { userId, documentId, collectionName, type} = terms
+  const { userId, documentId, collectionName, type } = terms;
   return {
-    selector: {userId, documentId, collectionName, type, deleted: false},
-    options: {sort: {createdAt: -1}, limit: 1}
+    selector: { userId, documentId, collectionName, type, deleted: false },
+    options: { sort: { createdAt: -1 }, limit: 1 },
   };
 });
-ensureIndex(Subscriptions, {userId: 1, documentId: 1, collectionName: 1, type: 1, createdAt: 1});
+ensureIndex(Subscriptions, { userId: 1, documentId: 1, collectionName: 1, type: 1, createdAt: 1 });
 
 Subscriptions.addView("subscriptionsOfType", function (terms: SubscriptionsViewTerms) {
   return {
@@ -32,6 +31,6 @@ Subscriptions.addView("subscriptionsOfType", function (terms: SubscriptionsViewT
       deleted: false,
       state: "subscribed",
     },
-    options: {sort: {createdAt: -1}}
+    options: { sort: { createdAt: -1 } },
   };
 });

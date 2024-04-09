@@ -23,28 +23,29 @@ declare global {
   type Repos = ReturnType<typeof getAllRepos>;
 }
 
-const getAllRepos = () => ({
-  collections: new CollectionsRepo(),
-  comments: new CommentsRepo(),
-  conversations: new ConversationsRepo(),
-  databaseMetadata: new DatabaseMetadataRepo(),
-  debouncerEvents: new DebouncerEventsRepo(),
-  dialogueChecks: new DialogueChecksRepo(),
-  electionCandidates: new ElectionCandidatesRepo(),
-  electionVotes: new ElectionVotesRepo(),
-  localgroups: new LocalgroupsRepo(),
-  pageCaches: new PageCacheRepo(),
-  PostEmbeddingsRepo: new PostEmbeddingsRepo(),
-  postRecommendations: new PostRecommendationsRepo(),
-  postRelations: new PostRelationsRepo(),
-  posts: new PostsRepo(),
-  readStatuses: new ReadStatusesRepo(),
-  sequences: new SequencesRepo(),
-  tags: new TagsRepo(),
-  typingIndicators: new TypingIndicatorsRepo(),
-  users: new UsersRepo(),
-  votes: new VotesRepo(),
-} as const);
+const getAllRepos = () =>
+  ({
+    collections: new CollectionsRepo(),
+    comments: new CommentsRepo(),
+    conversations: new ConversationsRepo(),
+    databaseMetadata: new DatabaseMetadataRepo(),
+    debouncerEvents: new DebouncerEventsRepo(),
+    dialogueChecks: new DialogueChecksRepo(),
+    electionCandidates: new ElectionCandidatesRepo(),
+    electionVotes: new ElectionVotesRepo(),
+    localgroups: new LocalgroupsRepo(),
+    pageCaches: new PageCacheRepo(),
+    PostEmbeddingsRepo: new PostEmbeddingsRepo(),
+    postRecommendations: new PostRecommendationsRepo(),
+    postRelations: new PostRelationsRepo(),
+    posts: new PostsRepo(),
+    readStatuses: new ReadStatusesRepo(),
+    sequences: new SequencesRepo(),
+    tags: new TagsRepo(),
+    typingIndicators: new TypingIndicatorsRepo(),
+    users: new UsersRepo(),
+    votes: new VotesRepo(),
+  }) as const;
 
 export {
   CollectionsRepo,
