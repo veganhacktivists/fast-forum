@@ -114,8 +114,8 @@ Vulcan.postgresImport = async () => {
   // Merge data
   commentData = deepObjectExtend(commentData, commentMetaData);
   // Convert to LW2 comment format [Does not yet include parentCommentIds and topLevelCommentIds]
-  // @ts-ignore
   commentData = await Promise.all(
+    // @ts-expect-error
     mapValues(commentData, (comment, id) =>
       legacyCommentToNewComment(
         comment,

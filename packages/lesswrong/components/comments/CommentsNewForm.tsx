@@ -354,10 +354,10 @@ const CommentsNewForm = ({
     }
   }, [userNextAbleToComment, formDisabledDueToRateLimit]);
 
-  // @ts-ignore FIXME: Not enforcing that the post-author fragment has enough fields for userIsAllowedToComment
   if (
     currentUser &&
     !userCanDo(currentUser, `posts.moderate.all`) &&
+    // @ts-expect-error FIXME: Not enforcing that the post-author fragment has enough fields for userIsAllowedToComment
     !userIsAllowedToComment(currentUser, prefilledProps, post?.user, !!parentComment)
   ) {
     return <span>Sorry, you do not have permission to comment at this time.</span>;

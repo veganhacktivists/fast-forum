@@ -269,7 +269,7 @@ const WrappedAd = ({ classes }: { classes: ClassesType<typeof styles> }) => {
 
   const { CloudinaryImage2 } = Components;
 
-  return <AnalyticsContext pageSubSectionContext="wrappedAd"></AnalyticsContext>;
+  return <AnalyticsContext pageSubSectionContext="wrappedAd" />;
 };
 
 /**

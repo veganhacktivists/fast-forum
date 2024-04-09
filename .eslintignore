@@ -5,3 +5,5 @@ packages/webapp
 packages/lesswrong/platform/webpack
 packages/lesswrong/lib/generated
 scripts
+public/lesswrong-editor
+!public/lesswrong-editor/src

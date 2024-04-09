@@ -75,8 +75,8 @@ const SearchAutoComplete = ({
   return (
     <InstantSearch indexName={indexName} searchClient={getSearchClient()}>
       <div className={classes.autoComplete}>
-        {/* @ts-ignore */}
         <AutocompleteTextbox
+          // @ts-expect-error
           onSuggestionSelected={onSuggestionSelected}
           placeholder={placeholder}
           renderSuggestion={renderSuggestion}
@@ -98,10 +98,13 @@ const AutocompleteTextbox = connectAutoComplete(
     // Extra props that DefinitelyTyped didn't annotate, but which we do pass
     // (in the usage in SearchAutoComplete above). We could maybe eliminate the
     // need for this ts-ignore by merging the functions.
-    // @ts-ignore
+    // @ts-expect-error
     onSuggestionSelected,
+    // @ts-expect-error
     placeholder,
+    // @ts-expect-error
     renderSuggestion,
+    // @ts-expect-error
     renderInputComponent,
   }) => {
     return (

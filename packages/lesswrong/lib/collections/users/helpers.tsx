@@ -201,7 +201,7 @@ export const userIsBannedFromAllPosts = (
     // @ts-ignore FIXME: Not enforcing that the fragment includes bannedUserIds
     (
       postAuthor?.bannedUserIds?.includes(user._id) &&
-      // @ts-ignore FIXME: Not enforcing that the fragment includes user.groups
+      // @ts-expect-error FIXME: Not enforcing that the fragment includes user.groups
       userCanDo(postAuthor, "posts.moderate.own") &&
       postAuthor &&
       userOwns(postAuthor, post)
@@ -215,14 +215,11 @@ export const userIsBannedFromAllPersonalPosts = (
   postAuthor: PostsAuthors_user | DbUser | null,
 ): boolean => {
   return !!(
-    // @ts-ignore FIXME: Not enforcing that the fragment includes bannedUserIds
-    (
-      postAuthor?.bannedPersonalUserIds?.includes(user._id) &&
-      // @ts-ignore FIXME: Not enforcing that the fragment includes user.groups
-      userCanDo(postAuthor, "posts.moderate.own.personal") &&
-      postAuthor &&
-      userOwns(postAuthor, post)
-    )
+    (postAuthor as DbUser)?.bannedPersonalUserIds?.includes(user._id) &&
+    // @ts-expect-error FIXME: Not enforcing that the fragment includes user.groups
+    userCanDo(postAuthor, "posts.moderate.own.personal") &&
+    postAuthor &&
+    userOwns(postAuthor, post)
   );
 };
 
