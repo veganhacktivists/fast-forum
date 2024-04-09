@@ -74,7 +74,7 @@ class ElasticExporter {
       if (targetName === indexName) {
         continue;
       }
-      // eslint-disable-next-line
+      // eslint-disable-next-line no-console
       console.log("Deleting orphaned elastic index:", indexName);
       await client.indices.delete({
         index: indexName,

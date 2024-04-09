@@ -457,7 +457,7 @@ getCollectionHooks("TagRels").newAsync.add(async function TaggedPostNewNotificat
 async function getEmailFromRsvp({email, userId}: RSVPType): Promise<string | undefined> {
   if (email) {
     // Email is free text
-    // eslint-disable-next-line
+    // eslint-disable-next-line no-useless-escape
     const matches = email.match(/(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/)
     const foundEmail = matches?.[0]
     if (foundEmail) {

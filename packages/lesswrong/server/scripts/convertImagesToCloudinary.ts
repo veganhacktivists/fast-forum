@@ -341,12 +341,12 @@ export const rehostPostMetaImages = async (post: DbPost) => {
     try {
       newUrl = await moveImageToCloudinary(currentUrl, post._id);
     } catch (e) {
-      // eslint-disable-next-line
+      // eslint-disable-next-line no-console
       console.error(`Failed to move image for ${post._id}:`, field, `(error ${e})`);
       continue;
     }
     if (!newUrl) {
-      // eslint-disable-next-line
+      // eslint-disable-next-line no-console
       console.error(`Failed to move image for ${post._id}:`, field);
       continue;
     }

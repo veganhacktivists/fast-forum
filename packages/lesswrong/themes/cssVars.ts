@@ -46,7 +46,7 @@ export const requestedCssVarsToString = (theme: MuiThemeType & ThemeType, select
     if (value) {
       vars.push(`${keyToVar(key)}: ${value};`);
     } else {
-      // eslint-disable-next-line
+      // eslint-disable-next-line no-console
       console.warn("Warning: Invalid theme key:", key);
     }
   }
