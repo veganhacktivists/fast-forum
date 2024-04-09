@@ -193,12 +193,7 @@ will likely have to add tracking manually with a captureEvent call. (Search code
 The best way to ensure you are tracking correctly with is to look at the logs
 in the client or server (ensure getShowAnalyticsDebug is returning true).
 */
-export const AnalyticsContext = ({
-  children,
-  ...props
-}: AnalyticsProps & {
-  children: ReactNode;
-}) => {
+export const AnalyticsContext = ({ children, ...props }: React.PropsWithChildren<AnalyticsProps>) => {
   const existingContextData = useContext(ReactTrackingContext);
 
   // Create a child context, which is the parent context plus the provided props
