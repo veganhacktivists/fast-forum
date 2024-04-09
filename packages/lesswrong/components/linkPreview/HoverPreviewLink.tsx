@@ -91,7 +91,8 @@ const HoverPreviewLink = ({
     const linkTargetAbsolute = new URLClass(href, currentURL);
 
     const onsiteUrl = linkTargetAbsolute.pathname + linkTargetAbsolute.search + linkTargetAbsolute.hash;
-    const hostType = classifyHost(linkTargetAbsolute.host);
+    const hostType = classifyHost(linkTargetAbsolute);
+
     if (!linkIsExcludedFromPreview(onsiteUrl) && (hostType === "onsite" || hostType === "mirrorOfUs" || isServer)) {
       const parsedUrl = parseRouteWithErrors(onsiteUrl, contentSourceDescription);
       const destinationUrl = hostType === "onsite" ? parsedUrl.url : href;
@@ -180,7 +181,7 @@ const HoverPreviewLink = ({
         );
       }
       return (
-        <Components.DefaultPreview href={href} id={id} rel={rel}>
+        <Components.DefaultPreview target="_blank" href={href} id={id} rel={rel}>
           {children}
         </Components.DefaultPreview>
       );

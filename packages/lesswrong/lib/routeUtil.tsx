@@ -155,8 +155,18 @@ const forumDomainWhitelist: ForumOptions<DomainList> = {
 
 const domainWhitelist: DomainList = forumSelect(forumDomainWhitelist);
 
-export const classifyHost = (host: string): "onsite" | "offsite" | "mirrorOfUs" => {
+export const classifyHost = (urlOrHost: string | URL): "onsite" | "offsite" | "mirrorOfUs" => {
   let urlType: "onsite" | "offsite" | "mirrorOfUs" = "offsite";
+
+  if (urlOrHost instanceof URL) {
+    const url = urlOrHost;
+    if (url.host === new URL(window.location.toString()).host) {
+      return "onsite";
+    }
+    return "offsite";
+  }
+
+  const host = urlOrHost;
 
   // Returns true if two domains are either the same, or differ only by addition or removal of a "www."
   function isSameDomainModuloWWW(a: string, b: string) {

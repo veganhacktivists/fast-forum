@@ -503,8 +503,9 @@ const DefaultPreview = ({
   href,
   onsite = false,
   id,
-  rel,
+  rel: _rel,
   children,
+  target,
 }: {
   classes: ClassesType;
   href: string;
@@ -512,6 +513,7 @@ const DefaultPreview = ({
   id?: string;
   rel?: string;
   children: ReactNode;
+  target?: "_blank";
 }) => {
   const { LWPopper } = Components;
   const { eventHandlers, hover, anchorEl } = useHover({
@@ -520,6 +522,9 @@ const DefaultPreview = ({
     href,
     onsite,
   });
+
+  const rel = _rel ?? (target ? "noreferrer" : _rel);
+
   return (
     <span {...eventHandlers}>
       <LWPopper open={hover} anchorEl={anchorEl} placement="bottom-start" clickable={false}>
@@ -529,12 +534,12 @@ const DefaultPreview = ({
       </LWPopper>
 
       {onsite ? (
-        <Link to={href} id={id} rel={rel}>
+        <Link target={target} to={href} id={id} rel={rel}>
           {children}
         </Link>
       ) : (
         <Components.AnalyticsTracker eventType="link" eventProps={{ to: href }}>
-          <a href={href} id={id} rel={rel}>
+          <a target={target} href={href} id={id} rel={rel}>
             {children}
           </a>
         </Components.AnalyticsTracker>
@@ -622,7 +627,7 @@ const MozillaHubPreview = ({
   const { anchorEl, hover, eventHandlers } = useHover();
   if (loading || !data)
     return (
-      <a href={href}>
+      <a target="_blank" rel="noreferrer" href={href}>
         <span>{children}</span>
       </a>
     );
@@ -630,7 +635,7 @@ const MozillaHubPreview = ({
   return (
     <AnalyticsTracker eventType="link" eventProps={{ to: href }}>
       <span {...eventHandlers}>
-        <a href={data.url} id={id}>
+        <a target="_blank" rel="noreferrer" href={data.url} id={id}>
           <span>{children}</span>
           <span className={classes.users}>
             (<SupervisorAccountIcon className={classes.icon} />
@@ -688,13 +693,17 @@ const OWIDPreview = ({
   const [match] = href.match(/^http(?:s?):\/\/ourworldindata\.org\/grapher\/.*/) || [];
 
   if (!match) {
-    return <a href={href}>{children}</a>;
+    return (
+      <a target="_blank" rel="noreferrer" href={href}>
+        {children}
+      </a>
+    );
   }
 
   return (
     <AnalyticsTracker eventType="link" eventProps={{ to: href }}>
       <span {...eventHandlers}>
-        <a className={classes.link} href={href} id={id}>
+        <a target="_blank" rel="noreferrer" className={classes.link} href={href} id={id}>
           {children}
         </a>
 
@@ -744,13 +753,17 @@ const MetaculusPreview = ({
     href.match(/^http(?:s?):\/\/(www\.)?metaculus\.com\/questions\/([a-zA-Z0-9]{1,6})?/) || [];
 
   if (!questionNumber) {
-    return <a href={href}>{children}</a>;
+    return (
+      <a target="_blank" rel="noreferrer" href={href}>
+        {children}
+      </a>
+    );
   }
 
   return (
     <AnalyticsTracker eventType="link" eventProps={{ to: href }}>
       <span {...eventHandlers}>
-        <a className={classes.link} href={href} id={id}>
+        <a target="_blank" rel="noreferrer" className={classes.link} href={href} id={id}>
           {children}
         </a>
 
@@ -802,7 +815,11 @@ const ManifoldPreview = ({
   const [, userAndSlug] = href.match(/^https?:\/\/manifold\.markets\/(\w+\/[\w-]+)/) || [];
 
   if (!isEmbed && !userAndSlug) {
-    return <a href={href}>{children}</a>;
+    return (
+      <a target="_blank" rel="noreferrer" href={href}>
+        {children}
+      </a>
+    );
   }
 
   const url = isEmbed ? href : `https://manifold.markets/embed/${userAndSlug}`;
@@ -810,7 +827,7 @@ const ManifoldPreview = ({
   return (
     <AnalyticsTracker eventType="link" eventProps={{ to: href }}>
       <span {...eventHandlers}>
-        <a className={classes.link} href={href} id={id}>
+        <a target="_blank" rel="noreferrer" className={classes.link} href={href} id={id}>
           {children}
         </a>
 
@@ -855,7 +872,11 @@ const MetaforecastPreview = ({
   const [, questionId] = href.match(/^https?:\/\/metaforecast\.org\/questions\/([\w-]+)/) || [];
 
   if (!isEmbed && !questionId) {
-    return <a href={href}>{children}</a>;
+    return (
+      <a target="_blank" rel="noreferrer" href={href}>
+        {children}
+      </a>
+    );
   }
 
   const url = isEmbed ? href : `https://metaforecast.org/questions/embed/${questionId}`;
@@ -863,7 +884,7 @@ const MetaforecastPreview = ({
   return (
     <AnalyticsTracker eventType="link" eventProps={{ to: href }}>
       <span {...eventHandlers}>
-        <a className={classes.link} href={href} id={id}>
+        <a target="_blank" rel="noreferrer" className={classes.link} href={href} id={id}>
           {children}
         </a>
 
@@ -974,7 +995,7 @@ const ArbitalPreview = ({
 
   if (!arbitalSlug || loading) {
     return (
-      <Components.DefaultPreview href={href} id={id}>
+      <Components.DefaultPreview target="_blank" href={href} id={id}>
         {children}
       </Components.DefaultPreview>
     );
@@ -983,7 +1004,7 @@ const ArbitalPreview = ({
   return (
     <AnalyticsTracker eventType="link" eventProps={{ to: href }}>
       <span {...eventHandlers}>
-        <a className={classes.link} href={href} id={id}>
+        <a target="_blank" rel="noreferrer" className={classes.link} href={href} id={id}>
           {children}
         </a>
 
@@ -1041,13 +1062,17 @@ const EstimakerPreview = ({
   const isEmbed = /^https?:\/\/estimaker\.app\/_\/.+$/.test(href);
 
   if (!isEmbed) {
-    return <a href={href}>{children}</a>;
+    return (
+      <a target="_blank" rel="noreferrer" href={href}>
+        {children}
+      </a>
+    );
   }
 
   return (
     <AnalyticsTracker eventType="link" eventProps={{ to: href }}>
       <span {...eventHandlers}>
-        <a className={classes.link} href={href} id={id}>
+        <a target="_blank" rel="noreferrer" className={classes.link} href={href} id={id}>
           {children}
         </a>
         <LWPopper open={hover} anchorEl={anchorEl} placement="bottom-start">
@@ -1099,7 +1124,7 @@ const ViewpointsPreview = ({
   return (
     <AnalyticsTracker eventType="link" eventProps={{ to: url }}>
       <span {...eventHandlers}>
-        <a className={classes.link} href={href} id={id}>
+        <a target="_blank" rel="noreferrer" className={classes.link} href={href} id={id}>
           {children}
         </a>
         <LWPopper open={hover} anchorEl={anchorEl} placement="bottom-start">
