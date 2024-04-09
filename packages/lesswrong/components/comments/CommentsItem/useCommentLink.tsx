@@ -6,13 +6,13 @@ import { Link, useNavigate } from "../../../lib/reactRouterWrapper";
 import qs from "qs";
 
 export type UseCommentLinkProps = {
-  comment: Pick<CommentsList, "_id" | "tagCommentType">,
-  post?: Pick<PostsMinimumInfo, "_id" | "slug"> | null,
-  tag?: TagBasicInfo,
-  scrollOnClick?: boolean,
-  scrollIntoView?: () => void,
-  permalink?: boolean,
-}
+  comment: Pick<CommentsList, "_id" | "tagCommentType">;
+  post?: Pick<PostsMinimumInfo, "_id" | "slug"> | null;
+  tag?: TagBasicInfo;
+  scrollOnClick?: boolean;
+  scrollIntoView?: () => void;
+  permalink?: boolean;
+};
 
 export const useCommentLink = ({
   comment,
@@ -23,8 +23,8 @@ export const useCommentLink = ({
   permalink = true,
 }: UseCommentLinkProps) => {
   const navigate = useNavigate();
-  const {location, query} = useLocation();
-  const {captureEvent} = useTracking();
+  const { location, query } = useLocation();
+  const { captureEvent } = useTracking();
 
   const url = commentGetPageUrlFromIds({
     postId: post?._id,
@@ -53,26 +53,26 @@ export const useCommentLink = ({
     event.preventDefault();
     navigate({
       ...location,
-      search: qs.stringify({...query, commentId: comment._id}),
+      search: qs.stringify({ ...query, commentId: comment._id }),
       hash: null,
     });
 
     if (scrollIntoView) {
       scrollIntoView();
     }
-  }
+  };
 
   const Wrapper: FC = scrollOnClick
-    ? ({children}) => (
-      <a rel="nofollow" href={url} onClick={handleLinkClick}>
-        {children}
-      </a>
-    )
-    : ({children}) => (
-      <Link rel="nofollow" to={url} eventProps={{furtherContext}}>
-        {children}
-      </Link>
-    );
+    ? ({ children }) => (
+        <a rel="nofollow" href={url} onClick={handleLinkClick}>
+          {children}
+        </a>
+      )
+    : ({ children }) => (
+        <Link rel="nofollow" to={url} eventProps={{ furtherContext }}>
+          {children}
+        </Link>
+      );
 
   return Wrapper;
-}
+};

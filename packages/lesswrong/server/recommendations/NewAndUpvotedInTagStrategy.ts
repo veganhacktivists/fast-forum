@@ -10,9 +10,9 @@ class NewAndUpvotedInTagStrategy extends RecommendationStrategy {
   }
 
   async recommend(
-    currentUser: DbUser|null,
+    currentUser: DbUser | null,
     count: number,
-    {postId, tagId}: StrategySpecification,
+    { postId, tagId }: StrategySpecification,
   ): Promise<RecommendationResult> {
     if (!tagId) {
       throw new Error("No tag id provided");
@@ -25,11 +25,11 @@ class NewAndUpvotedInTagStrategy extends RecommendationStrategy {
         (p."tagRelevance"->$(tagId))::INTEGER >= 1 AND
         (NOW() - p."createdAt") < '3 months'
       `,
-      {tagId},
+      { tagId },
       "score",
     );
-    return {posts, settings: {postId, tagId}};
-  };
+    return { posts, settings: { postId, tagId } };
+  }
 }
 
 export default NewAndUpvotedInTagStrategy;

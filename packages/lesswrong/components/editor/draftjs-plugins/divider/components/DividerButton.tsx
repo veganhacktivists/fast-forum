@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import unionClassNames from 'union-class-names';
+import React, { Component } from "react";
+import unionClassNames from "union-class-names";
 
 import {
   EditorState,
@@ -7,25 +7,25 @@ import {
   // Modifier,
   // AtomicBlockUtils,
   RichUtils,
-} from 'draft-js';
+} from "draft-js";
 
 import {
   // addNewBlock,
   getCurrentBlock,
   isFirstBlock,
   isLastBlock,
-} from '../utils';
+} from "../utils";
 import {
   // insertNewLineBefore,
   insertNewLineAfter,
   insertNewLineBoth,
-} from '../utils/insertNewLine';
+} from "../utils/insertNewLine";
 
 export interface DividerButtonProps {
   getEditorState: () => EditorState;
   setEditorState: (state: EditorState) => any;
-  blockType: string,
-  theme: any
+  blockType: string;
+  theme: any;
 }
 
 export default class DividerButton extends Component<DividerButtonProps> {
@@ -42,22 +42,13 @@ export default class DividerButton extends Component<DividerButtonProps> {
     const isFirst = isFirstBlock(editorState);
     const isLast = isLastBlock(editorState);
     const isBoth = isFirst && isLast;
-    const newDividerBlock = RichUtils.toggleBlockType(
-      editorState,
-      this.props.blockType,
-    );
+    const newDividerBlock = RichUtils.toggleBlockType(editorState, this.props.blockType);
     let newEditorState;
 
     if (isLast) {
-      newEditorState = insertNewLineAfter(
-        editorState,
-        getCurrentBlock(newDividerBlock),
-      );
+      newEditorState = insertNewLineAfter(editorState, getCurrentBlock(newDividerBlock));
     } else if (isBoth || isFirst) {
-      newEditorState = insertNewLineBoth(
-        editorState,
-        getCurrentBlock(newDividerBlock),
-      );
+      newEditorState = insertNewLineBoth(editorState, getCurrentBlock(newDividerBlock));
     } else {
       newEditorState = newDividerBlock;
     }
@@ -76,18 +67,13 @@ export default class DividerButton extends Component<DividerButtonProps> {
     }
 
     const editorState = this.props.getEditorState();
-    const type = editorState
-      .getCurrentContent()
-      .getBlockForKey(editorState.getSelection().getStartKey())
-      .getType();
+    const type = editorState.getCurrentContent().getBlockForKey(editorState.getSelection().getStartKey()).getType();
     return type === this.props.blockType;
   };
 
   render() {
     const { theme } = this.props;
-    const className = this.blockTypeIsActive()
-      ? unionClassNames(theme.button, theme.active)
-      : theme.button;
+    const className = this.blockTypeIsActive() ? unionClassNames(theme.button, theme.active) : theme.button;
 
     return (
       <div className={theme.buttonWrapper} onMouseDown={this.preventBubblingUp}>
@@ -103,8 +89,8 @@ export default class DividerButton extends Component<DividerButtonProps> {
           </svg> */}
           <svg width="24" height="24" viewBox="0 0 24 24">
             <g fillRule="evenodd">
-              <path d="M8.45 12H5.3c-.247 0-.45.224-.45.5 0 .274.203.5.45.5h5.4c.247 0 .45-.226.45-.5 0-.276-.203-.5-.45-.5H8.45z"/>
-              <path d="M17.45 12H14.3c-.247 0-.45.224-.45.5 0 .274.203.5.45.5h5.4c.248 0 .45-.226.45-.5 0-.276-.202-.5-.45-.5h-2.25z"/>
+              <path d="M8.45 12H5.3c-.247 0-.45.224-.45.5 0 .274.203.5.45.5h5.4c.247 0 .45-.226.45-.5 0-.276-.203-.5-.45-.5H8.45z" />
+              <path d="M17.45 12H14.3c-.247 0-.45.224-.45.5 0 .274.203.5.45.5h5.4c.248 0 .45-.226.45-.5 0-.276-.202-.5-.45-.5h-2.25z" />
             </g>
           </svg>
         </button>

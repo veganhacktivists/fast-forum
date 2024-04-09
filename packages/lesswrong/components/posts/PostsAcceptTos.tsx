@@ -4,15 +4,19 @@ import { isLWorAF } from "../../lib/instanceSettings";
 import { useUpdateCurrentUser } from "../hooks/useUpdateCurrentUser";
 import { useMessages } from "../common/withMessages";
 import { Link } from "../../lib/reactRouterWrapper";
-import Checkbox from '@material-ui/core/Checkbox';
+import Checkbox from "@material-ui/core/Checkbox";
 
-export const TosLink: FC = ({children}) =>
-  <Link to="/termsOfUse" target="_blank" rel="noreferrer">{children ?? "terms of use"}</Link>
+export const TosLink: FC = ({ children }) => (
+  <Link to="/termsOfUse" target="_blank" rel="noreferrer">
+    {children ?? "terms of use"}
+  </Link>
+);
 
-export const LicenseLink: FC = ({children}) =>
+export const LicenseLink: FC = ({ children }) => (
   <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noreferrer">
     {children ?? "CC-BY"}
   </a>
+);
 
 const styles = (theme: ThemeType) => ({
   root: {
@@ -32,14 +36,11 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const PostsAcceptTos = ({currentUser, classes}: {
-  currentUser: UsersCurrent,
-  classes: ClassesType,
-}) => {
+const PostsAcceptTos = ({ currentUser, classes }: { currentUser: UsersCurrent; classes: ClassesType }) => {
   const [loading, setLoading] = useState(false);
   const [accepted, setAccepted] = useState(currentUser.acceptedTos);
   const updateCurrentUser = useUpdateCurrentUser();
-  const {flash} = useMessages();
+  const { flash } = useMessages();
 
   const onAccept = useCallback(async () => {
     if (loading) {
@@ -66,27 +67,23 @@ const PostsAcceptTos = ({currentUser, classes}: {
 
   return (
     <div className={classes.root}>
-      <Checkbox
-        onChange={onAccept}
-        checked={loading}
-        disabled={loading}
-        disableRipple
-      />
-      {loading
-        ? <Components.Loading className={classes.spinner} />
-        : <Components.Typography variant="body2" className={classes.label}>
-          Before you can publish this post you must agree to the <TosLink /> including
-          your content being available under a <LicenseLink /> license
+      <Checkbox onChange={onAccept} checked={loading} disabled={loading} disableRipple />
+      {loading ? (
+        <Components.Loading className={classes.spinner} />
+      ) : (
+        <Components.Typography variant="body2" className={classes.label}>
+          Before you can publish this post you must agree to the <TosLink /> including your content being available
+          under a <LicenseLink /> license
         </Components.Typography>
-      }
+      )}
     </div>
   );
-}
+};
 
-const PostsAcceptTosComponent = registerComponent("PostsAcceptTos", PostsAcceptTos, {styles});
+const PostsAcceptTosComponent = registerComponent("PostsAcceptTos", PostsAcceptTos, { styles });
 
 declare global {
   interface ComponentTypes {
-    PostsAcceptTos: typeof PostsAcceptTosComponent
+    PostsAcceptTos: typeof PostsAcceptTosComponent;
   }
 }

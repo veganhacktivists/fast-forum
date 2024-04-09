@@ -1,5 +1,5 @@
-import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
-import Users from '../../lib/collections/users/collection';
+import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
+import Users from "../../lib/collections/users/collection";
 
 registerMigration({
   name: "includedBackToDefault",
@@ -9,18 +9,18 @@ registerMigration({
     await forEachDocumentBatchInCollection({
       collection: Users,
       batchSize: 100,
-      filter: {'frontpageFilterSettings.personalBlog': 'Included'},
+      filter: { "frontpageFilterSettings.personalBlog": "Included" },
       callback: async (users: Array<DbUser>) => {
         // eslint-disable-next-line no-console
         console.log("Migrating user batch");
-        const changes = users.map(user => ({
+        const changes = users.map((user) => ({
           updateOne: {
             filter: { _id: user._id },
-            update: {$set: {'frontpageFilterSettings.personalBlog': 'Default'}}
-          }
-        }))
+            update: { $set: { "frontpageFilterSettings.personalBlog": "Default" } },
+          },
+        }));
         await Users.rawCollection().bulkWrite(changes, { ordered: false });
-      }
+      },
     });
-  }
+  },
 });

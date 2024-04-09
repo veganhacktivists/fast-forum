@@ -12,13 +12,13 @@
  * -
  * --- Accepted on 2023-01-25T22:32:59.000Z by 20230125T223259.user_mentions_newMentionNotifictions.ts
  * +-- Overall schema hash: 619ed0268e244678740dac4731f64051
- *  
+ *
  * @@ -864,3 +862,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * --- Schema for "Users", hash: 119779a0cbbfc3d7b7d75c3ffed47970
  * +-- Schema for "Users", hash: 1ed3426ba7931d385e326044273456f6
  *  CREATE TABLE "Users" (
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -32,10 +32,10 @@ export const acceptsSchemaHash = "619ed0268e244678740dac4731f64051";
 import Users from "../../lib/collections/users/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Users, 'hideFrontpageFilterSettingsDesktop');
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Users, "hideFrontpageFilterSettingsDesktop");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Users, 'hideFrontpageFilterSettingsDesktop');
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Users, "hideFrontpageFilterSettingsDesktop");
+};

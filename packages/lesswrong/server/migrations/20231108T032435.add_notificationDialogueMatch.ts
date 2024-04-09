@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-11-07T23:17:16.000Z by 20231107T231716.addElicitTables.ts
  * +-- Overall schema hash: 0d5156717800f18b4407edd0caa14def
- *  
+ *
  * @@ -1099,3 +1097,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * --- Schema for "Users", hash: e8e6630d880bf48c1c4bd54c4b31e8d0
  * +-- Schema for "Users", hash: af068329774f52ec88fd989f515874db
  *  CREATE TABLE "Users" (
@@ -22,7 +22,7 @@
  *      "notificationDebateReplies" jsonb DEFAULT '{"channel":"onsite","batchingFrequency":"realtime","timeOfDayGMT":12,"dayOfWeekGMT":"Monday"}' ::jsonb,
  * +    "notificationDialogueMatch" jsonb DEFAULT '{"channel":"both","batchingFrequency":"realtime","timeOfDayGMT":12,"dayOfWeekGMT":"Monday"}' ::jsonb,
  *      "hideDialogueFacilitation" bool NOT NULL DEFAULT false,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -34,12 +34,12 @@
 export const acceptsSchemaHash = "0d5156717800f18b4407edd0caa14def";
 
 import Users from "../../lib/collections/users/collection";
-import {addField, dropField} from "./meta/utils";
+import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Users, "notificationDialogueMatch");
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Users, "notificationDialogueMatch");
-}
+};

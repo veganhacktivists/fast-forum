@@ -1,9 +1,9 @@
-import React from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import { Link } from '../../lib/reactRouterWrapper';
-import { postGetPageUrl } from '../../lib/collections/posts/helpers';
-import classNames from 'classnames';
-import { isFriendlyUI } from '../../themes/forumTheme';
+import React from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import { Link } from "../../lib/reactRouterWrapper";
+import { postGetPageUrl } from "../../lib/collections/posts/helpers";
+import classNames from "classnames";
+import { isFriendlyUI } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -30,18 +30,18 @@ const styles = (theme: ThemeType): JssStyles => ({
   title: {
     ...(isFriendlyUI
       ? {
-        fontFamily: theme.palette.fonts.sansSerifStack,
-        fontWeight: 600,
-      }
+          fontFamily: theme.palette.fonts.sansSerifStack,
+          fontWeight: 600,
+        }
       : {
-        position: "relative",
-      }),
+          position: "relative",
+        }),
     top: 2,
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
     flexGrow: 1,
-    color: theme.palette.lwTertiary.dark
+    color: theme.palette.lwTertiary.dark,
   },
   wrap: {
     whiteSpace: "unset",
@@ -53,48 +53,51 @@ const styles = (theme: ThemeType): JssStyles => ({
     marginLeft: 20,
   },
   widerSpacing: {
-    marginBottom: 4
-  }
+    marginBottom: 4,
+  },
 });
 
-const TagSmallPostLink = ({classes, post, hideMeta, wrap, widerSpacing}: {
-  classes: ClassesType,
-  post: PostsList,
-  hideMeta?: boolean,
-  wrap?: boolean,
-  widerSpacing?: boolean
+const TagSmallPostLink = ({
+  classes,
+  post,
+  hideMeta,
+  wrap,
+  widerSpacing,
+}: {
+  classes: ClassesType;
+  post: PostsList;
+  hideMeta?: boolean;
+  wrap?: boolean;
+  widerSpacing?: boolean;
 }) => {
-  const {PostsTooltip, UsersName, MetaInfo, KarmaDisplay} = Components;
+  const { PostsTooltip, UsersName, MetaInfo, KarmaDisplay } = Components;
   return (
-    <div className={classNames(classes.root, {[classes.widerSpacing]: widerSpacing})}>
+    <div className={classNames(classes.root, { [classes.widerSpacing]: widerSpacing })}>
       <PostsTooltip post={post} clickable placement="left-start">
         <div className={classes.post}>
-          {!hideMeta &&
+          {!hideMeta && (
             <MetaInfo className={classes.karma}>
               <KarmaDisplay document={post} placement="right" />
             </MetaInfo>
-          }
-          <Link
-            to={postGetPageUrl(post)}
-            className={classNames(classes.title, {[classes.wrap]: wrap})}
-          >
+          )}
+          <Link to={postGetPageUrl(post)} className={classNames(classes.title, { [classes.wrap]: wrap })}>
             {post.title}
           </Link>
-          {!hideMeta && post.user &&
+          {!hideMeta && post.user && (
             <MetaInfo className={classes.author}>
               <UsersName user={post.user} />
             </MetaInfo>
-          }
+          )}
         </div>
       </PostsTooltip>
     </div>
   );
-}
+};
 
-const TagSmallPostLinkComponent = registerComponent("TagSmallPostLink", TagSmallPostLink, {styles});
+const TagSmallPostLinkComponent = registerComponent("TagSmallPostLink", TagSmallPostLink, { styles });
 
 declare global {
   interface ComponentTypes {
-    TagSmallPostLink: typeof TagSmallPostLinkComponent
+    TagSmallPostLink: typeof TagSmallPostLinkComponent;
   }
 }

@@ -1,7 +1,7 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import chai from "chai";
+import chaiAsPromised from "chai-as-promised";
 import { AbortSignal } from "node-abort-controller";
-import { setPublicSettings } from '../lib/settingsCache';
+import { setPublicSettings } from "../lib/settingsCache";
 // See https://github.com/openai/openai-node#customizing-the-fetch-client
 import "openai/shims/node";
 

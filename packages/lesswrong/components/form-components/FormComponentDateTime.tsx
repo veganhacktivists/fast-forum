@@ -1,29 +1,29 @@
-import React, { useCallback, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import DateTimePicker from 'react-datetime';
-import moment from '../../lib/moment-timezone';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormControl from '@material-ui/core/FormControl';
-import type { Moment } from 'moment';
-import classNames from 'classnames';
+import React, { useCallback, useRef, useState } from "react";
+import PropTypes from "prop-types";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import DateTimePicker from "react-datetime";
+import moment from "../../lib/moment-timezone";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
+import type { Moment } from "moment";
+import classNames from "classnames";
 
 const styles = (theme: ThemeType): JssStyles => ({
   input: {
     borderBottom: `solid 1px ${theme.palette.grey[550]}`,
-    padding: '6px 0 7px 0',
-    background: 'transparent'
+    padding: "6px 0 7px 0",
+    background: "transparent",
   },
   error: {
     borderBottom: `solid 1px ${theme.palette.error.main}`,
   },
   label: {
-    position:"relative",
-    transform:"none",
+    position: "relative",
+    transform: "none",
     fontSize: 10,
   },
   timezone: {
-    marginLeft: 4
+    marginLeft: 4,
   },
 
   wrapperAbove: {
@@ -63,11 +63,11 @@ const styles = (theme: ThemeType): JssStyles => ({
       boxShadow: "none",
       position: "static",
     },
-    
+
     "& .rdtPicker .rdtTimeToggle": {
       textAlign: "center",
     },
-    
+
     "& .rdtPicker table": {
       width: "100%",
       margin: 0,
@@ -79,10 +79,11 @@ const styles = (theme: ThemeType): JssStyles => ({
     "& .rdtPicker td": {
       cursor: "pointer",
     },
-    "& .rdtPicker td.rdtToday:hover, & .rdtPicker td.rdtHour:hover, & .rdtPicker td.rdtMinute:hover, & .rdtPicker td.rdtSecond:hover, & .rdtPicker .rdtTimeToggle:hover": {
-      background: theme.palette.grey[200],
-      cursor: "pointer",
-    },
+    "& .rdtPicker td.rdtToday:hover, & .rdtPicker td.rdtHour:hover, & .rdtPicker td.rdtMinute:hover, & .rdtPicker td.rdtSecond:hover, & .rdtPicker .rdtTimeToggle:hover":
+      {
+        background: theme.palette.grey[200],
+        cursor: "pointer",
+      },
     "& .rdtPicker td.rdtOld, & .rdtPicker td.rdtNew": {
       color: theme.palette.grey[550],
     },
@@ -90,7 +91,7 @@ const styles = (theme: ThemeType): JssStyles => ({
       position: "relative",
     },
     "& .rdtPicker td.rdtToday:before": {
-      content: '',
+      content: "",
       display: "inline-block",
       borderLeft: "7px solid transparent",
       borderBottom: `7px solid ${theme.palette.datePicker.selectedDate}`,
@@ -112,7 +113,7 @@ const styles = (theme: ThemeType): JssStyles => ({
       color: theme.palette.grey[550],
       cursor: "notAllowed",
     },
-    
+
     "& .rdtPicker td span.rdtOld": {
       color: theme.palette.grey[550],
     },
@@ -135,17 +136,17 @@ const styles = (theme: ThemeType): JssStyles => ({
       fontSize: 21,
       verticalAlign: "top",
     },
-    
+
     "& .rdtPrev span, & .rdtNext span": {
       display: "block",
-      "-webkit-touch-callout": "none", /* iOS Safari */
-      "-webkit-user-select": "none",   /* Chrome/Safari/Opera */
-      "-khtml-user-select": "none",    /* Konqueror */
-      "-moz-user-select": "none",      /* Firefox */
-      "-ms-user-select": "none",       /* Internet Explorer/Edge */
+      "-webkit-touch-callout": "none" /* iOS Safari */,
+      "-webkit-user-select": "none" /* Chrome/Safari/Opera */,
+      "-khtml-user-select": "none" /* Konqueror */,
+      "-moz-user-select": "none" /* Firefox */,
+      "-ms-user-select": "none" /* Internet Explorer/Edge */,
       userSelect: "none",
     },
-    
+
     "& .rdtPicker th.rdtDisabled, & .rdtPicker th.rdtDisabled:hover": {
       background: "none",
       color: theme.palette.grey[550],
@@ -157,11 +158,11 @@ const styles = (theme: ThemeType): JssStyles => ({
     "& .rdtPicker thead tr:first-child th:hover": {
       background: theme.palette.grey[200],
     },
-    
-    "& .rdtPicker tfoot":{
+
+    "& .rdtPicker tfoot": {
       borderTop: `1px solid ${theme.palette.grey[55]}`,
     },
-    
+
     "& .rdtPicker button": {
       border: "none",
       background: "none",
@@ -170,12 +171,12 @@ const styles = (theme: ThemeType): JssStyles => ({
     "& .rdtPicker button:hover": {
       backgroundColor: theme.palette.grey[200],
     },
-    
+
     "& .rdtPicker thead button": {
       width: "100%",
       height: "100%",
     },
-    
+
     "& td.rdtMonth, & td.rdtYear": {
       height: 50,
       width: "25%",
@@ -184,35 +185,35 @@ const styles = (theme: ThemeType): JssStyles => ({
     "& td.rdtMonth:hover, & td.rdtYear:hover": {
       background: theme.palette.grey[200],
     },
-    
+
     "& .rdtCounters": {
       display: "inline-block",
     },
-    
+
     "& .rdtCounters > div": {
       float: "left",
     },
-    
+
     "& .rdtCounter": {
       height: 100,
       width: 40,
     },
-    
+
     "& .rdtCounterSeparator": {
-      lineHeight: '100px',
+      lineHeight: "100px",
     },
-    
+
     "& .rdtCounter .rdtBtn": {
       height: "40%",
       lineHeight: "40px",
       cursor: "pointer",
       display: "block",
-    
-      "-webkit-touch-callout": "none", /* iOS Safari */
-      "-webkit-user-select": "none",   /* Chrome/Safari/Opera */
-      "-khtml-user-select": "none",    /* Konqueror */
-      "-moz-user-select": "none",      /* Firefox */
-      "-ms-user-select": "none",       /* Internet Explorer/Edge */
+
+      "-webkit-touch-callout": "none" /* iOS Safari */,
+      "-webkit-user-select": "none" /* Chrome/Safari/Opera */,
+      "-khtml-user-select": "none" /* Konqueror */,
+      "-moz-user-select": "none" /* Firefox */,
+      "-ms-user-select": "none" /* Internet Explorer/Edge */,
       userSelect: "none",
     },
     "& .rdtCounter .rdtBtn:hover": {
@@ -222,123 +223,134 @@ const styles = (theme: ThemeType): JssStyles => ({
       height: "20%",
       fontSize: "1.2em",
     },
-    
+
     "& .rdtMilli": {
       verticalAlign: "middle",
       paddingLeft: 8,
       width: 48,
     },
-    
+
     "& .rdtMilli input": {
       width: "100%",
       fontSize: "1.2em",
       marginTop: 37,
     },
-    
+
     "& .rdtDayPart": {
       marginTop: 43,
     },
   },
-})
+});
 
 /**
  * A wrapper around the react-datetime library, making a UI element for picking
  * a date/time. Needs the wrapping to get its styles. This is split from
  * FormComponentDateTime so that it can be used in non-vulcan-forms contexts.
  */
-const DatePicker = ({label, name, value, below, onChange, onClose, classes}: {
-  label?: string,
-  name?: string,
-  value?: Date,
-  below?: boolean,
-  onChange: (newValue: Date)=>void,
-  onClose?: (newValue: Date)=>void,
-  classes: ClassesType
+const DatePicker = ({
+  label,
+  name,
+  value,
+  below,
+  onChange,
+  onClose,
+  classes,
+}: {
+  label?: string;
+  name?: string;
+  value?: Date;
+  below?: boolean;
+  onChange: (newValue: Date) => void;
+  onClose?: (newValue: Date) => void;
+  classes: ClassesType;
 }) => {
   // since tz abbrev can depend on the date (i.e. EST vs EDT),
   // we try to use the selected date to determine the tz (and default to now)
   const tzDate = value ? moment(value) : moment();
-  const [error, setError] = useState(false)
-  const valueIsNullRef = useRef(!value)
+  const [error, setError] = useState(false);
+  const valueIsNullRef = useRef(!value);
 
-  const handleDateChange = useCallback((newDate: Moment | string) => {
-    let parsedDate: Date | null = null;
-    if (moment.isMoment(newDate)) {
-      parsedDate = newDate.toDate();
-    } else if (typeof newDate === "string") {
-      const momentParsed = moment(newDate, "MM/DD/YYYY hh:mm A", true);
-      if (momentParsed.isValid()) {
-        parsedDate = momentParsed.toDate();
+  const handleDateChange = useCallback(
+    (newDate: Moment | string) => {
+      let parsedDate: Date | null = null;
+      if (moment.isMoment(newDate)) {
+        parsedDate = newDate.toDate();
+      } else if (typeof newDate === "string") {
+        const momentParsed = moment(newDate, "MM/DD/YYYY hh:mm A", true);
+        if (momentParsed.isValid()) {
+          parsedDate = momentParsed.toDate();
+        }
       }
-    }
 
-    if (parsedDate) {
-      onChange(parsedDate);
-      setError(false)
-    } else {
-      setError(true)
-    }
-  }, [onChange]);
+      if (parsedDate) {
+        onChange(parsedDate);
+        setError(false);
+      } else {
+        setError(true);
+      }
+    },
+    [onChange],
+  );
 
-  const valueJustCleared = !value && valueIsNullRef.current
-  valueIsNullRef.current = !value
+  const valueJustCleared = !value && valueIsNullRef.current;
+  valueIsNullRef.current = !value;
 
-  return <FormControl>
-    <InputLabel className={classes.label}>
-      { label } <span className={classes.timezone}>({tzDate.tz(moment.tz.guess()).zoneAbbr()})</span>
-    </InputLabel>
-    <div className={classNames(classes.wrapper, {
-      [classes.wrapperAbove]: !below,
-      [classes.wrapperBelow]: below,
-    })}>
-      <DateTimePicker
-        value={value}
-        inputProps={{
-          name:name,
-          autoComplete:"off",
-          className: classNames(classes.input, {[classes.error]: error}),
-          ...(valueJustCleared && {value: undefined}),
-        }}
-        onChange={handleDateChange}
-        onBlur={handleDateChange}
-      />
-    </div>
-  </FormControl>
-}
-
+  return (
+    <FormControl>
+      <InputLabel className={classes.label}>
+        {label} <span className={classes.timezone}>({tzDate.tz(moment.tz.guess()).zoneAbbr()})</span>
+      </InputLabel>
+      <div
+        className={classNames(classes.wrapper, {
+          [classes.wrapperAbove]: !below,
+          [classes.wrapperBelow]: below,
+        })}
+      >
+        <DateTimePicker
+          value={value}
+          inputProps={{
+            name: name,
+            autoComplete: "off",
+            className: classNames(classes.input, { [classes.error]: error }),
+            ...(valueJustCleared && { value: undefined }),
+          }}
+          onChange={handleDateChange}
+          onBlur={handleDateChange}
+        />
+      </div>
+    </FormControl>
+  );
+};
 
 /**
  * Date-picker UI element, wrapped for use in vulcan-forms.
  * TODO: This may not work right in nested contexts.
  */
-const FormComponentDateTime = ({ path, value, name, label }: FormComponentProps<string|Date>, context: FormComponentContext<string|Date>) => {
+const FormComponentDateTime = (
+  { path, value, name, label }: FormComponentProps<string | Date>,
+  context: FormComponentContext<string | Date>,
+) => {
   const updateDate = (date: Date | undefined) => {
     if (date) {
-      void context.updateCurrentValues({[path]: date})
+      void context.updateCurrentValues({ [path]: date });
     }
-  }
+  };
 
-  const date = value ? (typeof value === 'string' ? new Date(value) : value) : undefined;
+  const date = value ? (typeof value === "string" ? new Date(value) : value) : undefined;
 
-  return <Components.DatePicker
-    label={label}
-    name={name}
-    value={date}
-    onChange={updateDate}
-  />
-}
+  return <Components.DatePicker label={label} name={name} value={date} onChange={updateDate} />;
+};
 
 (FormComponentDateTime as any).contextTypes = {
   updateCurrentValues: PropTypes.func,
 };
 
-const DatePickerComponent = registerComponent("DatePicker", DatePicker, {styles});
+const DatePickerComponent = registerComponent("DatePicker", DatePicker, { styles });
 const FormComponentDateTimeComponent = registerComponent("FormComponentDateTime", FormComponentDateTime);
 
 declare global {
   interface ComponentTypes {
-    DatePicker: typeof DatePickerComponent
-    FormComponentDateTime: typeof FormComponentDateTimeComponent
+    DatePicker: typeof DatePickerComponent;
+    FormComponentDateTime: typeof FormComponentDateTimeComponent;
   }
 }
-

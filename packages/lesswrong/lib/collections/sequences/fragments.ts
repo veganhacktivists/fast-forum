@@ -1,4 +1,4 @@
-import { registerFragment } from '../../vulcan-lib';
+import { registerFragment } from "../../vulcan-lib";
 
 registerFragment(`
   fragment SequencesPageTitleFragment on Sequence {
@@ -54,7 +54,7 @@ registerFragment(`
       ...ChaptersFragment
     }
   }
-`)
+`);
 
 registerFragment(`
   fragment SequencesEdit on Sequence {
@@ -63,4 +63,4 @@ registerFragment(`
       ...RevisionEdit
     }
   }
-`)
+`);

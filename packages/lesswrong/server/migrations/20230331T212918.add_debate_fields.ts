@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-03-31T00:20:47.000Z by 20230331T002047.add_noComicSans_to_Users.ts
  * +-- Overall schema hash: 33b4ea4a4234276f8784ddff0eb3a974
- *  
+ *
  * @@ -108,3 +106,3 @@ CREATE TABLE "CommentModeratorActions" (
- *  
+ *
  * --- Schema for "Comments", hash: e869ffa2ef7db9015c6f8f8c6a579baf
  * +-- Schema for "Comments", hash: 31480d0beb75ffb592b7b20e68cbff13
  *  CREATE TABLE "Comments" (
@@ -27,11 +27,11 @@
  * +    "debate" bool DEFAULT false,
  *      "subforumTagId" varchar(27),
  * @@ -889,3 +889,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * --- Schema for "Users", hash: dca06a3ff139a831e465b8a67f6f9e68
  * +-- Schema for "Users", hash: 80f05b0a0b0f1c525600d8b66b050f1c
  *  CREATE TABLE "Users" (
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -46,12 +46,12 @@ import Comments from "../../lib/collections/comments/collection";
 import Posts from "../../lib/collections/posts/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Posts, 'debate');
-  await addField(db, Comments, 'debateResponse');
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Posts, "debate");
+  await addField(db, Comments, "debateResponse");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Posts, 'debate');
-  await dropField(db, Comments, 'debateResponse');
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Posts, "debate");
+  await dropField(db, Comments, "debateResponse");
+};

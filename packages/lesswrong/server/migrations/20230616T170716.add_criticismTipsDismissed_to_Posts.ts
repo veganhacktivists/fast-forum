@@ -12,8 +12,8 @@
  * -
  * --- Accepted on 2023-06-14T18:28:37.000Z by 20230614T182837.add_digest_tables.ts
  * +-- Overall schema hash: 88bc10e632764af3e6cff68763da9113
- *  
- * 
+ *
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -24,18 +24,18 @@
  */
 export const acceptsSchemaHash = "88bc10e632764af3e6cff68763da9113";
 
-import Posts from "../../lib/collections/posts/collection"
+import Posts from "../../lib/collections/posts/collection";
 import Tags from "../../lib/collections/tags/collection";
-import { addField, dropField, updateDefaultValue } from "./meta/utils"
+import { addField, dropField, updateDefaultValue } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Posts, 'criticismTipsDismissed')
-  await updateDefaultValue(db, Tags, "autoTagModel")
-  await updateDefaultValue(db, Tags, "autoTagPrompt")
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Posts, "criticismTipsDismissed");
+  await updateDefaultValue(db, Tags, "autoTagModel");
+  await updateDefaultValue(db, Tags, "autoTagPrompt");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Posts, 'criticismTipsDismissed')
-  await updateDefaultValue(db, Tags, "autoTagModel")
-  await updateDefaultValue(db, Tags, "autoTagPrompt")
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Posts, "criticismTipsDismissed");
+  await updateDefaultValue(db, Tags, "autoTagModel");
+  await updateDefaultValue(db, Tags, "autoTagPrompt");
+};

@@ -19,7 +19,7 @@ export const deletePgIndexes = async () => {
       AND indexname NOT LIKE '%_pkey'
   `);
   for (const index of indexes) {
-    const {indexname} = index;
+    const { indexname } = index;
     try {
       // eslint-disable-next-line no-console
       console.log(`Deleting index '${indexname}'`);
@@ -29,6 +29,6 @@ export const deletePgIndexes = async () => {
       console.error(`Failed to delete index '${indexname}':`, e.message);
     }
   }
-}
+};
 
 Vulcan.deletePgIndexes = deletePgIndexes;

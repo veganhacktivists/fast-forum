@@ -16,9 +16,9 @@ Spotlights.addView("mostRecentlyPromotedSpotlights", function (terms: Spotlights
     },
     options: {
       sort: { lastPromotedAt: -1, position: 1 },
-      ...limit
-    }
-  }
+      ...limit,
+    },
+  };
 });
 
 ensureIndex(Spotlights, { lastPromotedAt: -1 });
@@ -29,19 +29,19 @@ Spotlights.addView("spotlightsPage", function (terms: SpotlightsViewTerms) {
   return {
     options: {
       sort: { lastPromotedAt: -1, position: 1 },
-      ...limit
-    }
-  }
+      ...limit,
+    },
+  };
 });
 
 Spotlights.addView("spotlightForSequence", (terms: SpotlightsViewTerms) => {
   return {
     selector: {
       documentId: terms.sequenceId,
-      draft: false
+      draft: false,
     },
     options: {
-      sort: { position: 1 }
-    }
-  }
+      sort: { position: 1 },
+    },
+  };
 });

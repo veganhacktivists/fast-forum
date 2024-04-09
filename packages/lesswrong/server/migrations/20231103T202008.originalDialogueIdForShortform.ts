@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-10-28T01:20:12.000Z by 20231028T012012.add_notificationAddedAsCoauthor.ts
  * +-- Overall schema hash: 1e3a27dd5e7df23c64a524f8fdef9856
- *  
+ *
  * @@ -121,3 +119,3 @@ CREATE TABLE "CommentModeratorActions" (
- *  
+ *
  * --- Schema for "Comments", hash: 84b8fb0665229242c2162a605ef4bb34
  * +-- Schema for "Comments", hash: e8c4560c2d87989e29048a433dac68f2
  *  CREATE TABLE "Comments" (
@@ -22,7 +22,7 @@
  *      "agentFoundationsId" text,
  * +    "originalDialogueId" varchar(27),
  *      "schemaVersion" double precision DEFAULT 1,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -36,10 +36,10 @@ export const acceptsSchemaHash = "e02a31666a33984e158e485e3a0c5f30";
 import { Comments } from "../../lib/collections/comments";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Comments, 'originalDialogueId');
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Comments, "originalDialogueId");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Comments, 'originalDialogueId');
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Comments, "originalDialogueId");
+};

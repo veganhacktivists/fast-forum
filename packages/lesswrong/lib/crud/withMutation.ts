@@ -1,18 +1,16 @@
-import { graphql } from '@apollo/client/react/hoc';
-import { useMutation, gql, OperationVariables } from '@apollo/client';
-import { getFragment } from '../vulcan-lib';
-import * as _ from 'underscore';
+import { graphql } from "@apollo/client/react/hoc";
+import { useMutation, gql, OperationVariables } from "@apollo/client";
+import { getFragment } from "../vulcan-lib";
+import * as _ from "underscore";
 
 /**
  * HoC for an arbitrary GraphQL mutation, which assembles a graphql query string
  * from parts. DEPRECATED: you probably want to use Apollo's useMutation instead.
  */
-export function withMutation({name, args, fragmentName}: {
-  name: string,
-  args: any,
-  fragmentName?: FragmentName,
-}) {
-  let mutation, fragment, fragmentBlock = '';
+export function withMutation({ name, args, fragmentName }: { name: string; args: any; fragmentName?: FragmentName }) {
+  let mutation,
+    fragment,
+    fragmentBlock = "";
 
   if (fragmentName) {
     fragment = getFragment(fragmentName);
@@ -20,7 +18,7 @@ export function withMutation({name, args, fragmentName}: {
       ...${fragmentName}
     }`;
   }
-  
+
   if (args) {
     const args1 = _.map(args, (type, name) => `$${name}: ${type}`); // e.g. $url: String
     const args2 = _.map(args, (type, name) => `${name}: $${name}`); // e.g. $url: url
@@ -36,17 +34,23 @@ export function withMutation({name, args, fragmentName}: {
       }
     `;
   }
-  
-  return graphql(gql`${mutation}${fragmentName ? fragment : ''}`, {
-    alias: 'withMutation',
-    props: ({ownProps, mutate}: any) => ({
-      [name]: (vars: any) => {
-        return mutate({ 
-          variables: vars,
-        });
-      }
-    }),
-  });
+
+  return graphql(
+    gql`
+      ${mutation}
+      ${fragmentName ? fragment : ""}
+    `,
+    {
+      alias: "withMutation",
+      props: ({ ownProps, mutate }: any) => ({
+        [name]: (vars: any) => {
+          return mutate({
+            variables: vars,
+          });
+        },
+      }),
+    },
+  );
 }
 
 /**
@@ -54,12 +58,18 @@ export function withMutation({name, args, fragmentName}: {
  * pieces. DEPRECATED: This doesn't really provide any value over calling
  * Apollo's `useMutation`, which is more transparent/direct.
  */
-export function useNamedMutation<ArgsType extends OperationVariables>({name, graphqlArgs, fragmentName}: {
-  name: string,
-  graphqlArgs: any,
-  fragmentName?: keyof FragmentTypes,
+export function useNamedMutation<ArgsType extends OperationVariables>({
+  name,
+  graphqlArgs,
+  fragmentName,
+}: {
+  name: string;
+  graphqlArgs: any;
+  fragmentName?: keyof FragmentTypes;
 }) {
-  let mutation, fragment, fragmentBlock = '';
+  let mutation,
+    fragment,
+    fragmentBlock = "";
 
   if (fragmentName) {
     fragment = getFragment(fragmentName);
@@ -67,7 +77,7 @@ export function useNamedMutation<ArgsType extends OperationVariables>({name, gra
       ...${fragmentName}
     }`;
   }
-  
+
   if (graphqlArgs) {
     const args1 = _.map(graphqlArgs, (type, name) => `$${name}: ${type}`); // e.g. $url: String
     const args2 = _.map(graphqlArgs, (type, name) => `${name}: $${name}`); // e.g. $url: url
@@ -83,10 +93,15 @@ export function useNamedMutation<ArgsType extends OperationVariables>({name, gra
       }
     `;
   }
-  
-  const [mutate, { loading }] = useMutation(gql`${mutation}${fragmentName ? fragment : ''}`);
-  return {mutate: async (variables: ArgsType) => {
-    return await mutate({ variables });
-  }, loading};
-}
 
+  const [mutate, { loading }] = useMutation(gql`
+    ${mutation}
+    ${fragmentName ? fragment : ""}
+  `);
+  return {
+    mutate: async (variables: ArgsType) => {
+      return await mutate({ variables });
+    },
+    loading,
+  };
+}

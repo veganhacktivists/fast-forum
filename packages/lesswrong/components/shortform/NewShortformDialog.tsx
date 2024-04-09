@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import DialogContent from '@material-ui/core/DialogContent';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { isFriendlyUI } from '../../themes/forumTheme';
-import { useNavigate } from '../../lib/reactRouterWrapper';
+import React, { useState } from "react";
+import DialogContent from "@material-ui/core/DialogContent";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { isFriendlyUI } from "../../themes/forumTheme";
+import { useNavigate } from "../../lib/reactRouterWrapper";
 
 const styles = (_theme: ThemeType) => ({
   content: {
@@ -17,13 +17,10 @@ const styles = (_theme: ThemeType) => ({
   },
 });
 
-const NewShortformDialog = ({onClose, classes}: {
-  onClose: () => void,
-  classes: ClassesType,
-}) => {
+const NewShortformDialog = ({ onClose, classes }: { onClose: () => void; classes: ClassesType }) => {
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
-  const {ShortformSubmitForm, LWDialog} = Components;
+  const { ShortformSubmitForm, LWDialog } = Components;
   return (
     <LWDialog
       open={open}
@@ -32,13 +29,13 @@ const NewShortformDialog = ({onClose, classes}: {
       maxWidth={isFriendlyUI ? "md" : "sm"}
       disableBackdropClick={isFriendlyUI}
       disableEscapeKeyDown={isFriendlyUI}
-      dialogClasses={{paper: classes.dialogPaper}}
+      dialogClasses={{ paper: classes.dialogPaper }}
     >
       <DialogContent className={classes.content}>
         <ShortformSubmitForm
           successCallback={() => {
             onClose();
-            navigate(isFriendlyUI ? '/quicktakes' : '/shortform');
+            navigate(isFriendlyUI ? "/quicktakes" : "/shortform");
           }}
           cancelCallback={() => {
             setOpen(false);
@@ -48,16 +45,12 @@ const NewShortformDialog = ({onClose, classes}: {
       </DialogContent>
     </LWDialog>
   );
-}
+};
 
-const NewShortformDialogComponent = registerComponent(
-  'NewShortformDialog',
-  NewShortformDialog,
-  {styles},
-);
+const NewShortformDialogComponent = registerComponent("NewShortformDialog", NewShortformDialog, { styles });
 
 declare global {
   interface ComponentTypes {
-    NewShortformDialog: typeof NewShortformDialogComponent
+    NewShortformDialog: typeof NewShortformDialogComponent;
   }
 }

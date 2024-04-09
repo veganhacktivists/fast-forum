@@ -30,20 +30,24 @@ class PgStorage implements UmzugStorage<MigrationContext> {
   /**
    * Logs a migration to be considered as executed
    */
-  async logMigration({name, context}: MigrationParams<MigrationContext>): Promise<void> {
-    const {db, timers, hashes} = context;
-    await db.none(`
+  async logMigration({ name, context }: MigrationParams<MigrationContext>): Promise<void> {
+    const { db, timers, hashes } = context;
+    await db.none(
+      `
       INSERT INTO migration_log (name, hash, start_time, end_time)
       VALUES ($1, $2, $3, $4)
-    `, [name, hashes[name], timers[name]?.start, timers[name]?.end]);
+    `,
+      [name, hashes[name], timers[name]?.start, timers[name]?.end],
+    );
   }
 
   /**
    * Logs a migration to be considered as pending (ie; not executed)
    */
-  async unlogMigration({name, context}: MigrationParams<MigrationContext>): Promise<void> {
-    const {db} = context;
-    await db.none(`
+  async unlogMigration({ name, context }: MigrationParams<MigrationContext>): Promise<void> {
+    const { db } = context;
+    await db.none(
+      `
       UPDATE migration_log
       SET unlog_time = CURRENT_TIMESTAMP
       WHERE id IN (
@@ -52,18 +56,20 @@ class PgStorage implements UmzugStorage<MigrationContext> {
         ORDER BY end_time DESC LIMIT 1
         FOR UPDATE
       )
-    `, [name]);
+    `,
+      [name],
+    );
   }
 
   /**
    * Gets a a list of already executed migrations
    */
-  async executed({context}: Pick<MigrationParams<MigrationContext>, "context">): Promise<string[]> {
-    const {db} = context;
-    const result: {name: string}[] = await db.any(
+  async executed({ context }: Pick<MigrationParams<MigrationContext>, "context">): Promise<string[]> {
+    const { db } = context;
+    const result: { name: string }[] = await db.any(
       "SELECT name FROM migration_log WHERE unlog_time IS NULL ORDER BY name DESC",
     );
-    return result.map(({name}) => name);
+    return result.map(({ name }) => name);
   }
 }
 

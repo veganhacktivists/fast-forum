@@ -1,5 +1,5 @@
-import { UserInputError } from 'apollo-server';
-import { Utils } from '../../lib/vulcan-lib';
+import { UserInputError } from "apollo-server";
+import { Utils } from "../../lib/vulcan-lib";
 
 /*
 
@@ -11,7 +11,7 @@ An error should have:
 
 */
 export const throwError = (error: { id: string; data: Record<string, any> }) => {
-  const { id, } = error;
+  const { id } = error;
   throw new UserInputError(id, error);
 };
 

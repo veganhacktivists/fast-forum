@@ -1,4 +1,4 @@
-import { registerFragment } from '../../vulcan-lib';
+import { registerFragment } from "../../vulcan-lib";
 
 registerFragment(`
   fragment CommentsList on Comment {
@@ -95,7 +95,7 @@ registerFragment(`
       ...TagPreviewFragment
     }
   }
-`)
+`);
 
 registerFragment(`
   fragment CommentWithRepliesFragment on Comment {
@@ -135,7 +135,7 @@ registerFragment(`
     deletedReason
     deletedPublic
   }
-`)
+`);
 
 registerFragment(`
   fragment DeletedCommentsModerationLog on Comment {
@@ -149,7 +149,7 @@ registerFragment(`
       _id
     }
   }
-`)
+`);
 
 registerFragment(`
   fragment CommentsListWithParentMetadata on Comment {

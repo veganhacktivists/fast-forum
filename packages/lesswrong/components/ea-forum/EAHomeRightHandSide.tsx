@@ -1,67 +1,67 @@
-import React, { useRef, useState } from 'react';
-import NoSSR from 'react-no-ssr';
-import moment from 'moment';
-import classNames from 'classnames';
-import sortBy from 'lodash/sortBy';
-import findIndex from 'lodash/findIndex';
-import TextField from '@material-ui/core/TextField';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
+import React, { useRef, useState } from "react";
+import NoSSR from "react-no-ssr";
+import moment from "moment";
+import classNames from "classnames";
+import sortBy from "lodash/sortBy";
+import findIndex from "lodash/findIndex";
+import TextField from "@material-ui/core/TextField";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
 import { AnalyticsContext, useTracking } from "../../lib/analyticsEvents";
-import { Link } from '../../lib/reactRouterWrapper';
-import { useMulti } from '../../lib/crud/withMulti';
-import { useTimezone } from '../common/withTimezone';
-import { useCurrentUser } from '../common/withUser';
-import { useUpdateCurrentUser } from '../hooks/useUpdateCurrentUser';
-import { useMessages } from '../common/withMessages';
-import { useUserLocation, userHasEmailAddress } from '../../lib/collections/users/helpers';
-import { postGetPageUrl } from '../../lib/collections/posts/helpers';
-import { getCityName } from '../localGroups/TabNavigationEventsList';
-import { isPostWithForeignId } from '../hooks/useForeignCrosspost';
-import { eaForumDigestSubscribeURL } from '../recentDiscussion/RecentDiscussionSubscribeReminder';
-import { userHasEAHomeRHS } from '../../lib/betas';
-import { spotifyLogoIcon } from '../icons/SpotifyLogoIcon';
-import { pocketCastsLogoIcon } from '../icons/PocketCastsLogoIcon';
-import { applePodcastsLogoIcon } from '../icons/ApplePodcastsLogoIcon';
-import { getBrowserLocalStorage } from '../editor/localStorageHandlers';
-import { useRecentOpportunities } from '../hooks/useRecentOpportunities';
-import { podcastAddictLogoIcon } from '../icons/PodcastAddictLogoIcon';
+import { Link } from "../../lib/reactRouterWrapper";
+import { useMulti } from "../../lib/crud/withMulti";
+import { useTimezone } from "../common/withTimezone";
+import { useCurrentUser } from "../common/withUser";
+import { useUpdateCurrentUser } from "../hooks/useUpdateCurrentUser";
+import { useMessages } from "../common/withMessages";
+import { useUserLocation, userHasEmailAddress } from "../../lib/collections/users/helpers";
+import { postGetPageUrl } from "../../lib/collections/posts/helpers";
+import { getCityName } from "../localGroups/TabNavigationEventsList";
+import { isPostWithForeignId } from "../hooks/useForeignCrosspost";
+import { eaForumDigestSubscribeURL } from "../recentDiscussion/RecentDiscussionSubscribeReminder";
+import { userHasEAHomeRHS } from "../../lib/betas";
+import { spotifyLogoIcon } from "../icons/SpotifyLogoIcon";
+import { pocketCastsLogoIcon } from "../icons/PocketCastsLogoIcon";
+import { applePodcastsLogoIcon } from "../icons/ApplePodcastsLogoIcon";
+import { getBrowserLocalStorage } from "../editor/localStorageHandlers";
+import { useRecentOpportunities } from "../hooks/useRecentOpportunities";
+import { podcastAddictLogoIcon } from "../icons/PodcastAddictLogoIcon";
 
 const styles = (theme: ThemeType) => ({
   root: {
     paddingRight: 50,
     marginTop: 10,
     marginLeft: 50,
-    '@media(max-width: 1370px)': {
-      display: 'none'
-    }
+    "@media(max-width: 1370px)": {
+      display: "none",
+    },
   },
   sidebarToggle: {
-    position: 'absolute',
+    position: "absolute",
     right: 0,
     height: 36,
     width: 30,
     backgroundColor: theme.palette.grey[200],
     color: theme.palette.grey[500],
     padding: 9,
-    borderRadius: '18px 0 0 18px',
-    cursor: 'pointer',
-    transition: 'width 0.2s ease',
-    '&:hover': {
+    borderRadius: "18px 0 0 18px",
+    cursor: "pointer",
+    transition: "width 0.2s ease",
+    "&:hover": {
       width: 34,
       backgroundColor: theme.palette.grey[250],
     },
-    '@media(max-width: 1370px)': {
-      display: 'none'
-    }
+    "@media(max-width: 1370px)": {
+      display: "none",
+    },
   },
   sidebarToggleIcon: {
-    fontSize: 18
+    fontSize: 18,
   },
   section: {
     maxWidth: 260,
-    display: 'flex',
-    flexDirection: 'column',
-    rowGap: '9px',
+    display: "flex",
+    flexDirection: "column",
+    rowGap: "9px",
     fontSize: 13,
     fontWeight: 450,
     fontFamily: theme.typography.fontFamily,
@@ -71,125 +71,125 @@ const styles = (theme: ThemeType) => ({
     maxWidth: 334,
   },
   podcastsSection: {
-    rowGap: '6px',
+    rowGap: "6px",
   },
   wrappedAd: {
     backgroundColor: theme.palette.wrapped.background,
     color: theme.palette.text.alwaysWhite,
-    padding: '12px 24px',
+    padding: "12px 24px",
     borderRadius: theme.borderRadius.default,
     transition: `box-shadow .3s`,
-    '&:hover': {
+    "&:hover": {
       opacity: 1,
-      boxShadow: `0 0 11px ${theme.palette.icon.dim5}`
-    }
+      boxShadow: `0 0 11px ${theme.palette.icon.dim5}`,
+    },
   },
   wrappedAdHeadingRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
     columnGap: 40,
   },
   wrappedAdHeading: {
     fontWeight: 600,
     fontSize: 16,
-    lineHeight: '22px',
-    margin: 0
+    lineHeight: "22px",
+    margin: 0,
   },
   wrappedAdImg: {
-    width: 50
+    width: 50,
   },
   digestAd: {
     maxWidth: 280,
     backgroundColor: theme.palette.grey[200],
-    padding: '12px 16px',
-    borderRadius: theme.borderRadius.default
+    padding: "12px 16px",
+    borderRadius: theme.borderRadius.default,
   },
   digestAdHeadingRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
+    display: "flex",
+    justifyContent: "space-between",
     columnGap: 8,
-    marginBottom: 12
+    marginBottom: 12,
   },
   digestAdHeading: {
     fontWeight: 600,
     fontSize: 16,
-    margin: 0
+    margin: 0,
   },
   digestAdClose: {
     height: 16,
     width: 16,
     color: theme.palette.grey[600],
-    cursor: 'pointer',
-    '&:hover': {
+    cursor: "pointer",
+    "&:hover": {
       color: theme.palette.grey[800],
-    }
+    },
   },
   digestAdBody: {
     fontSize: 13,
-    lineHeight: '19px',
+    lineHeight: "19px",
     fontWeight: 500,
     color: theme.palette.grey[600],
-    marginBottom: 15
+    marginBottom: 15,
   },
   digestForm: {
-    display: 'flex',
-    alignItems: 'baseline',
+    display: "flex",
+    alignItems: "baseline",
     columnGap: 8,
-    rowGap: '12px'
+    rowGap: "12px",
   },
   digestFormInput: {
     flexGrow: 1,
     background: theme.palette.grey[0],
     borderRadius: theme.borderRadius.default,
-    '& .MuiInputLabel-outlined': {
-      transform: 'translate(14px,12px) scale(1)',
-      '&.MuiInputLabel-shrink': {
-        transform: 'translate(14px,-6px) scale(0.75)',
-      }
+    "& .MuiInputLabel-outlined": {
+      transform: "translate(14px,12px) scale(1)",
+      "&.MuiInputLabel-shrink": {
+        transform: "translate(14px,-6px) scale(0.75)",
+      },
     },
-    '& .MuiNotchedOutline-root': {
+    "& .MuiNotchedOutline-root": {
       borderRadius: theme.borderRadius.default,
     },
-    '& .MuiOutlinedInput-input': {
-      padding: 11
-    }
+    "& .MuiOutlinedInput-input": {
+      padding: 11,
+    },
   },
   digestFormBtnWideScreen: {
-    '@media(max-width: 1450px)': {
-      display: 'none'
-    }
+    "@media(max-width: 1450px)": {
+      display: "none",
+    },
   },
   digestFormBtnNarrowScreen: {
-    display: 'none',
-    '@media(max-width: 1450px)': {
-      display: 'inline'
-    }
+    display: "none",
+    "@media(max-width: 1450px)": {
+      display: "inline",
+    },
   },
   digestFormBtnArrow: {
-    transform: 'translateY(3px)',
-    fontSize: 16
+    transform: "translateY(3px)",
+    fontSize: 16,
   },
   digestSuccess: {
-    display: 'flex',
+    display: "flex",
     columnGap: 10,
     fontSize: 13,
-    lineHeight: '19px',
+    lineHeight: "19px",
     color: theme.palette.grey[800],
   },
   digestSuccessCheckIcon: {
-    color: theme.palette.icon.greenCheckmark
+    color: theme.palette.icon.greenCheckmark,
   },
   digestSuccessLink: {
-    color: theme.palette.primary.main
+    color: theme.palette.primary.main,
   },
   sectionTitle: {
     fontSize: 12,
-    lineHeight: '16px'
+    lineHeight: "16px",
   },
   resourceLink: {
-    display: 'inline-flex',
-    alignItems: 'center',
+    display: "inline-flex",
+    alignItems: "center",
     columnGap: 6,
     color: theme.palette.primary.main,
     fontWeight: 600,
@@ -202,39 +202,38 @@ const styles = (theme: ThemeType) => ({
     fontWeight: 600,
   },
   postTitleLink: {
-    display: 'inline-block',
-    maxWidth: '100%',
-    overflow: 'hidden',
+    display: "inline-block",
+    maxWidth: "100%",
+    overflow: "hidden",
     whiteSpace: "nowrap",
-    textOverflow: 'ellipsis',
+    textOverflow: "ellipsis",
   },
   postMetadata: {
     color: theme.palette.text.dim3,
   },
   eventDate: {
-    display: 'inline-block',
-    width: 52
+    display: "inline-block",
+    width: 52,
   },
-  eventLocation: {
-  },
+  eventLocation: {},
   podcastApps: {
-    display: 'grid',
+    display: "grid",
     gridTemplateColumns: "117px 138px",
     columnGap: 7,
-    rowGap: '3px',
+    rowGap: "3px",
     marginLeft: -3,
     marginBottom: 2,
   },
   podcastApp: {
-    display: 'flex',
+    display: "flex",
     columnGap: 8,
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
     padding: 6,
     borderRadius: theme.borderRadius.default,
-    '&:hover': {
+    "&:hover": {
       backgroundColor: theme.palette.grey[200],
-      opacity: 1
-    }
+      opacity: 1,
+    },
   },
   podcastAppIcon: {
     color: theme.palette.primary.main,
@@ -243,8 +242,8 @@ const styles = (theme: ThemeType) => ({
     color: theme.palette.text.dim3,
     fontSize: 9,
     fontWeight: 700,
-    textTransform: 'uppercase',
-    marginBottom: 2
+    textTransform: "uppercase",
+    marginBottom: 2,
   },
   podcastAppName: {
     fontSize: 12,
@@ -263,19 +262,15 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const WrappedAd = ({classes}: {
-  classes: ClassesType<typeof styles>,
-}) => {
-  const currentUser = useCurrentUser()
-  
-  if (!currentUser) return null
-  
-  const { CloudinaryImage2 } = Components
-  
-  return <AnalyticsContext pageSubSectionContext="wrappedAd">
+const WrappedAd = ({ classes }: { classes: ClassesType<typeof styles> }) => {
+  const currentUser = useCurrentUser();
 
-  </AnalyticsContext>
-}
+  if (!currentUser) return null;
+
+  const { CloudinaryImage2 } = Components;
+
+  return <AnalyticsContext pageSubSectionContext="wrappedAd"></AnalyticsContext>;
+};
 
 /**
  * This is the Forum Digest ad that appears at the top of the EA Forum home page right hand side.
@@ -285,80 +280,80 @@ const WrappedAd = ({classes}: {
  *
  * See RecentDiscussionSubscribeReminder.tsx for the other component.
  */
-const DigestAd = ({classes}: {
-  classes: ClassesType<typeof styles>,
-}) => {
-  const currentUser = useCurrentUser()
-  const updateCurrentUser = useUpdateCurrentUser()
-  const emailRef = useRef<HTMLInputElement|null>(null)
-  const ls = getBrowserLocalStorage()
+const DigestAd = ({ classes }: { classes: ClassesType<typeof styles> }) => {
+  const currentUser = useCurrentUser();
+  const updateCurrentUser = useUpdateCurrentUser();
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const ls = getBrowserLocalStorage();
   const [isHidden, setIsHidden] = useState(
     // logged out user clicked the X in this ad, or previously submitted the form
-    (!currentUser && ls?.getItem('hideHomeDigestAd')) ||
-    // user is already subscribed
-    currentUser?.subscribedToDigest ||
-    // user is logged in and clicked the X in this ad, or "Don't ask again" in the ad in "Recent discussion"
-    currentUser?.hideSubscribePoke
-  )
-  const [loading, setLoading] = useState(false)
-  const [subscribeClicked, setSubscribeClicked] = useState(false)
-  const { flash } = useMessages()
-  const { captureEvent } = useTracking()
-  
+    (!currentUser && ls?.getItem("hideHomeDigestAd")) ||
+      // user is already subscribed
+      currentUser?.subscribedToDigest ||
+      // user is logged in and clicked the X in this ad, or "Don't ask again" in the ad in "Recent discussion"
+      currentUser?.hideSubscribePoke,
+  );
+  const [loading, setLoading] = useState(false);
+  const [subscribeClicked, setSubscribeClicked] = useState(false);
+  const { flash } = useMessages();
+  const { captureEvent } = useTracking();
+
   // This should never happen, but just exit if it does.
-  if (!currentUser && !ls) return null
-  
+  if (!currentUser && !ls) return null;
+
   // If the user just submitted the form, make sure not to hide it, so that it properly finishes submitting.
   // Alternatively, if the logged in user just clicked "Subscribe", show the success text rather than hiding this.
-  if (isHidden && !subscribeClicked) return null
-  
+  if (isHidden && !subscribeClicked) return null;
+
   // If the user is logged in and has an email address, we show their email address and the "Subscribe" button.
   // Otherwise, we show the form with the email address input.
-  const showForm = !currentUser || !userHasEmailAddress(currentUser)
-  
+  const showForm = !currentUser || !userHasEmailAddress(currentUser);
+
   const handleClose = () => {
-    setIsHidden(true)
-    captureEvent("digestAdClosed")
+    setIsHidden(true);
+    captureEvent("digestAdClosed");
     if (currentUser) {
-      void updateCurrentUser({hideSubscribePoke: true})
+      void updateCurrentUser({ hideSubscribePoke: true });
     } else {
-      ls.setItem('hideHomeDigestAd', true)
+      ls.setItem("hideHomeDigestAd", true);
     }
-  }
-  
+  };
+
   const handleUserSubscribe = async () => {
-    setLoading(true)
-    setSubscribeClicked(true)
-    captureEvent("digestAdSubscribed")
-    
+    setLoading(true);
+    setSubscribeClicked(true);
+    captureEvent("digestAdSubscribed");
+
     if (currentUser) {
       try {
         await updateCurrentUser({
           subscribedToDigest: true,
-          unsubscribeFromAll: false
-        })
-      } catch(e) {
-        flash('There was a problem subscribing you to the digest. Please try again later.')
+          unsubscribeFromAll: false,
+        });
+      } catch (e) {
+        flash("There was a problem subscribing you to the digest. Please try again later.");
       }
     }
     if (showForm && emailRef.current?.value) {
-      ls.setItem('hideHomeDigestAd', true)
+      ls.setItem("hideHomeDigestAd", true);
     }
-    
-    setLoading(false)
-  }
-  
-  const { ForumIcon, EAButton } = Components
-  
-  const buttonProps = loading ? {disabled: true} : {}
+
+    setLoading(false);
+  };
+
+  const { ForumIcon, EAButton } = Components;
+
+  const buttonProps = loading ? { disabled: true } : {};
   // button either says "Subscribe" or has a right arrow depending on the screen width
-  const buttonContents = <>
-    <span className={classes.digestFormBtnWideScreen}>Subscribe</span>
-    <span className={classes.digestFormBtnNarrowScreen}>
-      <ForumIcon icon="ArrowRight" className={classes.digestFormBtnArrow} />
-    </span>
-  </>
-  
+  const buttonContents = (
+    <>
+      <span className={classes.digestFormBtnWideScreen}>Subscribe</span>
+      <span className={classes.digestFormBtnNarrowScreen}>
+        <ForumIcon icon="ArrowRight" className={classes.digestFormBtnArrow} />
+      </span>
+    </>
+  );
+
   // Show the form to submit to Mailchimp directly,
   // or display the logged in user's email address and the Subscribe button
   let formNode = showForm ? (
@@ -378,65 +373,62 @@ const DigestAd = ({classes}: {
     </form>
   ) : (
     <div className={classes.digestForm}>
-      <TextField
-        variant="outlined"
-        value={currentUser.email}
-        className={classes.digestFormInput}
-        disabled={true}
-      />
+      <TextField variant="outlined" value={currentUser.email} className={classes.digestFormInput} disabled={true} />
       <EAButton onClick={handleUserSubscribe} {...buttonProps}>
         {buttonContents}
       </EAButton>
     </div>
-  )
-  
+  );
+
   // If a logged in user with an email address subscribes, show the success message.
   if (!showForm && subscribeClicked) {
-    formNode = <div className={classes.digestSuccess}>
-      <ForumIcon icon="CheckCircle" className={classes.digestSuccessCheckIcon} />
-      <div>
-        Thanks for subscribing! You can edit your subscription via
-        your <Link to={'/account?highlightField=subscribedToDigest'} className={classes.digestSuccessLink}>
-          account settings
-        </Link>.
+    formNode = (
+      <div className={classes.digestSuccess}>
+        <ForumIcon icon="CheckCircle" className={classes.digestSuccessCheckIcon} />
+        <div>
+          Thanks for subscribing! You can edit your subscription via your{" "}
+          <Link to={"/account?highlightField=subscribedToDigest"} className={classes.digestSuccessLink}>
+            account settings
+          </Link>
+          .
+        </div>
       </div>
-    </div>
+    );
   }
-  
-  return <AnalyticsContext pageSubSectionContext="digestAd">
-    <div className={classNames(classes.section, classes.digestAdSection)}>
-      <div className={classes.digestAd}>
-        <div className={classes.digestAdHeadingRow}>
-          <h2 className={classes.digestAdHeading}>Get the best posts emailed</h2>
-          <ForumIcon icon="Close" className={classes.digestAdClose} onClick={handleClose} />
-        </div>
-        <div className={classes.digestAdBody}>
-          Sign up for the FAST Forum Digest to get curated weekly recommendations
-        </div>
-        {formNode}
-      </div>
-    </div>
-  </AnalyticsContext>
-}
 
+  return (
+    <AnalyticsContext pageSubSectionContext="digestAd">
+      <div className={classNames(classes.section, classes.digestAdSection)}>
+        <div className={classes.digestAd}>
+          <div className={classes.digestAdHeadingRow}>
+            <h2 className={classes.digestAdHeading}>Get the best posts emailed</h2>
+            <ForumIcon icon="Close" className={classes.digestAdClose} onClick={handleClose} />
+          </div>
+          <div className={classes.digestAdBody}>
+            Sign up for the FAST Forum Digest to get curated weekly recommendations
+          </div>
+          {formNode}
+        </div>
+      </div>
+    </AnalyticsContext>
+  );
+};
 
 /**
  * This is the primary EA Forum home page right-hand side component.
  */
-export const EAHomeRightHandSide = ({classes}: {
-  classes: ClassesType<typeof styles>,
-}) => {
-  const currentUser = useCurrentUser()
-  const updateCurrentUser = useUpdateCurrentUser()
-  const { captureEvent } = useTracking()
+export const EAHomeRightHandSide = ({ classes }: { classes: ClassesType<typeof styles> }) => {
+  const currentUser = useCurrentUser();
+  const updateCurrentUser = useUpdateCurrentUser();
+  const { captureEvent } = useTracking();
   // logged in users can hide the RHS - this is tracked via state so that the UI is snappy
-  const [isHidden, setIsHidden] = useState(!!currentUser?.hideHomeRHS)
+  const [isHidden, setIsHidden] = useState(!!currentUser?.hideHomeRHS);
 
-  const {results: opportunityPosts} = useRecentOpportunities({
+  const { results: opportunityPosts } = useRecentOpportunities({
     fragmentName: "PostsListWithVotesAndSequence",
   });
 
-  const {results: savedPosts} = useMulti({
+  const { results: savedPosts } = useMulti({
     collectionName: "Posts",
     terms: {
       view: "myBookmarkedPosts",
@@ -445,199 +437,235 @@ export const EAHomeRightHandSide = ({classes}: {
     fragmentName: "PostsList",
     fetchPolicy: "cache-and-network",
     skip: !currentUser?._id,
-  })
+  });
   // HACK: The results are not properly sorted, so we sort them here.
   // See also comments in BookmarksList.tsx and the myBookmarkedPosts view.
-  const sortedSavedPosts = sortBy(savedPosts,
-    post => -findIndex(
-      currentUser?.bookmarkedPostsMetadata || [],
-      (bookmark) => bookmark.postId === post._id
-    )
-  )
-  
-  const handleToggleSidebar = () => {
-    if (!currentUser) return
-    
-    if (isHidden) {
-      setIsHidden(false)
-      captureEvent("homeRhsShown")
-      void updateCurrentUser({hideHomeRHS: false})
-    } else {
-      setIsHidden(true)
-      captureEvent("homeRhsHidden")
-      void updateCurrentUser({hideHomeRHS: true})
-    }
-  }
+  const sortedSavedPosts = sortBy(
+    savedPosts,
+    (post) => -findIndex(currentUser?.bookmarkedPostsMetadata || [], (bookmark) => bookmark.postId === post._id),
+  );
 
-  if (!userHasEAHomeRHS(currentUser)) return null
-  
-  const {
-    SectionTitle, PostsItemTooltipWrapper, PostsItemDate, LWTooltip, ForumIcon,
-  } = Components
-  
-  const sidebarToggleNode = <div className={classes.sidebarToggle} onClick={handleToggleSidebar}>
-    <LWTooltip title={isHidden ? 'Show sidebar' : 'Hide sidebar'}>
-      <ForumIcon icon={isHidden ? 'ThickChevronLeft' : 'ThickChevronRight'} className={classes.sidebarToggleIcon} />
-    </LWTooltip>
-  </div>
-  
-  if (isHidden) return sidebarToggleNode
-  
+  const handleToggleSidebar = () => {
+    if (!currentUser) return;
+
+    if (isHidden) {
+      setIsHidden(false);
+      captureEvent("homeRhsShown");
+      void updateCurrentUser({ hideHomeRHS: false });
+    } else {
+      setIsHidden(true);
+      captureEvent("homeRhsHidden");
+      void updateCurrentUser({ hideHomeRHS: true });
+    }
+  };
+
+  if (!userHasEAHomeRHS(currentUser)) return null;
+
+  const { SectionTitle, PostsItemTooltipWrapper, PostsItemDate, LWTooltip, ForumIcon } = Components;
+
+  const sidebarToggleNode = (
+    <div className={classes.sidebarToggle} onClick={handleToggleSidebar}>
+      <LWTooltip title={isHidden ? "Show sidebar" : "Hide sidebar"}>
+        <ForumIcon icon={isHidden ? "ThickChevronLeft" : "ThickChevronRight"} className={classes.sidebarToggleIcon} />
+      </LWTooltip>
+    </div>
+  );
+
+  if (isHidden) return sidebarToggleNode;
+
   // NoSSR sections that could affect the logged out user cache
-  let digestAdNode = <DigestAd classes={classes} />
+  let digestAdNode = <DigestAd classes={classes} />;
   if (!currentUser) {
-    digestAdNode = <NoSSR>{digestAdNode}</NoSSR>
+    digestAdNode = <NoSSR>{digestAdNode}</NoSSR>;
   }
 
   // data for podcasts section
-  const podcasts = [{
-    url: 'https://open.spotify.com/show/3NwXq1GGCveAbeH1Sk3yNq',
-    icon: spotifyLogoIcon,
-    name: 'Spotify'
-  }, {
-    url: 'https://podcasts.apple.com/us/podcast/1657526204',
-    icon: applePodcastsLogoIcon,
-    name: 'Apple Podcasts'
-  }, {
-    url: 'https://pca.st/zlt4n89d',
-    icon: pocketCastsLogoIcon,
-    name: 'Pocket Casts'
-  }, {
-    url: 'https://podcastaddict.com/podcast/ea-forum-podcast-curated-popular/4160487',
-    icon: podcastAddictLogoIcon,
-    name: 'Podcast Addict'
-  }]
-  const podcastPost = '/posts/K5Snxo5EhgmwJJjR2/announcing-ea-forum-podcast-audio-narrations-of-ea-forum'
+  const podcasts = [
+    {
+      url: "https://open.spotify.com/show/3NwXq1GGCveAbeH1Sk3yNq",
+      icon: spotifyLogoIcon,
+      name: "Spotify",
+    },
+    {
+      url: "https://podcasts.apple.com/us/podcast/1657526204",
+      icon: applePodcastsLogoIcon,
+      name: "Apple Podcasts",
+    },
+    {
+      url: "https://pca.st/zlt4n89d",
+      icon: pocketCastsLogoIcon,
+      name: "Pocket Casts",
+    },
+    {
+      url: "https://podcastaddict.com/podcast/ea-forum-podcast-curated-popular/4160487",
+      icon: podcastAddictLogoIcon,
+      name: "Podcast Addict",
+    },
+  ];
+  const podcastPost = "/posts/K5Snxo5EhgmwJJjR2/announcing-ea-forum-podcast-audio-narrations-of-ea-forum";
 
-  return <AnalyticsContext pageSectionContext="homeRhs">
-    {!!currentUser && sidebarToggleNode}
-    <div className={classes.root}>
-      <WrappedAd classes={classes} />
+  return (
+    <AnalyticsContext pageSectionContext="homeRhs">
+      {!!currentUser && sidebarToggleNode}
+      <div className={classes.root}>
+        <WrappedAd classes={classes} />
 
-      {digestAdNode}
+        {digestAdNode}
 
-      <AnalyticsContext pageSubSectionContext="resources">
-        <div className={classes.section}>
-          <SectionTitle title="Quick Links" className={classes.sectionTitle} noTopMargin noBottomPadding />
-          <div>
-            <Link to="https://forum.fastcommunity.org/newPost" className={classes.resourceLink}>
-              Create a new post
-            </Link>
+        <AnalyticsContext pageSubSectionContext="resources">
+          <div className={classes.section}>
+            <SectionTitle title="Quick Links" className={classes.sectionTitle} noTopMargin noBottomPadding />
+            <div>
+              <Link to="https://forum.fastcommunity.org/newPost" className={classes.resourceLink}>
+                Create a new post
+              </Link>
+            </div>
+            <div>
+              <Link to="https://forum.fastcommunity.org/quicktakes" className={classes.resourceLink}>
+                Post a quick take
+              </Link>
+            </div>
+            <div>
+              <Link to="https://forum.fastcommunity.org/newPost?question=true" className={classes.resourceLink}>
+                Ask a question
+              </Link>
+            </div>
           </div>
-          <div>
-            <Link to="https://forum.fastcommunity.org/quicktakes" className={classes.resourceLink}>
-              Post a quick take
-            </Link>
-          </div>
-          <div>
-            <Link to="https://forum.fastcommunity.org/newPost?question=true" className={classes.resourceLink}>
-              Ask a question
-            </Link>
-          </div>
-        </div>
-      </AnalyticsContext>
+        </AnalyticsContext>
 
-      <div className="TabNavigationMenu-divider" style={{ marginLeft: '0px' }}></div>
-      
-      <AnalyticsContext pageSubSectionContext="resources">
-        <div className={classes.section}>
-          <SectionTitle title="Resources" className={classes.sectionTitle} noTopMargin noBottomPadding />
-          <div>
-            <Link to="https://forum.fastcommunity.org/posts/gTBQ9APGmxcizgorA/our-community-guidelines" className={classes.resourceLink}>
-              <ForumIcon icon="BookOpen" className={classes.resourceIcon} />
-              Community Guidelines
-            </Link>
+        <div className="TabNavigationMenu-divider" style={{ marginLeft: "0px" }}></div>
+
+        <AnalyticsContext pageSubSectionContext="resources">
+          <div className={classes.section}>
+            <SectionTitle title="Resources" className={classes.sectionTitle} noTopMargin noBottomPadding />
+            <div>
+              <Link
+                to="https://forum.fastcommunity.org/posts/gTBQ9APGmxcizgorA/our-community-guidelines"
+                className={classes.resourceLink}
+              >
+                <ForumIcon icon="BookOpen" className={classes.resourceIcon} />
+                Community Guidelines
+              </Link>
+            </div>
+            <div>
+              <Link to="https://forum.fastcommunity.org/topics" className={classes.resourceLink}>
+                <ForumIcon icon="ComputerDesktop" className={classes.resourceIcon} />
+                Explore & Subscribe to Topics
+              </Link>
+            </div>
+            <div>
+              <Link to="https://fastcommunity.org/resources" className={classes.resourceLink}>
+                <ForumIcon icon="UsersOutline" className={classes.resourceIcon} />
+                Discover our Resource Hub
+              </Link>
+            </div>
           </div>
-          <div>
-            <Link to="https://forum.fastcommunity.org/topics" className={classes.resourceLink}>
-              <ForumIcon icon="ComputerDesktop" className={classes.resourceIcon} />
-              Explore & Subscribe to Topics
-            </Link>
-          </div>
-          <div>
-            <Link to="https://fastcommunity.org/resources" className={classes.resourceLink}>
-              <ForumIcon icon="UsersOutline" className={classes.resourceIcon} />
-              Discover our Resource Hub
-            </Link>
-          </div>
-        </div>
-      </AnalyticsContext>
-      
-      {!!opportunityPosts?.length && <AnalyticsContext pageSubSectionContext="opportunities">
-        <div className={classes.section}>
-          <LWTooltip
-            title="View more posts tagged “Opportunities to take action”"
-            placement="top-start"
-            popperClassName={classes.tooltip}
+        </AnalyticsContext>
+
+        {!!opportunityPosts?.length && (
+          <AnalyticsContext pageSubSectionContext="opportunities">
+            <div className={classes.section}>
+              <LWTooltip
+                title="View more posts tagged “Opportunities to take action”"
+                placement="top-start"
+                popperClassName={classes.tooltip}
+              >
+                <SectionTitle
+                  title="Careers & Volunteering"
+                  href="/topics/careers-and-volunteering"
+                  className={classes.sectionTitle}
+                  noTopMargin
+                  noBottomPadding
+                />
+              </LWTooltip>
+              {opportunityPosts?.map((post) => (
+                <div key={post._id}>
+                  <div className={classes.postTitle}>
+                    <PostsItemTooltipWrapper post={post} As="span">
+                      <Link to={postGetPageUrl(post)} className={classes.postTitleLink}>
+                        {post.title}
+                      </Link>
+                    </PostsItemTooltipWrapper>
+                  </div>
+                  <div className={classes.postMetadata}>
+                    Posted <PostsItemDate post={post} includeAgo />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </AnalyticsContext>
+        )}
+
+        {!!sortedSavedPosts?.length && (
+          <AnalyticsContext pageSubSectionContext="savedPosts">
+            <div className={classes.section}>
+              <SectionTitle
+                title="Saved posts"
+                href="/saved"
+                className={classes.sectionTitle}
+                noTopMargin
+                noBottomPadding
+              />
+              {sortedSavedPosts.map((post) => {
+                let postAuthor = "[anonymous]";
+                if (post.user && !post.hideAuthor) {
+                  postAuthor = post.user.displayName;
+                }
+                const readTime = isPostWithForeignId(post) ? "" : `, ${post.readTimeMinutes} min`;
+                return (
+                  <div key={post._id}>
+                    <div className={classes.postTitle}>
+                      <PostsItemTooltipWrapper post={post} As="span">
+                        <Link to={postGetPageUrl(post)} className={classes.postTitleLink}>
+                          {post.title}
+                        </Link>
+                      </PostsItemTooltipWrapper>
+                    </div>
+                    <div className={classes.postMetadata}>
+                      {postAuthor}
+                      {readTime}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </AnalyticsContext>
+        )}
+        <div className="TabNavigationMenu-divider" style={{ marginLeft: "0px" }}></div>
+        <p className="EAHomeRightHandSide-feedbackLink">FAST Animal Advocacy Forum © 2024</p>
+        <p className="EAHomeRightHandSide-feedbackLink" style={{ lineHeight: "20px", maxWidth: "320px" }}>
+          Maintained by{" "}
+          <a href="https://veganhacktivists.org" style={{ color: "#1c563e" }} target="_blank" rel="noreferrer">
+            Vegan Hacktivists
+          </a>
+          , designed by{" "}
+          <a href="https://violetstudios.org" style={{ color: "#1c563e" }} target="_blank" rel="noreferrer">
+            Violet Studios
+          </a>
+          , built{" "}
+          <a
+            href="https://github.com/ForumMagnum/ForumMagnum"
+            style={{ color: "#1c563e" }}
+            target="_blank"
+            rel="noreferrer"
           >
-            <SectionTitle
-              title="Careers & Volunteering"
-              href="/topics/careers-and-volunteering"
-              className={classes.sectionTitle}
-              noTopMargin
-              noBottomPadding
-            />
-          </LWTooltip>
-          {opportunityPosts?.map(post => <div key={post._id}>
-            <div className={classes.postTitle}>
-              <PostsItemTooltipWrapper post={post} As="span">
-                <Link to={postGetPageUrl(post)} className={classes.postTitleLink}>
-                  {post.title}
-                </Link>
-              </PostsItemTooltipWrapper>
-            </div>
-            <div className={classes.postMetadata}>
-              Posted <PostsItemDate post={post} includeAgo />
-            </div>
-          </div>)}
-        </div>
-      </AnalyticsContext>}
-      
-      {!!sortedSavedPosts?.length && <AnalyticsContext pageSubSectionContext="savedPosts">
-        <div className={classes.section}>
-          <SectionTitle
-            title="Saved posts"
-            href="/saved"
-            className={classes.sectionTitle}
-            noTopMargin
-            noBottomPadding
-          />
-          {sortedSavedPosts.map(post => {
-            let postAuthor = '[anonymous]'
-            if (post.user && !post.hideAuthor) {
-              postAuthor = post.user.displayName
-            }
-            const readTime = isPostWithForeignId(post) ? '' : `, ${post.readTimeMinutes} min`
-            return <div key={post._id}>
-              <div className={classes.postTitle}>
-                <PostsItemTooltipWrapper post={post} As="span">
-                  <Link to={postGetPageUrl(post)} className={classes.postTitleLink}>
-                    {post.title}
-                  </Link>
-                </PostsItemTooltipWrapper>
-              </div>
-              <div className={classes.postMetadata}>
-                {postAuthor}{readTime}
-              </div>
-            </div>
-          })}
-        </div>
-      </AnalyticsContext>}
-      <div className="TabNavigationMenu-divider" style={{ marginLeft: '0px' }}></div>
-      <p className="EAHomeRightHandSide-feedbackLink">FAST Animal Advocacy Forum © 2024</p>
-      <p className="EAHomeRightHandSide-feedbackLink" style={{ lineHeight: '20px', maxWidth: '320px' }}>
-          Maintained by <a href="https://veganhacktivists.org" style={{ color: '#1c563e' }} target="_blank">Vegan Hacktivists</a>, 
-          designed by <a href="https://violetstudios.org" style={{ color: '#1c563e' }} target="_blank">Violet Studios</a>, 
-          built <a href="https://github.com/ForumMagnum/ForumMagnum" style={{ color: '#1c563e' }} target="_blank">and based</a> on <a href="https://forum.effectivealtruism.org/" style={{ color: '#1c563e' }} target="_blank">EAForum</a>.
-      </p>
-    </div>
-  </AnalyticsContext>
-}
+            and based
+          </a>{" "}
+          on{" "}
+          <a href="https://forum.effectivealtruism.org/" style={{ color: "#1c563e" }} target="_blank" rel="noreferrer">
+            EAForum
+          </a>
+          .
+        </p>
+      </div>
+    </AnalyticsContext>
+  );
+};
 
-const EAHomeRightHandSideComponent = registerComponent('EAHomeRightHandSide', EAHomeRightHandSide, {styles});
+const EAHomeRightHandSideComponent = registerComponent("EAHomeRightHandSide", EAHomeRightHandSide, { styles });
 
 declare global {
   interface ComponentTypes {
-    EAHomeRightHandSide: typeof EAHomeRightHandSideComponent
+    EAHomeRightHandSide: typeof EAHomeRightHandSideComponent;
   }
 }

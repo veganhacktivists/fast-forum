@@ -9,15 +9,12 @@ export function isValidBase36Id(id: string): boolean {
   return !isNaN(parseInt(id, 36));
 }
 
-export function base36toNumber(id: string): number|null {
-  const parsed = parseInt(id, 36)
-  if (isNaN(parsed))
-    return null
-  else
-    return parsed;
+export function base36toNumber(id: string): number | null {
+  const parsed = parseInt(id, 36);
+  if (isNaN(parsed)) return null;
+  else return parsed;
 }
 
 export function numberToBase36(n: number): string {
   return n.toString(36);
 }
-

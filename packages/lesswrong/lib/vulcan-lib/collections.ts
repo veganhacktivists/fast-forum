@@ -1,29 +1,30 @@
-import PgCollection from '../sql/PgCollection';
-import { getDefaultFragmentText, registerFragment } from './fragments';
-import { registerCollection } from './getCollection';
-import { addGraphQLCollection } from './graphql';
-import { camelCaseify } from './utils';
-import { pluralize } from './pluralize';
-export * from './getCollection';
+import PgCollection from "../sql/PgCollection";
+import { getDefaultFragmentText, registerFragment } from "./fragments";
+import { registerCollection } from "./getCollection";
+import { addGraphQLCollection } from "./graphql";
+import { camelCaseify } from "./utils";
+import { pluralize } from "./pluralize";
+export * from "./getCollection";
 
 // When used in a view, set the query so that it returns rows where a field is
 // null or is missing. Equivalent to a search with mongo's `field:null`, except
 // that null can't be used this way within Vulcan views because it's ambiguous
 // between searching for null/missing, vs overriding the default view to allow
 // any value.
-export const viewFieldNullOrMissing = {nullOrMissing:true};
+export const viewFieldNullOrMissing = { nullOrMissing: true };
 
 // When used in a view, set the query so that any value for this field is
 // permitted, overriding constraints from the default view if they exist.
-export const viewFieldAllowAny = {allowAny:true};
+export const viewFieldAllowAny = { allowAny: true };
 
 // TODO: find more reliable way to get collection name from type name?
-export const getCollectionName = (typeName: string): CollectionNameString => pluralize(typeName) as CollectionNameString;
+export const getCollectionName = (typeName: string): CollectionNameString =>
+  pluralize(typeName) as CollectionNameString;
 
 // TODO: find more reliable way to get type name from collection name?
 export const getTypeName = (collectionName: CollectionNameString) => collectionName.slice(0, -1);
 
-type CreateCollectionOptions <N extends CollectionNameString> = Omit<
+type CreateCollectionOptions<N extends CollectionNameString> = Omit<
   CollectionOptions<N>,
   "singleResolverName" | "multiResolverName" | "interfaces" | "description"
 >;
@@ -31,23 +32,14 @@ type CreateCollectionOptions <N extends CollectionNameString> = Omit<
 export const createCollection = <N extends CollectionNameString>(
   options: CreateCollectionOptions<N>,
 ): CollectionsByName[N] => {
-  const {
-    typeName,
-    collectionName,
-    schema,
-    generateGraphQLSchema = true,
-    dbCollectionName,
-  } = options;
+  const { typeName, collectionName, schema, generateGraphQLSchema = true, dbCollectionName } = options;
 
   // initialize new collection
-  const collection = new PgCollection<N>(
-    dbCollectionName ?? collectionName.toLowerCase(),
-    {
-      ...options,
-      singleResolverName: camelCaseify(typeName),
-      multiResolverName: camelCaseify(pluralize(typeName)),
-    },
-  );
+  const collection = new PgCollection<N>(dbCollectionName ?? collectionName.toLowerCase(), {
+    ...options,
+    singleResolverName: camelCaseify(typeName),
+    multiResolverName: camelCaseify(pluralize(typeName)),
+  });
 
   // add typeName if missing
   collection.typeName = typeName;

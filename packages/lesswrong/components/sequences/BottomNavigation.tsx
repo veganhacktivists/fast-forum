@@ -1,13 +1,13 @@
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import React from 'react';
-import { legacyBreakpoints } from '../../lib/utils/theme';
-import withErrorBoundary from '../common/withErrorBoundary'
-import classnames from 'classnames';
-import { useCurrentUser } from '../common/withUser';
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import React from "react";
+import { legacyBreakpoints } from "../../lib/utils/theme";
+import withErrorBoundary from "../common/withErrorBoundary";
+import classnames from "classnames";
+import { useCurrentUser } from "../common/withUser";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
-    position: "relative"
+    position: "relative",
   },
 
   post: {
@@ -24,18 +24,17 @@ const styles = (theme: ThemeType): JssStyles => ({
     },
     [legacyBreakpoints.maxTiny]: {
       paddingLeft: 5,
-    }
+    },
   },
 
-  prevPost: {
-  },
+  prevPost: {},
 
   nextPost: {
     float: "right",
 
     [legacyBreakpoints.maxSmall]: {
-      paddingBottom: 50
-    }
+      paddingBottom: 50,
+    },
   },
 
   divider: {
@@ -53,8 +52,8 @@ const styles = (theme: ThemeType): JssStyles => ({
     top: 0,
 
     [legacyBreakpoints.maxSmall]: {
-      display: "none"
-    }
+      display: "none",
+    },
   },
 
   nextSequenceDirection: {
@@ -63,52 +62,49 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 
   clear: {
-    clear: "both"
-  }
-})
+    clear: "both",
+  },
+});
 
-const BottomNavigation = ({post, classes}: {
-  post: PostSequenceNavigation,
-  classes: ClassesType,
-}) => {
+const BottomNavigation = ({ post, classes }: { post: PostSequenceNavigation; classes: ClassesType }) => {
   const { nextPost, prevPost, sequence } = post;
   const currentUser = useCurrentUser();
-  
-  if (!nextPost && !prevPost)
-    return null;
-  
-  if (!post?.sequence)
-    return null;
-  if (post.sequence.draft && (!currentUser || currentUser._id!==post.sequence.userId) && !currentUser?.isAdmin) {
+
+  if (!nextPost && !prevPost) return null;
+
+  if (!post?.sequence) return null;
+  if (post.sequence.draft && (!currentUser || currentUser._id !== post.sequence.userId) && !currentUser?.isAdmin) {
     return null;
   }
-  
-  return <div className={classes.root}>
-    {prevPost &&
-      <div className={classnames(classes.post, classes.prevPost)}>
-      <Components.BottomNavigationItem direction="Previous" post={prevPost} sequence={prevPost.sequence}/>
-      </div>}
-    
-    <div className={classes.divider}></div>
-    
-    {nextPost &&
-      <div className={classnames(classes.post, classes.nextPost)}>
-        <Components.BottomNavigationItem direction="Next" post={nextPost} sequence={nextPost.sequence}/>
-      </div>}
-    
-    <div className={classes.clear}></div>
-  </div>
+
+  return (
+    <div className={classes.root}>
+      {prevPost && (
+        <div className={classnames(classes.post, classes.prevPost)}>
+          <Components.BottomNavigationItem direction="Previous" post={prevPost} sequence={prevPost.sequence} />
+        </div>
+      )}
+
+      <div className={classes.divider}></div>
+
+      {nextPost && (
+        <div className={classnames(classes.post, classes.nextPost)}>
+          <Components.BottomNavigationItem direction="Next" post={nextPost} sequence={nextPost.sequence} />
+        </div>
+      )}
+
+      <div className={classes.clear}></div>
+    </div>
+  );
 };
 
-
-const BottomNavigationComponent = registerComponent('BottomNavigation', BottomNavigation, {
+const BottomNavigationComponent = registerComponent("BottomNavigation", BottomNavigation, {
   styles,
-  hocs: [withErrorBoundary]
+  hocs: [withErrorBoundary],
 });
 
 declare global {
   interface ComponentTypes {
-    BottomNavigation: typeof BottomNavigationComponent
+    BottomNavigation: typeof BottomNavigationComponent;
   }
 }
-

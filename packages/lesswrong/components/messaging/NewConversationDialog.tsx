@@ -12,7 +12,7 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   root: {
     maxWidth: 600,
-    width: 'min(600px, 100%)',
+    width: "min(600px, 100%)",
     maxHeight: 600,
     flex: 1,
     minHeight: 0,
@@ -24,7 +24,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     color: theme.palette.grey[1000],
     fontSize: 20,
     fontWeight: 700,
-    padding: '20px 20px 14px 20px',
+    padding: "20px 20px 14px 20px",
     display: "flex",
     justifyContent: "space-between",
   },
@@ -48,7 +48,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     },
   },
   modWarning: {
-    padding: '0px 20px 12px 20px',
+    padding: "0px 20px 12px 20px",
     color: theme.palette.grey[600],
     fontSize: 14,
   },
@@ -114,7 +114,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     width: 20,
     height: 20,
     cursor: "pointer",
-  }
+  },
 });
 
 const NewConversationDialog = ({
@@ -134,9 +134,13 @@ const NewConversationDialog = ({
 
   return (
     <AnalyticsContext pageSectionContext="newConversationDialog">
-      <LWDialog open={true} onClose={onClose} dialogClasses={{
-        paper: classes.paper,
-      }}>
+      <LWDialog
+        open={true}
+        onClose={onClose}
+        dialogClasses={{
+          paper: classes.paper,
+        }}
+      >
         <div className={classes.root}>
           <div className={classes.titleRow}>
             <div>New conversation</div>
@@ -162,7 +166,9 @@ const NewConversationDialog = ({
                 </LWTooltip>
               </div>
               {isModInbox && (
-                <Typography variant="body2" className={classes.modWarning}>Moderators will be included in this conversation</Typography>
+                <Typography variant="body2" className={classes.modWarning}>
+                  Moderators will be included in this conversation
+                </Typography>
               )}
               <ErrorBoundary>
                 <div className={classes.usersList}>

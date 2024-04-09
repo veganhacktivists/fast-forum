@@ -1,4 +1,4 @@
-import { foreignKeyField } from '../../../lib/utils/schemaUtils';
+import { foreignKeyField } from "../../../lib/utils/schemaUtils";
 
 const schema: SchemaType<"EmailTokens"> = {
   token: {
@@ -27,6 +27,6 @@ const schema: SchemaType<"EmailTokens"> = {
     type: Object,
     blackbox: true,
   },
-}
+};
 
 export default schema;

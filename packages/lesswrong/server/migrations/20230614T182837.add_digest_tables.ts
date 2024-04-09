@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-06-09T10:00:00.000Z by 20230609T100000.add_PageCache.ts
  * +-- Overall schema hash: 7abdde9662fea7114e47457ccdc6f4ad
- *  
+ *
  * @@ -237,2 +235,26 @@ CREATE TABLE "DebouncerEvents" (
- *  
+ *
  * +-- Schema for "DigestPosts", hash: fb8d9230b033323f61ec3b5039a2d588
  * +CREATE TABLE "DigestPosts" (
  * +    _id varchar(27) PRIMARY KEY,
@@ -40,7 +40,7 @@
  * +);
  * +
  *  -- Schema for "EmailTokens", hash: e5ad1bb9271a861a3a69375cabb71b64
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -51,30 +51,30 @@
  */
 export const acceptsSchemaHash = "7abdde9662fea7114e47457ccdc6f4ad";
 
-import DigestPosts from "../../lib/collections/digestPosts/collection"
-import Digests from "../../lib/collections/digests/collection"
-import { randomId } from "../../lib/random"
-import InsertQuery from "../../lib/sql/InsertQuery"
-import { createTable, dropTable } from "./meta/utils"
+import DigestPosts from "../../lib/collections/digestPosts/collection";
+import Digests from "../../lib/collections/digests/collection";
+import { randomId } from "../../lib/random";
+import InsertQuery from "../../lib/sql/InsertQuery";
+import { createTable, dropTable } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await createTable(db, Digests)
-  await createTable(db, DigestPosts)
+export const up = async ({ db }: MigrationContext) => {
+  await createTable(db, Digests);
+  await createTable(db, DigestPosts);
 
   // insert a digest to start
-  const now = new Date()
+  const now = new Date();
   const newDigest = {
     _id: randomId(),
     num: 1,
     startDate: now,
     createdAt: now,
-  }
-  const query = new InsertQuery(Digests.getTable(), newDigest as DbDigest)
-  const {sql, args} = query.compile()
-  await db.none(sql, args)
-}
+  };
+  const query = new InsertQuery(Digests.getTable(), newDigest as DbDigest);
+  const { sql, args } = query.compile();
+  await db.none(sql, args);
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropTable(db, DigestPosts)
-  await dropTable(db, Digests)
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropTable(db, DigestPosts);
+  await dropTable(db, Digests);
+};

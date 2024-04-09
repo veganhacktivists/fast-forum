@@ -5,10 +5,10 @@ import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
  */
 export default class UrlValidator extends Plugin {
 	init() {
-		this.editor.model.document.on('change:data', (eventInfo) => {
+		this.editor.model.document.on("change:data", (eventInfo) => {
 			for (const change of eventInfo.source.differ.getChanges()) {
 				const { type, attributeKey: key, attributeNewValue: value } = change;
-				if (type === 'attribute' && key === 'linkHref' && value) {
+				if (type === "attribute" && key === "linkHref" && value) {
 					this._updateUrlIfInvalid(value);
 				}
 			}
@@ -19,7 +19,7 @@ export default class UrlValidator extends Plugin {
 		const newUrl = this._validateUrl(url);
 		if (newUrl !== url) {
 			this.editor.model.change((writer) => {
-				this.editor.commands.get('link').execute(newUrl);
+				this.editor.commands.get("link").execute(newUrl);
 			});
 		}
 	}
@@ -43,7 +43,7 @@ export default class UrlValidator extends Plugin {
 			}
 		}
 
-	  return url;
+		return url;
 	}
 
 	_tryToFixUrl(oldUrl, newUrl) {

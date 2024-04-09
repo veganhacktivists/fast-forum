@@ -10,7 +10,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     fontFamily: theme.palette.fonts.sansSerifStack,
     overflow: "hidden",
     [theme.breakpoints.down("xs")]: {
-      display: "none"
+      display: "none",
     },
   },
   mainContainer: {
@@ -51,16 +51,10 @@ const styles = (theme: ThemeType): JssStyles => ({
 });
 
 type EAPostsPreviewTooltipProps = PostsPreviewTooltipProps & {
-  classes: ClassesType,
-}
+  classes: ClassesType;
+};
 
-const EAPostsPreviewTooltip = ({
-  post,
-  postsList,
-  hash,
-  comment,
-  classes,
-}: EAPostsPreviewTooltipProps) => {
+const EAPostsPreviewTooltip = ({ post, postsList, hash, comment, classes }: EAPostsPreviewTooltipProps) => {
   const tagsRef = useRef(null);
 
   if (!post) {
@@ -68,74 +62,50 @@ const EAPostsPreviewTooltip = ({
   }
 
   const showSubheaderInfo = !postsList;
-  const {imageUrl} = post.socialPreviewData ?? {};
+  const { imageUrl } = post.socialPreviewData ?? {};
 
-  const {PostExcerpt, EAPostMeta, TruncatedTagsList, CommentsNode} = Components;
+  const { PostExcerpt, EAPostMeta, TruncatedTagsList, CommentsNode } = Components;
   return (
     <AnalyticsContext pageElementContext={POST_PREVIEW_ELEMENT_CONTEXT}>
       <div className={classes.root}>
         <div className={classes.mainContainer}>
           <div className={classes.headerContainer}>
-            <div className={classes.title}>
-              {post.title}
-            </div>
-            {showSubheaderInfo &&
-              <EAPostMeta
-                post={post}
-                useEventStyles={post.isEvent}
-                className={classes.meta}
-              />
-            }
-            {!showSubheaderInfo && post.tags?.length > 0 &&
+            <div className={classes.title}>{post.title}</div>
+            {showSubheaderInfo && <EAPostMeta post={post} useEventStyles={post.isEvent} className={classes.meta} />}
+            {!showSubheaderInfo && post.tags?.length > 0 && (
               <div ref={tagsRef}>
                 <TruncatedTagsList post={post} expandContainer={tagsRef} />
               </div>
-            }
+            )}
           </div>
-          {comment
-            ? (
-              <CommentsNode
-                treeOptions={{
-                  post,
-                  hideReply: true,
-                  forceNotSingleLine: true,
-                }}
-                comment={comment}
-                truncated
-                hoverPreview
-                forceUnCollapsed
-              />
-            )
-            : (
-              <div className={classes.excerptContainer}>
-                <PostExcerpt
-                  post={post}
-                  hash={hash}
-                  lines={3.5}
-                  hideMoreLink
-                  smallText
-                  hideMultimedia
-                />
-              </div>
-            )
-          }
+          {comment ? (
+            <CommentsNode
+              treeOptions={{
+                post,
+                hideReply: true,
+                forceNotSingleLine: true,
+              }}
+              comment={comment}
+              truncated
+              hoverPreview
+              forceUnCollapsed
+            />
+          ) : (
+            <div className={classes.excerptContainer}>
+              <PostExcerpt post={post} hash={hash} lines={3.5} hideMoreLink smallText hideMultimedia />
+            </div>
+          )}
         </div>
-        {imageUrl &&
-          <img className={classes.image} src={imageUrl} />
-        }
+        {imageUrl && <img className={classes.image} src={imageUrl} />}
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const EAPostsPreviewTooltipComponent = registerComponent(
-  "EAPostsPreviewTooltip",
-  EAPostsPreviewTooltip,
-  {styles},
-);
+const EAPostsPreviewTooltipComponent = registerComponent("EAPostsPreviewTooltip", EAPostsPreviewTooltip, { styles });
 
 declare global {
   interface ComponentTypes {
-    EAPostsPreviewTooltip: typeof EAPostsPreviewTooltipComponent
+    EAPostsPreviewTooltip: typeof EAPostsPreviewTooltipComponent;
   }
 }

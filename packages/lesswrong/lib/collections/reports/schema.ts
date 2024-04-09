@@ -1,4 +1,4 @@
-import { foreignKeyField } from '../../utils/schemaUtils'
+import { foreignKeyField } from "../../utils/schemaUtils";
 
 const schema: SchemaType<"Reports"> = {
   userId: {
@@ -9,11 +9,11 @@ const schema: SchemaType<"Reports"> = {
       type: "User",
       nullable: false,
     }),
-    canRead: ['guests'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canCreate: ["members"],
     hidden: true,
     optional: true,
-    nullable: false
+    nullable: false,
   },
   reportedUserId: {
     ...foreignKeyField({
@@ -23,8 +23,8 @@ const schema: SchemaType<"Reports"> = {
       type: "User",
       nullable: true,
     }),
-    canRead: ['guests'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canCreate: ["members"],
     hidden: true,
     optional: true,
   },
@@ -37,8 +37,8 @@ const schema: SchemaType<"Reports"> = {
       nullable: true,
     }),
     optional: true,
-    canRead: ['guests'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canCreate: ["members"],
     hidden: true,
   },
   postId: {
@@ -50,15 +50,15 @@ const schema: SchemaType<"Reports"> = {
       nullable: true,
     }),
     optional: true,
-    canRead: ['guests'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canCreate: ["members"],
     hidden: true,
   },
   link: {
     type: String,
     optional: false,
-    canCreate: ['members'],
-    canRead: ['guests'],
+    canCreate: ["members"],
+    canRead: ["guests"],
     hidden: true,
   },
   claimedUserId: {
@@ -70,17 +70,17 @@ const schema: SchemaType<"Reports"> = {
       nullable: true,
     }),
     optional: true,
-    canRead: ['guests'],
+    canRead: ["guests"],
     hidden: true,
-    canUpdate: ['sunshineRegiment', 'admins'],
-    canCreate: ['sunshineRegiment', 'admins'],
+    canUpdate: ["sunshineRegiment", "admins"],
+    canCreate: ["sunshineRegiment", "admins"],
   },
   description: {
     type: String,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['members'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canUpdate: ["members"],
+    canCreate: ["members"],
     label: "Reason",
     placeholder: "What are you reporting this comment for?",
   },
@@ -88,15 +88,15 @@ const schema: SchemaType<"Reports"> = {
     optional: true,
     nullable: true,
     type: Date,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
   },
   // Only set when report is closed. Indicates whether content is spam or not.
   markedAsSpam: {
     optional: true,
     type: Boolean,
-    canRead: ['guests'],
-    canUpdate: ['sunshineRegiment', 'admins'],
+    canRead: ["guests"],
+    canUpdate: ["sunshineRegiment", "admins"],
   },
   // Set when report is created, indicates whether content was reported as spam
   // (currently only used for Akismet integration)
@@ -104,10 +104,10 @@ const schema: SchemaType<"Reports"> = {
     optional: true,
     hidden: true,
     type: Boolean,
-    canRead: ['guests'],
-    canUpdate: ['sunshineRegiment', 'admins'],
-    canCreate: ['members']
-  }
+    canRead: ["guests"],
+    canUpdate: ["sunshineRegiment", "admins"],
+    canCreate: ["members"],
+  },
 };
 
 export default schema;

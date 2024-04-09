@@ -1,6 +1,6 @@
-import React from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import { useQuery, gql } from '@apollo/client';
+import React from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import { useQuery, gql } from "@apollo/client";
 
 const styles = (theme: ThemeType): JssStyles => ({
   indexesTable: {
@@ -16,30 +16,34 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const adminMetadataQuery = gql`query AdminMetadataQuery {
-  AdminMetadata
-}`;
+const adminMetadataQuery = gql`
+  query AdminMetadataQuery {
+    AdminMetadata
+  }
+`;
 
 const AdminMetadata = ({ classes }: { classes: ClassesType }) => {
   const { data, loading } = useQuery(adminMetadataQuery, { ssr: true });
-  if (loading)
-    return <Components.Loading/>
-  
-  const adminMetadata = JSON.parse(data.AdminMetadata);
-  const {serverInfo} = adminMetadata;
-  
-  return <ul>
-    {Object.keys(serverInfo).map(key => <li key={key}>
-      {key}: {typeof serverInfo[key]==="string" ? serverInfo[key] : JSON.stringify(serverInfo[key])}
-    </li>)}
-  </ul>
-}
+  if (loading) return <Components.Loading />;
 
-const AdminMetadataComponent = registerComponent('AdminMetadata', AdminMetadata, {styles});
+  const adminMetadata = JSON.parse(data.AdminMetadata);
+  const { serverInfo } = adminMetadata;
+
+  return (
+    <ul>
+      {Object.keys(serverInfo).map((key) => (
+        <li key={key}>
+          {key}: {typeof serverInfo[key] === "string" ? serverInfo[key] : JSON.stringify(serverInfo[key])}
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+const AdminMetadataComponent = registerComponent("AdminMetadata", AdminMetadata, { styles });
 
 declare global {
   interface ComponentTypes {
-    AdminMetadata: typeof AdminMetadataComponent
+    AdminMetadata: typeof AdminMetadataComponent;
   }
 }
-

@@ -7,13 +7,16 @@ import { isEAForum } from "../../lib/instanceSettings";
 export const pgPromiseLib = pgp({});
 
 export const connectionStringSetting = new DatabaseServerSetting<string | null>("analytics.connectionString", null);
-export const mirrorConnectionSettingString = new DatabaseServerSetting<string | null>("analytics.mirrorConnectionString", null); //for streaming to two DB at once
+export const mirrorConnectionSettingString = new DatabaseServerSetting<string | null>(
+  "analytics.mirrorConnectionString",
+  null,
+); //for streaming to two DB at once
 
 export type AnalyticsConnectionPool = IDatabase<{}, IClient>;
 let analyticsConnectionPools: Map<string, AnalyticsConnectionPool> = new Map();
 let missingConnectionStringWarned = false;
 
-function getAnalyticsConnectionFromString(connectionString: string | null): AnalyticsConnectionPool | null{
+function getAnalyticsConnectionFromString(connectionString: string | null): AnalyticsConnectionPool | null {
   if (isAnyTest && !isEAForum) {
     return null;
   }
@@ -27,8 +30,9 @@ function getAnalyticsConnectionFromString(connectionString: string | null): Anal
     }
     return null;
   }
-  if (!analyticsConnectionPools.get(connectionString)) analyticsConnectionPools.set(connectionString, pgPromiseLib(connectionString))
-  return analyticsConnectionPools.get(connectionString)!
+  if (!analyticsConnectionPools.get(connectionString))
+    analyticsConnectionPools.set(connectionString, pgPromiseLib(connectionString));
+  return analyticsConnectionPools.get(connectionString)!;
 }
 
 // Return the Analytics database connection pool, if configured. If no

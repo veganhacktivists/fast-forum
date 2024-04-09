@@ -4,14 +4,23 @@ Layout for a single form item
 
 */
 
-import React from 'react';
-import Form from 'react-bootstrap/Form';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { registerComponent } from '../../../lib/vulcan-lib';
+import React from "react";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import { registerComponent } from "../../../lib/vulcan-lib";
 
-const FormItem = ({ path, label, children, beforeInput, afterInput, layout = 'horizontal', ...rest }: AnyBecauseTodo) => {
-  if (layout === 'inputOnly' || !label) { // input only layout
+const FormItem = ({
+  path,
+  label,
+  children,
+  beforeInput,
+  afterInput,
+  layout = "horizontal",
+  ...rest
+}: AnyBecauseTodo) => {
+  if (layout === "inputOnly" || !label) {
+    // input only layout
     return (
       <Form.Group controlId={path} {...rest}>
         {beforeInput}
@@ -19,9 +28,11 @@ const FormItem = ({ path, label, children, beforeInput, afterInput, layout = 'ho
         {afterInput}
       </Form.Group>
     );
-  } else if (layout === 'vertical') { // vertical layout
+  } else if (layout === "vertical") {
+    // vertical layout
     return <div>TODO</div>;
-  } else { // horizontal layout (default)
+  } else {
+    // horizontal layout (default)
     return (
       <Form.Group as={Row} controlId={path} {...rest}>
         <Form.Label column sm={3}>
@@ -37,11 +48,10 @@ const FormItem = ({ path, label, children, beforeInput, afterInput, layout = 'ho
   }
 };
 
-const FormItemComponent = registerComponent('FormItem', FormItem);
+const FormItemComponent = registerComponent("FormItem", FormItem);
 
 declare global {
   interface ComponentTypes {
-    FormItem: typeof FormItemComponent
+    FormItem: typeof FormItemComponent;
   }
 }
-

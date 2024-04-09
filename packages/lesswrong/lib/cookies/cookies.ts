@@ -20,7 +20,11 @@ export const TIMEZONE_COOKIE = registerCookie({
   description: "Stores the user's timezone",
 });
 
-export const THEME_COOKIE = registerCookie({ name: "theme", type: "necessary", description: "Stores the user's theme preferences" });
+export const THEME_COOKIE = registerCookie({
+  name: "theme",
+  type: "necessary",
+  description: "Stores the user's theme preferences",
+});
 
 export const HIDE_FEATURED_RESOURCE_COOKIE = registerCookie({
   name: "hide_featured_resource",
@@ -29,28 +33,28 @@ export const HIDE_FEATURED_RESOURCE_COOKIE = registerCookie({
 });
 
 export const SHOW_COMMUNITY_POSTS_SECTION_COOKIE = registerCookie({
-  name: 'show_community_posts_section',
+  name: "show_community_posts_section",
   type: "necessary",
   description: "Whether to show the community posts section on the FAST Forum home page",
-})
+});
 
 export const SHOW_QUICK_TAKES_SECTION_COOKIE = registerCookie({
-  name: 'show_quick_takes_section',
+  name: "show_quick_takes_section",
   type: "necessary",
   description: "Whether to show the quick takes section on the FAST Forum home page",
-})
+});
 
 export const SHOW_QUICK_TAKES_SECTION_COMMUNITY_COOKIE = registerCookie({
-  name: 'show_quick_takes_community',
+  name: "show_quick_takes_community",
   type: "necessary",
   description: "Whether to include quick takes tagged with community in the home page quick takes section",
-})
+});
 
 export const SHOW_POPULAR_COMMENTS_SECTION_COOKIE = registerCookie({
-  name: 'show_popular_comments_section',
+  name: "show_popular_comments_section",
   type: "necessary",
   description: "Whether to show the popular comments section on the FAST Forum home page",
-})
+});
 
 export const HIDE_HANDBOOK_COOKIE = registerCookie({
   name: "hide_home_handbook",
@@ -58,7 +62,11 @@ export const HIDE_HANDBOOK_COOKIE = registerCookie({
   description: "Whether to hide the EA Handbook on the FAST Forum home page",
 });
 
-export const HIDE_JOB_AD_COOKIE = registerCookie({name: 'hide_job_ad', type: "necessary", description: 'Controls whether job ads are hidden'});
+export const HIDE_JOB_AD_COOKIE = registerCookie({
+  name: "hide_job_ad",
+  type: "necessary",
+  description: "Controls whether job ads are hidden",
+});
 
 export const SHOW_PODCAST_PLAYER_COOKIE = registerCookie({
   name: "show_post_podcast_player",
@@ -66,7 +74,11 @@ export const SHOW_PODCAST_PLAYER_COOKIE = registerCookie({
   description: "Whether to show the podcast player on a posts pages",
 });
 
-export const PODCAST_TOOLTIP_SEEN_COOKIE = registerCookie({name: 'podcast_tooltip_seen', type: "necessary", description: "Stores whether the user has seen the podcast 'new feature' tooltip"})
+export const PODCAST_TOOLTIP_SEEN_COOKIE = registerCookie({
+  name: "podcast_tooltip_seen",
+  type: "necessary",
+  description: "Stores whether the user has seen the podcast 'new feature' tooltip",
+});
 
 export const HIDE_WELCOME_BOX_COOKIE = registerCookie({
   name: "hide_welcome_box",
@@ -74,9 +86,13 @@ export const HIDE_WELCOME_BOX_COOKIE = registerCookie({
   description: "Controls whether the welcome box on a post page is hidden",
 });
 
-export const HIDE_MAP_COOKIE = registerCookie({name: `hideMapFromFrontpage`, type: "necessary", description: "Stores whether the user has hidden the map from the frontpage."});
+export const HIDE_MAP_COOKIE = registerCookie({
+  name: `hideMapFromFrontpage`,
+  type: "necessary",
+  description: "Stores whether the user has hidden the map from the frontpage.",
+});
 
-export const HIDE_COLLECTION_ITEM_PREFIX = 'hide_collection_item_';
+export const HIDE_COLLECTION_ITEM_PREFIX = "hide_collection_item_";
 registerCookie({
   name: `${HIDE_COLLECTION_ITEM_PREFIX}[*]`,
   matches: (name: string) => name.startsWith(HIDE_COLLECTION_ITEM_PREFIX),
@@ -107,7 +123,7 @@ export const HIDE_IMPORT_EAG_PROFILE = registerCookie({
 export const HIDE_MORE_FROM_THE_FORUM_RECOMMENDATIONS_COOKIE = registerCookie({
   name: "hide_more_from_the_forum_recommendations",
   type: "necessary",
-  description: "Don't show the \"More from the forum\" recommendations section",
+  description: 'Don\'t show the "More from the forum" recommendations section',
 });
 
 export const HIDE_NEW_POST_HOW_TO_GUIDE_COOKIE = registerCookie({
@@ -121,7 +137,6 @@ export const HIDE_2021_BOOK_BANNER_COOKIE = registerCookie({
   type: "necessary",
   description: "Don't show the 2021 book banner",
 });
-
 
 // Third party cookies
 
@@ -196,8 +211,7 @@ registerCookie({
   matches: (name: string) => name.startsWith("_hjIncludedInSessionSample_"),
   type: "functional",
   thirdPartyName: "Hotjar",
-  description:
-    "Whether the current user is included in the session sample.",
+  description: "Whether the current user is included in the session sample.",
 });
 
 registerCookie({
@@ -221,14 +235,16 @@ registerCookie({
   name: "_gid",
   type: "analytics",
   thirdPartyName: "Google",
-  description: "This cookie name is associated with Google Universal Analytics. This appears to be a new cookie and as of Spring 2017 no information is available from Google. It appears to store and update a unique value for each page visited.",
+  description:
+    "This cookie name is associated with Google Universal Analytics. This appears to be a new cookie and as of Spring 2017 no information is available from Google. It appears to store and update a unique value for each page visited.",
 });
 
 registerCookie({
   name: "_ga",
   type: "analytics",
   thirdPartyName: "Google",
-  description: "This cookie name is associated with Google Universal Analytics. This cookie is used to distinguish unique users by assigning a randomly generated number as a client identifier.",
+  description:
+    "This cookie name is associated with Google Universal Analytics. This cookie is used to distinguish unique users by assigning a randomly generated number as a client identifier.",
 });
 
 registerCookie({
@@ -243,7 +259,8 @@ registerCookie({
   name: "__Host-GAPS",
   type: "necessary",
   thirdPartyName: "Google",
-  description: "This cookie name is associated with Google. It is set by Google to identify the user and is used in support of the Google Identity application.",
+  description:
+    "This cookie name is associated with Google. It is set by Google to identify the user and is used in support of the Google Identity application.",
 });
 
 // Google Recaptcha
@@ -251,7 +268,8 @@ registerCookie({
   name: "(various)",
   type: "analytics",
   thirdPartyName: "Google ReCaptcha",
-  description: "Google ReCaptcha may set a number of cookies under the 'google.com' domain in order to check for suspicious activity. " +
-               "The full list of known possible cookies are: __Secure-3PSIDCC, __Secure-1PSIDCC, SIDCC, __Secure-3PAPISID, SSID, " +
-               "__Secure-1PAPISID, HSID, __Secure-3PSID, __Secure-1PSID, SID, SAPISID, APISID, NID, OTZ, 1P_JAR, AEC, DV, __Secure-ENID",
+  description:
+    "Google ReCaptcha may set a number of cookies under the 'google.com' domain in order to check for suspicious activity. " +
+    "The full list of known possible cookies are: __Secure-3PSIDCC, __Secure-1PSIDCC, SIDCC, __Secure-3PAPISID, SSID, " +
+    "__Secure-1PAPISID, HSID, __Secure-3PSID, __Secure-1PSID, SID, SAPISID, APISID, NID, OTZ, 1P_JAR, AEC, DV, __Secure-ENID",
 });

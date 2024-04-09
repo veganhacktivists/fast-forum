@@ -33,14 +33,11 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const EAUsersProfileImage = ({user, classes}: {
-  user: UsersProfile,
-  classes: ClassesType,
-}) => {
+const EAUsersProfileImage = ({ user, classes }: { user: UsersProfile; classes: ClassesType }) => {
   const currentUser = useCurrentUser();
   const updateCurrentUser = useUpdateCurrentUser();
-  const {flash} = useMessages();
-  const {uploadImage, ImageUploadScript} = useImageUpload({
+  const { flash } = useMessages();
+  const { uploadImage, ImageUploadScript } = useImageUpload({
     imageType: "profileImageId",
     onUploadSuccess: (publicImageId: string) => {
       void updateCurrentUser({
@@ -52,12 +49,10 @@ const EAUsersProfileImage = ({user, classes}: {
       flash(error.message);
     },
   });
-  const {ForumIcon, UsersProfileImage} = Components;
+  const { ForumIcon, UsersProfileImage } = Components;
 
   if (!userCanEditUser(currentUser, user)) {
-    return (
-      <UsersProfileImage user={user} size={SIZE} className={classes.root} />
-    );
+    return <UsersProfileImage user={user} size={SIZE} className={classes.root} />;
   }
 
   return (
@@ -69,16 +64,12 @@ const EAUsersProfileImage = ({user, classes}: {
       <UsersProfileImage user={user} size={SIZE} />
     </div>
   );
-}
+};
 
-const EAUsersProfileImageComponent = registerComponent(
-  "EAUsersProfileImage",
-  EAUsersProfileImage,
-  {styles},
-);
+const EAUsersProfileImageComponent = registerComponent("EAUsersProfileImage", EAUsersProfileImage, { styles });
 
 declare global {
   interface ComponentTypes {
-    EAUsersProfileImage: typeof EAUsersProfileImageComponent
+    EAUsersProfileImage: typeof EAUsersProfileImageComponent;
   }
 }

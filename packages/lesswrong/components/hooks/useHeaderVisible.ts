@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
 type HeaderVisibility = {
-  headerVisible: boolean,
-  headerAtTop: boolean,
-}
+  headerVisible: boolean;
+  headerAtTop: boolean;
+};
 
 export const useHeaderVisible = (): HeaderVisibility => {
   const [visible, setVisible] = useState<HeaderVisibility>({
@@ -22,9 +22,9 @@ export const useHeaderVisible = (): HeaderVisibility => {
         headerAtTop: targetNode.classList.contains("headroom--unfixed"),
       });
     });
-    mutationObserver.observe(targetNode, {attributes: true});
+    mutationObserver.observe(targetNode, { attributes: true });
     return () => mutationObserver.disconnect();
   }, []);
 
   return visible;
-}
+};

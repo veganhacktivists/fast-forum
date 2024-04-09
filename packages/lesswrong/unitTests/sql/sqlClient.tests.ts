@@ -1,9 +1,4 @@
-import {
-  setSqlClient,
-  getSqlClient,
-  getSqlClientOrThrow,
-  closeSqlClient,
-} from "../../lib/sql/sqlClient";
+import { setSqlClient, getSqlClient, getSqlClientOrThrow, closeSqlClient } from "../../lib/sql/sqlClient";
 
 const createMockClient = (): SqlClient => {
   const client = {
@@ -12,7 +7,7 @@ const createMockClient = (): SqlClient => {
     },
   };
   return client as unknown as SqlClient;
-}
+};
 
 describe("sqlClient", () => {
   it("can get, set and close client", async () => {

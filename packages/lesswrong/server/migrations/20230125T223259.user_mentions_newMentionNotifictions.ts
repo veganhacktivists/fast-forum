@@ -1,6 +1,6 @@
-import Users from '../../lib/collections/users/collection'
-import {Comments} from '../../lib/collections/comments'
-import {addField, dropField} from './meta/utils'
+import Users from "../../lib/collections/users/collection";
+import { Comments } from "../../lib/collections/comments";
+import { addField, dropField } from "./meta/utils";
 
 /**
  * Generated on 2023-01-25T22:32:59.886Z by `yarn makemigrations`
@@ -17,12 +17,12 @@ import {addField, dropField} from './meta/utils'
  */
 export const acceptsSchemaHash = "f74d70468a0d76011ef39059dc9584d5";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Users, 'notificationNewMention')
-  await addField(db, Comments, 'pingbacks')
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Users, "notificationNewMention");
+  await addField(db, Comments, "pingbacks");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Users, 'notificationNewMention')
-  await dropField(db, Comments, 'pingbacks')
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Users, "notificationNewMention");
+  await dropField(db, Comments, "pingbacks");
+};

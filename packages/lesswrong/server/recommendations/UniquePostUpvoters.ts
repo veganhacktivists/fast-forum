@@ -36,8 +36,4 @@ const refreshUniquePostUpvotersQuery = `
   REFRESH MATERIALIZED VIEW "UniquePostUpvoters"
 `;
 
-createPostgresView(
-  createUniquePostUpvotersQuery,
-  [createUniquePostUpvotersIndexQuery],
-  refreshUniquePostUpvotersQuery,
-);
+createPostgresView(createUniquePostUpvotersQuery, [createUniquePostUpvotersIndexQuery], refreshUniquePostUpvotersQuery);

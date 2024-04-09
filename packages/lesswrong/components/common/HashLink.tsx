@@ -1,27 +1,29 @@
 // Modified From: https://github.com/rafrex/react-router-hash-link/blob/master/src/index.js
 
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 // eslint-disable-next-line no-restricted-imports
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 // eslint-disable-next-line no-restricted-imports
-import type { LinkProps } from 'react-router-dom';
+import type { LinkProps } from "react-router-dom";
 
-type ScrollFunction = ((el: HTMLElement) => void);
+type ScrollFunction = (el: HTMLElement) => void;
 
 export type HashLinkProps = LinkProps & {
-  scroll?: ScrollFunction,
-  smooth?: boolean
+  scroll?: ScrollFunction;
+  smooth?: boolean;
 };
 
-let hashFragment = '';
+let hashFragment = "";
 let observer: null | MutationObserver = null;
 let asyncTimerId: null | number = null;
 let scrollFunction: null | ScrollFunction = null;
 
 function reset() {
-  hashFragment = '';
-  if (observer) {observer.disconnect();}
+  hashFragment = "";
+  if (observer) {
+    observer.disconnect();
+  }
   if (asyncTimerId !== null) {
     window.clearTimeout(asyncTimerId);
     asyncTimerId = null;
@@ -63,24 +65,14 @@ export function genericHashLink(props: HashLinkProps) {
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     reset();
     if (props.onClick) props.onClick(e);
-    if (typeof props.to === 'string') {
-      hashFragment = props.to
-        .split('#')
-        .slice(1)
-        .join('#');
-    } else if (
-      typeof props.to === 'object' &&
-      typeof props.to?.hash === 'string'
-    ) {
-      hashFragment = props.to.hash.replace('#', '');
+    if (typeof props.to === "string") {
+      hashFragment = props.to.split("#").slice(1).join("#");
+    } else if (typeof props.to === "object" && typeof props.to?.hash === "string") {
+      hashFragment = props.to.hash.replace("#", "");
     }
-    if (hashFragment !== '') {
+    if (hashFragment !== "") {
       scrollFunction =
-        props.scroll ||
-        (el =>
-          props.smooth
-            ? el.scrollIntoView({ behavior: "smooth" })
-            : el.scrollIntoView());
+        props.scroll || ((el) => (props.smooth ? el.scrollIntoView({ behavior: "smooth" }) : el.scrollIntoView()));
       hashLinkScroll();
     }
   }
@@ -100,29 +92,19 @@ export function getHashLinkOnClick(props: HashLinkProps) {
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
     reset();
     if (props.onClick) props.onClick(e);
-    if (typeof props.to === 'string') {
-      hashFragment = props.to
-        .split('#')
-        .slice(1)
-        .join('#');
-    } else if (
-      typeof props.to === 'object' &&
-      typeof props.to?.hash === 'string'
-    ) {
-      hashFragment = props.to.hash.replace('#', '');
+    if (typeof props.to === "string") {
+      hashFragment = props.to.split("#").slice(1).join("#");
+    } else if (typeof props.to === "object" && typeof props.to?.hash === "string") {
+      hashFragment = props.to.hash.replace("#", "");
     }
-    if (hashFragment !== '') {
+    if (hashFragment !== "") {
       scrollFunction =
-        props.scroll ||
-        (el =>
-          props.smooth
-            ? el.scrollIntoView({ behavior: "smooth" })
-            : el.scrollIntoView());
+        props.scroll || ((el) => (props.smooth ? el.scrollIntoView({ behavior: "smooth" }) : el.scrollIntoView()));
       hashLinkScroll();
     }
   }
   return handleClick;
-};
+}
 
 const propTypes = {
   onClick: PropTypes.func,

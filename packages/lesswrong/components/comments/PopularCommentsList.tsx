@@ -15,38 +15,29 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const PopularCommentsList = ({classes}: {classes: ClassesType}) => {
-  const {loadMoreProps, results} = usePaginatedResolver({
+const PopularCommentsList = ({ classes }: { classes: ClassesType }) => {
+  const { loadMoreProps, results } = usePaginatedResolver({
     fragmentName: "CommentsListWithParentMetadata",
     resolverName: "PopularComments",
     limit: 3,
     itemsPerPage: 5,
   });
 
-  const {LoadMore, PopularComment} = Components;
+  const { LoadMore, PopularComment } = Components;
   return (
     <AnalyticsContext pageSectionContext="popularCommentsList">
       <div className={classes.root}>
-        {results?.map((comment) =>
-          <PopularComment
-            key={comment._id}
-            comment={comment}
-          />
-        )}
+        {results?.map((comment) => <PopularComment key={comment._id} comment={comment} />)}
         <LoadMore {...loadMoreProps} />
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const PopularCommentsListComponent = registerComponent(
-  "PopularCommentsList",
-  PopularCommentsList,
-  {styles},
-);
+const PopularCommentsListComponent = registerComponent("PopularCommentsList", PopularCommentsList, { styles });
 
 declare global {
   interface ComponentTypes {
-    PopularCommentsList: typeof PopularCommentsListComponent
+    PopularCommentsList: typeof PopularCommentsListComponent;
   }
 }

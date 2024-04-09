@@ -64,13 +64,13 @@ export const votingPortalStyles = (theme: ThemeType) => ({
     fontSize: 16,
     lineHeight: "24px",
     marginBottom: 26,
-    '& a': {
+    "& a": {
       textDecoration: "underline",
       textUnderlineOffset: "3px",
-      '&:hover': {
+      "&:hover": {
         textDecoration: "underline",
-      }
-    }
+      },
+    },
   },
   subtitleParagraph: {
     marginBottom: 16,
@@ -81,7 +81,7 @@ export const votingPortalStyles = (theme: ThemeType) => ({
     justifyContent: "center",
     gap: "6px",
     fontSize: 16,
-    lineHeight: '22px',
+    lineHeight: "22px",
     fontWeight: 600,
     borderRadius: theme.borderRadius.small,
     padding: 16,

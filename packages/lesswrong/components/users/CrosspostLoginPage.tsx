@@ -37,10 +37,8 @@ const connectCrossposterMutation = gql`
   }
 `;
 
-const CrosspostLoginPage = ({classes}: {
-  classes: ClassesType,
-}) => {
-  const [connectCrossposter, loading] = useMutation(connectCrossposterMutation, {errorPolicy: "all"});
+const CrosspostLoginPage = ({ classes }: { classes: ClassesType }) => {
+  const [connectCrossposter, loading] = useMutation(connectCrossposterMutation, { errorPolicy: "all" });
   const [error, setError] = useState<string | null>(null);
   const currentUser = useCurrentUser();
   const token = new URLSearchParams(location.search).get("token");
@@ -50,7 +48,7 @@ const CrosspostLoginPage = ({classes}: {
       throw new Error("Can't connect crosspost account whilst logged out");
     }
     const result = await connectCrossposter({
-      variables: {token},
+      variables: { token },
     });
     if (result?.data?.connectCrossposter === "success") {
       setError(null);
@@ -60,9 +58,9 @@ const CrosspostLoginPage = ({classes}: {
     } else {
       setError("Failed to connect accounts");
     }
-  }
+  };
 
-  const {LoginForm, SiteLogo, Loading, Typography} = Components;
+  const { LoginForm, SiteLogo, Loading, Typography } = Components;
 
   return (
     <div className={classes.root}>
@@ -73,38 +71,28 @@ const CrosspostLoginPage = ({classes}: {
         </Typography>
       </div>
       {error && <div className={classes.error}>Error: {error}</div>}
-      {currentUser
-        ? (
-          <>
-            <Typography variant="body2">
-              Logged in as {currentUser.displayName}
-            </Typography>
-            <div className={classes.buttonContainer}>
-              {loading?.loading || (loading?.called && !loading?.error)
-                ? (
-                  <Loading />
-                )
-                : (
-                  <Button onClick={onConfirm}>
-                    Click to connect your account for crossposting
-                  </Button>
-                )
-              }
-            </div>
-          </>
-        )
-        : (
-          <LoginForm immediateRedirect />
-        )
-      }
+      {currentUser ? (
+        <>
+          <Typography variant="body2">Logged in as {currentUser.displayName}</Typography>
+          <div className={classes.buttonContainer}>
+            {loading?.loading || (loading?.called && !loading?.error) ? (
+              <Loading />
+            ) : (
+              <Button onClick={onConfirm}>Click to connect your account for crossposting</Button>
+            )}
+          </div>
+        </>
+      ) : (
+        <LoginForm immediateRedirect />
+      )}
     </div>
   );
-}
+};
 
-const CrosspostLoginPageComponent = registerComponent("CrosspostLoginPage", CrosspostLoginPage, {styles});
+const CrosspostLoginPageComponent = registerComponent("CrosspostLoginPage", CrosspostLoginPage, { styles });
 
 declare global {
   interface ComponentTypes {
-    CrosspostLoginPage: typeof CrosspostLoginPageComponent,
+    CrosspostLoginPage: typeof CrosspostLoginPageComponent;
   }
 }

@@ -1,6 +1,6 @@
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import type { PopperPlacementType } from '@material-ui/core/Popper'
-import React from 'react';
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import type { PopperPlacementType } from "@material-ui/core/Popper";
+import React from "react";
 
 /**
  * A user name, with styling, tooltip, etc. Takes either a user object or a
@@ -11,38 +11,55 @@ import React from 'react';
 const UsersName = ({
   user,
   documentId,
-  nofollow=false,
-  simple=false,
-  tooltipPlacement="left",
+  nofollow = false,
+  simple = false,
+  tooltipPlacement = "left",
   className,
   ...otherProps
 }: {
-  user?: UsersMinimumInfo|null|undefined,
-  documentId?: string,
+  user?: UsersMinimumInfo | null | undefined;
+  documentId?: string;
   /** Marks the link nofollow, so if it's spammy search engines won't crawl the user page. */
-  nofollow?: boolean,
+  nofollow?: boolean;
   /** Makes it not a link, and removes the tooltip. */
-  simple?: boolean,
-  tooltipPlacement?: PopperPlacementType,
-  noTooltip?: boolean,
-  color?: boolean,
-  pageSectionContext?: string,
+  simple?: boolean;
+  tooltipPlacement?: PopperPlacementType;
+  noTooltip?: boolean;
+  color?: boolean;
+  pageSectionContext?: string;
   /** Add an extra class/styling to the link */
-  className?: string,
+  className?: string;
 }) => {
   if (user) {
-    return <Components.UsersNameDisplay user={user} nofollow={nofollow} simple={simple} tooltipPlacement={tooltipPlacement} className={className} {...otherProps}/>
+    return (
+      <Components.UsersNameDisplay
+        user={user}
+        nofollow={nofollow}
+        simple={simple}
+        tooltipPlacement={tooltipPlacement}
+        className={className}
+        {...otherProps}
+      />
+    );
   } else if (documentId) {
-    return <Components.UsersNameWrapper documentId={documentId} nofollow={nofollow} simple={simple} className={className}  {...otherProps}/>
+    return (
+      <Components.UsersNameWrapper
+        documentId={documentId}
+        nofollow={nofollow}
+        simple={simple}
+        className={className}
+        {...otherProps}
+      />
+    );
   } else {
-    return <Components.UserNameDeleted />
+    return <Components.UserNameDeleted />;
   }
-}
+};
 
-const UsersNameComponent = registerComponent('UsersName', UsersName);
+const UsersNameComponent = registerComponent("UsersName", UsersName);
 
 declare global {
   interface ComponentTypes {
-    UsersName: typeof UsersNameComponent
+    UsersName: typeof UsersNameComponent;
   }
 }

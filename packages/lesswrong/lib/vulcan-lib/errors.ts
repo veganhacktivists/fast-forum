@@ -1,4 +1,4 @@
-import isEmpty from 'lodash/isEmpty';
+import isEmpty from "lodash/isEmpty";
 
 /*
 
@@ -29,21 +29,20 @@ In field "addresses": Expected "[JSON]!", found null."
 */
 
 const parseErrorMessage = (message: AnyBecauseTodo) => {
-
   if (!message) {
     return null;
   }
 
   // note: optionally add .slice(1) at the end to get rid of the first error, which is not that helpful
-  let fieldErrors = message.split('\n');
+  let fieldErrors = message.split("\n");
 
   fieldErrors = fieldErrors.map((error: AnyBecauseTodo) => {
     // field name is whatever is between the first to double quotes
     const fieldName = getFirstWord(error);
-    if (error.includes('found null')) {
+    if (error.includes("found null")) {
       // missing field errors
       return {
-        id: 'errors.required',
+        id: "errors.required",
         path: fieldName,
         properties: {
           name: fieldName,
@@ -80,31 +79,31 @@ export const getErrors = (error: AnyBecauseTodo) => {
   // if this is one or more GraphQL errors, extract and convert them
   if (error.graphQLErrors && error.graphQLErrors.length > 0) {
     // get graphQL error (see https://github.com/thebigredgeek/apollo-errors/issues/12)
-    const graphQLError = error.graphQLErrors[0]
-    const data = (graphQLError?.extensions?.exception?.data) || graphQLError?.data
+    const graphQLError = error.graphQLErrors[0];
+    const data = graphQLError?.extensions?.exception?.data || graphQLError?.data;
 
-    let baseErrorMessages = parseErrorMessage(graphQLError?.message)
+    let baseErrorMessages = parseErrorMessage(graphQLError?.message);
     if (data && !isEmpty(data)) {
       if (data.errors) {
         // 2. There are multiple errors on the data.errors object
         // Check for helpful message
         if (data.errors.some((e: AnyBecauseTodo) => e.message)) {
-          return data.errors
+          return data.errors;
         }
         // Otherwise we need at least one helpful message
-        return baseErrorMessages.concat(data.errors)
+        return baseErrorMessages.concat(data.errors);
       }
       // 3. There is only one error
       // Check for helpful message
       if (data.message) {
-        return [data]
+        return [data];
       }
       // Again we need a helpful message
-      return baseErrorMessages.concat([data])
+      return baseErrorMessages.concat([data]);
     }
     // 4. There is no data object, just use the raw error messages
-    return baseErrorMessages
+    return baseErrorMessages;
   }
   // 1. Wrap in array
-  return [error]
-}
+  return [error];
+};

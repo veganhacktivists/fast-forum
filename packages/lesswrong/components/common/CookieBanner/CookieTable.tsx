@@ -15,7 +15,7 @@ const styles = (theme: ThemeType): JssStyles => ({
   tableContainer: {
     borderTopLeftRadius: theme.borderRadius.default,
     borderTopRightRadius: theme.borderRadius.default,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 8,
   },
   table: {
@@ -64,7 +64,7 @@ const CookieTable = ({
   const { Typography } = Components;
 
   const filteredCookies = Object.values(CookiesTable).filter(
-    (cookie: CookieSignature) => cookie.type === type && cookie.thirdPartyName === thirdPartyName
+    (cookie: CookieSignature) => cookie.type === type && cookie.thirdPartyName === thirdPartyName,
   );
 
   return (

@@ -6,11 +6,11 @@ import { useUpdate } from "../../../lib/crud/withUpdate";
 import { userCanDo } from "../../../lib/vulcan-users";
 import { isFriendlyUI, preferredHeadingCase } from "../../../themes/forumTheme";
 
-const ShortformDropdownItem = ({post}: {post: PostsBase}) => {
+const ShortformDropdownItem = ({ post }: { post: PostsBase }) => {
   const currentUser = useCurrentUser();
-  const {mutate: updateUser} = useUpdate({
+  const { mutate: updateUser } = useUpdate({
     collectionName: "Users",
-    fragmentName: 'UsersCurrent',
+    fragmentName: "UsersCurrent",
   });
 
   if (post.shortform || !userCanDo(currentUser, "posts.edit.all")) {
@@ -19,31 +19,25 @@ const ShortformDropdownItem = ({post}: {post: PostsBase}) => {
 
   const handleMakeShortform = () => {
     void updateUser({
-      selector: {_id: post.userId},
+      selector: { _id: post.userId },
       data: {
         shortformFeedId: post._id,
       },
     });
-  }
+  };
 
   const contentType = isFriendlyUI ? "Quick takes" : "Shortform";
 
-  const {DropdownItem} = Components;
+  const { DropdownItem } = Components;
   return (
-    <DropdownItem
-      title={preferredHeadingCase(`Set as user's ${contentType} Post`)}
-      onClick={handleMakeShortform}
-    />
+    <DropdownItem title={preferredHeadingCase(`Set as user's ${contentType} Post`)} onClick={handleMakeShortform} />
   );
-}
+};
 
-const ShortformDropdownItemComponent = registerComponent(
-  "ShortformDropdownItem",
-  ShortformDropdownItem,
-);
+const ShortformDropdownItemComponent = registerComponent("ShortformDropdownItem", ShortformDropdownItem);
 
 declare global {
   interface ComponentTypes {
-    ShortformDropdownItem: typeof ShortformDropdownItemComponent
+    ShortformDropdownItem: typeof ShortformDropdownItemComponent;
   }
 }

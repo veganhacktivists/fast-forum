@@ -1,18 +1,13 @@
-import { registerMigration, migrateDocuments, dropUnusedField } from './migrationUtils';
-import { Posts } from '../../lib/collections/posts';
-import * as _ from 'underscore';
+import { registerMigration, migrateDocuments, dropUnusedField } from "./migrationUtils";
+import { Posts } from "../../lib/collections/posts";
+import * as _ from "underscore";
 
 registerMigration({
   name: "scoreExceededDateFalseToNull",
   dateWritten: "2019-03-07",
   idempotent: true,
   action: async () => {
-    let fieldsToFix = [
-      "scoreExceeded2Date",
-      "scoreExceeded30Date",
-      "scoreExceeded45Date",
-      "scoreExceeded74Date"
-    ];
+    let fieldsToFix = ["scoreExceeded2Date", "scoreExceeded30Date", "scoreExceeded45Date", "scoreExceeded74Date"];
     for (let fieldName of fieldsToFix) {
       await migrateDocuments({
         description: `${fieldName} false->null`,
@@ -22,22 +17,22 @@ registerMigration({
         },
         batchSize: 1000,
         migrate: async (documents) => {
-          let updates = _.map(documents, doc => ({
+          let updates = _.map(documents, (doc) => ({
             updateOne: {
               filter: { _id: doc._id },
               update: {
                 $set: {
-                  [fieldName]: null
-                }
-              }
-            }
+                  [fieldName]: null,
+                },
+              },
+            },
           }));
-         
+
           await Posts.rawCollection().bulkWrite(updates, { ordered: false });
         },
       });
     }
-  }
+  },
 });
 
 registerMigration({
@@ -46,5 +41,5 @@ registerMigration({
   idempotent: true,
   action: async () => {
     await dropUnusedField(Posts, "content");
-  }
+  },
 });

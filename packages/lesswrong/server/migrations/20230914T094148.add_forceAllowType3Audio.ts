@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-08-18T21:54:51.000Z by 20230818T215451.post_embeddings_have_vector_type.ts
  * +-- Overall schema hash: a368523cc273895e66ea4bcc3e70f9d9
- *  
+ *
  * @@ -545,3 +543,3 @@ CREATE TABLE "PostRelations" (
- *  
+ *
  * --- Schema for "Posts", hash: 5bfebdec4ea08ba7e454089afd808c34
  * +-- Schema for "Posts", hash: 913c57af784029a0adf5dd61b01aca11
  *  CREATE TABLE "Posts" (
@@ -22,7 +22,7 @@
  *      "podcastEpisodeId" varchar(27),
  * +    "forceAllowType3Audio" bool DEFAULT false,
  *      "legacy" bool DEFAULT false,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -36,10 +36,10 @@ export const acceptsSchemaHash = "1688c0a0ffbebf808f0ad26c4ba8d073";
 import Posts from "../../lib/collections/posts/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Posts, "forceAllowType3Audio");
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Posts, "forceAllowType3Audio");
-}
+};

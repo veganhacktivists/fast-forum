@@ -3,15 +3,12 @@ import ElectionVotes from "./collection";
 
 declare global {
   interface ElectionVotesViewTerms extends ViewTermsBase {
-    electionName?: string,
-    userId?: string,
+    electionName?: string;
+    userId?: string;
   }
 }
 
-ElectionVotes.addDefaultView(({
-  electionName,
-  userId,
-}: ElectionVotesViewTerms) => {
+ElectionVotes.addDefaultView(({ electionName, userId }: ElectionVotesViewTerms) => {
   return {
     selector: {
       electionName,
@@ -20,13 +17,13 @@ ElectionVotes.addDefaultView(({
   };
 });
 
-ElectionVotes.addView('allSubmittedVotes', (terms: ElectionVotesViewTerms) => {
+ElectionVotes.addView("allSubmittedVotes", (terms: ElectionVotesViewTerms) => {
   return {
     selector: {
       electionName: terms.electionName,
-      submittedAt: {$exists: true},
+      submittedAt: { $exists: true },
     },
   };
 });
 
-ensureIndex(ElectionVotes, {electionName: 1});
+ensureIndex(ElectionVotes, { electionName: 1 });

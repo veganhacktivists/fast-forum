@@ -15,7 +15,7 @@ const styles = (theme: ThemeType) => ({
   mb2: {
     marginBottom: 12,
   },
-})
+});
 
 const EAVotingPortalAllocateVotesPageLoader = ({ classes }: { classes: ClassesType }) => {
   const { electionVote, updateVote } = useElectionVote(eaGivingSeason23ElectionName);
@@ -40,13 +40,7 @@ const EAVotingPortalAllocateVotesPageLoader = ({ classes }: { classes: ClassesTy
 
   if (!electionVote?.vote) return null;
 
-  return (
-    <EAVotingPortalAllocateVotesPage
-      electionVote={electionVote}
-      updateVote={updateVote}
-      classes={classes}
-    />
-  );
+  return <EAVotingPortalAllocateVotesPage electionVote={electionVote} updateVote={updateVote} classes={classes} />;
 };
 
 const EAVotingPortalAllocateVotesPage = ({
@@ -63,7 +57,9 @@ const EAVotingPortalAllocateVotesPage = ({
   const { flash } = useMessages();
 
   const didCompareStep = !!electionVote.compareState;
-  const subtitleStart = didCompareStep ? "Edit the suggested point allocation (auto-generated from your answers in the previous step)." : "Add a numerical score for each candidate listed here.";
+  const subtitleStart = didCompareStep
+    ? "Edit the suggested point allocation (auto-generated from your answers in the previous step)."
+    : "Add a numerical score for each candidate listed here.";
 
   // Note: strings are allowed here because to allow the user to type we need to differentiate between
   // e.g. "0" and "0.". These are converted to numbers in saveAllocation
@@ -77,9 +73,9 @@ const EAVotingPortalAllocateVotesPage = ({
       // Convert all strings to numbers with parseFloat
       const newVote = Object.fromEntries(
         // Treate 0, "0", null etc all as null
-        Object.entries(voteState).map(([id, value]) => [id, value ? parseFloat(value as string) : null])
+        Object.entries(voteState).map(([id, value]) => [id, value ? parseFloat(value as string) : null]),
       );
-      await updateVote({vote: newVote});
+      await updateVote({ vote: newVote });
     } catch (e) {
       flash(e.message);
       return;
@@ -102,7 +98,8 @@ const EAVotingPortalAllocateVotesPage = ({
               </b>
             </div>
             <div>
-            Points you assign to candidates you don’t think will win are not wasted — if a candidate you assigned points to is eliminated, your other points will count for more.{" "}
+              Points you assign to candidates you don’t think will win are not wasted — if a candidate you assigned
+              points to is eliminated, your other points will count for more.{" "}
               <Link to={processLink} target="_blank" rel="noopener noreferrer">
                 This post
               </Link>{" "}
@@ -133,7 +130,7 @@ const EAVotingPortalAllocateVotesPage = ({
 const EAVotingPortalAllocateVotesPageComponent = registerComponent(
   "EAVotingPortalAllocateVotesPage",
   EAVotingPortalAllocateVotesPageLoader,
-  {styles},
+  { styles },
 );
 
 declare global {
@@ -141,4 +138,3 @@ declare global {
     EAVotingPortalAllocateVotesPage: typeof EAVotingPortalAllocateVotesPageComponent;
   }
 }
-

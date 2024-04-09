@@ -1,9 +1,9 @@
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { slugify } from '../../lib/vulcan-lib/utils';
-import React from 'react';
-import { useLocation } from '../../lib/routeUtil';
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { slugify } from "../../lib/vulcan-lib/utils";
+import React from "react";
+import { useLocation } from "../../lib/routeUtil";
 import { userGetProfileUrl, userGetProfileUrlFromSlug } from "../../lib/collections/users/helpers";
-import { isFriendlyUI } from '../../themes/forumTheme';
+import { isFriendlyUI } from "../../themes/forumTheme";
 
 /**
  * Build structured data for a user to help with SEO.
@@ -12,42 +12,41 @@ export const getUserStructuredData = (user: UsersProfile) => {
   return {
     "@context": "http://schema.org",
     "@type": "Person",
-    "name": user.displayName,
-    "url": userGetProfileUrl(user, true),
-    ...((user.biography?.plaintextDescription) && { "description": user.biography.plaintextDescription }),
-    ...((user.jobTitle) && { "jobTitle": user.jobTitle }),
+    name: user.displayName,
+    url: userGetProfileUrl(user, true),
+    ...(user.biography?.plaintextDescription && { description: user.biography.plaintextDescription }),
+    ...(user.jobTitle && { jobTitle: user.jobTitle }),
     ...(user.organization && {
-      "worksFor": {
+      worksFor: {
         "@type": "Organization",
-        "name": user.organization,
-      }
+        name: user.organization,
+      },
     }),
-    "interactionStatistic": [
+    interactionStatistic: [
       {
         "@type": "InteractionCounter",
-        "interactionType": {
+        interactionType: {
           "@type": "http://schema.org/LikeAction",
         },
-        "userInteractionCount": user.karma,
+        userInteractionCount: user.karma,
       },
       {
         "@type": "InteractionCounter",
-        "interactionType": {
+        interactionType: {
           "@type": "http://schema.org/WriteAction",
         },
-        "userInteractionCount": user.postCount,
+        userInteractionCount: user.postCount,
       },
     ],
-    "memberSince": new Date(user.createdAt).toISOString(),
-    ...((user.howOthersCanHelpMe?.plaintextDescription) && { "seeks": user.howOthersCanHelpMe.plaintextDescription }),
-    ...((user.howICanHelpOthers?.plaintextDescription) && { "offers": user.howICanHelpOthers.plaintextDescription }),
+    memberSince: new Date(user.createdAt).toISOString(),
+    ...(user.howOthersCanHelpMe?.plaintextDescription && { seeks: user.howOthersCanHelpMe.plaintextDescription }),
+    ...(user.howICanHelpOthers?.plaintextDescription && { offers: user.howICanHelpOthers.plaintextDescription }),
   };
 };
 
-
 const UsersSingle = () => {
   const { params, pathname } = useLocation();
-  
+
   const slug = slugify(params.slug);
   const canonicalUrl = userGetProfileUrlFromSlug(slug);
   if (pathname !== canonicalUrl) {
@@ -56,16 +55,18 @@ const UsersSingle = () => {
     // pageload.
     return <Components.PermanentRedirect url={canonicalUrl} />;
   } else {
-    return isFriendlyUI ?
-      <Components.EAUsersProfile terms={{view: 'usersProfile', slug}} slug={slug} /> :
-      <Components.UsersProfile terms={{view: 'usersProfile', slug}} slug={slug} />
+    return isFriendlyUI ? (
+      <Components.EAUsersProfile terms={{ view: "usersProfile", slug }} slug={slug} />
+    ) : (
+      <Components.UsersProfile terms={{ view: "usersProfile", slug }} slug={slug} />
+    );
   }
 };
 
-const UsersSingleComponent = registerComponent('UsersSingle', UsersSingle);
+const UsersSingleComponent = registerComponent("UsersSingle", UsersSingle);
 
 declare global {
   interface ComponentTypes {
-    UsersSingle: typeof UsersSingleComponent
+    UsersSingle: typeof UsersSingleComponent;
   }
 }

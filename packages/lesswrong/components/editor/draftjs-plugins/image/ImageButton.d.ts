@@ -1,3 +1,2 @@
-
-const ImageButton: AnyBecauseTodo
-export default ImageButton
+const ImageButton: AnyBecauseTodo;
+export default ImageButton;

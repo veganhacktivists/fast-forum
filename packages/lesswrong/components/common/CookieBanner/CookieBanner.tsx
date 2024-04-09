@@ -67,19 +67,19 @@ const styles = (theme: ThemeType) => ({
     "&:hover": {
       backgroundColor: theme.palette.grey[700],
     },
-  }
+  },
 });
 
 const CookieBanner = ({ classes }: { classes: ClassesType }) => {
   const { openDialog } = useDialog();
   const { updateCookiePreferences } = useCookiePreferences();
-  
+
   const handleAcceptAll = () => {
     updateCookiePreferences(ALL_COOKIES);
-  }
+  };
   const handleReject = () => {
     updateCookiePreferences(ONLY_NECESSARY_COOKIES);
-  }
+  };
 
   const { Typography } = Components;
   return (

@@ -22,48 +22,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-import seek from './dom-seek'
+import seek from "./dom-seek";
 
-const SHOW_TEXT = 4
+const SHOW_TEXT = 4;
 
 export function fromRange(root: AnyBecauseTodo, range: AnyBecauseTodo) {
   if (root === undefined) {
-    throw new Error('missing required parameter "root"')
+    throw new Error('missing required parameter "root"');
   }
   if (range === undefined) {
-    throw new Error('missing required parameter "range"')
+    throw new Error('missing required parameter "range"');
   }
 
-  let document = root.ownerDocument
-  let prefix = document.createRange()
+  let document = root.ownerDocument;
+  let prefix = document.createRange();
 
-  let startNode = range.startContainer
-  let startOffset = range.startOffset
+  let startNode = range.startContainer;
+  let startOffset = range.startOffset;
 
-  prefix.setStart(root, 0)
-  prefix.setEnd(startNode, startOffset)
+  prefix.setStart(root, 0);
+  prefix.setEnd(startNode, startOffset);
 
-  let start = rangeToString(prefix).length
-  let end = start + rangeToString(range).length
+  let start = rangeToString(prefix).length;
+  let end = start + rangeToString(range).length;
 
   return {
     start: start,
     end: end,
-  }
+  };
 }
-
 
 export function toRange(root: AnyBecauseTodo, selector: AnyBecauseTodo = {}) {
   if (root === undefined) {
-    throw new Error('missing required parameter "root"')
+    throw new Error('missing required parameter "root"');
   }
 
-  const document = root.ownerDocument
-  const range = document.createRange()
-  const iter = document.createNodeIterator(root, SHOW_TEXT)
+  const document = root.ownerDocument;
+  const range = document.createRange();
+  const iter = document.createNodeIterator(root, SHOW_TEXT);
 
-  const start: AnyBecauseTodo = selector.start || 0
-  const end: AnyBecauseTodo = selector.end || start
+  const start: AnyBecauseTodo = selector.start || 0;
+  const end: AnyBecauseTodo = selector.end || start;
 
   const startOffset = start - seek(iter, start);
   const startNode = iter.referenceNode;
@@ -73,10 +72,10 @@ export function toRange(root: AnyBecauseTodo, selector: AnyBecauseTodo = {}) {
   const endOffset = remainder - seek(iter, remainder);
   const endNode = iter.referenceNode;
 
-  range.setStart(startNode, startOffset)
-  range.setEnd(endNode, endOffset)
+  range.setStart(startNode, startOffset);
+  range.setEnd(endNode, endOffset);
 
-  return range
+  return range;
 }
 
 /**
@@ -84,42 +83,42 @@ export function toRange(root: AnyBecauseTodo, selector: AnyBecauseTodo = {}) {
  */
 function nextNode(node: AnyBecauseTodo, skipChildren?: AnyBecauseTodo) {
   if (!skipChildren && node.firstChild) {
-    return node.firstChild
+    return node.firstChild;
   }
 
   do {
     if (node.nextSibling) {
-      return node.nextSibling
+      return node.nextSibling;
     }
-    node = node.parentNode
-  } while (node)
+    node = node.parentNode;
+  } while (node);
 
   /* istanbul ignore next */
-  return node
+  return node;
 }
 
 function firstNode(range: AnyBecauseTodo) {
   if (range.startContainer.nodeType === Node.ELEMENT_NODE) {
-    const node = range.startContainer.childNodes[range.startOffset]
-    return node || nextNode(range.startContainer, true /* skip children */)
+    const node = range.startContainer.childNodes[range.startOffset];
+    return node || nextNode(range.startContainer, true /* skip children */);
   }
-  return range.startContainer
+  return range.startContainer;
 }
 
 function firstNodeAfter(range: AnyBecauseTodo) {
   if (range.endContainer.nodeType === Node.ELEMENT_NODE) {
-    const node = range.endContainer.childNodes[range.endOffset]
-    return node || nextNode(range.endContainer, true /* skip children */)
+    const node = range.endContainer.childNodes[range.endOffset];
+    return node || nextNode(range.endContainer, true /* skip children */);
   }
-  return nextNode(range.endContainer)
+  return nextNode(range.endContainer);
 }
 
 function forEachNodeInRange(range: AnyBecauseTodo, cb: AnyBecauseTodo) {
-  let node = firstNode(range)
-  const pastEnd = firstNodeAfter(range)
+  let node = firstNode(range);
+  const pastEnd = firstNodeAfter(range);
   while (node !== pastEnd) {
-    cb(node)
-    node = nextNode(node)
+    cb(node);
+    node = nextNode(node);
   }
 }
 
@@ -133,14 +132,14 @@ function forEachNodeInRange(range: AnyBecauseTodo, cb: AnyBecauseTodo) {
 function rangeToString(range: AnyBecauseTodo) {
   // This is a fairly direct translation of the Range.toString() implementation
   // in Blink.
-  let text = ''
+  let text = "";
   forEachNodeInRange(range, (node: AnyBecauseTodo) => {
     if (node.nodeType !== Node.TEXT_NODE) {
-      return
+      return;
     }
-    const start = node === range.startContainer ? range.startOffset : 0
-    const end = node === range.endContainer ? range.endOffset : node.textContent.length
-    text += node.textContent.slice(start, end)
-  })
-  return text
+    const start = node === range.startContainer ? range.startOffset : 0;
+    const end = node === range.endContainer ? range.endOffset : node.textContent.length;
+    text += node.textContent.slice(start, end);
+  });
+  return text;
 }

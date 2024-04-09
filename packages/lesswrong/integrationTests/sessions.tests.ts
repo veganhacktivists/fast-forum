@@ -11,7 +11,7 @@ const makeCookie = () => {
   cookie.domain = "cow.com";
   cookie.sameSite = false;
   return cookie;
-}
+};
 
 const makeDataNoCookie = () => {
   return {
@@ -23,14 +23,14 @@ const makeDataNoCookie = () => {
     num: 1,
     cookie: {},
   } as unknown as SessionData;
-}
+};
 
 const makeData = () => {
   return {
     ...makeDataNoCookie(),
     cookie: makeCookie(),
   };
-}
+};
 
 const createStoreHelper = () => {
   const store = new MongoStore({
@@ -45,10 +45,10 @@ const createStoreHelper = () => {
     all: promisify(store.all).bind(store),
     touch: promisify(store.touch).bind(store),
     destroy: promisify(store.destroy).bind(store),
-  }
+  };
 
   return { store, storePromise };
-}
+};
 
 let state: ReturnType<typeof createStoreHelper>;
 
@@ -125,7 +125,7 @@ describe("Sessions", () => {
       state.store.get(sid, (error, session) => {
         expect(error).toBeNull();
         expect(session).toEqual(serializedSession);
-        done()
+        done();
       });
     });
     void state.store.set(sessionId, sessionData);
@@ -159,6 +159,6 @@ describe("Sessions", () => {
     });
     void state.store.set(sessionId, sessionData).then(() => {
       void state.store.set(sessionId, sessionUpdate);
-    })
+    });
   });
 });

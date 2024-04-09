@@ -5,7 +5,7 @@ export const frontpageGuidelinesLW = `
     <li>Try to offer concrete models and predictions</li>
     <li>If you disagree, try getting curious about what your partner is thinking</li>
     <li>Don't be afraid to say 'oops' and change your mind</li>
-  </ul>`
+  </ul>`;
 
 export const defaultGuidelinesLW = `
 <p><em>Default comment guidelines:</em></p>
@@ -14,4 +14,4 @@ export const defaultGuidelinesLW = `
   <li>Try to offer concrete models and predictions</li>
   <li>If you disagree, try getting curious about what your partner is thinking</li>
   <li>Don't be afraid to say 'oops' and change your mind</li>
-</ul>`
+</ul>`;

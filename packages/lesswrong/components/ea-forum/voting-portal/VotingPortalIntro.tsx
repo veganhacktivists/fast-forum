@@ -42,7 +42,7 @@ const styles = (theme: ThemeType) => ({
       minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
       borderRadius: 0,
       alignSelf: "flex-start",
-      margin: 0
+      margin: 0,
     },
   },
   description: {
@@ -81,10 +81,10 @@ const styles = (theme: ThemeType) => ({
     display: "flex",
     flexDirection: "row",
     gap: "20px",
-    '& a': {
+    "& a": {
       flexBasis: "50%",
     },
-    '& button': {
+    "& button": {
       flexBasis: "50%",
     },
     [theme.breakpoints.down("xs")]: {
@@ -155,7 +155,10 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const introImageIdSetting = new DatabasePublicSetting<string>("votingPortalIntroImageId", 'voting-portal-intro-image-2023-12-01_1');
+const introImageIdSetting = new DatabasePublicSetting<string>(
+  "votingPortalIntroImageId",
+  "voting-portal-intro-image-2023-12-01_1",
+);
 
 const newTabProps = { target: "_blank", rel: "noopener noreferrer" };
 
@@ -164,11 +167,10 @@ const exploreLink = "/giving-portal";
 export const processLink = "/posts/dYhKfsNuQX2sznfxe/donation-election-how-voting-will-work";
 export const candidatesLink = "/posts/bBm64htDSKn3ZKiQ5/meet-the-candidates-in-the-forum-s-donation-election-2023";
 const getStartedLink = "/voting-portal/select-candidates";
-const votingNormsLink = "/posts/hAzhyikPnLnMXweXG/participate-in-the-donation-election-and-the-first-weekly#Who_can_vote___voting_norms";
+const votingNormsLink =
+  "/posts/hAzhyikPnLnMXweXG/participate-in-the-donation-election-and-the-first-weekly#Who_can_vote___voting_norms";
 
-const VotingPortalIntro = ({classes}: {
-  classes: ClassesType<typeof styles>,
-}) => {
+const VotingPortalIntro = ({ classes }: { classes: ClassesType<typeof styles> }) => {
   const currentUser = useCurrentUser();
   const { openDialog } = useDialog();
   const { flash } = useMessages();
@@ -185,30 +187,33 @@ const VotingPortalIntro = ({classes}: {
     if (!isLoggedIn) {
       openDialog({
         componentName: "LoginPopup",
-        componentProps: {}
+        componentProps: {},
       });
     } else if (!userCanVote) {
       flash("Accounts created after 22nd Oct 2023 cannot vote in this election");
     } else if (votingClosed) {
       flash("Voting has closed");
     }
-  }
+  };
 
   return (
     <div className={classes.root}>
       <div className={classes.h1}>Welcome to the voting portal</div>
-      {!userCanVote && <div className={classes.warningBox}>
-        <ForumIcon icon="Warning" />
-        {isLoggedIn ? "You are not eligible to vote as your account was created after 22nd Oct 2023" : "You must be logged in to vote"}
-      </div>}
+      {!userCanVote && (
+        <div className={classes.warningBox}>
+          <ForumIcon icon="Warning" />
+          {isLoggedIn
+            ? "You are not eligible to vote as your account was created after 22nd Oct 2023"
+            : "You must be logged in to vote"}
+        </div>
+      )}
       <div className={classes.description}>
         <div>
-        The {" "}
-        <Link to={exploreLink} {...newTabProps}>
+          The{" "}
+          <Link to={exploreLink} {...newTabProps}>
             Donation Election
           </Link>{" "}
-          is about allocating money based on Forum users’ votes.
-          The{" "}
+          is about allocating money based on Forum users’ votes. The{" "}
           <Link to={fundLink} {...newTabProps}>
             Donation Election Fund
           </Link>{" "}
@@ -263,13 +268,9 @@ const VotingPortalIntro = ({classes}: {
       </div>
     </div>
   );
-}
+};
 
-const VotingPortalIntroComponent = registerComponent(
-  "VotingPortalIntro",
-  VotingPortalIntro,
-  {styles},
-);
+const VotingPortalIntroComponent = registerComponent("VotingPortalIntro", VotingPortalIntro, { styles });
 
 declare global {
   interface ComponentTypes {

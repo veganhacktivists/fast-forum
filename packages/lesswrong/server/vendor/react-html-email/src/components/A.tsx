@@ -1,7 +1,7 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import EmailPropTypes from '../PropTypes'
-import includeDataProps from '../includeDataProps'
+import React from "react";
+import PropTypes from "prop-types";
+import EmailPropTypes from "../PropTypes";
+import includeDataProps from "../includeDataProps";
 
 export default function A(props: any) {
   return (
@@ -19,7 +19,7 @@ export default function A(props: any) {
     >
       {props.children}
     </a>
-  )
+  );
 }
 
 A.propTypes = {
@@ -29,13 +29,13 @@ A.propTypes = {
   textDecoration: PropTypes.string,
   style: EmailPropTypes.style,
   children: PropTypes.node,
-}
+};
 
 A.defaultProps = {
-  textDecoration: 'underline',
+  textDecoration: "underline",
   href: undefined,
   download: undefined,
   color: undefined,
   style: undefined,
   children: undefined,
-}
+};

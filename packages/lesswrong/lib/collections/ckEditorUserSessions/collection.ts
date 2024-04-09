@@ -4,15 +4,15 @@ import { createCollection } from "../../vulcan-lib";
 import schema from "./schema";
 
 export const CkEditorUserSessions = createCollection({
-  collectionName: 'CkEditorUserSessions',
-  typeName: 'CkEditorUserSession',
+  collectionName: "CkEditorUserSessions",
+  typeName: "CkEditorUserSession",
   schema,
-  resolvers: getDefaultResolvers('CkEditorUserSessions'),
+  resolvers: getDefaultResolvers("CkEditorUserSessions"),
   logChanges: true,
-})
+});
 
-addUniversalFields({ collection: CkEditorUserSessions })
+addUniversalFields({ collection: CkEditorUserSessions });
 
-ensureIndex(CkEditorUserSessions, {documentId: 1, userId: 1})
+ensureIndex(CkEditorUserSessions, { documentId: 1, userId: 1 });
 
 export default CkEditorUserSessions;

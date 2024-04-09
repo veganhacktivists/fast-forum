@@ -1,5 +1,5 @@
 import Users from "../../lib/collections/users/collection";
-import {updateDefaultValue} from "./meta/utils";
+import { updateDefaultValue } from "./meta/utils";
 /**
  * Generated on 2023-10-06T21:44:57.384Z by `yarn makemigrations`
  * The following schema changes were detected:
@@ -15,12 +15,12 @@ import {updateDefaultValue} from "./meta/utils";
  */
 export const acceptsSchemaHash = "d42e531dd915561448e15e72551b1d71";
 
-export const up = async ({db}: MigrationContext) => {
-  await updateDefaultValue(db, Users, "notificationDialogueMessages")
-  await updateDefaultValue(db, Users, "notificationPublishedDialogueMessages")
-}
+export const up = async ({ db }: MigrationContext) => {
+  await updateDefaultValue(db, Users, "notificationDialogueMessages");
+  await updateDefaultValue(db, Users, "notificationPublishedDialogueMessages");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await updateDefaultValue(db, Users, "notificationDialogueMessages")
-  await updateDefaultValue(db, Users, "notificationPublishedDialogueMessages")
-}
+export const down = async ({ db }: MigrationContext) => {
+  await updateDefaultValue(db, Users, "notificationDialogueMessages");
+  await updateDefaultValue(db, Users, "notificationPublishedDialogueMessages");
+};

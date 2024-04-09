@@ -1,6 +1,6 @@
-import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
-import Tags from '../../lib/collections/tags/collection';
-import Users from '../../lib/collections/users/collection';
+import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
+import Tags from "../../lib/collections/tags/collection";
+import Users from "../../lib/collections/users/collection";
 
 registerMigration({
   name: "addDadTagSettings",
@@ -16,7 +16,7 @@ registerMigration({
       collection: Users,
       batchSize: 100,
       filter: {
-        "frontpageFilterSettings.tags": {$exists: true},
+        "frontpageFilterSettings.tags": { $exists: true },
       },
       callback: async (users: Array<DbUser>) => {
         // eslint-disable-next-line no-console
@@ -32,14 +32,14 @@ registerMigration({
           ];
           return {
             updateOne: {
-              filter: {_id},
-              update: {$set: {"frontpageFilterSettings.tags": newTags}}
-            }
+              filter: { _id },
+              update: { $set: { "frontpageFilterSettings.tags": newTags } },
+            },
           };
         });
 
-        await Users.rawCollection().bulkWrite(changes, {ordered: false});
-      }
+        await Users.rawCollection().bulkWrite(changes, { ordered: false });
+      },
     });
   },
 });

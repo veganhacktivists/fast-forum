@@ -6,7 +6,7 @@ describe("useOrderPreservingArray", () => {
     const initialArray = [{ _id: "a" }, { _id: "b" }, { _id: "c" }];
     const { result, rerender } = renderHook(
       (array: any[]) => useOrderPreservingArray(array, (elem) => elem._id, "prepend-new"),
-      { initialProps: initialArray }
+      { initialProps: initialArray },
     );
     expect(result.current).toEqual(initialArray);
 
@@ -30,7 +30,7 @@ describe("useOrderPreservingArray", () => {
     const initialArray = [{ _id: "a" }, { _id: "b" }, { _id: "c" }];
     const { result, rerender } = renderHook(
       (array: any[]) => useOrderPreservingArray(array, (elem) => elem._id, "append-new"),
-      { initialProps: initialArray }
+      { initialProps: initialArray },
     );
     expect(result.current).toEqual(initialArray);
 
@@ -54,7 +54,7 @@ describe("useOrderPreservingArray", () => {
     const initialArray = [{ _id: "a" }, { _id: "b" }, { _id: "c" }];
     const { result, rerender } = renderHook(
       (array: any[]) => useOrderPreservingArray(array, (elem) => elem._id, "interleave-new"),
-      { initialProps: initialArray }
+      { initialProps: initialArray },
     );
     expect(result.current).toEqual(initialArray);
 
@@ -71,7 +71,7 @@ describe("useOrderPreservingArray", () => {
     const initialArray = [{ _id: "a" }, { _id: "b" }, { _id: "c" }];
     const { result, rerender } = renderHook(
       (array: any[]) => useOrderPreservingArray(array, (elem) => elem._id, "no-reorder"),
-      { initialProps: initialArray }
+      { initialProps: initialArray },
     );
     expect(result.current).toEqual(initialArray);
 

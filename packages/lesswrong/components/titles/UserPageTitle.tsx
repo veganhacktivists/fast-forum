@@ -1,19 +1,25 @@
-import React from 'react';
-import { registerComponent } from '../../lib/vulcan-lib';
-import { useMulti } from '../../lib/crud/withMulti';
-import { Link } from '../../lib/reactRouterWrapper';
-import { userGetProfileUrl } from '../../lib/collections/users/helpers';
-import { useLocation } from '../../lib/routeUtil';
-import { Helmet } from 'react-helmet';
-import { styles } from '../common/HeaderSubtitle';
-import { getUserFromResults } from '../users/UsersProfile';
+import React from "react";
+import { registerComponent } from "../../lib/vulcan-lib";
+import { useMulti } from "../../lib/crud/withMulti";
+import { Link } from "../../lib/reactRouterWrapper";
+import { userGetProfileUrl } from "../../lib/collections/users/helpers";
+import { useLocation } from "../../lib/routeUtil";
+import { Helmet } from "react-helmet";
+import { styles } from "../common/HeaderSubtitle";
+import { getUserFromResults } from "../users/UsersProfile";
 
-const UserPageTitle = ({isSubtitle, siteName, classes}: {
-  isSubtitle: boolean,
-  siteName: string,
-  classes: ClassesType,
+const UserPageTitle = ({
+  isSubtitle,
+  siteName,
+  classes,
+}: {
+  isSubtitle: boolean;
+  siteName: string;
+  classes: ClassesType;
 }) => {
-  const { params: {slug} } = useLocation();
+  const {
+    params: { slug },
+  } = useLocation();
   const { results, loading } = useMulti({
     terms: {
       view: "usersProfile",
@@ -25,41 +31,42 @@ const UserPageTitle = ({isSubtitle, siteName, classes}: {
     // posts-page or sequences-page title components) fails (results undefined)
     // if fetchPolicy is cache-only. When set to cache-then-network, it works,
     // without generating any network requests.
-    fetchPolicy: 'cache-then-network' as any, //TODO
+    fetchPolicy: "cache-then-network" as any, //TODO
   });
-  
+
   if (!results || loading) return null;
-  
+
   const user = getUserFromResults(results);
   if (!user) return null;
   const userLink = userGetProfileUrl(user);
   const userNameString = user.displayName || user.slug;
-  const titleString = `${userNameString} - ${siteName}`
-  
-  // Ray note: I think it was just a mistake to have the User Profile subtitle 
+  const titleString = `${userNameString} - ${siteName}`;
+
+  // Ray note: I think it was just a mistake to have the User Profile subtitle
   // on the UsersProfile page, because it's just superfluous with the actual header
   // title. I've removed that use of this component, and I don't think there's another
   // currently-in-use subtitle version of this component. Probably should remove
   // the option, unless we want to go back to using the User subtitle on personal blogposts.
   if (isSubtitle) {
-    return (<span className={classes.subtitle}>
-      <Link to={userLink}>
-        {userNameString}
-      </Link>
-    </span>);
+    return (
+      <span className={classes.subtitle}>
+        <Link to={userLink}>{userNameString}</Link>
+      </span>
+    );
   } else {
-    return <Helmet>
-      <title>{titleString}</title>
-      <meta property='og:title' content={titleString}/>
-    </Helmet>
+    return (
+      <Helmet>
+        <title>{titleString}</title>
+        <meta property="og:title" content={titleString} />
+      </Helmet>
+    );
   }
-}
+};
 
-const UserPageTitleComponent = registerComponent("UserPageTitle", UserPageTitle, {styles});
+const UserPageTitleComponent = registerComponent("UserPageTitle", UserPageTitle, { styles });
 
 declare global {
   interface ComponentTypes {
-    UserPageTitle: typeof UserPageTitleComponent
+    UserPageTitle: typeof UserPageTitleComponent;
   }
 }
-

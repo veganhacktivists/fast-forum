@@ -1,16 +1,18 @@
 import { performanceMetricLoggingEnabled } from "../../lib/publicSettings";
 import { asyncLocalStorage, closePerfMetric, openPerfMetric } from "../perfMetrics";
 
-type Constructor<TResult, TParams extends any[] = any[]> = new (
-  ...params: TParams
-) => TResult;
+type Constructor<TResult, TParams extends any[] = any[]> = new (...params: TParams) => TResult;
 
 type PromiseMethodNames<T extends InstanceType<any>> = {
-  [k in keyof T & string]: T[k] extends ((...args: any[]) => any) ? ReturnType<T[k]> extends Promise<any> ? k : never : never;
+  [k in keyof T & string]: T[k] extends (...args: any[]) => any
+    ? ReturnType<T[k]> extends Promise<any>
+      ? k
+      : never
+    : never;
 }[keyof T & string];
 
 interface PerfMetricsDecoratorOptions<T extends Constructor<any, any>> {
-  excludeMethods?: PromiseMethodNames<InstanceType<T>>[]
+  excludeMethods?: PromiseMethodNames<InstanceType<T>>[];
 }
 
 function wrapWithPerfMetrics(method: Function, repoName: string, methodName: string) {
@@ -25,7 +27,7 @@ function wrapWithPerfMetrics(method: Function, repoName: string, methodName: str
 
     let parentTraceIdField;
     if (asyncContext) {
-      parentTraceIdField = { parent_trace_id: asyncContext.resolverContext?.perfMetric?.trace_id }
+      parentTraceIdField = { parent_trace_id: asyncContext.resolverContext?.perfMetric?.trace_id };
     } else {
       parentTraceIdField = {};
     }
@@ -33,9 +35,9 @@ function wrapWithPerfMetrics(method: Function, repoName: string, methodName: str
     const opName = `${repoName}.${methodName}`;
 
     const startedDbRepoMetric = openPerfMetric({
-      op_type: 'db_repo_method',
+      op_type: "db_repo_method",
       op_name: opName,
-      ...parentTraceIdField
+      ...parentTraceIdField,
     });
 
     const results = method.apply(this, args);
@@ -45,7 +47,7 @@ function wrapWithPerfMetrics(method: Function, repoName: string, methodName: str
     // Since this function is wrapping functions in Repos, it needs to not accidentally cause them to return promises if they weren't already doing so
     // That would break anything which called those functions and expected a sensible result (rather than a promise)
     if (results instanceof Promise) {
-      return results.then(res => {
+      return results.then((res) => {
         closePerfMetric(startedDbRepoMetric);
         return res;
       });
@@ -56,7 +58,7 @@ function wrapWithPerfMetrics(method: Function, repoName: string, methodName: str
     return results;
   };
 
-  Object.defineProperty(wrappedFn, 'name', { value: `perfMetricWrapped_${methodName}`, writable: false });
+  Object.defineProperty(wrappedFn, "name", { value: `perfMetricWrapped_${methodName}`, writable: false });
 
   return wrappedFn;
 }
@@ -66,15 +68,17 @@ function wrapMethods<T extends Constructor<any, any>>(targetClass: T, options?: 
 
   let wrappedMethodNames = methodNames;
   if (options?.excludeMethods) {
-    wrappedMethodNames = wrappedMethodNames.filter(methodName => !options.excludeMethods?.includes(methodName as PromiseMethodNames<InstanceType<T>>));
+    wrappedMethodNames = wrappedMethodNames.filter(
+      (methodName) => !options.excludeMethods?.includes(methodName as PromiseMethodNames<InstanceType<T>>),
+    );
   }
 
-  wrappedMethodNames.forEach(methodName => {
-      const originalMethod = targetClass.prototype[methodName];
+  wrappedMethodNames.forEach((methodName) => {
+    const originalMethod = targetClass.prototype[methodName];
 
-      if (typeof originalMethod === 'function' && methodName !== 'constructor') {
-        targetClass.prototype[methodName] = wrapWithPerfMetrics(originalMethod, targetClass.name, methodName);
-      }
+    if (typeof originalMethod === "function" && methodName !== "constructor") {
+      targetClass.prototype[methodName] = wrapWithPerfMetrics(originalMethod, targetClass.name, methodName);
+    }
   });
 }
 

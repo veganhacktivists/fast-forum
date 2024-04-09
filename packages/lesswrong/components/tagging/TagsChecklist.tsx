@@ -1,47 +1,47 @@
-import React, { useState } from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { tagStyle, coreTagStyle, smallTagTextStyle } from './FooterTag';
-import { taggingNameSetting } from '../../lib/instanceSettings';
-import classNames from 'classnames';
-import { isFriendlyUI } from '../../themes/forumTheme';
+import React, { useState } from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { tagStyle, coreTagStyle, smallTagTextStyle } from "./FooterTag";
+import { taggingNameSetting } from "../../lib/instanceSettings";
+import classNames from "classnames";
+import { isFriendlyUI } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     marginBottom: 8,
     display: "flex",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
   },
   checkbox: {
     padding: "0 8px 2px 0",
-    '& svg': {
-      height:14,
-      width: 14
-    }
+    "& svg": {
+      height: 14,
+      width: 14,
+    },
   },
   tag: {
     ...tagStyle(theme),
     backgroundColor: "unset",
     color: theme.palette.grey[500],
     border: theme.palette.border.extraFaint,
-    '&:hover': {
+    "&:hover": {
       border: theme.palette.border.grey300,
-      color: theme.palette.grey[800]
+      color: theme.palette.grey[800],
     },
     ...(isFriendlyUI
       ? {
-        ...coreTagStyle(theme),
-        opacity: 0.6,
-      }
+          ...coreTagStyle(theme),
+          opacity: 0.6,
+        }
       : {}),
   },
   selectedTag: {
-    display: 'inline-flex',
-    alignItems: 'baseline',
-    position: 'relative',
+    display: "inline-flex",
+    alignItems: "baseline",
+    position: "relative",
     columnGap: 4,
     ...tagStyle(theme),
     ...(isFriendlyUI ? coreTagStyle(theme) : {}),
-    cursor: 'default'
+    cursor: "default",
   },
   smallTag: {
     ...smallTagTextStyle(theme),
@@ -50,14 +50,14 @@ const styles = (theme: ThemeType): JssStyles => ({
     },
   },
   removeTag: {
-    background: 'transparent',
-    color: 'inherit',
+    background: "transparent",
+    color: "inherit",
     width: 15,
-    '&:hover': {
-      opacity: 0.5
+    "&:hover": {
+      opacity: 0.5,
     },
-    '& svg': {
-      position: 'absolute',
+    "& svg": {
+      position: "absolute",
       top: 7,
       right: 6,
       width: 13,
@@ -83,8 +83,8 @@ export interface ChecklistTag {
 }
 
 interface TagsChecklistItem {
-  tag: ChecklistTag,
-  selected: boolean,
+  tag: ChecklistTag;
+  selected: boolean;
 }
 
 const TagsChecklist = ({
@@ -101,7 +101,7 @@ const TagsChecklist = ({
 }: {
   onTagSelected?: (
     tag: { tagId: string; tagName: string; parentTagId?: string },
-    existingTagIds: Array<string>
+    existingTagIds: Array<string>,
   ) => void;
   onTagRemoved?: (tag: { tagId: string; tagName: string; parentTagId?: string }, existingTagIds: Array<string>) => void;
   classes: ClassesType;
@@ -110,17 +110,15 @@ const TagsChecklist = ({
   displaySelected?: "highlight" | "hide";
   tooltips?: boolean;
   truncate?: boolean;
-  smallText?: boolean,
-  shortNames?: boolean,
+  smallText?: boolean;
+  shortNames?: boolean;
 }) => {
   const { LWTooltip, LoadMore, ForumIcon } = Components;
   const [loadMoreClicked, setLoadMoreClicked] = useState(false);
 
   const getTagsToDisplay = (): TagsChecklistItem[] => {
     if (displaySelected === "hide") {
-      return tags
-        .filter((tag) => !selectedTagIds.includes(tag._id))
-        .map((tag) => ({ tag, selected: false }));
+      return tags.filter((tag) => !selectedTagIds.includes(tag._id)).map((tag) => ({ tag, selected: false }));
     } else {
       return tags.map((tag) => ({ tag, selected: selectedTagIds.includes(tag._id) }));
     }
@@ -139,17 +137,18 @@ const TagsChecklist = ({
     const selectedHiddenTags = selectedTags.filter((tag) => !initialTagsToDisplay.includes(tag));
 
     // Add hidden tags to the front of the list
-    tagsToDisplay = selectedHiddenTags.length > 0 ? selectedHiddenTags.concat(initialTagsToDisplay) : initialTagsToDisplay;
+    tagsToDisplay =
+      selectedHiddenTags.length > 0 ? selectedHiddenTags.concat(initialTagsToDisplay) : initialTagsToDisplay;
   }
   const shouldDisplayLoadMore = actuallyTruncate && tagsToDisplay.length < allRelevantTags.length;
   const numHidden = allRelevantTags.length - tagsToDisplay.length;
 
-  const handleOnTagSelected = (tag: AnyBecauseTodo, existingTagIds: AnyBecauseTodo) => onTagSelected({ tagId: tag._id, tagName: tag.name, parentTagId: tag.parentTag?._id }, existingTagIds)
-  const handleOnTagRemoved = (tag: AnyBecauseTodo, existingTagIds: AnyBecauseTodo) => onTagRemoved({ tagId: tag._id, tagName: tag.name, parentTagId: tag.parentTag?._id }, existingTagIds)
+  const handleOnTagSelected = (tag: AnyBecauseTodo, existingTagIds: AnyBecauseTodo) =>
+    onTagSelected({ tagId: tag._id, tagName: tag.name, parentTagId: tag.parentTag?._id }, existingTagIds);
+  const handleOnTagRemoved = (tag: AnyBecauseTodo, existingTagIds: AnyBecauseTodo) =>
+    onTagRemoved({ tagId: tag._id, tagName: tag.name, parentTagId: tag.parentTag?._id }, existingTagIds);
 
-  const getTagName = ({tag}: TagsChecklistItem) => smallText || shortNames
-    ? tag.shortName ?? tag.name
-    : tag.name;
+  const getTagName = ({ tag }: TagsChecklistItem) => (smallText || shortNames ? tag.shortName ?? tag.name : tag.name);
 
   return (
     <>
@@ -163,7 +162,7 @@ const TagsChecklist = ({
           >
             {getTagName(tagChecklistItem)}
             <button
-              className={classes.removeTag} 
+              className={classes.removeTag}
               onClick={() => handleOnTagRemoved(tagChecklistItem.tag, selectedTagIds)}
             >
               <ForumIcon icon="Close" />
@@ -176,7 +175,12 @@ const TagsChecklist = ({
             title={
               <div>
                 Click to assign <em>{tagChecklistItem.tag.name}</em> {taggingNameSetting.get()}
-                {!!tagChecklistItem.tag.parentTag && <span>. Its parent {taggingNameSetting.get()} <em>{tagChecklistItem.tag.parentTag.name}</em> will also be assigned automatically</span>}
+                {!!tagChecklistItem.tag.parentTag && (
+                  <span>
+                    . Its parent {taggingNameSetting.get()} <em>{tagChecklistItem.tag.parentTag.name}</em> will also be
+                    assigned automatically
+                  </span>
+                )}
               </div>
             }
             hideOnTouchScreens
@@ -190,24 +194,25 @@ const TagsChecklist = ({
               {getTagName(tagChecklistItem)}
             </div>
           </LWTooltip>
-        )
+        ),
       )}
-      {shouldDisplayLoadMore && <LoadMore
-        message={`${numHidden} more`}
-        loadMore={() => setLoadMoreClicked(true)}
-        className={classNames(classes.loadMore, {
-          [classes.smallLoadMore]: smallText,
-        })}
-      />}
+      {shouldDisplayLoadMore && (
+        <LoadMore
+          message={`${numHidden} more`}
+          loadMore={() => setLoadMoreClicked(true)}
+          className={classNames(classes.loadMore, {
+            [classes.smallLoadMore]: smallText,
+          })}
+        />
+      )}
     </>
   );
 };
 
-
-const TagsChecklistComponent = registerComponent("TagsChecklist", TagsChecklist, {styles});
+const TagsChecklistComponent = registerComponent("TagsChecklist", TagsChecklist, { styles });
 
 declare global {
   interface ComponentTypes {
-    TagsChecklist: typeof TagsChecklistComponent
+    TagsChecklist: typeof TagsChecklistComponent;
   }
 }

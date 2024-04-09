@@ -1,5 +1,5 @@
-import bowser from 'bowser'
-import { isClient } from '../executionEnvironment';
+import bowser from "bowser";
+import { isClient } from "../executionEnvironment";
 
 /**
  * Returns whether this is a mobile device (according to heuristics in the
@@ -10,7 +10,5 @@ import { isClient } from '../executionEnvironment';
  * instead.
  */
 export const isMobile = () => {
-  return isClient
-    && window?.navigator?.userAgent
-    && (bowser.mobile || bowser.tablet);
-}
+  return isClient && window?.navigator?.userAgent && (bowser.mobile || bowser.tablet);
+};

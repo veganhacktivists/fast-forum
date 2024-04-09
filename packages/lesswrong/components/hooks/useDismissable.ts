@@ -14,7 +14,7 @@ export const useDismissable = (
    */
   dismissDurationMonths = 120,
 ) => {
-  const {captureEvent} = useTracking();
+  const { captureEvent } = useTracking();
   const [cookies, setCookie] = useCookiesWithConsent([cookieName]);
   const [dismissed, setDismissed] = useState(cookies[cookieName] === "true");
   const dismiss = useCallback(() => {
@@ -30,4 +30,4 @@ export const useDismissable = (
     dismissed,
     dismiss,
   };
-}
+};

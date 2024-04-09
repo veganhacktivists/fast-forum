@@ -1,6 +1,5 @@
-
-import { registerMigration, fillDefaultValues } from './migrationUtils';
-import { Tags } from '../../lib/collections/tags/collection';
+import { registerMigration, fillDefaultValues } from "./migrationUtils";
+import { Tags } from "../../lib/collections/tags/collection";
 
 registerMigration({
   name: "defaultWikiGrade",
@@ -11,5 +10,5 @@ registerMigration({
       collection: Tags,
       fieldName: "wikiGrade",
     });
-  }
-})
+  },
+});

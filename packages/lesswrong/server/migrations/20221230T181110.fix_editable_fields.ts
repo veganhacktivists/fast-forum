@@ -13,22 +13,22 @@
  */
 export const acceptsSchemaHash = "ea71916ffaa87ae0a21302ce831261e6";
 
-import Spotlights from "../../lib/collections/spotlights/collection"
-import Tags from "../../lib/collections/tags/collection"
-import Users from "../../lib/vulcan-users"
-import { addField } from "./meta/utils"
+import Spotlights from "../../lib/collections/spotlights/collection";
+import Tags from "../../lib/collections/tags/collection";
+import Users from "../../lib/vulcan-users";
+import { addField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   const collectionsAndFieldsToMigrate = [
-    {collection: Spotlights, fieldName: 'description'},
-    {collection: Tags, fieldName: 'description'},
-    {collection: Tags, fieldName: 'subforumWelcomeText'},
-    {collection: Users, fieldName: 'howOthersCanHelpMe'},
-    {collection: Users, fieldName: 'howICanHelpOthers'},
-    {collection: Users, fieldName: 'biography'},
-  ]
+    { collection: Spotlights, fieldName: "description" },
+    { collection: Tags, fieldName: "description" },
+    { collection: Tags, fieldName: "subforumWelcomeText" },
+    { collection: Users, fieldName: "howOthersCanHelpMe" },
+    { collection: Users, fieldName: "howICanHelpOthers" },
+    { collection: Users, fieldName: "biography" },
+  ];
 
-  for (const {collection, fieldName} of collectionsAndFieldsToMigrate) {
+  for (const { collection, fieldName } of collectionsAndFieldsToMigrate) {
     // eslint-disable-next-line no-console
     console.log(`Migrating ${collection.collectionName} ${fieldName}`);
 
@@ -41,8 +41,10 @@ export const up = async ({db}: MigrationContext) => {
     console.log(`  Updating ${ids.length} documents`);
 
     const promises: Promise<null>[] = [];
-    for (const {_id} of ids) {
-      promises.push(db.none(`
+    for (const { _id } of ids) {
+      promises.push(
+        db.none(
+          `
         UPDATE "${collection.collectionName}"
         SET "${fieldName}" = (
           SELECT row_to_json(q.*)
@@ -62,15 +64,18 @@ export const up = async ({db}: MigrationContext) => {
               t."${fieldName}_latest" = r."_id") q
           )
         WHERE "_id" = $1
-      `, [_id]));
+      `,
+          [_id],
+        ),
+      );
     }
     await Promise.all(promises);
 
     // eslint-disable-next-line no-console
     console.log("    Done!");
   }
-}
+};
 
 export const down = async (_: MigrationContext) => {
   // Nah
-}
+};

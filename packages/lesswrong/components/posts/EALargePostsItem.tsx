@@ -20,7 +20,7 @@ const styles = (theme: ThemeType) => ({
     padding: "16px 16px",
     "&:hover": {
       background: theme.palette.grey[50],
-      border: `1px solid ${theme.palette.grey[250]}`
+      border: `1px solid ${theme.palette.grey[250]}`,
     },
   },
   postListItemTextSection: {
@@ -104,41 +104,35 @@ const EALargePostsItem = ({
   className,
   classes,
 }: {
-  post: PostsPage,
-  isNarrow?: boolean,
-  noImagePlaceholder?: boolean,
-  className?: string,
-  classes: ClassesType,
+  post: PostsPage;
+  isNarrow?: boolean;
+  noImagePlaceholder?: boolean;
+  className?: string;
+  classes: ClassesType;
 }) => {
   const authorExpandContainer = useRef(null);
 
   const postLink = postGetPageUrl(post);
-  const {onClick} = useClickableCell({href: postLink});
+  const { onClick } = useClickableCell({ href: postLink });
 
-  const {eventHandlers} = useHover({
+  const { eventHandlers } = useHover({
     pageElementContext: "postListItem",
     documentId: post._id,
     documentSlug: post.slug,
   });
 
   const timeFromNow = moment(new Date(post.postedAt)).fromNow();
-  const ago = timeFromNow !== "now"
-    ? <span className={classes.xsHide}>&nbsp;ago</span>
-    : null;
+  const ago = timeFromNow !== "now" ? <span className={classes.xsHide}>&nbsp;ago</span> : null;
 
   let imageUrl = post.socialPreviewData.imageUrl;
   if (!imageUrl && !noImagePlaceholder) {
     imageUrl = siteImageSetting.get();
   }
 
-  const {TruncatedAuthorsList, ForumIcon, PostsItemTooltipWrapper} = Components;
+  const { TruncatedAuthorsList, ForumIcon, PostsItemTooltipWrapper } = Components;
   return (
     <AnalyticsContext documentSlug={post.slug}>
-      <div
-        {...eventHandlers}
-        onClick={onClick}
-        className={classNames(classes.postListItem, className)}
-      >
+      <div {...eventHandlers} onClick={onClick} className={classNames(classes.postListItem, className)}>
         <div className={classes.postListItemTextSection}>
           <div className={classes.postListItemTitle}>
             <PostsItemTooltipWrapper post={post} placement="bottom" As="span">
@@ -148,18 +142,14 @@ const EALargePostsItem = ({
             </PostsItemTooltipWrapper>
           </div>
           {/** TODO
-            * The recent discussions redesign adds an `EAPostMeta` component
-            * which should probably be used here:
-            * https://github.com/ForumMagnum/ForumMagnum/pull/7858/files#diff-56fb35d84b446595acd8a1318777ab5c5d4f1d47434941f5baf9e2949c24431d
-            */}
+           * The recent discussions redesign adds an `EAPostMeta` component
+           * which should probably be used here:
+           * https://github.com/ForumMagnum/ForumMagnum/pull/7858/files#diff-56fb35d84b446595acd8a1318777ab5c5d4f1d47434941f5baf9e2949c24431d
+           */}
           <div className={classes.postListItemMeta}>
             <div ref={authorExpandContainer}>
               <InteractionWrapper>
-                <TruncatedAuthorsList
-                  post={post}
-                  expandContainer={authorExpandContainer}
-                  className={classes.authors}
-                />
+                <TruncatedAuthorsList post={post} expandContainer={authorExpandContainer} className={classes.authors} />
               </InteractionWrapper>
             </div>
             &nbsp;·&nbsp;
@@ -181,9 +171,7 @@ const EALargePostsItem = ({
               )}
             </div>
           </div>
-          <div className={classes.postListItemPreview}>
-            {post.contents?.plaintextDescription}
-          </div>
+          <div className={classes.postListItemPreview}>{post.contents?.plaintextDescription}</div>
         </div>
         {imageUrl && <img className={classes.postListItemImage} src={imageUrl} />}
       </div>
@@ -191,11 +179,10 @@ const EALargePostsItem = ({
   );
 };
 
-const EALargePostsItemComponent = registerComponent(
-  "EALargePostsItem",
-  EALargePostsItem,
-  {styles, stylePriority: -1,},
-);
+const EALargePostsItemComponent = registerComponent("EALargePostsItem", EALargePostsItem, {
+  styles,
+  stylePriority: -1,
+});
 
 declare global {
   interface ComponentTypes {

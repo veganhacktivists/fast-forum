@@ -1,25 +1,24 @@
-import React from 'react';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import { Components, getFragment, registerComponent } from '../../lib/vulcan-lib';
-import { TagFlags } from '../../lib/collections/tagFlags/collection';
-import { taggingNameCapitalSetting } from '../../lib/instanceSettings';
+import React from "react";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import { Components, getFragment, registerComponent } from "../../lib/vulcan-lib";
+import { TagFlags } from "../../lib/collections/tagFlags/collection";
+import { taggingNameCapitalSetting } from "../../lib/instanceSettings";
 
-const TagFlagEditAndNewForm = ({ tagFlagId, onClose, classes }: {
-  tagFlagId?: string,
-  onClose?: () => void,
-  classes: ClassesType,
+const TagFlagEditAndNewForm = ({
+  tagFlagId,
+  onClose,
+  classes,
+}: {
+  tagFlagId?: string;
+  onClose?: () => void;
+  classes: ClassesType;
 }) => {
   const { LWDialog } = Components;
   return (
-    <LWDialog
-      open={true}
-      onClose={onClose}
-    >
+    <LWDialog open={true} onClose={onClose}>
       <DialogTitle>
-        {tagFlagId ?
-          `Edit ${taggingNameCapitalSetting.get()} Flag` :
-          `Create ${taggingNameCapitalSetting.get()} Flag`}
+        {tagFlagId ? `Edit ${taggingNameCapitalSetting.get()} Flag` : `Create ${taggingNameCapitalSetting.get()} Flag`}
       </DialogTitle>
       <DialogContent>
         <Components.WrappedSmartForm
@@ -31,13 +30,13 @@ const TagFlagEditAndNewForm = ({ tagFlagId, onClose, classes }: {
         />
       </DialogContent>
     </LWDialog>
-  )
-}
+  );
+};
 
-const TagFlagEditAndNewFormComponent = registerComponent('TagFlagEditAndNewForm', TagFlagEditAndNewForm);
+const TagFlagEditAndNewFormComponent = registerComponent("TagFlagEditAndNewForm", TagFlagEditAndNewForm);
 
 declare global {
   interface ComponentTypes {
-    TagFlagEditAndNewForm: typeof TagFlagEditAndNewFormComponent
+    TagFlagEditAndNewForm: typeof TagFlagEditAndNewFormComponent;
   }
 }

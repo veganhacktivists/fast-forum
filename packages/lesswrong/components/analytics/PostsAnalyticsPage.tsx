@@ -13,17 +13,17 @@ import { useMultiPostAnalytics } from "../hooks/useAnalytics";
 import { Link } from "../../lib/reactRouterWrapper";
 
 function formatBounceRate(denominator?: number, numerator?: number) {
-  if (!denominator || numerator === undefined || numerator === null) return null
-  return `${((1 - (numerator / denominator)) * 100).toFixed(1)}%`
+  if (!denominator || numerator === undefined || numerator === null) return null;
+  return `${((1 - numerator / denominator) * 100).toFixed(1)}%`;
 }
 
-function readableReadingTime (seconds?: number) {
-  if (!seconds) return null
-  const minutes = Math.floor(seconds / 60)
-  const secondsRemainder = Math.round(seconds % 60)
-  const secondsPart = `${secondsRemainder} s`
-  if (minutes > 0) return `${minutes} m ${secondsRemainder ? secondsPart : ''}`
-  return secondsPart
+function readableReadingTime(seconds?: number) {
+  if (!seconds) return null;
+  const minutes = Math.floor(seconds / 60);
+  const secondsRemainder = Math.round(seconds % 60);
+  const secondsPart = `${secondsRemainder} s`;
+  if (minutes > 0) return `${minutes} m ${secondsRemainder ? secondsPart : ""}`;
+  return secondsPart;
 }
 
 const styles = (theme: ThemeType): JssStyles => ({
@@ -40,7 +40,7 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   subheading: {
     fontSize: 20,
-    margin: '8px 0px'
+    margin: "8px 0px",
   },
   table: {
     marginBottom: 24,

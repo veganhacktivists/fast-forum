@@ -1,12 +1,12 @@
-import { getCollection } from '../vulcan-lib/getCollection';
-import { loggerConstructor } from './logging'
-import { viewFieldNullOrMissing, viewFieldAllowAny } from '../vulcan-lib/collections';
-import { DatabasePublicSetting } from '../publicSettings';
-import * as _ from 'underscore';
-import merge from 'lodash/merge';
+import { getCollection } from "../vulcan-lib/getCollection";
+import { loggerConstructor } from "./logging";
+import { viewFieldNullOrMissing, viewFieldAllowAny } from "../vulcan-lib/collections";
+import { DatabasePublicSetting } from "../publicSettings";
+import * as _ from "underscore";
+import merge from "lodash/merge";
 
 // 'Maximum documents per request'
-const maxDocumentsPerRequestSetting = new DatabasePublicSetting<number>('maxDocumentsPerRequest', 5000)
+const maxDocumentsPerRequestSetting = new DatabasePublicSetting<number>("maxDocumentsPerRequest", 5000);
 
 /**
  * Given a view (which gets translated into a mongo query), provide a string
@@ -18,18 +18,23 @@ const maxDocumentsPerRequestSetting = new DatabasePublicSetting<number>('maxDocu
  */
 export function describeTerms(collectionName: CollectionNameString, terms: ViewTermsBase) {
   const viewName = terms.view || "defaultView";
-  const otherTerms = Object.keys(terms).filter(key => key!=='view').join(',');
-  if (otherTerms.length>0)
-    return `${collectionName}.${viewName}(${otherTerms})`;
-  else
-    return `${collectionName}.${viewName}`;
+  const otherTerms = Object.keys(terms)
+    .filter((key) => key !== "view")
+    .join(",");
+  if (otherTerms.length > 0) return `${collectionName}.${viewName}(${otherTerms})`;
+  else return `${collectionName}.${viewName}`;
 }
 
 /**
  * Given a set of terms describing a view, translate them into a mongodb selector
  * and options, which is ready to execute (but don't execute it yet).
  */
-export function viewTermsToQuery<N extends CollectionNameString>(collectionName: N, terms: ViewTermsByCollectionName[N], apolloClient?: any, resolverContext?: ResolverContext) {
+export function viewTermsToQuery<N extends CollectionNameString>(
+  collectionName: N,
+  terms: ViewTermsByCollectionName[N],
+  apolloClient?: any,
+  resolverContext?: ResolverContext,
+) {
   const collection = getCollection(collectionName);
   return getParameters(collection, terms, apolloClient, resolverContext);
 }
@@ -41,7 +46,7 @@ export function viewTermsToQuery<N extends CollectionNameString>(collectionName:
  * this selector as a starting point.
  */
 export function getDefaultViewSelector<N extends CollectionNameString>(collectionName: N) {
-  const viewQuery = viewTermsToQuery(collectionName, {})
+  const viewQuery = viewTermsToQuery(collectionName, {});
   return replaceSpecialFieldSelectors(viewQuery.selector);
 }
 
@@ -53,11 +58,11 @@ function getParameters<N extends CollectionNameString>(
   collection: CollectionBase<N>,
   terms: ViewTermsByCollectionName[N] = {},
   apolloClient?: any,
-  context?: ResolverContext
+  context?: ResolverContext,
 ): MergedViewQueryAndOptions<ObjectsByCollectionName[N]> {
   const collectionName = collection.collectionName;
-  const logger = loggerConstructor(`views-${collectionName.toLowerCase()}-${terms.view?.toLowerCase() ?? 'default'}`)
-  logger('getParameters(), terms:', terms);
+  const logger = loggerConstructor(`views-${collectionName.toLowerCase()}-${terms.view?.toLowerCase() ?? "default"}`);
+  logger("getParameters(), terms:", terms);
 
   let parameters: any = {
     selector: {},
@@ -70,8 +75,8 @@ function getParameters<N extends CollectionNameString>(
     parameters = {
       ...merge(parameters, defaultParameters),
       selector: newSelector,
-    }
-    logger('getParameters(), parameters after defaultView:', parameters)
+    };
+    logger("getParameters(), parameters after defaultView:", parameters);
   }
 
   // handle view option
@@ -80,12 +85,7 @@ function getParameters<N extends CollectionNameString>(
     const view = viewFn(terms, apolloClient, context);
     let mergedParameters = mergeSelectors(parameters, view);
 
-    if (
-      mergedParameters.options &&
-      mergedParameters.options.sort &&
-      view.options &&
-      view.options.sort
-    ) {
+    if (mergedParameters.options && mergedParameters.options.sort && view.options && view.options.sort) {
       // If both the default view and the selected view have sort options,
       // don't merge them together; take the selected view's sort. (Otherwise
       // they merge in the wrong order, so that the default-view's sort takes
@@ -93,7 +93,7 @@ function getParameters<N extends CollectionNameString>(
       mergedParameters.options.sort = view.options.sort;
     }
     parameters = mergedParameters;
-    logger('getParameters(), parameters after defaultView and view:', parameters)
+    logger("getParameters(), parameters after defaultView and view:", parameters);
   }
 
   // sort using terms.orderBy (overwrite defaultView's sort)
@@ -115,7 +115,7 @@ function getParameters<N extends CollectionNameString>(
   // remove any null fields (setting a field to null means it should be deleted)
   parameters.selector = replaceSpecialFieldSelectors(parameters.selector);
   if (parameters.options.sort) {
-    _.keys(parameters.options.sort).forEach(key => {
+    _.keys(parameters.options.sort).forEach((key) => {
       if (parameters.options.sort[key] === null) {
         delete parameters.options.sort[key];
       }
@@ -127,7 +127,7 @@ function getParameters<N extends CollectionNameString>(
   const limit = terms.limit || parameters.options.limit;
   parameters.options.limit = !limit || limit < 1 || limit > maxDocuments ? maxDocuments : limit;
 
-  logger('getParameters(), final parameters:', parameters);
+  logger("getParameters(), final parameters:", parameters);
   return parameters;
 }
 
@@ -159,20 +159,18 @@ export function replaceSpecialFieldSelectors(selector: any): any {
   return result;
 }
 
-export const jsonArrayContainsSelector = (field: string, value: AnyBecauseTodo) =>
-  ({$expr: {$jsonArrayContains: [field, value]}});
+export const jsonArrayContainsSelector = (field: string, value: AnyBecauseTodo) => ({
+  $expr: { $jsonArrayContains: [field, value] },
+});
 
 const removeAndOr = <T extends DbObject>(selector: MongoSelector<T>) => {
-  const copy = {...selector}
-  delete copy.$and
-  delete copy.$or
-  return copy
-}
+  const copy = { ...selector };
+  delete copy.$and;
+  delete copy.$or;
+  return copy;
+};
 
-const mergeTwoSelectors = <T extends DbObject>(
-  baseSelector?: MongoSelector<T>,
-  newSelector?: MongoSelector<T>,
-) => {
+const mergeTwoSelectors = <T extends DbObject>(baseSelector?: MongoSelector<T>, newSelector?: MongoSelector<T>) => {
   if (!baseSelector) return newSelector;
   if (!newSelector) return baseSelector;
 
@@ -181,26 +179,26 @@ const mergeTwoSelectors = <T extends DbObject>(
   if ("$and" in baseSelector || "$and" in newSelector) {
     mergedSelector = {
       ...mergedSelector,
-      $and: [...(baseSelector.$and ?? []), ...(newSelector.$and ?? [])]
-    }
+      $and: [...(baseSelector.$and ?? []), ...(newSelector.$and ?? [])],
+    };
   }
   if ("$or" in baseSelector || "$or" in newSelector) {
     mergedSelector = {
       ...mergedSelector,
-      $and: [...(baseSelector.$or ? [{$or: baseSelector.$or}] : []), ...(newSelector.$or ? [{$or: newSelector.$or}] : []), ...(mergedSelector.$and ?? [])]
-    }
+      $and: [
+        ...(baseSelector.$or ? [{ $or: baseSelector.$or }] : []),
+        ...(newSelector.$or ? [{ $or: newSelector.$or }] : []),
+        ...(mergedSelector.$and ?? []),
+      ],
+    };
   }
   return mergedSelector;
-}
+};
 
 /**
  * Merge selectors, with special handling for $and and $or. NB: Not yet
  * completely recursive, so while it will do a deep merge of your selectors,
  * $and and $or will only be merged at the top level.
  */
-export const mergeSelectors = <T extends DbObject>(
-  ...selectors: Array<MongoSelector<T> | undefined>
-) => selectors.reduce(
-  (mergedSelector, nextSelector) => mergeTwoSelectors(mergedSelector, nextSelector),
-  undefined
-);
+export const mergeSelectors = <T extends DbObject>(...selectors: Array<MongoSelector<T> | undefined>) =>
+  selectors.reduce((mergedSelector, nextSelector) => mergeTwoSelectors(mergedSelector, nextSelector), undefined);

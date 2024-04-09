@@ -5,46 +5,35 @@ import { useCurrentUser } from "../../common/withUser";
 import { useSetAlignmentPost } from "../../alignment-forum/withSetAlignmentPost";
 import { isLWorAF } from "../../../lib/instanceSettings";
 
-const MoveToAlignmentPostDropdownItem = ({post}: {post: PostsBase}) => {
+const MoveToAlignmentPostDropdownItem = ({ post }: { post: PostsBase }) => {
   const currentUser = useCurrentUser();
-  const {setAlignmentPostMutation} = useSetAlignmentPost({fragmentName: "PostsList"});
+  const { setAlignmentPostMutation } = useSetAlignmentPost({ fragmentName: "PostsList" });
 
   const handleMoveToAlignmentForum = () => {
     void setAlignmentPostMutation({
       postId: post._id,
       af: true,
-    })
-  }
+    });
+  };
 
   const handleRemoveFromAlignmentForum = () => {
     void setAlignmentPostMutation({
       postId: post._id,
       af: false,
-    })
-  }
+    });
+  };
 
-  if (
-    !isLWorAF ||
-    !userCanMakeAlignmentPost(currentUser, post)
-  ) {
+  if (!isLWorAF || !userCanMakeAlignmentPost(currentUser, post)) {
     return null;
   }
 
-  const {DropdownItem} = Components;
-  return post.af
-    ? (
-      <DropdownItem
-        title="Ω Remove Alignment"
-        onClick={handleRemoveFromAlignmentForum}
-      />
-    )
-    : (
-      <DropdownItem
-        title="Ω Move to Alignment"
-        onClick={handleMoveToAlignmentForum}
-      />
-    );
-}
+  const { DropdownItem } = Components;
+  return post.af ? (
+    <DropdownItem title="Ω Remove Alignment" onClick={handleRemoveFromAlignmentForum} />
+  ) : (
+    <DropdownItem title="Ω Move to Alignment" onClick={handleMoveToAlignmentForum} />
+  );
+};
 
 const MoveToAlignmentPostDropdownItemComponent = registerComponent(
   "MoveToAlignmentPostDropdownItem",
@@ -53,6 +42,6 @@ const MoveToAlignmentPostDropdownItemComponent = registerComponent(
 
 declare global {
   interface ComponentTypes {
-    MoveToAlignmentPostDropdownItem: typeof MoveToAlignmentPostDropdownItemComponent
+    MoveToAlignmentPostDropdownItem: typeof MoveToAlignmentPostDropdownItemComponent;
   }
 }

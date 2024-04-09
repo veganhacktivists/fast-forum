@@ -9,31 +9,33 @@ import type { ForumIconName } from "../common/ForumIcon";
 import { isFriendlyUI } from "../../themes/forumTheme";
 
 export type BookmarkPost = {
-  icon: ForumIconName,
-  labelText: string,
-  hoverText: string,
-  toggleBookmark: (event: MouseEvent) => void,
-}
+  icon: ForumIconName;
+  labelText: string;
+  hoverText: string;
+  toggleBookmark: (event: MouseEvent) => void;
+};
 
 const getLabelText = (bookmarked: boolean) => {
   if (isFriendlyUI) {
     return bookmarked ? "Saved" : "Save";
   }
   return bookmarked ? "Un-bookmark" : "Bookmark";
-}
+};
 
 const getHoverText = (bookmarked: boolean) => {
   if (isFriendlyUI) {
     return bookmarked ? "Remove from saved posts" : "Save post for later";
   }
   return bookmarked ? "Un-bookmark" : "Bookmark";
-}
+};
 
 export const useBookmarkPost = (post: PostsBase): BookmarkPost => {
   const currentUser = useCurrentUser();
-  const {openDialog} = useDialog();
-  const [bookmarked, setBookmarkedState] = useState(pluck((currentUser?.bookmarkedPostsMetadata || []), 'postId')?.includes(post._id));
-  const {captureEvent} = useTracking();
+  const { openDialog } = useDialog();
+  const [bookmarked, setBookmarkedState] = useState(
+    pluck(currentUser?.bookmarkedPostsMetadata || [], "postId")?.includes(post._id),
+  );
+  const { captureEvent } = useTracking();
 
   const [setIsBookmarkedMutation] = useMutation(gql`
     mutation setIsBookmarked($postId: String!, $isBookmarked: Boolean!) {
@@ -45,9 +47,9 @@ export const useBookmarkPost = (post: PostsBase): BookmarkPost => {
   `);
 
   const setBookmarked = (isBookmarked: boolean) => {
-    setBookmarkedState(isBookmarked)
+    setBookmarkedState(isBookmarked);
     void setIsBookmarkedMutation({
-      variables: {postId: post._id, isBookmarked},
+      variables: { postId: post._id, isBookmarked },
     });
   };
 
@@ -62,8 +64,8 @@ export const useBookmarkPost = (post: PostsBase): BookmarkPost => {
     }
 
     setBookmarked(!bookmarked);
-    captureEvent("bookmarkToggle", {"postId": post._id, "bookmarked": !bookmarked});
-  }
+    captureEvent("bookmarkToggle", { postId: post._id, bookmarked: !bookmarked });
+  };
 
   return {
     icon: bookmarked ? "Bookmark" : "BookmarkBorder",
@@ -71,4 +73,4 @@ export const useBookmarkPost = (post: PostsBase): BookmarkPost => {
     hoverText: getHoverText(bookmarked),
     toggleBookmark,
   };
-}
+};

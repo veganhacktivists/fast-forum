@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { registerComponent, Components } from '../../../lib/vulcan-lib';
-import type { ContentItemBody } from '../../common/ContentItemBody';
-import type { VotingProps } from '../votingProps';
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { registerComponent, Components } from "../../../lib/vulcan-lib";
+import type { ContentItemBody } from "../../common/ContentItemBody";
+import type { VotingProps } from "../votingProps";
 
 export const hideSelectorClassName = "hidden-selector";
 const hiddenSelector = `& .${hideSelectorClassName}`;
@@ -9,104 +9,111 @@ const hiddenSelector = `& .${hideSelectorClassName}`;
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     [hiddenSelector]: {
-      backgroundColor: theme.palette.background.primaryTranslucentHeavy
-    }
+      backgroundColor: theme.palette.background.primaryTranslucentHeavy,
+    },
   },
   button: {
     zIndex: 1000,
     position: "relative",
     left: 12,
-    backgroundColor: theme.palette.background.paper, 
+    backgroundColor: theme.palette.background.paper,
   },
 });
 
-export const InlineReactSelectionWrapper = ({commentBodyRef, voteProps, styling, children, classes}: {
-  commentBodyRef?: React.RefObject<ContentItemBody>|null, // we need this to check if the mouse is still over the comment, and it needs to be passed down from CommentsItem instead of declared here because it needs extra padding in order to behave intuively (without losing the selection)
-  voteProps: VotingProps<VoteableTypeClient>
-  styling: "comment"|"post",
-  children: React.ReactNode,
-  classes: ClassesType,
+export const InlineReactSelectionWrapper = ({
+  commentBodyRef,
+  voteProps,
+  styling,
+  children,
+  classes,
+}: {
+  commentBodyRef?: React.RefObject<ContentItemBody> | null; // we need this to check if the mouse is still over the comment, and it needs to be passed down from CommentsItem instead of declared here because it needs extra padding in order to behave intuively (without losing the selection)
+  voteProps: VotingProps<VoteableTypeClient>;
+  styling: "comment" | "post";
+  children: React.ReactNode;
+  classes: ClassesType;
 }) => {
-  const commentTextRef = useRef<HTMLDivElement|null>(null);
-  const popupRef = useRef<HTMLDivElement|null>(null);
+  const commentTextRef = useRef<HTMLDivElement | null>(null);
+  const popupRef = useRef<HTMLDivElement | null>(null);
   const [quote, setQuote] = useState<string>("");
-  const [anchorEl, setAnchorEl] = useState<HTMLElement|null>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [yOffset, setYOffset] = useState<number>(0);
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
 
   const { AddInlineReactionButton, LWPopper } = Components;
-  
-  const detectSelection = useCallback((e: MouseEvent): void => {
-    function clearAll() {
-      setAnchorEl(null);
-      setQuote("")
-      setDisabledButton(false)
-    }
-  
-    const selection = window.getSelection()
-    const selectedText = selection?.toString() ?? ""
-    const selectionAnchorNode = selection?.anchorNode
-    if (!selectionAnchorNode) {
-      clearAll()
-      return
-    }
 
-    const selectionInCommentRef = commentBodyRef && commentBodyRef.current?.containsNode(selectionAnchorNode);
-    const selectionInPopupRef = popupRef && popupRef.current?.contains(selectionAnchorNode as Node);
-
-    if (selectionInCommentRef && !selectionInPopupRef) {
-      const anchorEl = commentBodyRef?.current?.getAnchorEl();
-      
-      if (anchorEl instanceof HTMLElement && selectedText.length > 1 ) {
-        setAnchorEl(anchorEl);
-        setQuote(selectedText);
-        setYOffset(getYOffsetFromDocument(selection, commentTextRef));
-        const commentText = commentBodyRef.current?.getText() ?? "";
-        // Count the number of occurrences of the quote in the raw text
-        const count = countStringsInString(commentText, selectedText);
-        setDisabledButton(count > 1)
-      } else {
-        clearAll()
+  const detectSelection = useCallback(
+    (e: MouseEvent): void => {
+      function clearAll() {
+        setAnchorEl(null);
+        setQuote("");
+        setDisabledButton(false);
       }
-    }
-    if (!selectionInCommentRef && !selectionInPopupRef) {
-      clearAll()
-    }
-  }, [commentBodyRef, commentTextRef]);
-  
-  useEffect(() => { 
-    document.addEventListener('selectionchange', detectSelection);
+
+      const selection = window.getSelection();
+      const selectedText = selection?.toString() ?? "";
+      const selectionAnchorNode = selection?.anchorNode;
+      if (!selectionAnchorNode) {
+        clearAll();
+        return;
+      }
+
+      const selectionInCommentRef = commentBodyRef && commentBodyRef.current?.containsNode(selectionAnchorNode);
+      const selectionInPopupRef = popupRef && popupRef.current?.contains(selectionAnchorNode as Node);
+
+      if (selectionInCommentRef && !selectionInPopupRef) {
+        const anchorEl = commentBodyRef?.current?.getAnchorEl();
+
+        if (anchorEl instanceof HTMLElement && selectedText.length > 1) {
+          setAnchorEl(anchorEl);
+          setQuote(selectedText);
+          setYOffset(getYOffsetFromDocument(selection, commentTextRef));
+          const commentText = commentBodyRef.current?.getText() ?? "";
+          // Count the number of occurrences of the quote in the raw text
+          const count = countStringsInString(commentText, selectedText);
+          setDisabledButton(count > 1);
+        } else {
+          clearAll();
+        }
+      }
+      if (!selectionInCommentRef && !selectionInPopupRef) {
+        clearAll();
+      }
+    },
+    [commentBodyRef, commentTextRef],
+  );
+
+  useEffect(() => {
+    document.addEventListener("selectionchange", detectSelection);
     return () => {
-      document.removeEventListener('selectionchange', detectSelection);
+      document.removeEventListener("selectionchange", detectSelection);
     };
   }, [detectSelection, commentBodyRef]);
-  
-  const buttonOffsetLeft = (styling==="comment") ? 12 : 30;
-  const buttonOffsetTop = (styling==="comment") ? 0 : 6;
+
+  const buttonOffsetLeft = styling === "comment" ? 12 : 30;
+  const buttonOffsetTop = styling === "comment" ? 0 : 6;
 
   return (
     <div className={classes.root} ref={commentTextRef}>
-      <LWPopper
-        open={!!anchorEl} anchorEl={anchorEl}
-        placement="right"
-        allowOverflow={true}
-      >
-        <span ref={popupRef} className={classes.button}
-          style={{position:"relative", top: yOffset+buttonOffsetTop, marginLeft: buttonOffsetLeft}}
+      <LWPopper open={!!anchorEl} anchorEl={anchorEl} placement="right" allowOverflow={true}>
+        <span
+          ref={popupRef}
+          className={classes.button}
+          style={{ position: "relative", top: yOffset + buttonOffsetTop, marginLeft: buttonOffsetLeft }}
         >
-          <AddInlineReactionButton quote={quote} voteProps={voteProps} disabled={disabledButton}/>
-        </span> 
+          <AddInlineReactionButton quote={quote} voteProps={voteProps} disabled={disabledButton} />
+        </span>
       </LWPopper>
 
       {children}
     </div>
   );
-}
+};
 
-function getYOffsetFromDocument (selection: Selection, commentTextRef: React.RefObject<HTMLDivElement>) {
+function getYOffsetFromDocument(selection: Selection, commentTextRef: React.RefObject<HTMLDivElement>) {
   const commentTextRect = commentTextRef.current?.getBoundingClientRect();
   if (!commentTextRect) return 0;
-  const documentCenter = commentTextRect?.top + (commentTextRect?.height / 2);
+  const documentCenter = commentTextRect?.top + commentTextRect?.height / 2;
 
   const selectionRectTop = selection.getRangeAt(0).getBoundingClientRect().top;
   const selectionRectBottom = selection.getRangeAt(0).getBoundingClientRect().bottom;
@@ -125,10 +132,14 @@ function countStringsInString(haystack: string, needle: string): number {
   return count;
 }
 
-const InlineReactSelectionWrapperComponent = registerComponent('InlineReactSelectionWrapper', InlineReactSelectionWrapper, {styles});
+const InlineReactSelectionWrapperComponent = registerComponent(
+  "InlineReactSelectionWrapper",
+  InlineReactSelectionWrapper,
+  { styles },
+);
 
 declare global {
   interface ComponentTypes {
-    InlineReactSelectionWrapper: typeof InlineReactSelectionWrapperComponent
+    InlineReactSelectionWrapper: typeof InlineReactSelectionWrapperComponent;
   }
 }

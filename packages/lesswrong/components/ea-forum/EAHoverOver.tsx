@@ -30,19 +30,19 @@ const EAHoverOver = ({
    * This is the contents of the hover over, named `title` for compatability
    * with LWTooltip
    */
-  title: ReactNode,
-  children: ReactNode,
-  placement?: PopperPlacementType,
-  inlineBlock?: boolean,
-  As?: keyof JSX.IntrinsicElements,
-  clickable?: boolean,
-  flip?: boolean,
-  analyticsProps?: AnalyticsProps,
-  className?: string,
-  popperClassName?: string,
-  classes: ClassesType,
+  title: ReactNode;
+  children: ReactNode;
+  placement?: PopperPlacementType;
+  inlineBlock?: boolean;
+  As?: keyof JSX.IntrinsicElements;
+  clickable?: boolean;
+  flip?: boolean;
+  analyticsProps?: AnalyticsProps;
+  className?: string;
+  popperClassName?: string;
+  classes: ClassesType;
 }) => {
-  const {LWTooltip} = Components;
+  const { LWTooltip } = Components;
   return (
     <LWTooltip
       title={title}
@@ -60,16 +60,12 @@ const EAHoverOver = ({
       {children}
     </LWTooltip>
   );
-}
+};
 
-const EAHoverOverComponent = registerComponent(
-  "EAHoverOver",
-  EAHoverOver,
-  {styles, stylePriority: -1},
-);
+const EAHoverOverComponent = registerComponent("EAHoverOver", EAHoverOver, { styles, stylePriority: -1 });
 
 declare global {
   interface ComponentTypes {
-    EAHoverOver: typeof EAHoverOverComponent
+    EAHoverOver: typeof EAHoverOverComponent;
   }
 }

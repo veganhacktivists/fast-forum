@@ -1,12 +1,12 @@
 import type { GraphQLSchema, SourceLocation } from "graphql";
-import { SchemaLink } from '@apollo/client/link/schema';
-import { BatchHttpLink } from '@apollo/client/link/batch-http';
-import { onError } from '@apollo/client/link/error';
-import { isServer } from '../executionEnvironment';
+import { SchemaLink } from "@apollo/client/link/schema";
+import { BatchHttpLink } from "@apollo/client/link/batch-http";
+import { onError } from "@apollo/client/link/error";
+import { isServer } from "../executionEnvironment";
 import { DatabasePublicSetting } from "../publicSettings";
 import { ApolloLink, Operation, selectURI } from "@apollo/client/core";
 
-const graphqlBatchMaxSetting = new DatabasePublicSetting('batchHttpLink.batchMax', 50)
+const graphqlBatchMaxSetting = new DatabasePublicSetting("batchHttpLink.batchMax", 50);
 
 export const crosspostUserAgent = "ForumMagnum/2.1";
 
@@ -24,13 +24,13 @@ export const crosspostUserAgent = "ForumMagnum/2.1";
  */
 export const createSchemaLink = (schema: GraphQLSchema, context: ResolverContext) =>
   // We are doing `context: () => ({...context})` rather than just context to fix a bug in datadog, see: https://github.com/DataDog/dd-trace-js/issues/709
-  new SchemaLink({ schema, context: () => ({...context}) });
+  new SchemaLink({ schema, context: () => ({ ...context }) });
 
 /**
  * Http link is used for client side rendering
  */
-export const createHttpLink = (baseUrl = '/') => {
-  const uri = baseUrl + 'graphql';
+export const createHttpLink = (baseUrl = "/") => {
+  const uri = baseUrl + "graphql";
 
   const batchKey = (operation: Operation) => {
     // The default part is copied from https://github.com/apollographql/apollo-client/blob/main/src/link/batch-http/batchHttpLink.ts#L192-L206
@@ -49,35 +49,38 @@ export const createHttpLink = (baseUrl = '/') => {
     // This is to manually separate out very slow queries
     const explicitBatchKey = operation.variables?.batchKey;
 
-    return explicitBatchKey && typeof explicitBatchKey === "string" ? defaultBatchKey : defaultBatchKey + explicitBatchKey;
+    return explicitBatchKey && typeof explicitBatchKey === "string"
+      ? defaultBatchKey
+      : defaultBatchKey + explicitBatchKey;
   };
 
   const fetch: typeof globalThis.fetch = isServer
-    ? (url, options) => globalThis.fetch(url, {
-      ...options,
-      headers: {
-        ...options?.headers,
-        // user agent because LW bans bot agents
-        'User-Agent': crosspostUserAgent,
-      }
-    })
+    ? (url, options) =>
+        globalThis.fetch(url, {
+          ...options,
+          headers: {
+            ...options?.headers,
+            // user agent because LW bans bot agents
+            "User-Agent": crosspostUserAgent,
+          },
+        })
     : globalThis.fetch;
   return new BatchHttpLink({
     uri,
-    credentials: baseUrl === '/' ? 'same-origin' : 'omit',
+    credentials: baseUrl === "/" ? "same-origin" : "omit",
     batchMax: graphqlBatchMaxSetting.get(),
     fetch,
     batchKey,
   });
-}
+};
 
 export const headerLink = new ApolloLink((operation, forward) => {
   if (!isServer) {
-    const url = new URL(window.location.href)
-    const path = url.pathname + url.search
+    const url = new URL(window.location.href);
+    const path = url.pathname + url.search;
 
     const headers = {
-      'request-origin-path': path
+      "request-origin-path": path,
     };
 
     operation.setContext({
@@ -88,7 +91,7 @@ export const headerLink = new ApolloLink((operation, forward) => {
 });
 
 const locationsToStr = (locations: readonly SourceLocation[] = []) =>
-  locations.map(({column, line}) => `line ${line}, col ${column}`).join(';');
+  locations.map(({ column, line }) => `line ${line}, col ${column}`).join(";");
 
 /**
  * This is an extra utility link that is currently used for client side error handling

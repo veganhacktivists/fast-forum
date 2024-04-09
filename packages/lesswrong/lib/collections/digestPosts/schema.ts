@@ -1,8 +1,8 @@
-import { foreignKeyField } from '../../utils/schemaUtils'
-import { TupleSet, UnionOf } from '../../utils/typeGuardUtils';
+import { foreignKeyField } from "../../utils/schemaUtils";
+import { TupleSet, UnionOf } from "../../utils/typeGuardUtils";
 
-export const DIGEST_STATUSES = new TupleSet(['yes', 'maybe', 'no'] as const)
-export type InDigestStatus = UnionOf<typeof DIGEST_STATUSES>
+export const DIGEST_STATUSES = new TupleSet(["yes", "maybe", "no"] as const);
+export type InDigestStatus = UnionOf<typeof DIGEST_STATUSES>;
 
 const schema: SchemaType<"DigestPosts"> = {
   digestId: {
@@ -13,11 +13,11 @@ const schema: SchemaType<"DigestPosts"> = {
       type: "Digest",
       nullable: false,
     }),
-    canRead: ['guests'],
-    canCreate: ['admins'],
-    canUpdate: ['admins'],
+    canRead: ["guests"],
+    canCreate: ["admins"],
+    canUpdate: ["admins"],
     hidden: true,
-    nullable: false
+    nullable: false,
   },
   postId: {
     ...foreignKeyField({
@@ -27,9 +27,9 @@ const schema: SchemaType<"DigestPosts"> = {
       type: "Post",
       nullable: false,
     }),
-    canRead: ['guests'],
-    canCreate: ['admins'],
-    canUpdate: ['admins'],
+    canRead: ["guests"],
+    canCreate: ["admins"],
+    canUpdate: ["admins"],
     hidden: true,
     nullable: false,
   },
@@ -38,19 +38,19 @@ const schema: SchemaType<"DigestPosts"> = {
     type: String,
     optional: true,
     nullable: true,
-    canRead: ['guests'],
-    canUpdate: ['admins'],
-    canCreate: ['admins'],
+    canRead: ["guests"],
+    canUpdate: ["admins"],
+    canCreate: ["admins"],
   },
   // is this post in the on-site digest?
   onsiteDigestStatus: {
     type: String,
     optional: true,
     nullable: true,
-    canRead: ['guests'],
-    canUpdate: ['admins'],
-    canCreate: ['admins'],
-  }
+    canRead: ["guests"],
+    canUpdate: ["admins"],
+    canCreate: ["admins"],
+  },
 };
 
 export default schema;

@@ -1,3 +1,2 @@
-
-const createLinkifyPlugin: AnyBecauseTodo
-export default createLinkifyPlugin
+const createLinkifyPlugin: AnyBecauseTodo;
+export default createLinkifyPlugin;

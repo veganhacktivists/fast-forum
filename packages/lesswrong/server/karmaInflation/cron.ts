@@ -1,10 +1,14 @@
-import { onStartup } from '../../lib/executionEnvironment';
+import { onStartup } from "../../lib/executionEnvironment";
 import { DatabaseMetadata } from "../../lib/collections/databaseMetadata/collection";
-import { nullKarmaInflationSeries, setKarmaInflationSeries, TimeSeries } from '../../lib/collections/posts/karmaInflation';
-import { addCronJob } from '../cronUtil';
-import { Vulcan } from '../vulcan-lib';
-import PostsRepo from '../repos/PostsRepo';
-import DatabaseMetadataRepo from '../repos/DatabaseMetadataRepo';
+import {
+  nullKarmaInflationSeries,
+  setKarmaInflationSeries,
+  TimeSeries,
+} from "../../lib/collections/posts/karmaInflation";
+import { addCronJob } from "../cronUtil";
+import { Vulcan } from "../vulcan-lib";
+import PostsRepo from "../repos/PostsRepo";
+import DatabaseMetadataRepo from "../repos/DatabaseMetadataRepo";
 
 const AVERAGING_WINDOW_MS = 1000 * 60 * 60 * 24 * 28; // 28 days
 
@@ -19,7 +23,7 @@ export async function refreshKarmaInflation() {
   const meanKarmaByInterval = await postsRepo.getMeanKarmaByInterval(startDate, AVERAGING_WINDOW_MS);
   const meanKarmaOverall = await postsRepo.getMeanKarmaOverall();
 
-  const reciprocalOrOne = (x: number) => x === 0 ? 1 : 1 / x;
+  const reciprocalOrOne = (x: number) => (x === 0 ? 1 : 1 / x);
 
   // _id in meanKarmaByInterval always corresponds to the index of that interval in
   // the final time series, but meanKarmaByInterval may be missing some intervals (if there are no posts during that time)
@@ -40,7 +44,7 @@ export async function refreshKarmaInflation() {
   const karmaInflationSeries: TimeSeries = {
     start: startDate.getTime(),
     interval: AVERAGING_WINDOW_MS,
-    values: values
+    values: values,
   };
 
   // insert the new series into the db
@@ -67,11 +71,11 @@ onStartup(async () => {
 });
 
 addCronJob({
-  name: 'refreshKarmaInflationCron',
-  interval: 'every 24 hours',
+  name: "refreshKarmaInflationCron",
+  interval: "every 24 hours",
   job() {
     void refreshKarmaInflation();
-  }
+  },
 });
 
 Vulcan.refreshKarmaInflation = refreshKarmaInflation;

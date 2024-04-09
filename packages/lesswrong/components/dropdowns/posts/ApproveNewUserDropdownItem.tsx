@@ -6,11 +6,11 @@ import { useUpdate } from "../../../lib/crud/withUpdate";
 import { userCanDo } from "../../../lib/vulcan-users";
 import { preferredHeadingCase } from "../../../themes/forumTheme";
 
-const ApproveNewUserDropdownItem = ({post}: {post: PostsBase}) => {
+const ApproveNewUserDropdownItem = ({ post }: { post: PostsBase }) => {
   const currentUser = useCurrentUser();
-  const {mutate: updateUser} = useUpdate({
+  const { mutate: updateUser } = useUpdate({
     collectionName: "Users",
-    fragmentName: 'UsersCurrent',
+    fragmentName: "UsersCurrent",
   });
 
   if (!post.authorIsUnreviewed || !userCanDo(currentUser, "posts.edit.all")) {
@@ -21,7 +21,7 @@ const ApproveNewUserDropdownItem = ({post}: {post: PostsBase}) => {
   // get out of sync
   const handleApproveUser = async () => {
     await updateUser({
-      selector: {_id: post.userId},
+      selector: { _id: post.userId },
       data: {
         reviewedByUserId: currentUser?._id,
         sunshineFlagged: false,
@@ -30,24 +30,16 @@ const ApproveNewUserDropdownItem = ({post}: {post: PostsBase}) => {
         snoozedUntilContentCount: null,
       },
     });
-  }
+  };
 
-  const {DropdownItem} = Components;
-  return (
-    <DropdownItem
-      title={preferredHeadingCase("Approve New User")}
-      onClick={handleApproveUser}
-    />
-  );
-}
+  const { DropdownItem } = Components;
+  return <DropdownItem title={preferredHeadingCase("Approve New User")} onClick={handleApproveUser} />;
+};
 
-const ApproveNewUserDropdownItemComponent = registerComponent(
-  "ApproveNewUserDropdownItem",
-  ApproveNewUserDropdownItem,
-);
+const ApproveNewUserDropdownItemComponent = registerComponent("ApproveNewUserDropdownItem", ApproveNewUserDropdownItem);
 
 declare global {
   interface ComponentTypes {
-    ApproveNewUserDropdownItem: typeof ApproveNewUserDropdownItemComponent
+    ApproveNewUserDropdownItem: typeof ApproveNewUserDropdownItemComponent;
   }
 }

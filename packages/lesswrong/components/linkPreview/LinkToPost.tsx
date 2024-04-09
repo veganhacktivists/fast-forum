@@ -1,8 +1,8 @@
-import React from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { linkStyle } from './PostLinkPreview';
-import { postGetPageUrl } from '../../lib/collections/posts/helpers';
-import { Link } from '../../lib/reactRouterWrapper';
+import React from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { linkStyle } from "./PostLinkPreview";
+import { postGetPageUrl } from "../../lib/collections/posts/helpers";
+import { Link } from "../../lib/reactRouterWrapper";
 
 const styles = (theme: ThemeType): JssStyles => ({
   link: {
@@ -13,15 +13,12 @@ const styles = (theme: ThemeType): JssStyles => ({
 
 // A link to a post. Differs from the stuff in PostLinkPreview in that it's a
 // provided post object, rather than integrating with user-provided markup.
-const LinkToPost = ({post, classes}: {
-  post: PostsList|null,
-  classes: ClassesType
-}) => {
+const LinkToPost = ({ post, classes }: { post: PostsList | null; classes: ClassesType }) => {
   if (!post) {
-    return <span>[Deleted]</span>
+    return <span>[Deleted]</span>;
   }
 
-  const {PostsTooltip} = Components;
+  const { PostsTooltip } = Components;
   return (
     <PostsTooltip post={post} placement="bottom-start" clickable>
       <Link className={classes.link} to={postGetPageUrl(post)}>
@@ -29,12 +26,12 @@ const LinkToPost = ({post, classes}: {
       </Link>
     </PostsTooltip>
   );
-}
+};
 
-const LinkToPostComponent = registerComponent("LinkToPost", LinkToPost, {styles});
+const LinkToPostComponent = registerComponent("LinkToPost", LinkToPost, { styles });
 
 declare global {
   interface ComponentTypes {
-    LinkToPost: typeof LinkToPostComponent
+    LinkToPost: typeof LinkToPostComponent;
   }
 }

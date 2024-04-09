@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-09-15T22:44:33.000Z by 20230915T224433.create_typing_indicator_table.ts
  * +-- Overall schema hash: 819db4e73eb75d36dad4ede02eb17c1e
- *  
+ *
  * @@ -546,3 +544,3 @@ CREATE TABLE "PostRelations" (
- *  
+ *
  * --- Schema for "Posts", hash: 57fc03583592775f768f897a39c83a6f
  * +-- Schema for "Posts", hash: c6cb7802fe366bb996b40376c38f51db
  *  CREATE TABLE "Posts" (
@@ -27,7 +27,7 @@
  *      "debate" bool DEFAULT false,
  * +    "collabEditorDialogue" bool DEFAULT false,
  *      "rejected" bool DEFAULT false,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -38,15 +38,15 @@
  */
 export const acceptsSchemaHash = "2e10471e3641d01fe309198fb9ecff32";
 
-import { Posts } from "../../lib/collections/posts/collection"
-import { updateDefaultValue, addField, dropField } from "./meta/utils"
+import { Posts } from "../../lib/collections/posts/collection";
+import { updateDefaultValue, addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Posts, "collabEditorDialogue");
   await updateDefaultValue(db, Posts, "shareWithUsers");
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Posts, "collabEditorDialogue");
   await updateDefaultValue(db, Posts, "shareWithUsers");
-}
+};

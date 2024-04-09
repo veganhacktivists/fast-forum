@@ -1,23 +1,23 @@
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import React from 'react';
-import { useHover } from '../common/withHover';
-import { Link } from '../../lib/reactRouterWrapper';
-import { commentGetPageUrlFromIds } from '../../lib/collections/comments/helpers';
-import classNames from 'classnames';
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import React from "react";
+import { useHover } from "../common/withHover";
+import { Link } from "../../lib/reactRouterWrapper";
+import { commentGetPageUrlFromIds } from "../../lib/collections/comments/helpers";
+import classNames from "classnames";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     marginRight: 8,
-    whiteSpace: "nowrap"
+    whiteSpace: "nowrap",
   },
   commentPreview: {
-    maxWidth: 600
+    maxWidth: 600,
   },
   deleted: {
-    opacity: .6,
-    '&&': {
-      fontWeight: 400
-    }
+    opacity: 0.6,
+    "&&": {
+      fontWeight: 400,
+    },
   },
   default: {
     color: theme.palette.grey[900],
@@ -26,58 +26,66 @@ const styles = (theme: ThemeType): JssStyles => ({
     width: 30,
     marginRight: 8,
     display: "inline-block",
-    textAlign: "center"
+    textAlign: "center",
   },
   titleDisplay: {
-    display: "block"
+    display: "block",
   },
   highlight: {
     color: theme.palette.primary.main,
-    fontWeight: 600
-  }
-})
+    fontWeight: 600,
+  },
+});
 
-
-const CommentKarmaWithPreview = ({ comment, classes, displayTitle, reviewedAt }: {
-  comment: CommentsListWithParentMetadata,
-  classes: ClassesType,
-  displayTitle: boolean,
-  reviewedAt: Date
+const CommentKarmaWithPreview = ({
+  comment,
+  classes,
+  displayTitle,
+  reviewedAt,
+}: {
+  comment: CommentsListWithParentMetadata;
+  classes: ClassesType;
+  displayTitle: boolean;
+  reviewedAt: Date;
 }) => {
   const { hover, anchorEl, eventHandlers } = useHover();
-  const { LWPopper, CommentsNode, FormatDate } = Components
+  const { LWPopper, CommentsNode, FormatDate } = Components;
 
-  if (!comment) return null 
+  if (!comment) return null;
 
-  return <span className={classNames(classes.root, {[classes.titleDisplay]: displayTitle})} {...eventHandlers}>
-    <Link className={classNames({[classes.highlight]: comment.postedAt > reviewedAt, [classes.deleted]: comment.deleted, [classes.default]: !comment.deleted})}
-      to={commentGetPageUrlFromIds({postId: comment.postId, commentId: comment._id, postSlug: ""})}
-    >
-      {displayTitle && <span className={classes.scoreTitleFormat}>
-        <FormatDate date={comment.postedAt} />
-      </span>}
-      <span className={displayTitle ? classes.scoreTitleFormat : undefined}>
-        {comment.baseScore} 
-      </span>
-      {displayTitle && comment.post?.title }
-    </Link>
-    <LWPopper
-        open={hover}
-        anchorEl={anchorEl}
-        placement={displayTitle ? "right-start" : "bottom-start"}
+  return (
+    <span className={classNames(classes.root, { [classes.titleDisplay]: displayTitle })} {...eventHandlers}>
+      <Link
+        className={classNames({
+          [classes.highlight]: comment.postedAt > reviewedAt,
+          [classes.deleted]: comment.deleted,
+          [classes.default]: !comment.deleted,
+        })}
+        to={commentGetPageUrlFromIds({ postId: comment.postId, commentId: comment._id, postSlug: "" })}
       >
-      <div className={classes.commentPreview}>
-        <CommentsNode treeOptions={{showPostTitle: true}} comment={comment} forceUnTruncated forceUnCollapsed/>
-      </div>
-    </LWPopper>
-  </span>
-}
+        {displayTitle && (
+          <span className={classes.scoreTitleFormat}>
+            <FormatDate date={comment.postedAt} />
+          </span>
+        )}
+        <span className={displayTitle ? classes.scoreTitleFormat : undefined}>{comment.baseScore}</span>
+        {displayTitle && comment.post?.title}
+      </Link>
+      <LWPopper open={hover} anchorEl={anchorEl} placement={displayTitle ? "right-start" : "bottom-start"}>
+        <div className={classes.commentPreview}>
+          <CommentsNode treeOptions={{ showPostTitle: true }} comment={comment} forceUnTruncated forceUnCollapsed />
+        </div>
+      </LWPopper>
+    </span>
+  );
+};
 
-const CommentKarmaWithPreviewComponent = registerComponent('CommentKarmaWithPreview', CommentKarmaWithPreview, {styles});
+const CommentKarmaWithPreviewComponent = registerComponent("CommentKarmaWithPreview", CommentKarmaWithPreview, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    CommentKarmaWithPreview: typeof CommentKarmaWithPreviewComponent
+    CommentKarmaWithPreview: typeof CommentKarmaWithPreviewComponent;
   }
 }
-

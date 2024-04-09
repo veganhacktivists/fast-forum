@@ -1,136 +1,151 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Components, registerComponent, getSiteUrl } from '../../lib/vulcan-lib';
-import Button from '@material-ui/core/Button';
-import classNames from 'classnames';
+import React from "react";
+import PropTypes from "prop-types";
+import { Components, registerComponent, getSiteUrl } from "../../lib/vulcan-lib";
+import Button from "@material-ui/core/Button";
+import classNames from "classnames";
 import { useCurrentUser } from "../common/withUser";
 import { useTracking } from "../../lib/analyticsEvents";
-import {forumTitleSetting, isEAForum, isLW } from "../../lib/instanceSettings";
-import { isFriendlyUI } from '../../themes/forumTheme';
-import {requestFeedbackKarmaLevelSetting} from '../../lib/publicSettings.ts'
+import { forumTitleSetting, isEAForum, isLW } from "../../lib/instanceSettings";
+import { isFriendlyUI } from "../../themes/forumTheme";
+import { requestFeedbackKarmaLevelSetting } from "../../lib/publicSettings.ts";
 
 export const styles = (theme: ThemeType): JssStyles => ({
   formButton: {
     fontFamily: theme.typography.commentStyle.fontFamily,
     fontSize: isFriendlyUI ? 14 : 16,
     marginLeft: 5,
-    ...(isFriendlyUI ? {
-      textTransform: 'none',
-    } : {
-      paddingBottom: 4,
-      fontWeight: 500,
-      "&:hover": {
-        background: theme.palette.buttons.hoverGrayHighlight,
-      }
-    })
+    ...(isFriendlyUI
+      ? {
+          textTransform: "none",
+        }
+      : {
+          paddingBottom: 4,
+          fontWeight: 500,
+          "&:hover": {
+            background: theme.palette.buttons.hoverGrayHighlight,
+          },
+        }),
   },
   secondaryButton: {
-    ...(isFriendlyUI ? {
-      color: theme.palette.grey[680],
-      padding: '8px 12px'
-    } : {
-      color: theme.palette.text.dim40,
-    })
+    ...(isFriendlyUI
+      ? {
+          color: theme.palette.grey[680],
+          padding: "8px 12px",
+        }
+      : {
+          color: theme.palette.text.dim40,
+        }),
   },
   submitButtons: {
-    marginLeft: 'auto'
+    marginLeft: "auto",
   },
   submitButton: {
-    ...(isFriendlyUI ? {
-      backgroundColor: theme.palette.buttons.alwaysPrimary,
-      color: theme.palette.text.alwaysWhite,
-      boxShadow: 'none',
-      marginLeft: 10,
-    } : {
-      color: theme.palette.secondary.main
-    })
+    ...(isFriendlyUI
+      ? {
+          backgroundColor: theme.palette.buttons.alwaysPrimary,
+          color: theme.palette.text.alwaysWhite,
+          boxShadow: "none",
+          marginLeft: 10,
+        }
+      : {
+          color: theme.palette.secondary.main,
+        }),
   },
-  cancelButton: {
-  },
-  draft: {
-  },
-  feedback: {
-  }
+  cancelButton: {},
+  draft: {},
+  feedback: {},
 });
 
 export type PostSubmitProps = FormButtonProps & {
-  saveDraftLabel?: string,
-  feedbackLabel?: string,
-  document: PostsPage,
-  classes: ClassesType
-}
+  saveDraftLabel?: string;
+  feedbackLabel?: string;
+  document: PostsPage;
+  classes: ClassesType;
+};
 
-const PostSubmit = ({
-  submitLabel = "Submit",
-  cancelLabel = "Cancel",
-  saveDraftLabel = "Save as draft",
-  feedbackLabel = "Request Feedback",
-  cancelCallback, document, collectionName, classes
-}: PostSubmitProps, { updateCurrentValues, addToSuccessForm, submitForm }: any) => {
+const PostSubmit = (
+  {
+    submitLabel = "Submit",
+    cancelLabel = "Cancel",
+    saveDraftLabel = "Save as draft",
+    feedbackLabel = "Request Feedback",
+    cancelCallback,
+    document,
+    collectionName,
+    classes,
+  }: PostSubmitProps,
+  { updateCurrentValues, addToSuccessForm, submitForm }: any,
+) => {
   const currentUser = useCurrentUser();
   const { captureEvent } = useTracking();
-  if (!currentUser) throw Error("must be logged in to post")
+  if (!currentUser) throw Error("must be logged in to post");
 
   const { LWTooltip } = Components;
 
   const submitWithConfirmation = async (e: React.MouseEvent) => {
     e.preventDefault();
-    if (confirm('Warning!  This will publish your dialogue and make it visible to other users.')) {
-      collectionName === "Posts" && await updateCurrentValues({draft: false});
+    if (confirm("Warning!  This will publish your dialogue and make it visible to other users.")) {
+      collectionName === "Posts" && (await updateCurrentValues({ draft: false }));
       await submitForm();
     }
   };
 
-  const submitWithoutConfirmation = () => collectionName === "Posts" && updateCurrentValues({draft: false});
+  const submitWithoutConfirmation = () => collectionName === "Posts" && updateCurrentValues({ draft: false });
 
-  const requireConfirmation = isLW && collectionName === 'Posts' && !!document.debate;
+  const requireConfirmation = isLW && collectionName === "Posts" && !!document.debate;
 
   const onSubmitClick = requireConfirmation ? submitWithConfirmation : submitWithoutConfirmation;
-  const requestFeedbackKarmaLevel = requestFeedbackKarmaLevelSetting.get()
+  const requestFeedbackKarmaLevel = requestFeedbackKarmaLevelSetting.get();
 
   return (
     <React.Fragment>
-      {!!cancelCallback &&
+      {!!cancelCallback && (
         <div className={classes.cancelButton}>
           <Button
             className={classNames("form-cancel", classes.formButton, classes.secondaryButton)}
             onClick={(e) => {
               e.preventDefault();
-              cancelCallback(document)
+              cancelCallback(document);
             }}
           >
             {cancelLabel}
           </Button>
         </div>
-      }
+      )}
       <div className={classes.submitButtons}>
-        {requestFeedbackKarmaLevel !== null && currentUser.karma >= requestFeedbackKarmaLevel && document.draft!==false && <LWTooltip
-          // EA Forum title is Effective Altruism Forum, which is unecessarily long
-          title={`Request feedback from the ${isEAForum ? "FAST Forum" : forumTitleSetting.get()} team.`}
-        >
-          <Button type="submit"//treat as draft when draft is null
-            className={classNames(classes.formButton, classes.secondaryButton, classes.feedback)}
-            onClick={() => {
-              captureEvent("feedbackRequestButtonClicked")
-              if (!!document.title) {
-                updateCurrentValues({draft: true});
-                addToSuccessForm((createdPost: DbPost) => {
-                  // eslint-disable-next-line babel/new-cap
-                  window.Intercom(
-                    'trackEvent',
-                    'requested-feedback',
-                    {title: createdPost.title, _id: createdPost._id, url: getSiteUrl() + "posts/" + createdPost._id}
-                  );
-                });
-              }
-            }}
-          >
-            {feedbackLabel}
-          </Button>
-        </LWTooltip>}
-        <Button type="submit"
+        {requestFeedbackKarmaLevel !== null &&
+          currentUser.karma >= requestFeedbackKarmaLevel &&
+          document.draft !== false && (
+            <LWTooltip
+              // EA Forum title is Effective Altruism Forum, which is unecessarily long
+              title={`Request feedback from the ${isEAForum ? "FAST Forum" : forumTitleSetting.get()} team.`}
+            >
+              <Button
+                type="submit" //treat as draft when draft is null
+                className={classNames(classes.formButton, classes.secondaryButton, classes.feedback)}
+                onClick={() => {
+                  captureEvent("feedbackRequestButtonClicked");
+                  if (!!document.title) {
+                    updateCurrentValues({ draft: true });
+                    addToSuccessForm((createdPost: DbPost) => {
+                      // eslint-disable-next-line babel/new-cap
+                      window.Intercom("trackEvent", "requested-feedback", {
+                        title: createdPost.title,
+                        _id: createdPost._id,
+                        url: getSiteUrl() + "posts/" + createdPost._id,
+                      });
+                    });
+                  }
+                }}
+              >
+                {feedbackLabel}
+              </Button>
+            </LWTooltip>
+          )}
+        <Button
+          type="submit"
           className={classNames(classes.formButton, classes.secondaryButton, classes.draft)}
-          onClick={() => updateCurrentValues({draft: true})}
+          onClick={() => updateCurrentValues({ draft: true })}
         >
           {saveDraftLabel}
         </Button>
@@ -138,17 +153,19 @@ const PostSubmit = ({
           type="submit"
           onClick={onSubmitClick}
           className={classNames("primary-form-submit-button", classes.formButton, classes.submitButton)}
-          {...(isFriendlyUI ? {
-            variant: "contained",
-            color: "primary",
-          } : {})}
+          {...(isFriendlyUI
+            ? {
+                variant: "contained",
+                color: "primary",
+              }
+            : {})}
         >
           {submitLabel}
         </Button>
       </div>
     </React.Fragment>
   );
-}
+};
 
 PostSubmit.propTypes = {
   submitLabel: PropTypes.string,
@@ -163,15 +180,16 @@ PostSubmit.contextTypes = {
   updateCurrentValues: PropTypes.func,
   addToSuccessForm: PropTypes.func,
   addToSubmitForm: PropTypes.func,
-  submitForm: PropTypes.func
-}
-
+  submitForm: PropTypes.func,
+};
 
 // HACK: Cast PostSubmit to hide the legacy context arguments, to make the type checking work
-const PostSubmitComponent = registerComponent('PostSubmit', (PostSubmit as React.ComponentType<PostSubmitProps>), {styles});
+const PostSubmitComponent = registerComponent("PostSubmit", PostSubmit as React.ComponentType<PostSubmitProps>, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    PostSubmit: typeof PostSubmitComponent
+    PostSubmit: typeof PostSubmitComponent;
   }
 }

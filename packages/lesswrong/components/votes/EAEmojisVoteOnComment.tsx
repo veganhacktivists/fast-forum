@@ -20,7 +20,7 @@ const styles = (_theme: ThemeType): JssStyles => ({
 });
 
 interface EAEmojisVoteOnCommentProps extends CommentVotingComponentProps {
-  classes: ClassesType,
+  classes: ClassesType;
 }
 
 const EAEmojisVoteOnComment = ({
@@ -30,12 +30,8 @@ const EAEmojisVoteOnComment = ({
   votingSystem,
   classes,
 }: EAEmojisVoteOnCommentProps) => {
-  const voteProps = useVote(
-    document,
-    collection.options.collectionName,
-    votingSystem,
-  );
-  const {OverallVoteAxis, EAReactsSection} = Components;
+  const voteProps = useVote(document, collection.options.collectionName, votingSystem);
+  const { OverallVoteAxis, EAReactsSection } = Components;
   return (
     <>
       <OverallVoteAxis
@@ -45,24 +41,15 @@ const EAEmojisVoteOnComment = ({
         className={classes.overallAxis}
         showBox
       />
-      {isEAReactableDocument(collection, document) &&
-        <EAReactsSection
-          document={document}
-          voteProps={voteProps}
-        />
-      }
+      {isEAReactableDocument(collection, document) && <EAReactsSection document={document} voteProps={voteProps} />}
     </>
   );
-}
+};
 
-const EAEmojisVoteOnCommentComponent = registerComponent(
-  "EAEmojisVoteOnComment",
-  EAEmojisVoteOnComment,
-  {styles},
-);
+const EAEmojisVoteOnCommentComponent = registerComponent("EAEmojisVoteOnComment", EAEmojisVoteOnComment, { styles });
 
 declare global {
   interface ComponentTypes {
-    EAEmojisVoteOnComment: typeof EAEmojisVoteOnCommentComponent
+    EAEmojisVoteOnComment: typeof EAEmojisVoteOnCommentComponent;
   }
 }

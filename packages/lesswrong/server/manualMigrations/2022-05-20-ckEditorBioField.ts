@@ -1,5 +1,5 @@
-import { registerMigration, forEachDocumentInCollection } from './migrationUtils';
-import { Users } from '../../lib/collections/users/collection';
+import { registerMigration, forEachDocumentInCollection } from "./migrationUtils";
+import { Users } from "../../lib/collections/users/collection";
 
 registerMigration({
   name: "ckEditorBioField",
@@ -9,11 +9,11 @@ registerMigration({
     await forEachDocumentInCollection({
       collection: Users,
       callback: async (user: DbUser) => {
-        type LegacyUserType = DbUser&{bio?:string, htmlBio?:string};
+        type LegacyUserType = DbUser & { bio?: string; htmlBio?: string };
         const legacyUser: LegacyUserType = user as LegacyUserType;
         if (legacyUser.bio && !legacyUser.biography) {
           await Users.rawUpdateOne(
-            {_id: legacyUser._id},
+            { _id: legacyUser._id },
             {
               $set: {
                 biography: {
@@ -24,10 +24,10 @@ registerMigration({
                   html: legacyUser.htmlBio,
                 },
               },
-            }
+            },
           );
         }
-      }
+      },
     });
   },
 });

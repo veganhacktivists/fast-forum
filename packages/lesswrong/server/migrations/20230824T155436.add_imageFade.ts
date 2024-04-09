@@ -22,10 +22,10 @@ export const acceptsSchemaHash = "4acff74195e36da33248763ab681bfd7";
 import Spotlights from "../../lib/collections/spotlights/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Spotlights, "imageFade");
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Spotlights, "imageFade");
-}
+};

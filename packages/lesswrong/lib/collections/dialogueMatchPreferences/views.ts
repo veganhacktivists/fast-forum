@@ -1,18 +1,18 @@
-import {ensureIndex} from '../../collectionIndexUtils';
-import { DialogueMatchPreferences } from './collection';
+import { ensureIndex } from "../../collectionIndexUtils";
+import { DialogueMatchPreferences } from "./collection";
 
 declare global {
   interface DialogueMatchPreferencesViewTerms extends ViewTermsBase {
-    view?: DialogueMatchPreferencesViewName,
-    dialogueCheckId?: string,
+    view?: DialogueMatchPreferencesViewName;
+    dialogueCheckId?: string;
   }
 }
 
-DialogueMatchPreferences.addView('dialogueMatchPreferences', (terms: DialogueMatchPreferencesViewTerms) => {
+DialogueMatchPreferences.addView("dialogueMatchPreferences", (terms: DialogueMatchPreferencesViewTerms) => {
   return {
     selector: {
-        dialogueCheckId: terms.dialogueCheckId,
-        deleted: {$ne: true},
+      dialogueCheckId: terms.dialogueCheckId,
+      deleted: { $ne: true },
     },
   };
 });

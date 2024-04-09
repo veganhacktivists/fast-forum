@@ -1,82 +1,86 @@
-import React, { FC, MouseEvent, useEffect, useMemo } from 'react';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
-import { postGetAnswerCountStr, postGetCommentCount, postGetCommentCountStr } from '../../../lib/collections/posts/helpers';
+import React, { FC, MouseEvent, useEffect, useMemo } from "react";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
+import {
+  postGetAnswerCountStr,
+  postGetCommentCount,
+  postGetCommentCountStr,
+} from "../../../lib/collections/posts/helpers";
 import { AnalyticsContext } from "../../../lib/analyticsEvents";
-import { extractVersionsFromSemver } from '../../../lib/editor/utils'
-import { getUrlClass } from '../../../lib/routeUtil';
-import classNames from 'classnames';
-import { isServer } from '../../../lib/executionEnvironment';
-import moment from 'moment';
-import { isLWorAF } from '../../../lib/instanceSettings';
-import { useCookiesWithConsent } from '../../hooks/useCookiesWithConsent';
-import { PODCAST_TOOLTIP_SEEN_COOKIE } from '../../../lib/cookies/cookies';
-import { isBookUI, isFriendlyUI } from '../../../themes/forumTheme';
+import { extractVersionsFromSemver } from "../../../lib/editor/utils";
+import { getUrlClass } from "../../../lib/routeUtil";
+import classNames from "classnames";
+import { isServer } from "../../../lib/executionEnvironment";
+import moment from "moment";
+import { isLWorAF } from "../../../lib/instanceSettings";
+import { useCookiesWithConsent } from "../../hooks/useCookiesWithConsent";
+import { PODCAST_TOOLTIP_SEEN_COOKIE } from "../../../lib/cookies/cookies";
+import { isBookUI, isFriendlyUI } from "../../../themes/forumTheme";
 
 const SECONDARY_SPACING = 20;
 const PODCAST_ICON_SIZE = isFriendlyUI ? 22 : 24;
 // some padding around the icon to make it look like a stateful toggle button
-const PODCAST_ICON_PADDING = isFriendlyUI ? 4 : 2
+const PODCAST_ICON_PADDING = isFriendlyUI ? 4 : 2;
 
 const styles = (theme: ThemeType): JssStyles => ({
   header: {
-    position: 'relative',
-    display:"flex",
+    position: "relative",
+    display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: isFriendlyUI ? 20 : theme.spacing.unit*2,
+    marginBottom: isFriendlyUI ? 20 : theme.spacing.unit * 2,
   },
   headerLeft: {
-    width: "100%"
+    width: "100%",
   },
   headerVote: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 42,
-    position: isFriendlyUI ? 'absolute' : "relative",
+    position: isFriendlyUI ? "absolute" : "relative",
     top: isFriendlyUI ? 0 : undefined,
     left: isFriendlyUI ? -93 : undefined,
     [theme.breakpoints.down("sm")]: {
-      position: 'relative',
-      top: 'auto',
-      left: 'auto'
-    }
+      position: "relative",
+      top: "auto",
+      left: "auto",
+    },
   },
   eventHeader: {
     marginBottom: 0,
   },
   authorAndSecondaryInfo: {
-    display: 'flex',
-    alignItems: 'baseline',
+    display: "flex",
+    alignItems: "baseline",
     columnGap: SECONDARY_SPACING,
-    flexWrap: 'wrap',
-    fontSize: isFriendlyUI ? theme.typography.body1.fontSize : '1.4rem',
+    flexWrap: "wrap",
+    fontSize: isFriendlyUI ? theme.typography.body1.fontSize : "1.4rem",
     fontWeight: isFriendlyUI ? 450 : undefined,
     fontFamily: theme.typography.uiSecondary.fontFamily,
     color: theme.palette.text.dim3,
     paddingBottom: isFriendlyUI ? 12 : undefined,
-    borderBottom: isFriendlyUI ? theme.palette.border.grey300 : undefined
+    borderBottom: isFriendlyUI ? theme.palette.border.grey300 : undefined,
   },
   secondaryInfo: {
     flexGrow: 1,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "baseline",
     columnGap: SECONDARY_SPACING,
-    rowGap: '10px',
-    flexWrap: 'wrap',
+    rowGap: "10px",
+    flexWrap: "wrap",
     [theme.breakpoints.down("sm")]: {
-      justifyContent: 'flex-start'
-    }
+      justifyContent: "flex-start",
+    },
   },
   secondaryInfoLeft: {
-    display: 'flex',
-    alignItems: 'baseline',
+    display: "flex",
+    alignItems: "baseline",
     columnGap: SECONDARY_SPACING,
-    flexWrap: 'wrap'
+    flexWrap: "wrap",
   },
   secondaryInfoRight: {
-    flex: 'none',
-    display: 'flex',
-    columnGap: SECONDARY_SPACING
+    flex: "none",
+    display: "flex",
+    columnGap: SECONDARY_SPACING,
   },
   secondaryInfoLink: {
     fontWeight: isFriendlyUI ? 450 : undefined,
@@ -86,40 +90,40 @@ const styles = (theme: ThemeType): JssStyles => ({
   wordCount: {
     fontWeight: isFriendlyUI ? 450 : undefined,
     fontSize: isFriendlyUI ? undefined : theme.typography.body2.fontSize,
-    cursor: 'default',
+    cursor: "default",
     "@media print": { display: "none" },
   },
   togglePodcastContainer: {
-    alignSelf: 'center',
+    alignSelf: "center",
     color: isFriendlyUI ? undefined : theme.palette.primary.main,
     height: isFriendlyUI ? undefined : PODCAST_ICON_SIZE,
   },
   audioIcon: {
-    width: PODCAST_ICON_SIZE + (PODCAST_ICON_PADDING * 2),
-    height: PODCAST_ICON_SIZE + (PODCAST_ICON_PADDING * 2),
-    transform: isFriendlyUI ? `translateY(${5-PODCAST_ICON_PADDING}px)` : `translateY(-${PODCAST_ICON_PADDING}px)`,
-    padding: PODCAST_ICON_PADDING
+    width: PODCAST_ICON_SIZE + PODCAST_ICON_PADDING * 2,
+    height: PODCAST_ICON_SIZE + PODCAST_ICON_PADDING * 2,
+    transform: isFriendlyUI ? `translateY(${5 - PODCAST_ICON_PADDING}px)` : `translateY(-${PODCAST_ICON_PADDING}px)`,
+    padding: PODCAST_ICON_PADDING,
   },
   audioNewFeaturePulse: {
     top: PODCAST_ICON_PADDING * 1.5,
   },
   audioIconOn: {
     background: theme.palette.grey[200],
-    borderRadius: theme.borderRadius.small
+    borderRadius: theme.borderRadius.small,
   },
   actions: {
     color: isFriendlyUI ? undefined : theme.palette.grey[500],
     "&:hover": {
       opacity: 0.5,
     },
-    '& svg': {
-      color: 'inherit' // this is needed for the EAF version of the icon
+    "& svg": {
+      color: "inherit", // this is needed for the EAF version of the icon
     },
     "@media print": { display: "none" },
   },
   authorInfo: {
-    display: 'flex',
-    alignItems: 'baseline',
+    display: "flex",
+    alignItems: "baseline",
     columnGap: SECONDARY_SPACING,
   },
   authors: {
@@ -127,15 +131,15 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   feedName: {
     fontSize: theme.typography.body2.fontSize,
-    [theme.breakpoints.down('sm')]: {
-      display: "none"
-    }
+    [theme.breakpoints.down("sm")]: {
+      display: "none",
+    },
   },
   divider: {
-    marginTop: theme.spacing.unit*2,
-    marginLeft:0,
+    marginTop: theme.spacing.unit * 2,
+    marginLeft: 0,
     borderTop: theme.palette.border.faint,
-    borderLeft: 'transparent'
+    borderLeft: "transparent",
   },
   commentIcon: {
     fontSize: "1.4em",
@@ -152,7 +156,7 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   nonhumanAudio: {
     color: theme.palette.grey[500],
-  }
+  },
 });
 
 // On the server, use the 'url' library for parsing hostname out of feed URLs.
@@ -160,24 +164,22 @@ const styles = (theme: ThemeType): JssStyles => ({
 // properties from that. (There is a URL class which theoretically would work,
 // but it doesn't have the hostname field on IE11 and it's missing entirely on
 // Opera Mini.)
-const URLClass = getUrlClass()
+const URLClass = getUrlClass();
 
 function getProtocol(url: string): string {
-  if (isServer)
-    return new URLClass(url).protocol;
+  if (isServer) return new URLClass(url).protocol;
 
   // From https://stackoverflow.com/questions/736513/how-do-i-parse-a-url-into-hostname-and-path-in-javascript
-  var parser = document.createElement('a');
+  var parser = document.createElement("a");
   parser.href = url;
   return parser.protocol;
 }
 
 function getHostname(url: string): string {
-  if (isServer)
-    return new URLClass(url).hostname;
+  if (isServer) return new URLClass(url).hostname;
 
   // From https://stackoverflow.com/questions/736513/how-do-i-parse-a-url-into-hostname-and-path-in-javascript
-  var parser = document.createElement('a');
+  var parser = document.createElement("a");
   parser.href = url;
   return parser.hostname;
 }
@@ -185,16 +187,13 @@ function getHostname(url: string): string {
 const countAnswersAndDescendents = (answers: CommentsList[]) => {
   const sum = answers.reduce((prev: number, curr: CommentsList) => prev + curr.descendentCount, 0);
   return sum + answers.length;
-}
+};
 
-const getResponseCounts = (
-  post: PostsWithNavigation|PostsWithNavigationAndRevision,
-  answers: CommentsList[],
-) => {
+const getResponseCounts = (post: PostsWithNavigation | PostsWithNavigationAndRevision, answers: CommentsList[]) => {
   // answers may include some which are deleted:true, deletedPublic:true (in which
   // case various fields are unpopulated and a deleted-item placeholder is shown
   // in the UI). These deleted answers are *not* included in post.commentCount.
-  const nonDeletedAnswers = answers.filter(answer=>!answer.deleted);
+  const nonDeletedAnswers = answers.filter((answer) => !answer.deleted);
 
   return {
     answerCount: nonDeletedAnswers.length,
@@ -203,64 +202,89 @@ const getResponseCounts = (
 };
 
 const CommentsLink: FC<{
-  anchor: string,
-  children: React.ReactNode,
-  className?: string,
-}> = ({anchor, children, className}) => {
+  anchor: string;
+  children: React.ReactNode;
+  className?: string;
+}> = ({ anchor, children, className }) => {
   const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     const elem = document.querySelector(anchor);
     if (elem) {
       // Match the scroll behaviour from TableOfContentsList
       window.scrollTo({
-        top: elem.getBoundingClientRect().y - (window.innerHeight / 3) + 1,
+        top: elem.getBoundingClientRect().y - window.innerHeight / 3 + 1,
         behavior: "smooth",
       });
     }
-  }
+  };
   return (
-    <a className={className} {...(isFriendlyUI ? {onClick} : {href: anchor})}>
+    <a className={className} {...(isFriendlyUI ? { onClick } : { href: anchor })}>
       {children}
     </a>
   );
-}
+};
 
 /// PostsPagePostHeader: The metadata block at the top of a post page, with
 /// title, author, voting, an actions menu, etc.
-const PostsPagePostHeader = ({post, answers = [], dialogueResponses = [], showEmbeddedPlayer, toggleEmbeddedPlayer, hideMenu, hideTags, classes}: {
-  post: PostsWithNavigation|PostsWithNavigationAndRevision,
-  answers?: CommentsList[],
-  dialogueResponses?: CommentsList[],
-  showEmbeddedPlayer?: boolean,
-  toggleEmbeddedPlayer?: () => void,
-  hideMenu?: boolean,
-  hideTags?: boolean,
-  classes: ClassesType,
+const PostsPagePostHeader = ({
+  post,
+  answers = [],
+  dialogueResponses = [],
+  showEmbeddedPlayer,
+  toggleEmbeddedPlayer,
+  hideMenu,
+  hideTags,
+  classes,
+}: {
+  post: PostsWithNavigation | PostsWithNavigationAndRevision;
+  answers?: CommentsList[];
+  dialogueResponses?: CommentsList[];
+  showEmbeddedPlayer?: boolean;
+  toggleEmbeddedPlayer?: () => void;
+  hideMenu?: boolean;
+  hideTags?: boolean;
+  classes: ClassesType;
 }) => {
-  const {PostsPageTitle, PostsAuthors, LWTooltip, PostsPageDate, CrosspostHeaderIcon,
-    PostActionsButton, PostsVote, PostsGroupDetails, PostsTopSequencesNav,
-    PostsPageEventData, FooterTagList, AddToCalendarButton, BookmarkButton,
-    NewFeaturePulse, ForumIcon, GroupLinks, SharePostButton} = Components;
+  const {
+    PostsPageTitle,
+    PostsAuthors,
+    LWTooltip,
+    PostsPageDate,
+    CrosspostHeaderIcon,
+    PostActionsButton,
+    PostsVote,
+    PostsGroupDetails,
+    PostsTopSequencesNav,
+    PostsPageEventData,
+    FooterTagList,
+    AddToCalendarButton,
+    BookmarkButton,
+    NewFeaturePulse,
+    ForumIcon,
+    GroupLinks,
+    SharePostButton,
+  } = Components;
   const [cookies, setCookie] = useCookiesWithConsent([PODCAST_TOOLTIP_SEEN_COOKIE]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const cachedTooltipSeen = useMemo(() => cookies[PODCAST_TOOLTIP_SEEN_COOKIE], []);
 
   useEffect(() => {
-    if(!cachedTooltipSeen) {
+    if (!cachedTooltipSeen) {
       setCookie(PODCAST_TOOLTIP_SEEN_COOKIE, true, {
-        expires: moment().add(2, 'years').toDate(),
+        expires: moment().add(2, "years").toDate(),
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const feedLinkDescription = post.feed?.url && getHostname(post.feed.url)
+  const feedLinkDescription = post.feed?.url && getHostname(post.feed.url);
   const feedLink = post.feed?.url && `${getProtocol(post.feed.url)}//${getHostname(post.feed.url)}`;
-  const { major } = extractVersionsFromSemver(post.version)
-  const hasMajorRevision = major > 1
+  const { major } = extractVersionsFromSemver(post.version);
+  const hasMajorRevision = major > 1;
 
-  const crosspostNode = post.fmCrosspost?.isCrosspost && !post.fmCrosspost.hostedHere &&
+  const crosspostNode = post.fmCrosspost?.isCrosspost && !post.fmCrosspost.hostedHere && (
     <CrosspostHeaderIcon post={post} />
+  );
 
   const wordCount = useMemo(() => {
     if (!post.debate || dialogueResponses.length === 0) {
@@ -286,144 +310,155 @@ const PostsPagePostHeader = ({post, answers = [], dialogueResponses = [], showEm
     return Math.max(1, Math.round(wordCount / 250));
   }, [post, dialogueResponses, wordCount]);
 
-  const {
-    answerCount,
-    commentCount,
-  } = useMemo(() => getResponseCounts(post, answers), [post, answers]);
+  const { answerCount, commentCount } = useMemo(() => getResponseCounts(post, answers), [post, answers]);
 
   const minimalSecondaryInfo = post.isEvent || (isFriendlyUI && post.shortform);
 
-  const readingTimeNode = minimalSecondaryInfo
-    ? null
-    : (
-      <LWTooltip title={`${wordCount} words`}>
-        <span className={classes.wordCount}>{readTime} min read</span>
-      </LWTooltip>
-    );
+  const readingTimeNode = minimalSecondaryInfo ? null : (
+    <LWTooltip title={`${wordCount} words`}>
+      <span className={classes.wordCount}>{readTime} min read</span>
+    </LWTooltip>
+  );
 
-  const answersNode = !post.question || minimalSecondaryInfo
-    ? null
-    : (
+  const answersNode =
+    !post.question || minimalSecondaryInfo ? null : (
       <CommentsLink anchor="#answers" className={classes.secondaryInfoLink}>
         {postGetAnswerCountStr(answerCount)}
       </CommentsLink>
     );
 
-  const nonhumanAudio = post.podcastEpisodeId === null && isLWorAF
+  const nonhumanAudio = post.podcastEpisodeId === null && isLWorAF;
 
-  const audioIcon = <LWTooltip title={'Listen to this post'} className={classNames(classes.togglePodcastContainer, {[classes.nonhumanAudio]: nonhumanAudio})}>
-    <a href="#" onClick={toggleEmbeddedPlayer}>
-      <ForumIcon icon="VolumeUp" className={classNames(classes.audioIcon, {[classes.audioIconOn]: showEmbeddedPlayer})} />
-    </a>
-  </LWTooltip>
-  const audioNode = toggleEmbeddedPlayer && (
-    (cachedTooltipSeen || isLWorAF)
-      ? audioIcon
-      : (
-        <NewFeaturePulse className={classes.audioNewFeaturePulse}>
-          {audioIcon}
-        </NewFeaturePulse>
-      )
-  )
+  const audioIcon = (
+    <LWTooltip
+      title={"Listen to this post"}
+      className={classNames(classes.togglePodcastContainer, { [classes.nonhumanAudio]: nonhumanAudio })}
+    >
+      <a href="#" onClick={toggleEmbeddedPlayer}>
+        <ForumIcon
+          icon="VolumeUp"
+          className={classNames(classes.audioIcon, { [classes.audioIconOn]: showEmbeddedPlayer })}
+        />
+      </a>
+    </LWTooltip>
+  );
+  const audioNode =
+    toggleEmbeddedPlayer &&
+    (cachedTooltipSeen || isLWorAF ? (
+      audioIcon
+    ) : (
+      <NewFeaturePulse className={classes.audioNewFeaturePulse}>{audioIcon}</NewFeaturePulse>
+    ));
 
-  const addToCalendarNode = post.startTime && <div className={classes.secondaryInfoLink}>
-    <AddToCalendarButton post={post} label="Add to calendar" hideTooltip />
-  </div>
+  const addToCalendarNode = post.startTime && (
+    <div className={classes.secondaryInfoLink}>
+      <AddToCalendarButton post={post} label="Add to calendar" hideTooltip />
+    </div>
+  );
 
-  const tripleDotMenuNode = !hideMenu &&
+  const tripleDotMenuNode = !hideMenu && (
     <span className={classes.actions}>
       <AnalyticsContext pageElementContext="tripleDotMenu">
-        <PostActionsButton post={post} includeBookmark={isBookUI} flip={true}/>
+        <PostActionsButton post={post} includeBookmark={isBookUI} flip={true} />
       </AnalyticsContext>
     </span>
+  );
 
   let secondaryInfoNode;
   if (isBookUI) {
     // this is the info section under the post title, to the right of the author names
-    secondaryInfoNode = <div className={classes.secondaryInfo}>
-      <div className={classes.secondaryInfoLeft}>
-        {crosspostNode}
-        {readingTimeNode}
-        {!minimalSecondaryInfo && <PostsPageDate post={post} hasMajorRevision={hasMajorRevision} />}
-        {post.isEvent && <GroupLinks document={post} noMargin />}
-        {answersNode}
-        <CommentsLink anchor="#comments" className={classes.secondaryInfoLink}>
-          {postGetCommentCountStr(post, commentCount)}
-        </CommentsLink>
-        {audioNode}
-        {addToCalendarNode}
-        {tripleDotMenuNode}
+    secondaryInfoNode = (
+      <div className={classes.secondaryInfo}>
+        <div className={classes.secondaryInfoLeft}>
+          {crosspostNode}
+          {readingTimeNode}
+          {!minimalSecondaryInfo && <PostsPageDate post={post} hasMajorRevision={hasMajorRevision} />}
+          {post.isEvent && <GroupLinks document={post} noMargin />}
+          {answersNode}
+          <CommentsLink anchor="#comments" className={classes.secondaryInfoLink}>
+            {postGetCommentCountStr(post, commentCount)}
+          </CommentsLink>
+          {audioNode}
+          {addToCalendarNode}
+          {tripleDotMenuNode}
+        </div>
       </div>
-    </div>
+    );
   } else {
     // EA Forum splits the info into two sections, plus has the info in a different order
-    secondaryInfoNode = <div className={classes.secondaryInfo}>
-      <div className={classes.secondaryInfoLeft}>
-        {!minimalSecondaryInfo && <PostsPageDate post={post} hasMajorRevision={hasMajorRevision} />}
-        {readingTimeNode}
-        {audioNode}
-        {post.isEvent && <GroupLinks document={post} noMargin />}
-        {answersNode}
-        {!post.shortform &&
-          <LWTooltip title={postGetCommentCountStr(post, commentCount)}>
-            <CommentsLink anchor="#comments" className={classes.secondaryInfoLink}>
-              <ForumIcon icon="Comment" className={classes.commentIcon} /> {commentCount}
-            </CommentsLink>
-          </LWTooltip>
-        }
-        {addToCalendarNode}
-        {crosspostNode}
+    secondaryInfoNode = (
+      <div className={classes.secondaryInfo}>
+        <div className={classes.secondaryInfoLeft}>
+          {!minimalSecondaryInfo && <PostsPageDate post={post} hasMajorRevision={hasMajorRevision} />}
+          {readingTimeNode}
+          {audioNode}
+          {post.isEvent && <GroupLinks document={post} noMargin />}
+          {answersNode}
+          {!post.shortform && (
+            <LWTooltip title={postGetCommentCountStr(post, commentCount)}>
+              <CommentsLink anchor="#comments" className={classes.secondaryInfoLink}>
+                <ForumIcon icon="Comment" className={classes.commentIcon} /> {commentCount}
+              </CommentsLink>
+            </LWTooltip>
+          )}
+          {addToCalendarNode}
+          {crosspostNode}
+        </div>
+        <div className={classes.secondaryInfoRight}>
+          <BookmarkButton post={post} className={classes.bookmarkButton} placement="bottom-start" />
+          <SharePostButton post={post} />
+          {tripleDotMenuNode}
+        </div>
       </div>
-      <div className={classes.secondaryInfoRight}>
-        <BookmarkButton post={post} className={classes.bookmarkButton} placement='bottom-start' />
-        <SharePostButton post={post} />
-        {tripleDotMenuNode}
-      </div>
-    </div>
+    );
   }
 
   // TODO: If we are not the primary author of this post, but it was shared with
   // us as a draft, display a notice and a link to the collaborative editor.
 
-  return <>
-    {post.group && <PostsGroupDetails post={post} documentId={post.group._id} />}
-    <AnalyticsContext pageSectionContext="topSequenceNavigation">
-      <PostsTopSequencesNav post={post} />
-    </AnalyticsContext>
-    <div className={classNames(classes.header, {[classes.eventHeader]: post.isEvent})}>
-      <div className={classes.headerLeft}>
-        <PostsPageTitle post={post} />
-        <div className={classes.authorAndSecondaryInfo}>
-          <div className={classes.authorInfo}>
-            <div className={classes.authors}>
-              <PostsAuthors post={post} pageSectionContext="post_header" />
+  return (
+    <>
+      {post.group && <PostsGroupDetails post={post} documentId={post.group._id} />}
+      <AnalyticsContext pageSectionContext="topSequenceNavigation">
+        <PostsTopSequencesNav post={post} />
+      </AnalyticsContext>
+      <div className={classNames(classes.header, { [classes.eventHeader]: post.isEvent })}>
+        <div className={classes.headerLeft}>
+          <PostsPageTitle post={post} />
+          <div className={classes.authorAndSecondaryInfo}>
+            <div className={classes.authorInfo}>
+              <div className={classes.authors}>
+                <PostsAuthors post={post} pageSectionContext="post_header" />
+              </div>
+              {post.feed && post.feed.user && (
+                <LWTooltip title={`Crossposted from ${feedLinkDescription}`} className={classes.feedName}>
+                  <a href={feedLink}>{post.feed.nickname}</a>
+                </LWTooltip>
+              )}
             </div>
-            {post.feed && post.feed.user &&
-              <LWTooltip title={`Crossposted from ${feedLinkDescription}`} className={classes.feedName}>
-                <a href={feedLink}>{post.feed.nickname}</a>
-              </LWTooltip>
-            }
+            {secondaryInfoNode}
           </div>
-          {secondaryInfoNode}
         </div>
+        {!post.shortform && (
+          <div className={classes.headerVote}>
+            <PostsVote post={post} />
+          </div>
+        )}
       </div>
-      {!post.shortform && <div className={classes.headerVote}>
-        <PostsVote post={post} />
-      </div>}
-    </div>
-    {!post.shortform && !post.isEvent && !hideTags && <AnalyticsContext pageSectionContext="tagHeader">
-      <FooterTagList post={post} hideScore allowTruncate />
-    </AnalyticsContext>}
-    {post.isEvent && <PostsPageEventData post={post}/>}
-  </>
-}
+      {!post.shortform && !post.isEvent && !hideTags && (
+        <AnalyticsContext pageSectionContext="tagHeader">
+          <FooterTagList post={post} hideScore allowTruncate />
+        </AnalyticsContext>
+      )}
+      {post.isEvent && <PostsPageEventData post={post} />}
+    </>
+  );
+};
 
-const PostsPagePostHeaderComponent = registerComponent(
-  'PostsPagePostHeader', PostsPagePostHeader, {styles}
-);
+const PostsPagePostHeaderComponent = registerComponent("PostsPagePostHeader", PostsPagePostHeader, { styles });
 
 declare global {
   interface ComponentTypes {
-    PostsPagePostHeader: typeof PostsPagePostHeaderComponent,
+    PostsPagePostHeader: typeof PostsPagePostHeaderComponent;
   }
 }

@@ -1,14 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import toDictionary from '../../lib/utils/toDictionary';
-import mapValues from 'lodash/mapValues';
-import { isEAForum, taggingNamePluralCapitalSetting } from '../../lib/instanceSettings';
-import { useMulti } from '../../lib/crud/withMulti';
-import classNames from 'classnames';
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import toDictionary from "../../lib/utils/toDictionary";
+import mapValues from "lodash/mapValues";
+import { isEAForum, taggingNamePluralCapitalSetting } from "../../lib/instanceSettings";
+import { useMulti } from "../../lib/crud/withMulti";
+import classNames from "classnames";
 
 const styles = (_theme: ThemeType): JssStyles => ({
-  root: {
-  },
+  root: {},
   header: {
     marginTop: 6,
   },
@@ -21,10 +20,7 @@ const styles = (_theme: ThemeType): JssStyles => ({
  * Split a single array of tag ids into separate arrays based on boolean
  * predicates
  */
-const splitBy = (
-  predicates: ((tagId: string) => boolean)[],
-  tagIds: string[],
-): string[][] => {
+const splitBy = (predicates: ((tagId: string) => boolean)[], tagIds: string[]): string[][] => {
   const result = predicates.map(() => [] as string[]);
   for (const tagId of tagIds) {
     for (let i = 0; i < predicates.length; i++) {
@@ -35,7 +31,7 @@ const splitBy = (
     }
   }
   return result;
-}
+};
 
 /**
  * Edit tags on the new or edit post form. If it's the new form, use
@@ -44,8 +40,16 @@ const splitBy = (
  * voting-on-tag-relevance as the post page. Styling doesn't match between these
  * two, which is moderately unfortunate.
  */
-const FormComponentPostEditorTagging = ({value, path, document, formType, updateCurrentValues, placeholder, classes}: FormComponentProps<any> & {
-  classes: ClassesType,
+const FormComponentPostEditorTagging = ({
+  value,
+  path,
+  document,
+  formType,
+  updateCurrentValues,
+  placeholder,
+  classes,
+}: FormComponentProps<any> & {
+  classes: ClassesType;
 }) => {
   const showCoreAndTypesTopicSections = isEAForum;
 
@@ -71,74 +75,70 @@ const FormComponentPostEditorTagging = ({value, path, document, formType, update
 
   const loading = coreTagResult.loading || postTypeResult.loading;
 
-  const coreTags = useMemo(
-    () => coreTagResult.results ?? [],
-    [coreTagResult.results],
-  );
-  const postTypeTags = useMemo(
-    () => postTypeResult.results ?? [],
-    [postTypeResult.results],
-  );
+  const coreTags = useMemo(() => coreTagResult.results ?? [], [coreTagResult.results]);
+  const postTypeTags = useMemo(() => postTypeResult.results ?? [], [postTypeResult.results]);
 
   const selectedTagIds = Object.keys(value || {});
 
-  const [
-    selectedCoreTagIds,
-    selectedPostTypeTagIds,
-    selectedOtherTagIds,
-  ] = splitBy([
-    (tagId: string) => !!coreTags?.find((tag) => tag._id === tagId),
-    (tagId: string) => !!postTypeTags?.find((tag) => tag._id === tagId),
-    () => true,
-  ], selectedTagIds);
+  const [selectedCoreTagIds, selectedPostTypeTagIds, selectedOtherTagIds] = splitBy(
+    [
+      (tagId: string) => !!coreTags?.find((tag) => tag._id === tagId),
+      (tagId: string) => !!postTypeTags?.find((tag) => tag._id === tagId),
+      () => true,
+    ],
+    selectedTagIds,
+  );
 
   /**
    * post tagRelevance field needs to look like {string: number}
    */
-  const updateValuesWithArray = useCallback((arrayOfTagIds: string[]) => {
-    void updateCurrentValues(
-      mapValues(
-        {tagRelevance: arrayOfTagIds},
-        (arrayOfTagIds: string[]) => toDictionary(
-          arrayOfTagIds, tagId=>tagId, _tagId=>1
+  const updateValuesWithArray = useCallback(
+    (arrayOfTagIds: string[]) => {
+      void updateCurrentValues(
+        mapValues({ tagRelevance: arrayOfTagIds }, (arrayOfTagIds: string[]) =>
+          toDictionary(
+            arrayOfTagIds,
+            (tagId) => tagId,
+            (_tagId) => 1,
+          ),
         ),
-      ),
-    );
-  }, [updateCurrentValues]);
+      );
+    },
+    [updateCurrentValues],
+  );
 
-  const onMultiselectUpdate = useCallback((changes: {tagRelevance: string[]}) => {
-    updateValuesWithArray([
-      ...changes.tagRelevance,
-      ...selectedCoreTagIds,
-      ...selectedPostTypeTagIds,
-    ]);
-  }, [selectedCoreTagIds, selectedPostTypeTagIds, updateValuesWithArray]);
+  const onMultiselectUpdate = useCallback(
+    (changes: { tagRelevance: string[] }) => {
+      updateValuesWithArray([...changes.tagRelevance, ...selectedCoreTagIds, ...selectedPostTypeTagIds]);
+    },
+    [selectedCoreTagIds, selectedPostTypeTagIds, updateValuesWithArray],
+  );
 
   /**
    * When a tag is selected, add both it and its parent to the list of tags.
    */
-  const onTagSelected = useCallback(async (
-    tag: {tagId: string, tagName: string, parentTagId?: string},
-    existingTagIds: string[],
-  ) => {
-    updateValuesWithArray(
-      [
-        tag.tagId,
-        tag.parentTagId === undefined || existingTagIds.includes(tag.parentTagId) ? undefined : tag.parentTagId,
-        ...existingTagIds,
-      ].filter((tagId) => tagId) as string[],
-    );
-  }, [updateValuesWithArray]);
+  const onTagSelected = useCallback(
+    async (tag: { tagId: string; tagName: string; parentTagId?: string }, existingTagIds: string[]) => {
+      updateValuesWithArray(
+        [
+          tag.tagId,
+          tag.parentTagId === undefined || existingTagIds.includes(tag.parentTagId) ? undefined : tag.parentTagId,
+          ...existingTagIds,
+        ].filter((tagId) => tagId) as string[],
+      );
+    },
+    [updateValuesWithArray],
+  );
 
   /**
    * When a tag is removed, remove only that tag and not its parent.
    */
-  const onTagRemoved = useCallback((
-    tag: {tagId: string, tagName: string, parentTagId?: string},
-    existingTagIds: string[],
-  ) => {
-    updateValuesWithArray(existingTagIds.filter((thisTagId) => thisTagId !== tag.tagId))
-  }, [updateValuesWithArray]);
+  const onTagRemoved = useCallback(
+    (tag: { tagId: string; tagName: string; parentTagId?: string }, existingTagIds: string[]) => {
+      updateValuesWithArray(existingTagIds.filter((thisTagId) => thisTagId !== tag.tagId));
+    },
+    [updateValuesWithArray],
+  );
 
   const postCategory = useRef(document.postCategory);
 
@@ -163,27 +163,21 @@ const FormComponentPostEditorTagging = ({value, path, document, formType, update
     }
   }, [document.postCategory, onTagRemoved, onTagSelected, postTypeTags, selectedTagIds]);
 
-  const {TagsChecklist, TagMultiselect, FooterTagList, Loading} = Components;
+  const { TagsChecklist, TagMultiselect, FooterTagList, Loading } = Components;
 
   if (loading) {
-    return <Loading/>;
+    return <Loading />;
   }
 
   if (!document.draft && formType === "edit") {
-    return <FooterTagList
-      post={document}
-      hideScore
-      hidePostTypeTag
-      showCoreTags
-      link={false}
-    />
+    return <FooterTagList post={document} hideScore hidePostTypeTag showCoreTags link={false} />;
   }
 
   return (
     <div className={classes.root}>
       {showCoreAndTypesTopicSections && (
         <>
-          {!!coreTags.length &&
+          {!!coreTags.length && (
             <>
               <h3 className={classNames(classes.coreTagHeader, classes.header)}>Core topics</h3>
               <TagsChecklist
@@ -194,8 +188,8 @@ const FormComponentPostEditorTagging = ({value, path, document, formType, update
                 displaySelected="highlight"
               />
             </>
-          }
-          {!!postTypeTags.length &&
+          )}
+          {!!postTypeTags.length && (
             <>
               <h3 className={classNames(classes.coreTagHeader, classes.header)}>Common post types</h3>
               <TagsChecklist
@@ -207,7 +201,7 @@ const FormComponentPostEditorTagging = ({value, path, document, formType, update
                 shortNames
               />
             </>
-          }
+          )}
           <h3 className={classes.header}>Other topics</h3>
         </>
       )}
@@ -220,12 +214,16 @@ const FormComponentPostEditorTagging = ({value, path, document, formType, update
       />
     </div>
   );
-}
+};
 
-const FormComponentPostEditorTaggingComponent = registerComponent("FormComponentPostEditorTagging", FormComponentPostEditorTagging, {styles});
+const FormComponentPostEditorTaggingComponent = registerComponent(
+  "FormComponentPostEditorTagging",
+  FormComponentPostEditorTagging,
+  { styles },
+);
 
 declare global {
   interface ComponentTypes {
-    FormComponentPostEditorTagging: typeof FormComponentPostEditorTaggingComponent
+    FormComponentPostEditorTagging: typeof FormComponentPostEditorTaggingComponent;
   }
 }

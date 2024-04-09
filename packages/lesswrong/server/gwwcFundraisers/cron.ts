@@ -4,9 +4,9 @@ import { addCronJob } from "../cronUtil";
 import { Globals } from "../vulcan-lib";
 
 type ElectionCandidateAmounts = {
-  amountRaised: number,
+  amountRaised: number;
   // TODO pull in the targetAmount here also
-}
+};
 
 const fetchNewAmounts = async (gwwcId: string): Promise<ElectionCandidateAmounts> => {
   const res = await fetch("https://parfit.effectivealtruism.org/graphql", {
@@ -25,7 +25,7 @@ const fetchNewAmounts = async (gwwcId: string): Promise<ElectionCandidateAmounts
           }
         }
       `,
-      variables: null
+      variables: null,
     }),
     method: "POST",
   });
@@ -35,8 +35,8 @@ const fetchNewAmounts = async (gwwcId: string): Promise<ElectionCandidateAmounts
 
   return {
     amountRaised: parseFloat(amountRaised),
-  }
-}
+  };
+};
 
 async function updateFundraiserAmounts() {
   const electionCandidates = (await ElectionCandidates.find({
@@ -47,8 +47,8 @@ async function updateFundraiserAmounts() {
 
   for (const candidate of electionCandidates) {
     try {
-      const {amountRaised} = await fetchNewAmounts(candidate.gwwcId);
-    newAmounts[candidate._id] = {amountRaised};
+      const { amountRaised } = await fetchNewAmounts(candidate.gwwcId);
+      newAmounts[candidate._id] = { amountRaised };
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(`Failed to fetch new amounts for candidate ${candidate._id}`, e);
@@ -56,15 +56,15 @@ async function updateFundraiserAmounts() {
   }
 
   // Bulk update all the candidates
-  const updates = Object.entries(newAmounts).map(([candidateId, {amountRaised}]) => ({
+  const updates = Object.entries(newAmounts).map(([candidateId, { amountRaised }]) => ({
     updateOne: {
-      filter: {_id: candidateId},
+      filter: { _id: candidateId },
       update: {
         $set: {
-          amountRaised
-        }
-      }
-    }
+          amountRaised,
+        },
+      },
+    },
   }));
 
   await ElectionCandidates.rawCollection().bulkWrite(updates);
@@ -72,9 +72,9 @@ async function updateFundraiserAmounts() {
 
 if (isEAForum) {
   addCronJob({
-    name: 'updateFundraiserAmounts',
-    interval: 'every 5 minutes',
-    job: updateFundraiserAmounts
+    name: "updateFundraiserAmounts",
+    interval: "every 5 minutes",
+    job: updateFundraiserAmounts,
   });
 }
 

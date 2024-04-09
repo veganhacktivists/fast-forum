@@ -1,4 +1,4 @@
-import insertLink from './insertLink';
+import insertLink from "./insertLink";
 
 const handleLink = (editorState, character) => {
   const re = /\[([^\]]+)]\(([^)"]+)(?: "([^"]+)")?\)/g;

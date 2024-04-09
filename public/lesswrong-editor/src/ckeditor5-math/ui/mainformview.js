@@ -31,41 +31,31 @@ export default class MainFormView extends View {
 			// Math element
 			this.mathView = new MathView( engine, locale, previewUid );
 			this.listenTo( this.mathView, 'updatedMath', () => {
-				this.fire( 'updatedMath' );
+				this.fire( "updatedMath" );
 			} );
 
-			children = [
-				this.mathInputView,
-				this.mathView
-			];
+			children = [ this.mathInputView, this.mathView ];
 		} else {
-			children = [
-				this.mathInputView
-			];
+			children = [ this.mathInputView ];
 		}
 
 		// Add UI elements to template
 		this.setTemplate( {
 			tag: 'form',
 			attributes: {
-				class: [
-					'ck',
-					'ck-math-form',
-				],
+				class: [ "ck", 'ck-math-form'],
 				tabindex: '-1',
-				spellcheck: 'false'
+				spellcheck: 'false',
 			},
 			children: [
 				{
 					tag: 'div',
 					attributes: {
-						class: [
-							'ck-math-view'
-						]
+						class: [ "ck-math-view" ],
 					},
 					children
-				},
-			],
+				}
+			]
 		} );
 	}
 
@@ -75,14 +65,12 @@ export default class MainFormView extends View {
 		// Prevent default form submit event & trigger custom 'submit'
 		submitHandler( {
 			view: this,
-		} );
+		});
 
 		// Register form elements to focusable elements
-		const childViews = [
-			this.mathInputView,
-		];
+		const childViews = [ this.mathInputView ];
 
-		childViews.forEach( v => {
+		childViews.forEach( ( v ) => {
 			this._focusables.add( v );
 			this.focusTracker.add( v.element );
 		} );
@@ -117,9 +105,9 @@ export default class MainFormView extends View {
 			keystrokeHandler: this.keystrokes,
 			actions: {
 				focusPrevious: 'shift + tab',
-				focusNext: 'tab'
+				focusNext: 'tab',
 			}
-		} );
+		});
 	}
 
 	_createMathInput() {
@@ -132,23 +120,18 @@ export default class MainFormView extends View {
 				cols: 1,
 				rows: 1,
 				type: 'text',
-				class: [
-					'ck',
-					'ck-input',
-					'ck-input-text',
-					bind.if( 'hasError', 'ck-error' )
-				],
-				id: bind.to( 'id' ),
-				placeholder: bind.to( 'placeholder' ),
-				readonly: bind.to( 'isReadOnly' ),
-				'aria-invalid': bind.if( 'hasError', true ),
-				'aria-describedby': bind.to( 'ariaDescribedById' )
+				class: [ "ck", 'ck-input', 'ck-input-text', bind.if( "hasError", 'ck-error') ],
+				id: bind.to( "id" ),
+				placeholder: bind.to( "placeholder" ),
+				readonly: bind.to( "isReadOnly" ),
+				'aria-invalid': bind.if( "hasError", true ),
+				'aria-describedby': bind.to( "ariaDescribedById" ),
 			},
 			on: {
-				input: bind.to( 'input' )
+				input: bind.to( "input" ),
 			}
-		} );
-		inputView.on( 'input', () => {
+		});
+		inputView.on( "input", () => {
 			if ( this.previewEnabled ) {
 				const equationInput = inputView.element.value.trim();
 				// Resize input element to fit content

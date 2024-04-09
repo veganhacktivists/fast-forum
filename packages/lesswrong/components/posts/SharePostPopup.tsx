@@ -21,8 +21,8 @@ const styles = (theme: ThemeType): JssStyles => ({
     // The popper has its own translation applied, which
     // means we can't apply the animation to it. Remove the box
     // shadow so it isn't visible during the animation.
-    boxShadow: 'none',
-    '& .MuiPaper-elevation2': {
+    boxShadow: "none",
+    "& .MuiPaper-elevation2": {
       boxShadow: "none",
     },
     [theme.breakpoints.down("md")]: {
@@ -235,11 +235,11 @@ const SharePostPopup = ({
     };
   }, []);
 
-  const postUrl = (source: string) => `${postGetPageUrl(post, true)}?utm_campaign=publish_share&utm_source=${source}`
+  const postUrl = (source: string) => `${postGetPageUrl(post, true)}?utm_campaign=publish_share&utm_source=${source}`;
 
   const copyLink = () => {
-    captureEvent("sharePost", { pageElementContext: 'sharePostPopup', postId: post._id, option: "copyLink" });
-    void navigator.clipboard.writeText(postUrl('link'));
+    captureEvent("sharePost", { pageElementContext: "sharePostPopup", postId: post._id, option: "copyLink" });
+    void navigator.clipboard.writeText(postUrl("link"));
     flash("Link copied to clipboard");
   };
 
@@ -251,21 +251,21 @@ const SharePostPopup = ({
   const linkTitle = `${post.title} - ${siteName}`;
 
   const shareToTwitter = () => {
-    captureEvent("sharePost", { pageElementContext: 'sharePostPopup', postId: post._id, option: "twitter" });
-    const tweetText = `${linkTitle} ${postUrl('twitter')}`;
+    captureEvent("sharePost", { pageElementContext: "sharePostPopup", postId: post._id, option: "twitter" });
+    const tweetText = `${linkTitle} ${postUrl("twitter")}`;
     const destinationUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     openLinkInNewTab(destinationUrl);
   };
   const shareToFacebook = () => {
-    captureEvent("sharePost", { pageElementContext: 'sharePostPopup', postId: post._id, option: "facebook" });
+    captureEvent("sharePost", { pageElementContext: "sharePostPopup", postId: post._id, option: "facebook" });
     const destinationUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-      postUrl('facebook')
+      postUrl("facebook"),
     )}&t=${encodeURIComponent(linkTitle)}`;
     openLinkInNewTab(destinationUrl);
   };
   const shareToLinkedIn = () => {
-    captureEvent("sharePost", { pageElementContext: 'sharePostPopup', postId: post._id, option: "linkedIn" });
-    const destinationUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postUrl('linkedin'))}`;
+    captureEvent("sharePost", { pageElementContext: "sharePostPopup", postId: post._id, option: "linkedIn" });
+    const destinationUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postUrl("linkedin"))}`;
     openLinkInNewTab(destinationUrl);
   };
 
@@ -302,7 +302,7 @@ const SharePostPopup = ({
   return (
     <Popper open={true} anchorEl={anchorEl.current} placement="top-end" className={classes.popper} transition>
       <Paper>
-        <div className={classNames(classes.root, {[classes.rootAnimateOut]: isClosing})}>
+        <div className={classNames(classes.root, { [classes.rootAnimateOut]: isClosing })}>
           <div className={classes.closeButtonRow}>
             <Button className={classes.closeButton} onClick={onClickClose}>
               <ForumIcon icon="Close" className={classes.closeIcon} />

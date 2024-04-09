@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { registerComponent, Components, getFragment } from '../../lib/vulcan-lib';
+import React, { useState } from "react";
+import { registerComponent, Components, getFragment } from "../../lib/vulcan-lib";
 import { GardenCodes } from "../../lib/collections/gardencodes/collection";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useTracking } from "../../lib/analyticsEvents";
-import { useCurrentUser } from '../common/withUser';
-import moment from 'moment';
-import { useGlobalKeydown } from '../common/withGlobalKeydown';
-import classNames from 'classnames';
+import { useCurrentUser } from "../common/withUser";
+import moment from "moment";
+import { useGlobalKeydown } from "../common/withGlobalKeydown";
+import classNames from "classnames";
 
 export const gardenForm = (theme: ThemeType) => ({
   border: theme.palette.border.normal,
@@ -16,58 +16,56 @@ export const gardenForm = (theme: ThemeType) => ({
   padding: 8,
   backgroundColor: theme.palette.panelBackground.default,
   maxWidth: 400,
-  '& .MuiInput-formControl': {
-    width: 320
-  }
-})
+  "& .MuiInput-formControl": {
+    width: 320,
+  },
+});
 
 const styles = (theme: ThemeType): JssStyles => ({
   button: {
     marginTop: 8,
     marginBottom: 8,
-    width: 135
+    width: 135,
   },
   root: {
-    ...gardenForm(theme)
+    ...gardenForm(theme),
   },
   row: {
     display: "flex",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   formSubmitRow: {
     display: "flex",
-    justifyContent: "flex-end"
+    justifyContent: "flex-end",
   },
   submitButton: {
-    color: theme.palette.primary.main
-  }
-})
+    color: theme.palette.primary.main,
+  },
+});
 
-export const GardenCodeWidget = ({classes, type}:{classes:ClassesType, type: string}) => {
+export const GardenCodeWidget = ({ classes, type }: { classes: ClassesType; type: string }) => {
+  const { captureEvent } = useTracking();
+  const currentUser = useCurrentUser();
 
-  const { captureEvent } = useTracking()
-  const currentUser =  useCurrentUser()
-
-  const [currentCode, setCurrentCode] = useState<GardenCodeFragment|null>(null)
-  const [copiedCode, setCopiedCode] = useState(false)
-  const [open, setOpen] = useState(false)
+  const [currentCode, setCurrentCode] = useState<GardenCodeFragment | null>(null);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const autoselectCode = (event: AnyBecauseTodo) => {
-    event.target.select()
-  }
+    event.target.select();
+  };
 
   const keyDown = useGlobalKeydown((event: KeyboardEvent) => {
-    const Return_KeyCode = 13
-    const ReturnKey = "Enter"
+    const Return_KeyCode = 13;
+    const ReturnKey = "Enter";
     if (event.key === ReturnKey || event.keyCode === Return_KeyCode) {
-      event.preventDefault()
+      event.preventDefault();
     }
   });
 
-  const SubmitComponent = () => <div className={classNames("form-submit", classes.formSubmitRow)}>
-      <Button onClick={()=>setOpen(false)}>
-        Cancel
-      </Button>
+  const SubmitComponent = () => (
+    <div className={classNames("form-submit", classes.formSubmitRow)}>
+      <Button onClick={() => setOpen(false)}>Cancel</Button>
       <Button
         type="submit"
         className={classes.submitButton}
@@ -80,48 +78,60 @@ export const GardenCodeWidget = ({classes, type}:{classes:ClassesType, type: str
         Submit
       </Button>
     </div>
+  );
 
-  const generatedLink = `http://garden.lesswrong.com?code=${currentCode?.code}&event=${currentCode?.slug}`
+  const generatedLink = `http://garden.lesswrong.com?code=${currentCode?.code}&event=${currentCode?.slug}`;
 
-  if (!currentUser) return null
-  const label = type === "friend" ? "Invite a Friend" : "Host Event"
+  if (!currentUser) return null;
+  const label = type === "friend" ? "Invite a Friend" : "Host Event";
 
-  if (!open) return <Button className={classes.button} variant="outlined" onClick={() => setOpen(true)}>{label}</Button>
+  if (!open)
+    return (
+      <Button className={classes.button} variant="outlined" onClick={() => setOpen(true)}>
+        {label}
+      </Button>
+    );
 
-  const fields = type === "friend" ? ["title", "startTime"] : ["title", "startTime", "contents", "type", "afOnly"]
+  const fields = type === "friend" ? ["title", "startTime"] : ["title", "startTime", "contents", "type", "afOnly"];
 
-  return <Components.ContentStyles contentType="commentExceptPointerEvents" className={classes.root}>
-    {!!currentCode
-      ? <div>
-            Here is your code! It is valid from <strong>{moment(new Date(currentCode.startTime)).format("dddd, MMMM Do, h:mma")}</strong> until <strong>{moment(new Date(currentCode.endTime)).format("h:mma")}</strong>.
-            <TextField
-              className={classes.inviteCode}
-              // label={"Your code!"}
-              onClick={autoselectCode}
-              onSelect={autoselectCode}
-              value={generatedLink}
-              fullWidth
-            />
-            <CopyToClipboard
-              text={generatedLink}
-              onCopy={(text, result) => {
+  return (
+    <Components.ContentStyles contentType="commentExceptPointerEvents" className={classes.root}>
+      {!!currentCode ? (
+        <div>
+          Here is your code! It is valid from{" "}
+          <strong>{moment(new Date(currentCode.startTime)).format("dddd, MMMM Do, h:mma")}</strong> until{" "}
+          <strong>{moment(new Date(currentCode.endTime)).format("h:mma")}</strong>.
+          <TextField
+            className={classes.inviteCode}
+            // label={"Your code!"}
+            onClick={autoselectCode}
+            onSelect={autoselectCode}
+            value={generatedLink}
+            fullWidth
+          />
+          <CopyToClipboard
+            text={generatedLink}
+            onCopy={(text, result) => {
               setCopiedCode(result);
-              captureEvent("gardenCodeLinkCopied", {generatedLink})
-              }}
-              >
-              <Button color="primary">{copiedCode ? "Copied!" : "Copy Link"}</Button>
-            </CopyToClipboard>
-            <Button onClick={() => {
-              setCurrentCode(null)
-              setCopiedCode(false)
-            }}>
-              Generate New Code
-            </Button>
-            {/* {type === "event" && <div><a href={"https://www.facebook.com/events/create/?group_id=356586692361618"} target="_blank" rel="noopener noreferrer">
+              captureEvent("gardenCodeLinkCopied", { generatedLink });
+            }}
+          >
+            <Button color="primary">{copiedCode ? "Copied!" : "Copy Link"}</Button>
+          </CopyToClipboard>
+          <Button
+            onClick={() => {
+              setCurrentCode(null);
+              setCopiedCode(false);
+            }}
+          >
+            Generate New Code
+          </Button>
+          {/* {type === "event" && <div><a href={"https://www.facebook.com/events/create/?group_id=356586692361618"} target="_blank" rel="noopener noreferrer">
               <Button variant="outlined" className={classes.fbEventButton}>Create FB Event</Button>
             </a></div>} */}
-          </div>
-      : <div>
+        </div>
+      ) : (
+        <div>
           <p>Invite codes are valid for 12 hours from start time.</p>
           <Components.WrappedSmartForm
             collectionName="GardenCodes"
@@ -130,19 +140,20 @@ export const GardenCodeWidget = ({classes, type}:{classes:ClassesType, type: str
             queryFragment={getFragment("GardenCodeFragment")}
             formComponents={{
               FormSubmit: SubmitComponent,
-              FormGroupLayout: Components.DefaultStyleFormGroup
+              FormGroupLayout: Components.DefaultStyleFormGroup,
             }}
-            successCallback={(code: GardenCodeFragment) => setCurrentCode(code)}/>
-      </div>
-    }
-  </Components.ContentStyles>
-}
+            successCallback={(code: GardenCodeFragment) => setCurrentCode(code)}
+          />
+        </div>
+      )}
+    </Components.ContentStyles>
+  );
+};
 
-const GardenCodeWidgetComponent = registerComponent('GardenCodeWidget', GardenCodeWidget, {styles});
+const GardenCodeWidgetComponent = registerComponent("GardenCodeWidget", GardenCodeWidget, { styles });
 
 declare global {
   interface ComponentTypes {
-    GardenCodeWidget: typeof GardenCodeWidgetComponent
+    GardenCodeWidget: typeof GardenCodeWidgetComponent;
   }
 }
-

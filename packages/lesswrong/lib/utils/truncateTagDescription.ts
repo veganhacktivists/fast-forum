@@ -10,12 +10,9 @@ const getInnerHTML = (html: string) => {
   } else {
     return new DOMParser().parseFromString(html, "text/html").body.innerHTML;
   }
-}
+};
 
-const truncateTagDescription = (
-  htmlWithAnchors: string,
-  descriptionTruncationCount?: number,
-) => {
+const truncateTagDescription = (htmlWithAnchors: string, descriptionTruncationCount?: number) => {
   if (descriptionTruncationCount) {
     return truncate(
       htmlWithAnchors,
@@ -24,13 +21,8 @@ const truncateTagDescription = (
       "<span>...<p><a>(Read More)</a></p></span>",
     );
   }
-  for (let matchString of [
-      'id="Further_reading"',
-      'id="Bibliography"',
-      'id="Related_entries"',
-      'class="footnotes"',
-    ]) {
-    if(htmlWithAnchors.includes(matchString)) {
+  for (let matchString of ['id="Further_reading"', 'id="Bibliography"', 'id="Related_entries"', 'class="footnotes"']) {
+    if (htmlWithAnchors.includes(matchString)) {
       const truncationLength = htmlWithAnchors.indexOf(matchString);
       /**
        * The `truncate` method used above uses a complicated criterion for what
@@ -44,7 +36,7 @@ const truncateTagDescription = (
       return innerHTML + `<span>...<p><a>(${readMore})</a></p></span>`;
     }
   }
-  return htmlWithAnchors
-}
+  return htmlWithAnchors;
+};
 
 export default truncateTagDescription;

@@ -1,5 +1,5 @@
-import { Utils } from '../../lib/vulcan-lib/utils';
-import { loggerConstructor } from '../../lib/utils/logging';
+import { Utils } from "../../lib/vulcan-lib/utils";
+import { loggerConstructor } from "../../lib/utils/logging";
 
 /**
  * Connectors: A set of wrappers around mongodb collection operators.
@@ -31,67 +31,67 @@ const convertUniqueSelector = (selector: any) => {
 export const Connectors = {
   get: async <N extends CollectionNameString>(
     collection: CollectionBase<N>,
-    selector: MongoSelector<ObjectsByCollectionName[N]>|string = {},
+    selector: MongoSelector<ObjectsByCollectionName[N]> | string = {},
     options: MongoFindOneOptions<ObjectsByCollectionName[N]> = {},
     skipConversion?: boolean,
-  ): Promise<ObjectsByCollectionName[N]|null> => {
-    const logger = loggerConstructor(`db-${collection.collectionName.toLowerCase()}-get`)
-    logger('---------->')
-    logger('selector', selector)
-    logger('options', options)
-    const convertedSelector = skipConversion ? selector : convertUniqueSelector(selector)
+  ): Promise<ObjectsByCollectionName[N] | null> => {
+    const logger = loggerConstructor(`db-${collection.collectionName.toLowerCase()}-get`);
+    logger("---------->");
+    logger("selector", selector);
+    logger("options", options);
+    const convertedSelector = skipConversion ? selector : convertUniqueSelector(selector);
     const result = await collection.findOne(convertedSelector, options);
-    logger('result', result)
-    logger('---<')
-    return result
+    logger("result", result);
+    logger("---<");
+    return result;
   },
-  
+
   find: async <N extends CollectionNameString>(
     collection: CollectionBase<N>,
     selector: MongoSelector<ObjectsByCollectionName[N]> = {},
     options: MongoFindOptions<ObjectsByCollectionName[N]> = {},
   ): Promise<ObjectsByCollectionName[N][]> => {
-    const logger = loggerConstructor(`db-${collection.collectionName.toLowerCase()}-find`)
-    logger('---------->')
-    logger('selector', selector)
-    logger('options', options)
+    const logger = loggerConstructor(`db-${collection.collectionName.toLowerCase()}-find`);
+    logger("---------->");
+    logger("selector", selector);
+    logger("options", options);
     const result = await collection.find(convertSelector(selector), options).fetch();
     // logger('result', result)
-    logger('result.length', result.length)
-    logger('---<')
-    return result
+    logger("result.length", result.length);
+    logger("---<");
+    return result;
   },
-  
+
   count: async <N extends CollectionNameString>(
     collection: CollectionBase<N>,
     selector: MongoSelector<ObjectsByCollectionName[N]> = {},
     options: MongoFindOptions<ObjectsByCollectionName[N]> = {},
   ): Promise<number> => {
-    const logger = loggerConstructor(`db-${collection.collectionName.toLowerCase()}-count`)
-    logger('---------->')
-    logger('selector', selector)
-    logger('options', options)
+    const logger = loggerConstructor(`db-${collection.collectionName.toLowerCase()}-count`);
+    logger("---------->");
+    logger("selector", selector);
+    logger("options", options);
     const result = await collection.find(convertSelector(selector), options).count();
-    logger('result', result)
-    logger('---<')
-    return result
+    logger("result", result);
+    logger("---<");
+    return result;
   },
-  
+
   create: async <N extends CollectionNameString>(
     collection: CollectionBase<N>,
     document: ObjectsByCollectionName[N],
     options: MongoInsertOptions<ObjectsByCollectionName[N]> = {},
   ) => {
-    const logger = loggerConstructor(`db-${collection.collectionName.toLowerCase()}-create`)
-    logger('---------->')
-    logger('document', document)
-    logger('options', options)
+    const logger = loggerConstructor(`db-${collection.collectionName.toLowerCase()}-create`);
+    logger("---------->");
+    logger("document", document);
+    logger("options", options);
     const result = await collection.rawInsert(document);
-    logger('result', result)
-    logger('---<')
-    return result
+    logger("result", result);
+    logger("---<");
+    return result;
   },
-  
+
   updateOne: async <N extends CollectionNameString>(
     collection: CollectionBase<N>,
     selector: MongoSelector<ObjectsByCollectionName[N]>,
@@ -99,34 +99,34 @@ export const Connectors = {
     options: MongoUpdateOptions<ObjectsByCollectionName[N]> = {},
     skipConversion?: boolean,
   ) => {
-    const logger = loggerConstructor(`db-${collection.collectionName.toLowerCase()}-update`)
-    logger('---------->')
-    logger('selector', selector)
-    logger('modifier', modifier)
-    logger('options', options)
-    const convertedSelector = skipConversion ? selector : convertUniqueSelector(selector)
+    const logger = loggerConstructor(`db-${collection.collectionName.toLowerCase()}-update`);
+    logger("---------->");
+    logger("selector", selector);
+    logger("modifier", modifier);
+    logger("options", options);
+    const convertedSelector = skipConversion ? selector : convertUniqueSelector(selector);
     const result = await collection.rawUpdateOne(convertedSelector, modifier, options);
-    logger('result', result)
-    logger('---<')
-    return result
+    logger("result", result);
+    logger("---<");
+    return result;
   },
-  
+
   delete: async <N extends CollectionNameString>(
     collection: CollectionBase<N>,
     selector: MongoSelector<ObjectsByCollectionName[N]>,
     options: MongoRemoveOptions<ObjectsByCollectionName[N]> = {},
     skipConversion?: boolean,
   ) => {
-    const logger = loggerConstructor(`db-${collection.collectionName.toLowerCase()}-delete`)
-    logger('---------->')
-    logger('selector', selector)
-    logger('options', options)
-    const convertedSelector = skipConversion ? selector : convertUniqueSelector(selector)
+    const logger = loggerConstructor(`db-${collection.collectionName.toLowerCase()}-delete`);
+    logger("---------->");
+    logger("selector", selector);
+    logger("options", options);
+    const convertedSelector = skipConversion ? selector : convertUniqueSelector(selector);
     const result = await collection.rawRemove(convertedSelector);
-    logger('result', result)
-    logger('---<')
-    return result
+    logger("result", result);
+    logger("---<");
+    return result;
   },
-}
+};
 
 Utils.Connectors = Connectors;

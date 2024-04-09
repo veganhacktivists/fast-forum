@@ -10,8 +10,8 @@ registerMigration({
   idempotent: true,
   action: async () => {
     // Update the default notification settings for "threads" to be onsite, daily, and not muted
-    console.log("Updating default notification settings for subforum threads")
-    let usersUpdated = 0
+    console.log("Updating default notification settings for subforum threads");
+    let usersUpdated = 0;
     await forEachDocumentBatchInCollection({
       collection: Users,
       batchSize: 1000,
@@ -21,27 +21,40 @@ registerMigration({
         "notificationSubforumUnread.batchingFrequency": "daily",
       },
       callback: async (users) => {
-        await Users.rawUpdateMany({_id: {$in: users.map(u=>u._id)}}, {$set: {
-          "notificationSubforumUnread.channel": "onsite",
-        }})
-        usersUpdated += users.length
-        console.log(`Updated ${usersUpdated} users`)
-      }
+        await Users.rawUpdateMany(
+          { _id: { $in: users.map((u) => u._id) } },
+          {
+            $set: {
+              "notificationSubforumUnread.channel": "onsite",
+            },
+          },
+        );
+        usersUpdated += users.length;
+        console.log(`Updated ${usersUpdated} users`);
+      },
     });
-    
+
     // Update the default notification settings for posts to be not muted, keep whatever batching/channel the user had (which is onsite, realtime by default)
     // If the user has changed this manually in the past, there will be a Subscriptions document with `state` as "subscribed" or "suppressed". Ignore
     // those, and only create a new Subscriptions object for users that don't have one already.
-    console.log("Updating default notification settings for subforum posts")
-    const subforumTags = await Tags.find({isSubforum: true}).fetch()
-    
+    console.log("Updating default notification settings for subforum posts");
+    const subforumTags = await Tags.find({ isSubforum: true }).fetch();
+
     for (const tag of subforumTags) {
-      console.log(`Updating post notification settings for subforum ${tag.slug}`)
-      const subforumMembers = await Users.find({profileTagIds: tag._id}).fetch();
-      const subscribedSubforumMembers = await Subscriptions.find({userId:  {$in: subforumMembers.map(u=>u._id)}, documentId: tag._id, collectionName: "Tags", type: "newTagPosts", deleted: false}).fetch();
-      const unsubscribedSubforumMembers = subforumMembers.filter(u => !subscribedSubforumMembers.find(s => s.userId === u._id));
-      
-      const newSubscriptions = unsubscribedSubforumMembers.map(u => ({
+      console.log(`Updating post notification settings for subforum ${tag.slug}`);
+      const subforumMembers = await Users.find({ profileTagIds: tag._id }).fetch();
+      const subscribedSubforumMembers = await Subscriptions.find({
+        userId: { $in: subforumMembers.map((u) => u._id) },
+        documentId: tag._id,
+        collectionName: "Tags",
+        type: "newTagPosts",
+        deleted: false,
+      }).fetch();
+      const unsubscribedSubforumMembers = subforumMembers.filter(
+        (u) => !subscribedSubforumMembers.find((s) => s.userId === u._id),
+      );
+
+      const newSubscriptions = unsubscribedSubforumMembers.map((u) => ({
         insertOne: {
           document: {
             userId: u._id,
@@ -50,14 +63,14 @@ registerMigration({
             type: "newTagPosts",
             state: "subscribed",
             deleted: false,
-          }
-        }
-      }))
+          },
+        },
+      }));
 
-      console.log(`Creating ${newSubscriptions.length} new subscriptions`)
+      console.log(`Creating ${newSubscriptions.length} new subscriptions`);
       if (newSubscriptions.length) {
         await Subscriptions.rawCollection().bulkWrite(newSubscriptions);
       }
     }
-  }
+  },
 });

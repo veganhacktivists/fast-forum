@@ -6,11 +6,7 @@ import md5 from "md5";
  */
 const getLockKey = (query: string) => parseInt(md5(query), 16) / 1e20;
 
-export const queryWithLock = (
-  db: SqlClient,
-  query: string,
-  timeoutSeconds = 10,
-) => {
+export const queryWithLock = (db: SqlClient, query: string, timeoutSeconds = 10) => {
   return db.tx(async (transaction) => {
     if (db.isTestingClient) {
       // When creating testing databases we create the tables _after_ running the
@@ -23,5 +19,5 @@ export const queryWithLock = (
     await transaction.none(`SET LOCAL lock_timeout = '${timeoutSeconds}s';`);
     await transaction.one(`SELECT pg_advisory_xact_lock(${getLockKey(query)});`);
     await transaction.any(query);
-  })
-}
+  });
+};

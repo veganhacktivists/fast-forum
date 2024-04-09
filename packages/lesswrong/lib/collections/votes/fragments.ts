@@ -1,5 +1,4 @@
-import { registerFragment } from '../../vulcan-lib';
-
+import { registerFragment } from "../../vulcan-lib";
 
 registerFragment(`
   fragment TagRelVotes on Vote {
@@ -23,7 +22,7 @@ registerFragment(`
       ...TagRelFragment
     }
   }
-`)
+`);
 
 registerFragment(`
   fragment UserVotes on Vote {

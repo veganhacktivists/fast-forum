@@ -1,24 +1,20 @@
-import { registerComponent } from '../../lib/vulcan-lib';
-import React from 'react';
+import { registerComponent } from "../../lib/vulcan-lib";
+import React from "react";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     height: 150,
-  }
+  },
 });
 
-const Footer = ({classes}: {
-  classes: ClassesType,
-}) => {
-  return (
-    <div className={classes.root} />
-  )
-}
+const Footer = ({ classes }: { classes: ClassesType }) => {
+  return <div className={classes.root} />;
+};
 
-const FooterComponent = registerComponent('Footer', Footer, {styles});
+const FooterComponent = registerComponent("Footer", Footer, { styles });
 
 declare global {
   interface ComponentTypes {
-    Footer: typeof FooterComponent
+    Footer: typeof FooterComponent;
   }
 }

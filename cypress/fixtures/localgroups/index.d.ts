@@ -1,4 +1,2 @@
-
-const testGroups: DbLocalgroup[]
-export default testGroups
-
+const testGroups: DbLocalgroup[];
+export default testGroups;

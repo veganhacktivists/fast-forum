@@ -1,54 +1,54 @@
-import * as _ from 'underscore';
+import * as _ from "underscore";
 
 export type PingbackDocument = {
-  collectionName: CollectionNameString,
-  documentId: string,
+  collectionName: CollectionNameString;
+  documentId: string;
 };
 
 export type RouterLocation = {
   // Null in 404
-  currentRoute: Route|null,
-  RouteComponent: any,
-  location: any,
-  pathname: string,
-  url: string,
-  hash: string,
-  params: Record<string,string>,
-  query: Record<string,string>, // TODO: this should be Record<string,string|string[]>
-  redirected?: boolean,
+  currentRoute: Route | null;
+  RouteComponent: any;
+  location: any;
+  pathname: string;
+  url: string;
+  hash: string;
+  params: Record<string, string>;
+  query: Record<string, string>; // TODO: this should be Record<string,string|string[]>
+  redirected?: boolean;
 };
 
 export type Route = {
   // Name of the route. Must be unique, but has no effect, except maybe
   // appearing in debug logging occasionally.
-  name: string,
-  
+  name: string;
+
   // URL pattern for this route. Syntax comes from the path-to-regexp library
   // (via indirect dependency via react-router).
-  path: string,
-  
-  componentName?: keyof ComponentTypes,
-  title?: string,
-  titleComponentName?: keyof ComponentTypes,
-  subtitle?: string,
-  subtitleLink?: string,
-  subtitleComponentName?: keyof ComponentTypes,
-  description?: string,
-  redirect?: (location: RouterLocation)=>string,
-  getPingback?: (parsedUrl: RouterLocation) => Promise<PingbackDocument|null> | PingbackDocument|null,
-  previewComponentName?: keyof ComponentTypes,
-  _id?: string|null,
-  noIndex?: boolean,
-  background?: string,
-  sunshineSidebar?: boolean
-  disableAutoRefresh?: boolean,
-  initialScroll?: "top"|"bottom",
-  noFooter?: boolean,
-  standalone?: boolean // if true, this page has no header / intercom
-  staticHeader?: boolean // if true, the page header is not sticky to the top of the screen
-  fullscreen?: boolean // if true, the page contents are put into a flexbox with the header such that the page contents take up the full height of the screen without scrolling
-  unspacedGrid?: boolean // for routes with standalone navigation, setting this to true allows the page body to be full-width (the default is to have empty columns providing padding)
-  
+  path: string;
+
+  componentName?: keyof ComponentTypes;
+  title?: string;
+  titleComponentName?: keyof ComponentTypes;
+  subtitle?: string;
+  subtitleLink?: string;
+  subtitleComponentName?: keyof ComponentTypes;
+  description?: string;
+  redirect?: (location: RouterLocation) => string;
+  getPingback?: (parsedUrl: RouterLocation) => Promise<PingbackDocument | null> | PingbackDocument | null;
+  previewComponentName?: keyof ComponentTypes;
+  _id?: string | null;
+  noIndex?: boolean;
+  background?: string;
+  sunshineSidebar?: boolean;
+  disableAutoRefresh?: boolean;
+  initialScroll?: "top" | "bottom";
+  noFooter?: boolean;
+  standalone?: boolean; // if true, this page has no header / intercom
+  staticHeader?: boolean; // if true, the page header is not sticky to the top of the screen
+  fullscreen?: boolean; // if true, the page contents are put into a flexbox with the header such that the page contents take up the full height of the screen without scrolling
+  unspacedGrid?: boolean; // for routes with standalone navigation, setting this to true allows the page body to be full-width (the default is to have empty columns providing padding)
+
   // enablePrefetch: Start loading stylesheet and JS bundle before the page is
   // rendered. This requires sending headers before rendering, which means
   // that the page can't return an HTTP error status or an HTTP redirect. In
@@ -61,11 +61,11 @@ export type Route = {
   // Currently used for / and for /allPosts which is where this matters most.
   // Not used for post-pages because we don't know whether a post page is going
   // to be a 404 until we render it.
-  enableResourcePrefetch?: boolean
+  enableResourcePrefetch?: boolean;
 };
 
 /** Populated by calls to addRoute */
-export const Routes: Record<string,Route> = {};
+export const Routes: Record<string, Route> = {};
 
 // Add a route to the routes table.
 //
@@ -75,27 +75,27 @@ export const Routes: Record<string,Route> = {};
 // an array argument, take varargs, which preserve the original type.
 export const addRoute = (...routes: Route[]): void => {
   for (let route of routes) {
-    const {name, path, ...properties} = route;
-  
+    const { name, path, ...properties } = route;
+
     // check if there is already a route registered to this path
     // @ts-ignore The @types/underscore signature for _.findWhere is narrower than the real function; this works fine
     const routeWithSamePath = _.findWhere(Routes, { path });
-  
+
     if (routeWithSamePath) {
       // Don't allow shadowing/replacing routes
       throw new Error(`Conflicting routes with path ${path}`);
     }
-    
+
     // Check for name collisions
     if (Routes[name]) {
       throw new Error(`Conflicting routes with name ${name}`);
     }
-  
+
     // register the new route
     Routes[name] = {
       name,
       path,
-      ...properties
+      ...properties,
     };
   }
 };
@@ -103,7 +103,7 @@ export const addRoute = (...routes: Route[]): void => {
 export const overrideRoute = (...routes: Route[]): void => {
   // remove the old route if it exists, then call addRoute
   for (let route of routes) {
-    const {name, path} = route;
+    const { name, path } = route;
     delete Routes[name];
 
     // @ts-ignore The @types/underscore signature for _.findWhere is narrower than the real function; this works fine
@@ -114,4 +114,4 @@ export const overrideRoute = (...routes: Route[]): void => {
     }
   }
   addRoute(...routes);
-}
+};

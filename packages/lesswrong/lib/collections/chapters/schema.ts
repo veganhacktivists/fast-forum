@@ -1,4 +1,4 @@
-import { foreignKeyField, arrayOfForeignKeysField } from '../../utils/schemaUtils'
+import { foreignKeyField, arrayOfForeignKeysField } from "../../utils/schemaUtils";
 
 export const formGroups: Partial<Record<string, FormGroupType<"Chapters">>> = {
   chapterDetails: {
@@ -7,7 +7,7 @@ export const formGroups: Partial<Record<string, FormGroupType<"Chapters">>> = {
     label: "Chapter Details",
     startCollapsed: true,
   },
-}
+};
 
 const schema: SchemaType<"Chapters"> = {
   // Custom Properties
@@ -15,32 +15,32 @@ const schema: SchemaType<"Chapters"> = {
   title: {
     type: String,
     optional: true,
-    canRead: ['guests'],
+    canRead: ["guests"],
     canUpdate: ["admins"],
-    canCreate: ['admins'],
-    placeholder:"Title",
+    canCreate: ["admins"],
+    placeholder: "Title",
     order: 10,
-    group: formGroups.chapterDetails
+    group: formGroups.chapterDetails,
   },
 
   subtitle: {
     type: String,
     optional: true,
-    canRead: ['guests'],
+    canRead: ["guests"],
     canUpdate: ["admins"],
-    canCreate: ['admins'],
-    placeholder:"Subtitle",
+    canCreate: ["admins"],
+    placeholder: "Subtitle",
     order: 20,
-    group: formGroups.chapterDetails
+    group: formGroups.chapterDetails,
   },
 
   number: {
     type: Number,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['admins'],
-    canCreate: ['admins'],
-    group: formGroups.chapterDetails
+    canRead: ["guests"],
+    canUpdate: ["admins"],
+    canCreate: ["admins"],
+    group: formGroups.chapterDetails,
   },
 
   sequenceId: {
@@ -53,9 +53,9 @@ const schema: SchemaType<"Chapters"> = {
     }),
     optional: true,
     hidden: true,
-    canRead: ['guests'],
-    canUpdate: ['admins'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canUpdate: ["admins"],
+    canCreate: ["members"],
   },
 
   postIds: {
@@ -63,13 +63,13 @@ const schema: SchemaType<"Chapters"> = {
       idFieldName: "postIds",
       resolverName: "posts",
       collectionName: "Posts",
-      type: "Post"
+      type: "Post",
     }),
     optional: false,
     canRead: ["guests"],
     canUpdate: ["members"],
-    canCreate: ['members'],
-    control: 'PostsListEditor',
+    canCreate: ["members"],
+    control: "PostsListEditor",
   },
 
   "postIds.$": {
@@ -77,6 +77,6 @@ const schema: SchemaType<"Chapters"> = {
     foreignKey: "Posts",
     optional: true,
   },
-}
+};
 
 export default schema;

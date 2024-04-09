@@ -1,9 +1,9 @@
-import { addGraphQLResolvers, addGraphQLQuery } from './vulcan-lib';
-import process from 'process';
-import os from 'os';
-import { execSync } from 'child_process';
-import { getCacheHitRate } from './vulcan-lib/apollo-ssr/pageCache';
-import { getPreloadedDatabaseId } from './loadDatabaseSettings';
+import { addGraphQLResolvers, addGraphQLQuery } from "./vulcan-lib";
+import process from "process";
+import os from "os";
+import { execSync } from "child_process";
+import { getCacheHitRate } from "./vulcan-lib/apollo-ssr/pageCache";
+import { getPreloadedDatabaseId } from "./loadDatabaseSettings";
 
 // Send this as stringified-JSON rather than as real JSON, because for Mongo
 // indexes the order of keys matters, and that ordering doesn't survive
@@ -13,7 +13,7 @@ const siteAdminMetadataResolvers = {
     async AdminMetadata(root: void, args: void, context: ResolverContext) {
       if (!context.currentUser || !context.currentUser.isAdmin)
         throw new Error("AdminMetadata graphQL API requires being logged in as an admin");
-      
+
       return JSON.stringify({
         serverInfo: {
           nodeVersion: process.versions.node,
@@ -27,11 +27,11 @@ const siteAdminMetadataResolvers = {
           uptime: process.uptime(),
           cpuUsage: process.cpuUsage(),
           pageCacheHitRate: getCacheHitRate(),
-          serverTimezoneOffset: new Date().getTimezoneOffset()/60.0,
+          serverTimezoneOffset: new Date().getTimezoneOffset() / 60.0,
         },
       });
-    }
-  }
+    },
+  },
 };
 addGraphQLResolvers(siteAdminMetadataResolvers);
 addGraphQLQuery("AdminMetadata: String");
@@ -39,7 +39,7 @@ addGraphQLQuery("AdminMetadata: String");
 function getGitCommit(): string {
   try {
     return execSync("git rev-parse HEAD").toString().trim();
-  } catch(e) {
+  } catch (e) {
     return "Unknown";
   }
 }
@@ -47,7 +47,7 @@ function getGitCommit(): string {
 function getGitBranch(): string {
   try {
     return execSync("git branch --show-current").toString().trim();
-  } catch(e) {
+  } catch (e) {
     return "Unknown";
   }
 }

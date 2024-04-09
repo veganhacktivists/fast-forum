@@ -1,9 +1,9 @@
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import React from 'react';
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import React from "react";
 
 const styles = (theme: ThemeType): JssStyles => ({
   dialog: {
-    zIndex: theme.zIndexes.loginDialog
+    zIndex: theme.zIndexes.loginDialog,
   },
   paper: {
     // Remove left/right margins so that the login form fits on small phone
@@ -16,10 +16,7 @@ const styles = (theme: ThemeType): JssStyles => ({
 
 // Makes its child a link (wrapping it in an <a> tag) which opens a login
 // dialog.
-const LoginPopup = ({onClose, classes}: {
-  onClose?: ()=>void,
-  classes: ClassesType,
-}) => {
+const LoginPopup = ({ onClose, classes }: { onClose?: () => void; classes: ClassesType }) => {
   const { LWDialog } = Components;
   return (
     <LWDialog
@@ -27,18 +24,18 @@ const LoginPopup = ({onClose, classes}: {
       onClose={onClose}
       className={classes.dialog}
       dialogClasses={{
-        paper: classes.paper
+        paper: classes.paper,
       }}
     >
       <Components.LoginForm />
     </LWDialog>
   );
-}
+};
 
-const LoginPopupComponent = registerComponent('LoginPopup', LoginPopup, {styles});
+const LoginPopupComponent = registerComponent("LoginPopup", LoginPopup, { styles });
 
 declare global {
   interface ComponentTypes {
-    LoginPopup: typeof LoginPopupComponent
+    LoginPopup: typeof LoginPopupComponent;
   }
 }

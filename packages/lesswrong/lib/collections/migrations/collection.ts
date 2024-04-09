@@ -1,6 +1,6 @@
-import { createCollection } from '../../vulcan-lib';
-import { addUniversalFields } from '../../collectionUtils'
-import { schemaDefaultValue } from '../../utils/schemaUtils';
+import { createCollection } from "../../vulcan-lib";
+import { addUniversalFields } from "../../collectionUtils";
+import { schemaDefaultValue } from "../../utils/schemaUtils";
 
 /*
  * NOTE: This collection only tracks the use of migrations located in
@@ -40,6 +40,6 @@ export const Migrations: MigrationsCollection = createCollection({
   //resolvers: getDefaultResolvers("Migrations"),
   //mutations: getDefaultMutations("Migrations"),
 });
-addUniversalFields({collection: Migrations});
+addUniversalFields({ collection: Migrations });
 
 export default Migrations;

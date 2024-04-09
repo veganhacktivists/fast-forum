@@ -10,29 +10,28 @@
  * @see https://github.com/apollographql/apollo-server/issues/420
  */
 
-import { configureScope } from '@sentry/node';
-import DataLoader from 'dataloader';
-import { getCollectionsByName } from '../../../lib/vulcan-lib/collections';
-import findByIds from '../findbyids';
-import { getHeaderLocale } from '../intl';
-import * as _ from 'underscore';
-import { hashLoginToken, tokenExpiration, userIsBanned } from '../../loginTokens';
-import type { Request, Response } from 'express';
-import {getUserEmail} from "../../../lib/collections/users/helpers";
-import { getAllRepos, UsersRepo } from '../../repos';
-import UserActivities from '../../../lib/collections/useractivities/collection';
-import { getCookieFromReq } from '../../utils/httpUtil';
-import { isEAForum } from '../../../lib/instanceSettings';
-import { userChangedCallback } from '../../../lib/vulcan-lib/callbacks';
-import { asyncLocalStorage } from '../../perfMetrics';
+import { configureScope } from "@sentry/node";
+import DataLoader from "dataloader";
+import { getCollectionsByName } from "../../../lib/vulcan-lib/collections";
+import findByIds from "../findbyids";
+import { getHeaderLocale } from "../intl";
+import * as _ from "underscore";
+import { hashLoginToken, tokenExpiration, userIsBanned } from "../../loginTokens";
+import type { Request, Response } from "express";
+import { getUserEmail } from "../../../lib/collections/users/helpers";
+import { getAllRepos, UsersRepo } from "../../repos";
+import UserActivities from "../../../lib/collections/useractivities/collection";
+import { getCookieFromReq } from "../../utils/httpUtil";
+import { isEAForum } from "../../../lib/instanceSettings";
+import { userChangedCallback } from "../../../lib/vulcan-lib/callbacks";
+import { asyncLocalStorage } from "../../perfMetrics";
 
 // From https://github.com/apollographql/meteor-integration/blob/master/src/server.js
-export const getUser = async (loginToken: string): Promise<DbUser|null> => {
+export const getUser = async (loginToken: string): Promise<DbUser | null> => {
   if (loginToken) {
-    if (typeof loginToken !== 'string')
-      throw new Error("Login token is not a string");
+    if (typeof loginToken !== "string") throw new Error("Login token is not a string");
 
-    const hashedToken = hashLoginToken(loginToken)
+    const hashedToken = hashLoginToken(loginToken);
 
     const user = await new UsersRepo().getUserByLoginToken(hashedToken);
 
@@ -40,26 +39,28 @@ export const getUser = async (loginToken: string): Promise<DbUser|null> => {
       // find the right login token corresponding, the current user may have
       // several sessions logged on different browsers / computers
       const tokenInformation = user.services.resume.loginTokens.find(
-        (tokenInfo: AnyBecauseTodo) => tokenInfo.hashedToken === hashedToken
-      )
+        (tokenInfo: AnyBecauseTodo) => tokenInfo.hashedToken === hashedToken,
+      );
 
-      const expiresAt = tokenExpiration(tokenInformation.when)
+      const expiresAt = tokenExpiration(tokenInformation.when);
 
-      const isExpired = expiresAt < new Date()
+      const isExpired = expiresAt < new Date();
 
       if (!isExpired) {
-        return user
+        return user;
       }
     }
   }
-  
+
   return null;
-}
+};
 
 // @see https://www.apollographql.com/docs/react/recipes/meteor#Server
-const setupAuthToken = async (user: DbUser|null): Promise<{
-  userId: string|null,
-  currentUser: DbUser|null,
+const setupAuthToken = async (
+  user: DbUser | null,
+): Promise<{
+  userId: string | null;
+  currentUser: DbUser | null;
 }> => {
   if (user) {
     // identify user to any server-side analytics providers
@@ -81,22 +82,19 @@ const setupAuthToken = async (user: DbUser|null): Promise<{
 
 // Generate a set of DataLoader objects, one per collection, to be added to a resolver context
 export const generateDataLoaders = (): {
-  loaders: Record<CollectionNameString, DataLoader<string,any>>
-  extraLoaders: Record<string,any>
+  loaders: Record<CollectionNameString, DataLoader<string, any>>;
+  extraLoaders: Record<string, any>;
 } => {
-  const loaders = _.mapObject(getCollectionsByName(), (collection,name) =>
-    new DataLoader(
-      (ids: Array<string>) => findByIds(collection, ids),
-      { cache: true, }
-    )
-  ) as Record<CollectionNameString, DataLoader<string,any>>;
-  
+  const loaders = _.mapObject(
+    getCollectionsByName(),
+    (collection, name) => new DataLoader((ids: Array<string>) => findByIds(collection, ids), { cache: true }),
+  ) as Record<CollectionNameString, DataLoader<string, any>>;
+
   return {
     loaders,
-    extraLoaders: {}
+    extraLoaders: {},
   };
 };
-
 
 export function requestIsFromGreaterWrong(req?: Request): boolean {
   if (!req) return false;
@@ -106,15 +104,19 @@ export function requestIsFromGreaterWrong(req?: Request): boolean {
   return userAgent.startsWith("Dexador");
 }
 
-export const computeContextFromUser = async (user: DbUser|null, req?: Request, res?: Response): Promise<ResolverContext> => {
-  let visitorActivity: DbUserActivity|null = null;
+export const computeContextFromUser = async (
+  user: DbUser | null,
+  req?: Request,
+  res?: Response,
+): Promise<ResolverContext> => {
+  let visitorActivity: DbUserActivity | null = null;
   const clientId = req ? getCookieFromReq(req, "clientId") : null;
   if ((user || clientId) && isEAForum) {
-    visitorActivity = user ?
-      await UserActivities.findOne({visitorId: user._id, type: 'userId'}) :
-      await UserActivities.findOne({visitorId: clientId, type: 'clientId'});
+    visitorActivity = user
+      ? await UserActivities.findOne({ visitorId: user._id, type: "userId" })
+      : await UserActivities.findOne({ visitorId: clientId, type: "clientId" });
   }
-  
+
   let context: ResolverContext = {
     ...getCollectionsByName(),
     ...generateDataLoaders(),
@@ -126,7 +128,7 @@ export const computeContextFromUser = async (user: DbUser|null, req?: Request, r
     repos: getAllRepos(),
     clientId,
     visitorActivity,
-    ...await setupAuthToken(user),
+    ...(await setupAuthToken(user)),
     perfMetric: asyncLocalStorage.getStore()?.requestPerfMetric,
   };
 
@@ -135,13 +137,13 @@ export const computeContextFromUser = async (user: DbUser|null, req?: Request, r
   }
 
   return context;
-}
+};
 
 export function configureSentryScope(context: ResolverContext) {
   const user = context.currentUser;
-  
+
   if (user) {
-    configureScope(scope => {
+    configureScope((scope) => {
       scope.setUser({
         id: user._id,
         email: getUserEmail(user),
@@ -149,7 +151,7 @@ export function configureSentryScope(context: ResolverContext) {
       });
     });
   } else if (context.isGreaterWrong) {
-    configureScope(scope => {
+    configureScope((scope) => {
       scope.setUser({
         username: context.isGreaterWrong ? `Logged out (via GreaterWrong)` : "Logged out",
       });
@@ -157,10 +159,10 @@ export function configureSentryScope(context: ResolverContext) {
   }
 }
 
-export const getUserFromReq = async (req: AnyBecauseTodo): Promise<DbUser|null> => {
-  return req.user
+export const getUserFromReq = async (req: AnyBecauseTodo): Promise<DbUser | null> => {
+  return req.user;
   // return getUser(getAuthToken(req));
-}
+};
 
 export async function getContextFromReqAndRes(req: Request, res: Response): Promise<ResolverContext> {
   const user = await getUserFromReq(req);

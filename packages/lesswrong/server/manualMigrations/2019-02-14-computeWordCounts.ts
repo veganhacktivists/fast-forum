@@ -1,8 +1,8 @@
-import { registerMigration, migrateDocuments } from './migrationUtils';
-import { editableCollections, editableCollectionsFields } from '../../lib/editor/make_editable'
-import { getCollection } from '../../lib/vulcan-lib';
-import { dataToWordCount } from '../editor/conversionUtils';
-import { Revisions } from '../../lib/collections/revisions/collection';
+import { registerMigration, migrateDocuments } from "./migrationUtils";
+import { editableCollections, editableCollectionsFields } from "../../lib/editor/make_editable";
+import { getCollection } from "../../lib/vulcan-lib";
+import { dataToWordCount } from "../editor/conversionUtils";
+import { Revisions } from "../../lib/collections/revisions/collection";
 
 registerMigration({
   name: "computeWordCounts",
@@ -15,48 +15,48 @@ registerMigration({
       collection: Revisions,
       batchSize: 1000,
       unmigratedDocumentQuery: {
-        wordCount: {$exists: false}
+        wordCount: { $exists: false },
       },
-      
+
       migrate: async (documents) => {
         let updates: Array<any> = [];
-        
+
         for (let doc of documents) {
           if (!doc.originalContents) continue;
           const { data, type } = doc.originalContents;
           const wordCount = await dataToWordCount(data, type);
-          
+
           updates.push({
             updateOne: {
               filter: { _id: doc._id },
               update: {
                 $set: {
-                  wordCount: wordCount
-                }
-              }
-            }
+                  wordCount: wordCount,
+                },
+              },
+            },
           });
         }
-        
+
         await Revisions.rawCollection().bulkWrite(updates, { ordered: false });
-      }
+      },
     });
-    
+
     // Fill in wordCount in the denormalized latest revs on posts/comments/etc
     for (let collectionName of editableCollections) {
       for (let fieldName of editableCollectionsFields[collectionName]!) {
-        const collection: CollectionBase<any> = getCollection(collectionName)
+        const collection: CollectionBase<any> = getCollection(collectionName);
         await migrateDocuments({
           description: `Compute word counts for ${collectionName}.${fieldName}`,
           collection,
           batchSize: 1000,
           unmigratedDocumentQuery: {
-            [fieldName]: {$exists: true},
-            [`${fieldName}.wordCount`]: {$exists: false}
+            [fieldName]: { $exists: true },
+            [`${fieldName}.wordCount`]: { $exists: false },
           },
           migrate: async (documents) => {
             let updates: Array<any> = [];
-            
+
             for (let doc of documents) {
               if (doc[fieldName]) {
                 const { data, type } = doc[fieldName].originalContents;
@@ -66,16 +66,16 @@ registerMigration({
                     filter: { _id: doc._id },
                     update: {
                       $set: {
-                        [`${fieldName}.wordCount`]: wordCount
-                      }
-                    }
-                  }
+                        [`${fieldName}.wordCount`]: wordCount,
+                      },
+                    },
+                  },
                 });
               }
             }
             await collection.rawCollection().bulkWrite(updates, { ordered: false });
-          }
-        })
+          },
+        });
       }
     }
   },

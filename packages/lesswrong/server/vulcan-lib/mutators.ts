@@ -29,37 +29,40 @@ Finally, *after* the operation is performed, we execute any async callbacks.
 
 */
 
-import { Utils } from '../../lib/vulcan-lib/utils';
-import { validateDocument, validateData, dataToModifier, modifierToData, } from './validation';
-import { getSchema } from '../../lib/utils/getSchema';
-import { throwError } from './errors';
-import { Connectors } from './connectors';
-import { getCollectionHooks, CollectionMutationCallbacks, CreateCallbackProperties, UpdateCallbackProperties, DeleteCallbackProperties } from '../mutationCallbacks';
-import { logFieldChanges } from '../fieldChanges';
-import { createAnonymousContext } from './query';
-import clone from 'lodash/clone';
-import isEmpty from 'lodash/isEmpty';
-import { createError } from 'apollo-errors';
-import pickBy from 'lodash/pickBy';
-import { loggerConstructor } from '../../lib/utils/logging';
+import { Utils } from "../../lib/vulcan-lib/utils";
+import { validateDocument, validateData, dataToModifier, modifierToData } from "./validation";
+import { getSchema } from "../../lib/utils/getSchema";
+import { throwError } from "./errors";
+import { Connectors } from "./connectors";
+import {
+  getCollectionHooks,
+  CollectionMutationCallbacks,
+  CreateCallbackProperties,
+  UpdateCallbackProperties,
+  DeleteCallbackProperties,
+} from "../mutationCallbacks";
+import { logFieldChanges } from "../fieldChanges";
+import { createAnonymousContext } from "./query";
+import clone from "lodash/clone";
+import isEmpty from "lodash/isEmpty";
+import { createError } from "apollo-errors";
+import pickBy from "lodash/pickBy";
+import { loggerConstructor } from "../../lib/utils/logging";
 
 const mutatorParamsToCallbackProps = <N extends CollectionNameString>(
   createMutatorParams: CreateMutatorParams<N>,
 ): CreateCallbackProperties<N> => {
-  const {
-    currentUser = null,
-    collection,
-    context = createAnonymousContext(),
-    document
-  } = createMutatorParams;
+  const { currentUser = null, collection, context = createAnonymousContext(), document } = createMutatorParams;
 
   const schema = getSchema(collection);
 
   return {
-    currentUser, collection, context,
+    currentUser,
+    collection,
+    context,
     document: document as ObjectsByCollectionName[N], // Pretend this isn't Partial
     newDocument: document as ObjectsByCollectionName[N], // Pretend this isn't Partial
-    schema
+    schema,
   };
 };
 
@@ -69,15 +72,13 @@ const mutatorParamsToCallbackProps = <N extends CollectionNameString>(
  * Those may have side effects, depending on the collection!  If they do, you probably shouldn't use this.
  * (Let's please not write any more validation callbacks with side effects.)
  */
-export const validateCreateMutation = async <N extends CollectionNameString>(
-  mutatorParams: CreateMutatorParams<N>,
-) => {
+export const validateCreateMutation = async <N extends CollectionNameString>(mutatorParams: CreateMutatorParams<N>) => {
   let { document } = mutatorParams;
   const callbackProperties = mutatorParamsToCallbackProps(mutatorParams);
   const { collection, context, currentUser } = callbackProperties;
 
   const hooks = getCollectionHooks(collection.collectionName);
-  
+
   let validationErrors: Array<any> = [];
   validationErrors = validationErrors.concat(validateDocument(document, collection, context));
   // run validation callbacks
@@ -94,7 +95,7 @@ export const validateCreateMutation = async <N extends CollectionNameString>(
   });
   if (validationErrors.length) {
     console.log(validationErrors); // eslint-disable-line no-console
-    throwError({ id: 'app.validation_error', data: { break: true, errors: validationErrors } });
+    throwError({ id: "app.validation_error", data: { break: true, errors: validationErrors } });
   }
 
   return document;
@@ -105,25 +106,18 @@ export const validateCreateMutation = async <N extends CollectionNameString>(
  * Inserts an entry in a collection, and runs a bunch of callback functions to
  * fill in its denormalized fields etc. Input is a Partial<T>, because some
  * fields will be filled in by those callbacks; result is a T, but nothing
- * in the type system ensures that everything actually gets filled in. 
+ * in the type system ensures that everything actually gets filled in.
  */
 export const createMutator: CreateMutator = async <N extends CollectionNameString>(
   createMutatorParams: CreateMutatorParams<N>,
 ) => {
-  let {
-    collection,
-    document,
-    currentUser=null,
-    validate=true,
-    context,
-  } = createMutatorParams;
+  let { collection, document, currentUser = null, validate = true, context } = createMutatorParams;
   const logger = loggerConstructor(`mutators-${collection.collectionName.toLowerCase()}`);
-  logger('createMutator() begin')
-  logger('(new) document', document);
+  logger("createMutator() begin");
+  logger("(new) document", document);
   // If no context is provided, create a new one (so that callbacks will have
   // access to loaders)
-  if (!context)
-    context = createAnonymousContext();
+  if (!context) context = createAnonymousContext();
 
   const { collectionName } = collection;
   const schema = getSchema(collection);
@@ -147,17 +141,17 @@ export const createMutator: CreateMutator = async <N extends CollectionNameStrin
   if (validate) {
     document = await validateCreateMutation(createMutatorParams);
   } else {
-    logger('skipping validation')
+    logger("skipping validation");
   }
 
   // userId
-  // 
+  //
   // If user is logged in, check if userId field is in the schema and add it to
   // document if needed.
   // FIXME: This is a horrible hack; there's no good reason for this not to be
   // using the same callbacks as everything else.
   if (currentUser) {
-    const userIdInSchema = Object.keys(schema).find(key => key === 'userId');
+    const userIdInSchema = Object.keys(schema).find((key) => key === "userId");
     if (!!userIdInSchema && !(document as any).userId) {
       (document as any).userId = currentUser._id;
     }
@@ -173,7 +167,7 @@ export const createMutator: CreateMutator = async <N extends CollectionNameStrin
   note: clone arguments in case callbacks modify them
 
   */
-  logger('field onCreate/onInsert callbacks')
+  logger("field onCreate/onInsert callbacks");
   const start = Date.now();
   for (let fieldName of Object.keys(schema)) {
     let autoValue;
@@ -181,13 +175,13 @@ export const createMutator: CreateMutator = async <N extends CollectionNameStrin
     if (schemaField.onCreate) {
       // OpenCRUD backwards compatibility: keep both newDocument and data for now, but phase out newDocument eventually
       // eslint-disable-next-line no-await-in-loop
-      autoValue = await schemaField.onCreate({...properties, fieldName} as any); // eslint-disable-line no-await-in-loop
+      autoValue = await schemaField.onCreate({ ...properties, fieldName } as any); // eslint-disable-line no-await-in-loop
     } else if (schemaField.onInsert) {
       // OpenCRUD backwards compatibility
       autoValue = await schemaField.onInsert(clone(document) as any, currentUser); // eslint-disable-line no-await-in-loop
     }
-    if (typeof autoValue !== 'undefined') {
-      logger(`onCreate returned a value to insert for field ${fieldName}: ${autoValue}`)
+    if (typeof autoValue !== "undefined") {
+      logger(`onCreate returned a value to insert for field ${fieldName}: ${autoValue}`);
       Object.assign(document, { [fieldName]: autoValue });
     }
   }
@@ -210,32 +204,30 @@ export const createMutator: CreateMutator = async <N extends CollectionNameStrin
   Before
 
   */
-  logger('before callbacks')
-  logger('createBefore')
-  document = await hooks.createBefore.runCallbacks({
+  logger("before callbacks");
+  logger("createBefore");
+  document = (await hooks.createBefore.runCallbacks({
     iterator: document as ObjectsByCollectionName[N], // Pretend this isn't Partial
     properties: [properties],
-  }) as Partial<DbInsertion<ObjectsByCollectionName[N]>>;
-  logger('newBefore')
+  })) as Partial<DbInsertion<ObjectsByCollectionName[N]>>;
+  logger("newBefore");
   // OpenCRUD backwards compatibility
-  document = await hooks.newBefore.runCallbacks({
+  document = (await hooks.newBefore.runCallbacks({
     iterator: document as ObjectsByCollectionName[N], // Pretend this isn't Partial
-    properties: [
-      currentUser
-    ]
-  }) as Partial<DbInsertion<ObjectsByCollectionName[N]>>;
-  logger('newSync')
-  document = await hooks.newSync.runCallbacks({
+    properties: [currentUser],
+  })) as Partial<DbInsertion<ObjectsByCollectionName[N]>>;
+  logger("newSync");
+  document = (await hooks.newSync.runCallbacks({
     iterator: document as ObjectsByCollectionName[N], // Pretend this isn't Partial
-    properties: [currentUser]
-  }) as Partial<DbInsertion<ObjectsByCollectionName[N]>>;
+    properties: [currentUser],
+  })) as Partial<DbInsertion<ObjectsByCollectionName[N]>>;
 
   /*
 
   DB Operation
 
   */
-  logger('inserting into database');
+  logger("inserting into database");
   (document as any)._id = await Connectors.create(collection, document as ObjectsByCollectionName[N]);
 
   /*
@@ -244,24 +236,23 @@ export const createMutator: CreateMutator = async <N extends CollectionNameStrin
 
   */
   // run any post-operation sync callbacks
-  logger('after callbacks')
-  logger('createAfter')
-  document = await hooks.createAfter.runCallbacks({
+  logger("after callbacks");
+  logger("createAfter");
+  document = (await hooks.createAfter.runCallbacks({
     iterator: document as ObjectsByCollectionName[N], // Pretend this isn't Partial
     properties: [properties],
-  }) as Partial<DbInsertion<ObjectsByCollectionName[N]>>;
-  logger('newAfter')
+  })) as Partial<DbInsertion<ObjectsByCollectionName[N]>>;
+  logger("newAfter");
   // OpenCRUD backwards compatibility
-  document = await hooks.newAfter.runCallbacks({
+  document = (await hooks.newAfter.runCallbacks({
     iterator: document as ObjectsByCollectionName[N], // Pretend this isn't Partial
-    properties: [currentUser]
-  }) as Partial<DbInsertion<ObjectsByCollectionName[N]>>;
+    properties: [currentUser],
+  })) as Partial<DbInsertion<ObjectsByCollectionName[N]>>;
 
   // note: query for document to get fresh document with collection-hooks effects applied
   let completedDocument = document as ObjectsByCollectionName[N];
   const queryResult = await Connectors.get(collection, document._id);
-  if (queryResult)
-    completedDocument = queryResult;
+  if (queryResult) completedDocument = queryResult;
 
   /*
 
@@ -269,18 +260,12 @@ export const createMutator: CreateMutator = async <N extends CollectionNameStrin
 
   */
   // note: make sure properties.document is up to date
-  logger('async callbacks')
-  logger('createAsync')
-  await hooks.createAsync.runCallbacksAsync(
-    [{ ...properties, document: completedDocument }],
-  );
-  logger('newAsync')
+  logger("async callbacks");
+  logger("createAsync");
+  await hooks.createAsync.runCallbacksAsync([{ ...properties, document: completedDocument }]);
+  logger("newAsync");
   // OpenCRUD backwards compatibility
-  await hooks.newAsync.runCallbacksAsync([
-    completedDocument,
-    currentUser,
-    collection
-  ]);
+  await hooks.newAsync.runCallbacksAsync([completedDocument, currentUser, collection]);
 
   return { data: completedDocument };
 };
@@ -299,34 +284,33 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
   data: dataParam,
   set = {},
   unset = {},
-  currentUser=null,
-  validate=true,
+  currentUser = null,
+  validate = true,
   context,
   document: oldDocument,
 }: UpdateMutatorParams<N>) => {
   const { collectionName } = collection;
   const schema = getSchema(collection);
   const logger = loggerConstructor(`mutators-${collectionName.toLowerCase()}`);
-  logger('updateMutator() begin')
+  logger("updateMutator() begin");
 
   // If no context is provided, create a new one (so that callbacks will have
   // access to loaders)
-  if (!context)
-    context = createAnonymousContext();
+  if (!context) context = createAnonymousContext();
 
   // OpenCRUD backwards compatibility
   selector = selector || { _id: documentId };
   let data = dataParam || modifierToData({ $set: set, $unset: unset });
-  logger('update data', data)
-  
+  logger("update data", data);
+
   // Save the original mutation (before callbacks add more changes to it) for
   // logging in LWEvents
-  let origData = {...data};
+  let origData = { ...data };
 
   const hooks = getCollectionHooks(collectionName);
 
   if (isEmpty(selector)) {
-    throw new Error('Selector cannot be empty');
+    throw new Error("Selector cannot be empty");
   }
 
   // get original document from database or arguments
@@ -341,7 +325,7 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
   // FIXME: Filtering out null-valued fields here is a very sketchy, probably
   // wrong thing to do. This originates from Vulcan, and it's not clear why it's
   // doing it. Explicit cast to make it type-check anyways.
-  document = pickBy(document, f => f !== null) as any;
+  document = pickBy(document, (f) => f !== null) as any;
 
   /*
 
@@ -349,11 +333,14 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
 
   */
   const properties: UpdateCallbackProperties<N> = {
-    data: data||{},
+    data: data || {},
     oldDocument,
     document,
     newDocument: document,
-    currentUser, collection, context, schema
+    currentUser,
+    collection,
+    context,
+    schema,
   };
 
   /*
@@ -362,7 +349,7 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
 
   */
   if (validate) {
-    logger('validating')
+    logger("validating");
     let validationErrors: any = [];
 
     validationErrors = validationErrors.concat(validateData(data, document, collection, context));
@@ -378,18 +365,20 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
         iterator: dataToModifier(data),
         properties: [document, currentUser, validationErrors],
         ignoreExceptions: false,
-      })
+      }),
     );
 
     // LESSWRONG - added custom message (showing all validation errors instead of a generic message)
     if (validationErrors.length) {
       // eslint-disable-next-line no-console
-      console.log('// validationErrors:', validationErrors);
-      const EditDocumentValidationError = createError('app.validation_error', {message: JSON.stringify(validationErrors)});
-      throw new EditDocumentValidationError({data: { break: true, errors: validationErrors }});
+      console.log("// validationErrors:", validationErrors);
+      const EditDocumentValidationError = createError("app.validation_error", {
+        message: JSON.stringify(validationErrors),
+      });
+      throw new EditDocumentValidationError({ data: { break: true, errors: validationErrors } });
     }
   } else {
-    logger('skipping validation')
+    logger("skipping validation");
   }
 
   /*
@@ -397,23 +386,18 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
   onUpdate
 
   */
-  logger('field onUpdate/onEdit callbacks')
+  logger("field onUpdate/onEdit callbacks");
   for (let fieldName of Object.keys(schema)) {
     let autoValue;
     const schemaField = schema[fieldName];
     if (schemaField.onUpdate) {
-      autoValue = await schemaField.onUpdate({...properties, fieldName});
+      autoValue = await schemaField.onUpdate({ ...properties, fieldName });
     } else if (schemaField.onEdit) {
       // OpenCRUD backwards compatibility
-      autoValue = await schemaField.onEdit(
-        dataToModifier(clone(data)),
-        oldDocument,
-        currentUser,
-        document
-      );
+      autoValue = await schemaField.onEdit(dataToModifier(clone(data)), oldDocument, currentUser, document);
     }
-    if (typeof autoValue !== 'undefined') {
-      logger(`onUpdate returned a value to update for ${fieldName}: ${autoValue}`)
+    if (typeof autoValue !== "undefined") {
+      logger(`onUpdate returned a value to update for ${fieldName}: ${autoValue}`);
       data![fieldName] = autoValue;
     }
   }
@@ -423,34 +407,26 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
   Before
 
   */
-  logger('before callbacks')
-  logger('updateBefore')
+  logger("before callbacks");
+  logger("updateBefore");
   data = await hooks.updateBefore.runCallbacks({
     iterator: data,
     properties: [properties],
   });
-  logger('editBefore')
+  logger("editBefore");
   // OpenCRUD backwards compatibility
   data = modifierToData(
     await hooks.editBefore.runCallbacks({
       iterator: dataToModifier(data),
-      properties: [
-        oldDocument,
-        currentUser,
-        document
-      ]
-    })
+      properties: [oldDocument, currentUser, document],
+    }),
   );
-  logger('editSync')
+  logger("editSync");
   data = modifierToData(
     await hooks.editSync.runCallbacks({
       iterator: dataToModifier(data),
-      properties: [
-        oldDocument,
-        currentUser,
-        document
-      ]
-    })
+      properties: [oldDocument, currentUser, document],
+    }),
   );
 
   // update connector requires a modifier, so get it from data
@@ -471,13 +447,12 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
   */
   if (!isEmpty(modifier)) {
     // update document
-    logger('updating document')
+    logger("updating document");
     await Connectors.updateOne(collection, selector, modifier, { removeEmptyStrings: false });
 
     // get fresh copy of document from db
     const fetched = await Connectors.get(collection, selector);
-    if (!fetched)
-      throw new Error("Could not find updated document after applying update");
+    if (!fetched) throw new Error("Could not find updated document after applying update");
     document = fetched;
 
     // TODO: add support for caching by other indexes to Dataloader
@@ -493,20 +468,17 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
   After
 
   */
-  logger('after callbacks')
-  logger('updateAfter')
+  logger("after callbacks");
+  logger("updateAfter");
   document = await hooks.updateAfter.runCallbacks({
     iterator: document,
     properties: [properties],
   });
-  logger('editAfter')
+  logger("editAfter");
   // OpenCRUD backwards compatibility
   document = await hooks.editAfter.runCallbacks({
     iterator: document,
-    properties: [
-      oldDocument,
-      currentUser
-    ]
+    properties: [oldDocument, currentUser],
   });
 
   /*
@@ -515,19 +487,14 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
 
   */
   // run async callbacks
-  logger('async callbacks')
-  logger('updateAsync')
+  logger("async callbacks");
+  logger("updateAsync");
   await hooks.updateAsync.runCallbacksAsync([properties]);
   // OpenCRUD backwards compatibility
-  logger('editAsync')
-  await hooks.editAsync.runCallbacksAsync([
-    document,
-    oldDocument,
-    currentUser,
-    collection
-  ]);
-  
-  void logFieldChanges({currentUser, collection, oldDocument, data: origData});
+  logger("editAsync");
+  await hooks.editAsync.runCallbacksAsync([document, oldDocument, currentUser, collection]);
+
+  void logFieldChanges({ currentUser, collection, oldDocument, data: origData });
 
   return { data: document };
 };
@@ -541,8 +508,8 @@ export const deleteMutator: DeleteMutator = async <N extends CollectionNameStrin
   collection,
   documentId,
   selector,
-  currentUser=null,
-  validate=true,
+  currentUser = null,
+  validate = true,
   context,
   document,
 }: DeleteMutatorParams<N>) => {
@@ -555,11 +522,10 @@ export const deleteMutator: DeleteMutator = async <N extends CollectionNameStrin
 
   // If no context is provided, create a new one (so that callbacks will have
   // access to loaders)
-  if (!context)
-    context = createAnonymousContext();
+  if (!context) context = createAnonymousContext();
 
   if (isEmpty(selector)) {
-    throw new Error('Selector cannot be empty');
+    throw new Error("Selector cannot be empty");
   }
 
   document = document || (await Connectors.get(collection, selector));
@@ -597,7 +563,7 @@ export const deleteMutator: DeleteMutator = async <N extends CollectionNameStrin
 
     if (validationErrors.length) {
       console.log(validationErrors); // eslint-disable-line no-console
-      throwError({ id: 'app.validation_error', data: { break: true, errors: validationErrors } });
+      throwError({ id: "app.validation_error", data: { break: true, errors: validationErrors } });
     }
   }
 
@@ -625,11 +591,11 @@ export const deleteMutator: DeleteMutator = async <N extends CollectionNameStrin
   // OpenCRUD backwards compatibility
   await hooks.removeBefore.runCallbacks({
     iterator: document,
-    properties: [currentUser]
+    properties: [currentUser],
   });
   await hooks.removeSync.runCallbacks({
     iterator: document,
-    properties: [currentUser]
+    properties: [currentUser],
   });
 
   /*
@@ -652,11 +618,7 @@ export const deleteMutator: DeleteMutator = async <N extends CollectionNameStrin
   */
   await hooks.deleteAsync.runCallbacksAsync([properties]);
   // OpenCRUD backwards compatibility
-  await hooks.removeAsync.runCallbacksAsync([
-    document,
-    currentUser,
-    collection
-  ]);
+  await hooks.removeAsync.runCallbacksAsync([document, currentUser, collection]);
 
   return { data: document };
 };

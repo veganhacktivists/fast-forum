@@ -1,26 +1,42 @@
-import React from 'react';
-import { registerComponent, Components } from '../../../lib/vulcan-lib';
-import { userGetDisplayName, userCanModeratePost } from '../../../lib/collections/users/helpers';
-import { useSingle } from '../../../lib/crud/withSingle';
+import React from "react";
+import { registerComponent, Components } from "../../../lib/vulcan-lib";
+import { userGetDisplayName, userCanModeratePost } from "../../../lib/collections/users/helpers";
+import { useSingle } from "../../../lib/crud/withSingle";
 
-const CommentActions = ({currentUser, comment, post, tag, showEdit}: {
-  currentUser: UsersCurrent, // Must be logged in
-  comment: CommentsList,
-  post?: PostsMinimumInfo,
-  tag?: TagBasicInfo,
-  showEdit: ()=>void,
+const CommentActions = ({
+  currentUser,
+  comment,
+  post,
+  tag,
+  showEdit,
+}: {
+  currentUser: UsersCurrent; // Must be logged in
+  comment: CommentsList;
+  post?: PostsMinimumInfo;
+  tag?: TagBasicInfo;
+  showEdit: () => void;
 }) => {
   const {
-    EditCommentDropdownItem, ReportCommentDropdownItem, DeleteCommentDropdownItem,
-    RetractCommentDropdownItem, BanUserFromAllPostsDropdownItem, DropdownDivider,
-    MoveToAlignmentCommentDropdownItem, SuggestAlignmentCommentDropdownItem,
-    BanUserFromAllPersonalPostsDropdownItem, MoveToAnswersDropdownItem,
-    ToggleIsModeratorCommentDropdownItem, PinToProfileDropdownItem,
-    DropdownMenu, NotifyMeDropdownItem, ShortformFrontpageDropdownItem,
-    BanUserFromPostDropdownItem, LockThreadDropdownItem,
+    EditCommentDropdownItem,
+    ReportCommentDropdownItem,
+    DeleteCommentDropdownItem,
+    RetractCommentDropdownItem,
+    BanUserFromAllPostsDropdownItem,
+    DropdownDivider,
+    MoveToAlignmentCommentDropdownItem,
+    SuggestAlignmentCommentDropdownItem,
+    BanUserFromAllPersonalPostsDropdownItem,
+    MoveToAnswersDropdownItem,
+    ToggleIsModeratorCommentDropdownItem,
+    PinToProfileDropdownItem,
+    DropdownMenu,
+    NotifyMeDropdownItem,
+    ShortformFrontpageDropdownItem,
+    BanUserFromPostDropdownItem,
+    LockThreadDropdownItem,
   } = Components;
 
-  const {document: postDetails} = useSingle({
+  const { document: postDetails } = useSingle({
     skip: !post,
     documentId: post?._id,
     collectionName: "Posts",
@@ -30,15 +46,14 @@ const CommentActions = ({currentUser, comment, post, tag, showEdit}: {
 
   const enableSubscribeToPost = Boolean(
     post &&
-    comment.shortform &&
-    !comment.topLevelCommentId &&
-    (comment.user?._id && (comment.user._id !== currentUser._id))
+      comment.shortform &&
+      !comment.topLevelCommentId &&
+      comment.user?._id &&
+      comment.user._id !== currentUser._id,
   );
 
   const enableSubscribeToCommentUser = Boolean(
-    comment.user?._id &&
-    (comment.user._id !== currentUser._id) &&
-    !comment.deleted
+    comment.user?._id && comment.user._id !== currentUser._id && !comment.deleted,
   );
 
   // WARNING: Clickable items in this menu must be full-width, and
@@ -76,11 +91,7 @@ const CommentActions = ({currentUser, comment, post, tag, showEdit}: {
       <MoveToAlignmentCommentDropdownItem comment={comment} post={postDetails} />
       <SuggestAlignmentCommentDropdownItem comment={comment} post={postDetails} />
 
-      {postDetails &&
-        userCanModeratePost(currentUser, postDetails) &&
-        postDetails.user &&
-          <DropdownDivider />
-      }
+      {postDetails && userCanModeratePost(currentUser, postDetails) && postDetails.user && <DropdownDivider />}
 
       <MoveToAnswersDropdownItem comment={comment} post={postDetails} />
       <ShortformFrontpageDropdownItem comment={comment} />
@@ -93,12 +104,12 @@ const CommentActions = ({currentUser, comment, post, tag, showEdit}: {
       <ToggleIsModeratorCommentDropdownItem comment={comment} />
     </DropdownMenu>
   );
-}
+};
 
 const CommentActionsComponent = registerComponent("CommentActions", CommentActions);
 
 declare global {
   interface ComponentTypes {
-    CommentActions: typeof CommentActionsComponent,
+    CommentActions: typeof CommentActionsComponent;
   }
 }

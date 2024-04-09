@@ -1,25 +1,27 @@
-import React, { useState, useCallback } from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { useCurrentUser } from '../common/withUser';
-import { Link } from '../../lib/reactRouterWrapper';
-import classNames from 'classnames';
-import { getRecommendationSettings } from './RecommendationsAlgorithmPicker'
-import { useContinueReading } from './withContinueReading';
-import {AnalyticsContext, useTracking} from "../../lib/analyticsEvents";
-import { isLW, isEAForum } from '../../lib/instanceSettings';
-import type { RecommendationsAlgorithm } from '../../lib/collections/users/recommendationSettings';
-import { useExpandedFrontpageSection } from '../hooks/useExpandedFrontpageSection';
-import { SHOW_RECOMMENDATIONS_SECTION_COOKIE } from '../../lib/cookies/cookies';
-import { isFriendlyUI } from '../../themes/forumTheme';
+import React, { useState, useCallback } from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useCurrentUser } from "../common/withUser";
+import { Link } from "../../lib/reactRouterWrapper";
+import classNames from "classnames";
+import { getRecommendationSettings } from "./RecommendationsAlgorithmPicker";
+import { useContinueReading } from "./withContinueReading";
+import { AnalyticsContext, useTracking } from "../../lib/analyticsEvents";
+import { isLW, isEAForum } from "../../lib/instanceSettings";
+import type { RecommendationsAlgorithm } from "../../lib/collections/users/recommendationSettings";
+import { useExpandedFrontpageSection } from "../hooks/useExpandedFrontpageSection";
+import { SHOW_RECOMMENDATIONS_SECTION_COOKIE } from "../../lib/cookies/cookies";
+import { isFriendlyUI } from "../../themes/forumTheme";
 
-export const curatedUrl = "/recommendations"
+export const curatedUrl = "/recommendations";
 
 const styles = (theme: ThemeType): JssStyles => ({
-  section: isFriendlyUI ? {} : {
-    marginTop: -12,
-  },
+  section: isFriendlyUI
+    ? {}
+    : {
+        marginTop: -12,
+      },
   continueReadingList: {
-    marginBottom: theme.spacing.unit*2,
+    marginBottom: theme.spacing.unit * 2,
   },
   subsection: {
     marginBottom: theme.spacing.unit,
@@ -28,9 +30,9 @@ const styles = (theme: ThemeType): JssStyles => ({
     display: "flex",
     justifyContent: "flex-end",
     marginTop: 12,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       justifyContent: "center",
-    }
+    },
   },
   footer: {
     color: theme.palette.grey[600],
@@ -42,46 +44,46 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   loggedOutFooter: {
     maxWidth: 450,
-    marginLeft: "auto"
+    marginLeft: "auto",
   },
   largeScreenLoggedOutSequences: {
     marginTop: 2,
     marginBottom: 2,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       display: "none",
     },
   },
   smallScreenLoggedOutSequences: {
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up("md")]: {
       display: "none",
     },
   },
   loggedOutCustomizeLabel: {
     fontSize: "1rem",
-    fontStyle: "italic"
+    fontStyle: "italic",
   },
   posts: {
     boxShadow: theme.palette.boxShadow.default,
   },
   curated: {
-    marginTop: 12
+    marginTop: 12,
   },
   expandIcon: {
-    position: 'relative',
+    position: "relative",
     top: 3,
     left: 10,
     fontSize: 16,
-    cursor: 'pointer',
-    '&:hover': {
+    cursor: "pointer",
+    "&:hover": {
       color: theme.palette.grey[800],
-    }
+    },
   },
   readMoreLink: {
     fontSize: 14,
     color: theme.palette.grey[600],
     fontWeight: 600,
-    '@media (max-width: 350px)': {
-      display: 'none'
+    "@media (max-width: 350px)": {
+      display: "none",
     },
     ...(isFriendlyUI && {
       "&:hover": {
@@ -95,34 +97,28 @@ const styles = (theme: ThemeType): JssStyles => ({
 const getFrontPageOverwrites = (haveCurrentUser: boolean): Partial<RecommendationsAlgorithm> => {
   if (isFriendlyUI) {
     return {
-      method: haveCurrentUser ? 'sample' : 'top',
-      count: haveCurrentUser ? 3 : 5
-    }
+      method: haveCurrentUser ? "sample" : "top",
+      count: haveCurrentUser ? 3 : 5,
+    };
   }
   if (isLW) {
     return {
       lwRationalityOnly: true,
-      method: 'sample',
-      count: haveCurrentUser ? 3 : 2
-    }
+      method: "sample",
+      count: haveCurrentUser ? 3 : 2,
+    };
   }
   return {
-    method: 'sample',
-    count: haveCurrentUser ? 3 : 2
-  }
-}
+    method: "sample",
+    count: haveCurrentUser ? 3 : 2,
+  };
+};
 
 // NOTE: this component maybe should be deprecated. It first was created for LessWrong, then EA Forum added a bunch of special cases, then LW added
 // more special cases. I split it off into a LWRecommendations component, it looks like EA Forum isn't currently using this component. They could either \
 // create an EARecommendations component, or we can just delete it.
-const RecommendationsAndCurated = ({
-  configName,
-  classes,
-}: {
-  configName: string,
-  classes: ClassesType,
-}) => {
-  const {expanded, toggleExpanded} = useExpandedFrontpageSection({
+const RecommendationsAndCurated = ({ configName, classes }: { configName: string; classes: ClassesType }) => {
+  const { expanded, toggleExpanded } = useExpandedFrontpageSection({
     section: "recommendations",
     onExpandEvent: "recommendationsSectionExpanded",
     onCollapseEvent: "recommendationsSectionCollapsed",
@@ -134,60 +130,84 @@ const RecommendationsAndCurated = ({
   const [showSettings, setShowSettings] = useState(false);
   const [settingsState, setSettings] = useState<any>(null);
 
-  const {continueReading} = useContinueReading();
-  const { captureEvent } = useTracking({eventProps: {pageSectionContext: "recommendations"}});
+  const { continueReading } = useContinueReading();
+  const { captureEvent } = useTracking({ eventProps: { pageSectionContext: "recommendations" } });
 
   const toggleSettings = useCallback(() => {
-    captureEvent("toggleSettings", {action: !showSettings})
+    captureEvent("toggleSettings", { action: !showSettings });
     setShowSettings(!showSettings);
   }, [showSettings, captureEvent, setShowSettings]);
 
   const render = () => {
-    const { DismissibleSpotlightItem, RecommendationsAlgorithmPicker, SingleColumnSection, SettingsButton, ContinueReadingList,
-      RecommendationsList, SectionTitle, SectionSubtitle, BookmarksList, LWTooltip, CuratedPostsList, ForumIcon } = Components;
+    const {
+      DismissibleSpotlightItem,
+      RecommendationsAlgorithmPicker,
+      SingleColumnSection,
+      SettingsButton,
+      ContinueReadingList,
+      RecommendationsList,
+      SectionTitle,
+      SectionSubtitle,
+      BookmarksList,
+      LWTooltip,
+      CuratedPostsList,
+      ForumIcon,
+    } = Components;
 
-    const settings = getRecommendationSettings({settings: settingsState, currentUser, configName})
+    const settings = getRecommendationSettings({ settings: settingsState, currentUser, configName });
     const frontpageRecommendationSettings: RecommendationsAlgorithm = {
       ...settings,
-      ...getFrontPageOverwrites(!!currentUser)
-    }
+      ...getFrontPageOverwrites(!!currentUser),
+    };
 
-    const continueReadingTooltip = <div>
-      <div>The next posts in sequences you've started reading, but not finished.</div>
-    </div>
+    const continueReadingTooltip = (
+      <div>
+        <div>The next posts in sequences you've started reading, but not finished.</div>
+      </div>
+    );
 
-    const bookmarksTooltip = <div>
-      <div>Individual posts that you've {isFriendlyUI ? 'saved' : 'bookmarked'}</div>
-      <div><em>(Click to see all)</em></div>
-    </div>
+    const bookmarksTooltip = (
+      <div>
+        <div>Individual posts that you've {isFriendlyUI ? "saved" : "bookmarked"}</div>
+        <div>
+          <em>(Click to see all)</em>
+        </div>
+      </div>
+    );
 
     // Disabled during 2018 Review [and coronavirus]
-    const recommendationsTooltip = <div>
+    const recommendationsTooltip = (
       <div>
-        {isEAForum ?
-          'Assorted suggested reading, including some of the ' :
-          'Recently curated posts, as well as a random sampling of '}
-        top-rated posts of all time
-        {settings.onlyUnread && " that you haven't read yet"}.
+        <div>
+          {isEAForum
+            ? "Assorted suggested reading, including some of the "
+            : "Recently curated posts, as well as a random sampling of "}
+          top-rated posts of all time
+          {settings.onlyUnread && " that you haven't read yet"}.
+        </div>
+        <div>
+          <em>(Click to see more recommendations)</em>
+        </div>
       </div>
-      <div><em>(Click to see more recommendations)</em></div>
-    </div>
+    );
 
-    const renderBookmarks = !isEAForum && ((currentUser?.bookmarkedPostsMetadata?.length || 0) > 0) && !settings.hideBookmarks
-    const renderContinueReading = !isEAForum && currentUser && (continueReading?.length > 0) && !settings.hideContinueReading
-    
-    const renderRecommendations = !settings.hideFrontpage
+    const renderBookmarks =
+      !isEAForum && (currentUser?.bookmarkedPostsMetadata?.length || 0) > 0 && !settings.hideBookmarks;
+    const renderContinueReading =
+      !isEAForum && currentUser && continueReading?.length > 0 && !settings.hideContinueReading;
 
-    const bookmarksLimit = (settings.hideFrontpage && settings.hideContinueReading) ? 6 : 3
+    const renderRecommendations = !settings.hideFrontpage;
 
-    const titleText = isEAForum ? "Classic posts" : "Recommendations"
+    const bookmarksLimit = settings.hideFrontpage && settings.hideContinueReading ? 6 : 3;
+
+    const titleText = isEAForum ? "Classic posts" : "Recommendations";
     const titleNode = (
       <div className={classes.title}>
         <SectionTitle
           title={
             <>
               {isEAForum ? (
-                <>{ titleText }</>
+                <>{titleText}</>
               ) : (
                 <LWTooltip title={recommendationsTooltip} placement="left">
                   <Link to={"/recommendations"}>{titleText}</Link>
@@ -299,27 +319,32 @@ const RecommendationsAndCurated = ({
       </>
     );
 
-    return <SingleColumnSection className={classes.section}>
-      <AnalyticsContext pageSectionContext="recommendations">
-        {titleNode}
-        {showSettings &&
-          <RecommendationsAlgorithmPicker
-            configName={configName}
-            settings={frontpageRecommendationSettings}
-            onChange={(newSettings) => setSettings(newSettings)}
-          /> }
-        {(expanded || !isEAForum) && bodyNode}
-      </AnalyticsContext>
-    </SingleColumnSection>
-  }
+    return (
+      <SingleColumnSection className={classes.section}>
+        <AnalyticsContext pageSectionContext="recommendations">
+          {titleNode}
+          {showSettings && (
+            <RecommendationsAlgorithmPicker
+              configName={configName}
+              settings={frontpageRecommendationSettings}
+              onChange={(newSettings) => setSettings(newSettings)}
+            />
+          )}
+          {(expanded || !isEAForum) && bodyNode}
+        </AnalyticsContext>
+      </SingleColumnSection>
+    );
+  };
 
   return render();
-}
+};
 
-const RecommendationsAndCuratedComponent = registerComponent("RecommendationsAndCurated", RecommendationsAndCurated, {styles});
+const RecommendationsAndCuratedComponent = registerComponent("RecommendationsAndCurated", RecommendationsAndCurated, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    RecommendationsAndCurated: typeof RecommendationsAndCuratedComponent
+    RecommendationsAndCurated: typeof RecommendationsAndCuratedComponent;
   }
 }

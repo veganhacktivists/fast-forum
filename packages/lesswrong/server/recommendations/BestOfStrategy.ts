@@ -9,22 +9,18 @@ import { RecommendationResult } from "./RecommendationStrategy";
  */
 class BestOfStrategy extends FeatureStrategy {
   async recommend(
-    currentUser: DbUser|null,
+    currentUser: DbUser | null,
     count: number,
     strategy: StrategySpecification,
   ): Promise<RecommendationResult> {
-    return super.recommend(
-      currentUser,
-      count,
-      {
-        ...strategy,
-        features: [
-          {feature: "karma", weight: 1},
-          {feature: "curated", weight: 0.05},
-        ],
-      },
-    );
-  };
+    return super.recommend(currentUser, count, {
+      ...strategy,
+      features: [
+        { feature: "karma", weight: 1 },
+        { feature: "curated", weight: 0.05 },
+      ],
+    });
+  }
 }
 
 export default BestOfStrategy;

@@ -7,11 +7,7 @@ import Table from "./Table";
  */
 class DropDefaultValueQuery<T extends DbObject> extends Query<T> {
   constructor(table: Table<T>, fieldName: string) {
-    super(table, [
-      "ALTER TABLE",
-      table,
-      `ALTER COLUMN "${fieldName}" DROP DEFAULT`,
-    ]);
+    super(table, ["ALTER TABLE", table, `ALTER COLUMN "${fieldName}" DROP DEFAULT`]);
   }
 }
 

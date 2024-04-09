@@ -76,38 +76,27 @@ const PostsPageRecommendationItem = ({
   className,
   classes,
 }: {
-  post: PostsListWithVotesAndSequence,
+  post: PostsListWithVotesAndSequence;
   // This prop is not used, but is required to be compatible with RecommendationsList
-  translucentBackground?: boolean,
-  disableAnalytics?: boolean,
-  className?: string,
-  classes: ClassesType,
+  translucentBackground?: boolean;
+  disableAnalytics?: boolean;
+  className?: string;
+  classes: ClassesType;
 }) => {
   const postLink = postGetPageUrl(post, false, post.canonicalSequence?._id);
-  const {onClick: onClickCell} = useClickableCell({href: postLink});
-  const {ref, onClick} = useRecommendationAnalytics(
-    post._id,
-    onClickCell,
-    disableAnalytics,
-  );
+  const { onClick: onClickCell } = useClickableCell({ href: postLink });
+  const { ref, onClick } = useRecommendationAnalytics(post._id, onClickCell, disableAnalytics);
 
-  const {
-    PostsItemTooltipWrapper, KarmaDisplay, PostsTitle, UsersName, LWTooltip,
-    PostActionsButton,
-  } = Components;
+  const { PostsItemTooltipWrapper, KarmaDisplay, PostsTitle, UsersName, LWTooltip, PostActionsButton } = Components;
 
-  const TitleWrapper: FC = ({children}) => (
+  const TitleWrapper: FC = ({ children }) => (
     <PostsItemTooltipWrapper post={post} As="span">
       <Link to={postLink}>{children}</Link>
     </PostsItemTooltipWrapper>
   );
 
   return (
-    <div
-      onClick={onClick}
-      ref={ref}
-      className={classNames(classes.root, className)}
-    >
+    <div onClick={onClick} ref={ref} className={classNames(classes.root, className)}>
       <div className={classes.karma}>
         <div>
           <KarmaDisplay document={post} />
@@ -117,31 +106,25 @@ const PostsPageRecommendationItem = ({
         </div>
       </div>
       <div className={classes.titleContainer}>
-        <PostsTitle
-          post={post}
-          Wrapper={TitleWrapper}
-          isLink={false}
-          curatedIconLeft
-          className={classes.title}
-        />
+        <PostsTitle post={post} Wrapper={TitleWrapper} isLink={false} curatedIconLeft className={classes.title} />
         <div className={classes.author}>
           <InteractionWrapper className={classes.interactionWrapper}>
             <UsersName user={post.user} />
-            {post.coauthors?.length > 0 &&
+            {post.coauthors?.length > 0 && (
               <LWTooltip
                 title={
                   <div>
-                    {post.coauthors.map((coauthor, i) =>
+                    {post.coauthors.map((coauthor, i) => (
                       <div key={i}>
                         <UsersName user={coauthor} />
                       </div>
-                    )}
+                    ))}
                   </div>
                 }
               >
                 <span className={classes.coauthors}>+{post.coauthors.length} more</span>
               </LWTooltip>
-            }
+            )}
           </InteractionWrapper>
         </div>
       </div>
@@ -152,16 +135,16 @@ const PostsPageRecommendationItem = ({
       </div>
     </div>
   );
-}
+};
 
 const PostsPageRecommendationItemComponent = registerComponent(
   "PostsPageRecommendationItem",
   PostsPageRecommendationItem,
-  {styles},
+  { styles },
 );
 
 declare global {
   interface ComponentTypes {
-    PostsPageRecommendationItem: typeof PostsPageRecommendationItemComponent
+    PostsPageRecommendationItem: typeof PostsPageRecommendationItemComponent;
   }
 }

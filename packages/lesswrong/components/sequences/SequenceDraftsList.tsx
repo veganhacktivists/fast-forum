@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { useLocation } from '../../lib/routeUtil';
-import { useMulti } from '../../lib/crud/withMulti';
-import { useCurrentUser } from '../common/withUser';
-import { sortings } from '../posts/DraftsList';
+import React, { useState } from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useLocation } from "../../lib/routeUtil";
+import { useMulti } from "../../lib/crud/withMulti";
+import { useCurrentUser } from "../common/withUser";
+import { sortings } from "../posts/DraftsList";
 
 const styles = (theme: ThemeType): JssStyles => ({
   item: {
@@ -13,25 +13,32 @@ const styles = (theme: ThemeType): JssStyles => ({
     cursor: "pointer",
     minWidth: 400,
   },
-  [theme.breakpoints.down('xs')]: {
+  [theme.breakpoints.down("xs")]: {
     item: {
       minWidth: 230,
     },
-  }
-})
+  },
+});
 
-const SequenceDraftsList = ({limit, title="My Drafts", userId, classes, addDraft, dialogPostIds}: {
-  classes: ClassesType,
-  limit: number,
-  title?: string,
-  userId?: string,
-  addDraft: Function,
-  dialogPostIds: string[],
+const SequenceDraftsList = ({
+  limit,
+  title = "My Drafts",
+  userId,
+  classes,
+  addDraft,
+  dialogPostIds,
+}: {
+  classes: ClassesType;
+  limit: number;
+  title?: string;
+  userId?: string;
+  addDraft: Function;
+  dialogPostIds: string[];
 }) => {
   const [showSettings, setShowSettings] = useState(false);
   const currentUser = useCurrentUser();
-  const { Loading } = Components
-  
+  const { Loading } = Components;
+
   const { query } = useLocation();
 
   const currentSorting = query.sortDraftsBy ?? query.view ?? currentUser?.draftsListSorting ?? "lastModified";
@@ -41,51 +48,64 @@ const SequenceDraftsList = ({limit, title="My Drafts", userId, classes, addDraft
     userId: userId ?? currentUser?._id,
     limit,
     sortDraftsBy: currentSorting,
-    includeArchived: !!query.includeArchived ? (query.includeArchived === 'true') : currentUser?.draftsListShowArchived,
-    includeShared: !!query.includeShared ? (query.includeShared === 'true') : (currentUser?.draftsListShowShared !== false),
-  }
-  
+    includeArchived: !!query.includeArchived ? query.includeArchived === "true" : currentUser?.draftsListShowArchived,
+    includeShared: !!query.includeShared ? query.includeShared === "true" : currentUser?.draftsListShowShared !== false,
+  };
+
   const { results, loading, loadMoreProps } = useMulti({
     terms,
     collectionName: "Posts",
-    fragmentName: 'PostsList',
-    fetchPolicy: 'cache-and-network',
+    fragmentName: "PostsList",
+    fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
 
-  if (!currentUser) return null
+  if (!currentUser) return null;
 
-  return <>
-    {(!results && loading) ? <Loading /> : <>
-      <Components.SectionTitle title={title} noTopMargin={true}>
-        <div onClick={() => setShowSettings(!showSettings)}>
-          <Components.SettingsButton label={`Sorted by ${ sortings[currentSorting]}`}/>
-        </div>
-      </Components.SectionTitle>
-      {showSettings && <Components.DraftsListSettings
-        hidden={false}
-        persistentSettings={true}
-        currentSorting={currentSorting}
-        currentIncludeArchived={!!terms.includeArchived}
-        currentIncludeShared={!!terms.includeShared}
-        sortings={sortings}
-      />}
-      {results && results.map((post: PostsList) =>
-        <li key={post._id} className={classes.item} onClick={() => addDraft(post._id)} >
-          <Components.PostsItemWrapper documentId={post._id} addItem={addDraft} disabled={dialogPostIds.includes(post._id)} simpleAuthor={true} draggable={false} />
-        </li>
+  return (
+    <>
+      {!results && loading ? (
+        <Loading />
+      ) : (
+        <>
+          <Components.SectionTitle title={title} noTopMargin={true}>
+            <div onClick={() => setShowSettings(!showSettings)}>
+              <Components.SettingsButton label={`Sorted by ${sortings[currentSorting]}`} />
+            </div>
+          </Components.SectionTitle>
+          {showSettings && (
+            <Components.DraftsListSettings
+              hidden={false}
+              persistentSettings={true}
+              currentSorting={currentSorting}
+              currentIncludeArchived={!!terms.includeArchived}
+              currentIncludeShared={!!terms.includeShared}
+              sortings={sortings}
+            />
+          )}
+          {results &&
+            results.map((post: PostsList) => (
+              <li key={post._id} className={classes.item} onClick={() => addDraft(post._id)}>
+                <Components.PostsItemWrapper
+                  documentId={post._id}
+                  addItem={addDraft}
+                  disabled={dialogPostIds.includes(post._id)}
+                  simpleAuthor={true}
+                  draggable={false}
+                />
+              </li>
+            ))}
+        </>
       )}
-    </>}
-    <Components.LoadMore { ...loadMoreProps } />
-  </>
-}
+      <Components.LoadMore {...loadMoreProps} />
+    </>
+  );
+};
 
-const SequenceDraftsListComponent = registerComponent(
-  'SequenceDraftsList', SequenceDraftsList, {styles}
-);
+const SequenceDraftsListComponent = registerComponent("SequenceDraftsList", SequenceDraftsList, { styles });
 
 declare global {
   interface ComponentTypes {
-    SequenceDraftsList: typeof SequenceDraftsListComponent
+    SequenceDraftsList: typeof SequenceDraftsListComponent;
   }
 }

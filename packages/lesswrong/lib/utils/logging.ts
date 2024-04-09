@@ -16,26 +16,30 @@
  * 'db-comments-find']`, or in your instance settings (settings-$env.json),
  * setting `instanceDebuggers` to the same.
  */
-import util from 'util'
-import { PublicInstanceSetting } from '../instanceSettings'
-import { DatabasePublicSetting } from '../publicSettings'
+import util from "util";
+import { PublicInstanceSetting } from "../instanceSettings";
+import { DatabasePublicSetting } from "../publicSettings";
 
-const databaseDebuggersSetting = new DatabasePublicSetting<string[]>('debuggers', [])
-const instanceDebuggersSetting = new PublicInstanceSetting<string[]>('instanceDebuggers', [], 'optional')
-const instanceDebuggers = instanceDebuggersSetting.get()
+const databaseDebuggersSetting = new DatabasePublicSetting<string[]>("debuggers", []);
+const instanceDebuggersSetting = new PublicInstanceSetting<string[]>("instanceDebuggers", [], "optional");
+const instanceDebuggers = instanceDebuggersSetting.get();
 
-type Logger = (...args: any[]) => void
+type Logger = (...args: any[]) => void;
 
-const manuallyEnabledDebuggers: string[] = []
+const manuallyEnabledDebuggers: string[] = [];
 
 const scopeIsActive = (scope: string): boolean => {
   // We only need to re-check the cache for database settings. Changing instance
   // settings requires a rebuild
-  if (databaseDebuggersSetting.get().includes(scope) || instanceDebuggers.includes(scope) || manuallyEnabledDebuggers.includes(scope)) {
-    return true
+  if (
+    databaseDebuggersSetting.get().includes(scope) ||
+    instanceDebuggers.includes(scope) ||
+    manuallyEnabledDebuggers.includes(scope)
+  ) {
+    return true;
   }
-  return false
-}
+  return false;
+};
 
 // See the file docstring for documentation
 export const loggerConstructor = (scope: string): Logger => {
@@ -43,16 +47,16 @@ export const loggerConstructor = (scope: string): Logger => {
     // We check the settings here, utilizing the get function's cacheing and
     // cache-refreshing features
     if (scopeIsActive(scope)) {
-      let formattedArgs = args
+      let formattedArgs = args;
       if (util?.inspect) {
         // Full-depth object logging
-        formattedArgs = args.map(a => typeof a === 'object' ? util.inspect(a, false, null) : a)
+        formattedArgs = args.map((a) => (typeof a === "object" ? util.inspect(a, false, null) : a));
       }
       // eslint-disable-next-line no-console
-      console.log(`[${scope}]`, ...formattedArgs)
+      console.log(`[${scope}]`, ...formattedArgs);
     }
-  }
-}
+  };
+};
 
 // Mostly this is to re-implement Vulcan functionality, but it actually seems
 // quite nice and we should use it more
@@ -61,14 +65,14 @@ export const logGroupConstructor = (scope: string) => {
     logGroupStart: (...args: any[]) => {
       if (scopeIsActive(scope)) {
         // eslint-disable-next-line no-console
-        console.groupCollapsed(`[${scope}]`, ...args)
+        console.groupCollapsed(`[${scope}]`, ...args);
       }
     },
     logGroupEnd: () => {
       if (scopeIsActive(scope)) {
         // eslint-disable-next-line no-console
-        console.groupEnd()
+        console.groupEnd();
       }
-    }
-  }
-}
+    },
+  };
+};

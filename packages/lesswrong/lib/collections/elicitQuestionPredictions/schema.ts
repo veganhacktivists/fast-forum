@@ -1,11 +1,11 @@
-import SimpleSchema from 'simpl-schema';
-import { foreignKeyField, resolverOnlyField } from '../../utils/schemaUtils';
+import SimpleSchema from "simpl-schema";
+import { foreignKeyField, resolverOnlyField } from "../../utils/schemaUtils";
 
 const commonFields = (nullable: boolean) => ({
   hidden: true,
-  canCreate: ['admins' as const],
-  canRead: ['guests' as const],
-  canUpdate: ['admins' as const],
+  canCreate: ["admins" as const],
+  canRead: ["guests" as const],
+  canUpdate: ["admins" as const],
   optional: nullable,
   nullable,
 });
@@ -14,13 +14,13 @@ const creatorSchema = new SimpleSchema({
   _id: { type: String },
   displayName: { type: String },
   isQuestionCreator: { type: Boolean },
-  sourceUserId: { type: String, nullable: true, optional: true }
+  sourceUserId: { type: String, nullable: true, optional: true },
 });
 
 const schema: SchemaType<"ElicitQuestionPredictions"> = {
   _id: {
     type: String,
-    ...commonFields(false)
+    ...commonFields(false),
   },
   predictionId: resolverOnlyField({
     type: String,
@@ -28,48 +28,48 @@ const schema: SchemaType<"ElicitQuestionPredictions"> = {
   }),
   prediction: {
     type: Number,
-    ...commonFields(false)
+    ...commonFields(false),
   },
   createdAt: {
     type: Date,
     onInsert: (prediction) => prediction.createdAt ?? new Date(),
-    ...commonFields(false)
+    ...commonFields(false),
   },
   notes: {
     type: String,
-    ...commonFields(true)
+    ...commonFields(true),
   },
   creator: {
     type: creatorSchema,
-    ...commonFields(false)
+    ...commonFields(false),
   },
   userId: {
     ...foreignKeyField({
-      type: 'User',
-      collectionName: 'Users',
-      idFieldName: 'userId',
-      resolverName: 'user',
-      nullable: true
+      type: "User",
+      collectionName: "Users",
+      idFieldName: "userId",
+      resolverName: "user",
+      nullable: true,
     }),
-    ...commonFields(true)
+    ...commonFields(true),
   },
   sourceUrl: {
     type: String,
-    ...commonFields(true)
+    ...commonFields(true),
   },
   sourceId: {
     type: String,
-    ...commonFields(true)
+    ...commonFields(true),
   },
   binaryQuestionId: {
     ...foreignKeyField({
-      type: 'ElicitQuestion',
-      collectionName: 'ElicitQuestions',
-      idFieldName: 'binaryQuestionId',
-      resolverName: 'question',
-      nullable: false
+      type: "ElicitQuestion",
+      collectionName: "ElicitQuestions",
+      idFieldName: "binaryQuestionId",
+      resolverName: "question",
+      nullable: false,
     }),
-    ...commonFields(false)
+    ...commonFields(false),
   },
 };
 

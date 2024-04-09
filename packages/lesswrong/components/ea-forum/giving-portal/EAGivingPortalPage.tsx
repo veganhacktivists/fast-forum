@@ -4,11 +4,7 @@ import { AnalyticsContext } from "../../../lib/analyticsEvents";
 import { Link } from "../../../lib/reactRouterWrapper";
 import { SECTION_WIDTH } from "../../common/SingleColumnSection";
 import { formatStat } from "../../users/EAUserTooltipContent";
-import {
-  useAmountRaised,
-  useDonationOpportunities,
-  useShowTimeline,
-} from "./hooks";
+import { useAmountRaised, useDonationOpportunities, useShowTimeline } from "./hooks";
 import {
   eaGivingSeason23ElectionName,
   effectiveGivingTagId,
@@ -99,7 +95,7 @@ const styles = (theme: ThemeType) => ({
     letterSpacing: "-1.2px",
     [theme.breakpoints.down("xs")]: {
       fontSize: 40,
-    }
+    },
   },
   h2: {
     fontSize: 28,
@@ -147,7 +143,7 @@ const styles = (theme: ThemeType) => ({
   button: {
     textAlign: "center",
     fontSize: 16,
-    lineHeight: '24px',
+    lineHeight: "24px",
     fontWeight: 600,
     background: theme.palette.givingPortal.button.dark,
     color: theme.palette.givingPortal.button.light,
@@ -155,9 +151,9 @@ const styles = (theme: ThemeType) => ({
     padding: "12px 48px",
     border: "none",
     outline: "none",
-    '&:hover': {
+    "&:hover": {
       opacity: 0.9,
-    }
+    },
   },
   buttonDisabled: {
     cursor: "not-allowed",
@@ -273,12 +269,12 @@ const styles = (theme: ThemeType) => ({
     color: theme.palette.text.alwaysWhite,
   },
   votingBannerContent: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '30px',
-    flexWrap: 'wrap',
-    padding: '32px 32px 42px',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "30px",
+    flexWrap: "wrap",
+    padding: "32px 32px 42px",
   },
   votingBannerHeading: {
     color: theme.palette.givingPortal.homepageHeader.light4,
@@ -294,15 +290,15 @@ const styles = (theme: ThemeType) => ({
   },
   votingBannerDeadline: {
     fontWeight: 700,
-    textWrap: 'nowrap',
+    textWrap: "nowrap",
   },
   votingBannerButtons: {
-    display: 'flex',
-    gap: '16px',
-    flexWrap: 'wrap',
+    display: "flex",
+    gap: "16px",
+    flexWrap: "wrap",
   },
   voteCount: {
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   eaFundsOpportunities: {
     maxWidth: 1200,
@@ -314,11 +310,16 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const getListTerms = ({ tagId, sortedBy, limit, after }: {
-  tagId: string,
-  sortedBy: PostSortingModeWithRelevanceOption,
-  limit: number,
-  after?: string,
+const getListTerms = ({
+  tagId,
+  sortedBy,
+  limit,
+  after,
+}: {
+  tagId: string;
+  sortedBy: PostSortingModeWithRelevanceOption;
+  limit: number;
+  after?: string;
 }): PostsViewTerms => ({
   filterSettings: {
     tags: [
@@ -347,18 +348,21 @@ const formatDollars = (amount: number) => "$" + formatStat(Math.round(amount));
 
 const canonicalUrl = getSiteUrl() + "giving-portal";
 
-const participateLink = "/posts/hAzhyikPnLnMXweXG/participate-in-the-donation-election-and-the-first-weekly#Participate_in_the_Donation_Election";
+const participateLink =
+  "/posts/hAzhyikPnLnMXweXG/participate-in-the-donation-election-and-the-first-weekly#Participate_in_the_Donation_Election";
 const resultsLink = "/posts/7D83kwkyaHLQSo6JT/winners-in-the-forum-s-donation-election-2023";
 const candidatesLink = "/posts/bBm64htDSKn3ZKiQ5/meet-the-candidates-in-the-forum-s-donation-election-2023";
 
-const pageDescription = "Giving season 2023 on the FAST Forum included a Donation Election (read about the winners!) and discussions related to weekly themes.";
+const pageDescription =
+  "Giving season 2023 on the FAST Forum included a Donation Election (read about the winners!) and discussions related to weekly themes.";
 const PageDescription = () => (
   <>
-    Giving season 2023 on the FAST Forum included a{" "}
-    <Link to={participateLink}>Donation Election</Link>{" "}
-    (read about <Link to={resultsLink}>the winners</Link>!){" "}
-    and discussions related to{" "}
-    <Link to="/posts/hAzhyikPnLnMXweXG/participate-in-the-donation-election-and-the-first-weekly#Giving_Season___weekly_discussion_themes">weekly themes</Link>.
+    Giving season 2023 on the FAST Forum included a <Link to={participateLink}>Donation Election</Link> (read about{" "}
+    <Link to={resultsLink}>the winners</Link>!) and discussions related to{" "}
+    <Link to="/posts/hAzhyikPnLnMXweXG/participate-in-the-donation-election-and-the-first-weekly#Giving_Season___weekly_discussion_themes">
+      weekly themes
+    </Link>
+    .
   </>
 );
 
@@ -388,13 +392,10 @@ const otherFeaturedCharities = [
   "Vida Plena",
 ];
 
-const EAGivingPortalPage = ({classes}: {classes: ClassesType<typeof styles>}) => {
+const EAGivingPortalPage = ({ classes }: { classes: ClassesType<typeof styles> }) => {
   const { data: amountRaised, loading: amountRaisedLoading } = useAmountRaised(eaGivingSeason23ElectionName);
 
-  const {
-    results: donationOpportunities,
-    loading: donationOpportunitiesLoading,
-  } = useDonationOpportunities();
+  const { results: donationOpportunities, loading: donationOpportunitiesLoading } = useDonationOpportunities();
   /*
   const {document: donationElectionTag} = useSingle({
     documentId: donationElectionTagId,
@@ -440,19 +441,24 @@ const EAGivingPortalPage = ({classes}: {classes: ClassesType<typeof styles>}) =>
   const raisedForElectionFundFormatted = formatDollars(amountRaised.raisedForElectionFund);
   const targetPercent = amountRaised.electionFundTarget > 0 ? (amountRaised.raisedForElectionFund / amountRaised.electionFundTarget) * 100 : 0;
    */
-  const allDonationOpportunities = !!donationOpportunities?.length ? [...donationOpportunities, ...otherDonationOpportunities] : []
-  const eaFundsOpportunities = allDonationOpportunities.filter(
-    ({name}) => name.indexOf("EA Funds") >= 0,
-  );
-  const featuredCharities = allDonationOpportunities.filter(
-    ({name}) => otherFeaturedCharities.includes(name),
-  );
+  const allDonationOpportunities = !!donationOpportunities?.length
+    ? [...donationOpportunities, ...otherDonationOpportunities]
+    : [];
+  const eaFundsOpportunities = allDonationOpportunities.filter(({ name }) => name.indexOf("EA Funds") >= 0);
+  const featuredCharities = allDonationOpportunities.filter(({ name }) => otherFeaturedCharities.includes(name));
 
   // const voteMessage = isPastVotingDeadline() ? "Voting has closed. You can still donate to the Election Fund until Dec 20" : "Voting is open until Dec 15. Select candidates and distribute your votes using a ranked-choice method."
 
   const {
-    Loading, HeadTags, Timeline, Typography, PostsList2,
-    ElectionCandidatesList, DonationOpportunity, CloudinaryImage2, QuickTakesList,
+    Loading,
+    HeadTags,
+    Timeline,
+    Typography,
+    PostsList2,
+    ElectionCandidatesList,
+    DonationOpportunity,
+    CloudinaryImage2,
+    QuickTakesList,
   } = Components;
 
   return (
@@ -465,61 +471,52 @@ const EAGivingPortalPage = ({classes}: {classes: ClassesType<typeof styles>}) =>
           description={pageDescription}
           image={makeCloudinaryImageUrl(heroImageId, socialImageProps)}
         />
-        {showVotingBanner && <div className={classes.votingBanner}>
-          <div className={classes.votingBannerContent} id="votingBanner">
-            <div>
-              <Typography
-                variant="display1"
-                className={classes.votingBannerHeading}
-              >
-                Decide how you're voting
-              </Typography>
-              <div className={classNames(classes.text, classes.textWide)}>
-                Vote to help determine how the {" "}
-                <Link to={fundLink}>
-                  Donation Election Fund
-                </Link>{" "}should be distributed.{" "}
-                <span className={classes.votingBannerDeadline}>Deadline: December 15</span>
+        {showVotingBanner && (
+          <div className={classes.votingBanner}>
+            <div className={classes.votingBannerContent} id="votingBanner">
+              <div>
+                <Typography variant="display1" className={classes.votingBannerHeading}>
+                  Decide how you're voting
+                </Typography>
+                <div className={classNames(classes.text, classes.textWide)}>
+                  Vote to help determine how the <Link to={fundLink}>Donation Election Fund</Link> should be
+                  distributed. <span className={classes.votingBannerDeadline}>Deadline: December 15</span>
+                </div>
+              </div>
+              <div className={classes.votingBannerButtons}>
+                <Link
+                  to={electionCandidatesPostLink}
+                  className={classNames(classes.button, classes.votingBannerButtonLightOpaque)}
+                >
+                  Read about the candidates
+                </Link>
+                <Link to="/voting-portal" className={classNames(classes.button, classes.votingBannerButtonLight)}>
+                  Vote in the Donation Election
+                </Link>
               </div>
             </div>
-            <div className={classes.votingBannerButtons}>
-              <Link to={electionCandidatesPostLink} className={classNames(classes.button, classes.votingBannerButtonLightOpaque)}>
-                Read about the candidates
-              </Link>
-              <Link to='/voting-portal' className={classNames(classes.button, classes.votingBannerButtonLight)}>
-                Vote in the Donation Election
-              </Link>
-            </div>
           </div>
-        </div>}
+        )}
         <div className={classes.content} id="top">
-          <div className={classNames(classes.h1, classes.center, classes.mt30)}>
-            Giving portal
-          </div>
+          <div className={classNames(classes.h1, classes.center, classes.mt30)}>Giving portal</div>
           <div className={classNames(classes.text, classes.center)}>
             <PageDescription />
           </div>
-          {showTimeline &&
+          {showTimeline && (
             <>
-              <div className={classNames(
-                classes.h2,
-                classes.mt20,
-                classes.hideOnMobile,
-              )}>
-                Timeline
-              </div>
+              <div className={classNames(classes.h2, classes.mt20, classes.hideOnMobile)}>Timeline</div>
               <Timeline {...timelineSpec} className={classes.hideOnMobile} />
             </>
-          }
+          )}
         </div>
         <div className={classNames(classes.content, classes.mb20)}>
-          <div className={classNames(classes.h2, classes.center)}>
-            Donate now
-          </div>
+          <div className={classNames(classes.h2, classes.center)}>Donate now</div>
           <div className={classNames(classes.text, classes.center)}>
             Consider donating to one of these{" "}
-            <Link to="https://www.givingwhatwecan.org/en-US/why-we-recommend-funds?slug=why-we-recommend-funds">expert-led charitable funds</Link>,{" "}
-            or explore other funds and organizations{" "}
+            <Link to="https://www.givingwhatwecan.org/en-US/why-we-recommend-funds?slug=why-we-recommend-funds">
+              expert-led charitable funds
+            </Link>
+            , or explore other funds and organizations{" "}
             <Link to="https://www.givingwhatwecan.org/donate/organizations">here</Link>.
           </div>
           <div className={classNames(classes.grid, classes.eaFundsOpportunities)}>
@@ -533,30 +530,22 @@ const EAGivingPortalPage = ({classes}: {classes: ClassesType<typeof styles>}) =>
         <div className={classes.sectionLight}>
           <div className={classes.content} id="election">
             <div className={classNames(classes.column, classes.mt60, classes.mb60)}>
-              <div className={classNames(classes.h1, classes.primaryText)}>
-                Donation election 2023
-              </div>
+              <div className={classNames(classes.h1, classes.primaryText)}>Donation election 2023</div>
               <div className={classNames(classes.text, classes.primaryText, classes.textWide)}>
-                The Donation Election was{" "}
-                <Link to={participateLink}>officially announced</Link>{" "}
-                in early November; Forum users would vote on how we should allocate a{" "}
-                “<Link to={fundLink}>Donation Election Fund</Link>.”{" "}
+                The Donation Election was <Link to={participateLink}>officially announced</Link> in early November;
+                Forum users would vote on how we should allocate a “<Link to={fundLink}>Donation Election Fund</Link>.”{" "}
                 Voting opened on December 1st and closed on December 15th.
               </div>
               <div className={classNames(classes.text, classes.primaryText, classes.textWide)}>
-                In the end, <span className={classes.bold}>341 people voted, and{" "}
-                <Link to={resultsLink}>the results were announced here</Link></span>;{" "}
-                Rethink Priorities took first place, followed by Charity Entrepreneurship’s
-                Incubated Charities Fund, and the Animal Welfare Fund. You can also{" "}
-                <Link to={candidatesLink}>read about the charities that were candidates
-                in the Election</Link>.
+                In the end,{" "}
+                <span className={classes.bold}>
+                  341 people voted, and <Link to={resultsLink}>the results were announced here</Link>
+                </span>
+                ; Rethink Priorities took first place, followed by Charity Entrepreneurship’s Incubated Charities Fund,
+                and the Animal Welfare Fund. You can also{" "}
+                <Link to={candidatesLink}>read about the charities that were candidates in the Election</Link>.
               </div>
-              <div className={classNames(
-                classes.text,
-                classes.primaryText,
-                classes.textWide,
-                classes.mb20,
-              )}>
+              <div className={classNames(classes.text, classes.primaryText, classes.textWide, classes.mb20)}>
                 The section below hasn’t been changed since before the Donation Election closed.
               </div>
               {/*
@@ -621,31 +610,16 @@ const EAGivingPortalPage = ({classes}: {classes: ClassesType<typeof styles>}) =>
         <div className={classes.sectionDark}>
           <div className={classes.content} id="candidates">
             <div className={classNames(classes.column, classes.mt60)}>
-              <div className={classNames(classes.h2, classes.primaryText)}>
-                Candidates in the Election
-              </div>
-              <div className={classNames(
-                classes.text,
-                classes.primaryText,
-                classes.textWide,
-                classes.mb20,
-              )}>
-                The Donation Election Fund will be designated for the top three
-                winning candidates in the election (split proportionately, based
-                on users' votes). You can read about{" "}
-                <Link to={candidatesLink}>these candidates</Link> and what marginal
-                donations to them would accomplish, and, more broadly{" "}
-                <Link to="/topics/donation-election-2023">read Forum posts about the election</Link>.
+              <div className={classNames(classes.h2, classes.primaryText)}>Candidates in the Election</div>
+              <div className={classNames(classes.text, classes.primaryText, classes.textWide, classes.mb20)}>
+                The Donation Election Fund will be designated for the top three winning candidates in the election
+                (split proportionately, based on users' votes). You can read about{" "}
+                <Link to={candidatesLink}>these candidates</Link> and what marginal donations to them would accomplish,
+                and, more broadly <Link to="/topics/donation-election-2023">read Forum posts about the election</Link>.
               </div>
               <ElectionCandidatesList className={classes.electionCandidates} />
-              <div className={classNames(
-                classes.rowThin,
-                classes.mt10,
-                classes.mb80,
-              )}>
-                <button className={classNames(classes.button, classes.buttonDisabled)}>
-                  Vote in the Election
-                </button>
+              <div className={classNames(classes.rowThin, classes.mt10, classes.mb80)}>
+                <button className={classNames(classes.button, classes.buttonDisabled)}>Vote in the Election</button>
               </div>
             </div>
           </div>
@@ -653,28 +627,14 @@ const EAGivingPortalPage = ({classes}: {classes: ClassesType<typeof styles>}) =>
         <CloudinaryImage2 publicId={heroImageId} fullWidthHeader imgProps={{ h: "1200" }} />
         <div className={classes.sectionLight}>
           <div className={classes.content}>
-            <div className={classNames(
-              classes.column,
-              classes.mt60,
-              classes.mb80,
-            )} id="posts">
+            <div className={classNames(classes.column, classes.mt60, classes.mb80)} id="posts">
               <div className={classNames(classes.h2, classes.primaryText)}>
                 Posts tagged &quot;Effective Giving&quot;
               </div>
-              <div className={classNames(
-                classes.postsList,
-                classes.primaryLoadMore,
-              )}>
-                <PostsList2
-                  terms={effectiveGivingPostsTerms}
-                  loadMoreMessage="View more"
-                />
+              <div className={classNames(classes.postsList, classes.primaryLoadMore)}>
+                <PostsList2 terms={effectiveGivingPostsTerms} loadMoreMessage="View more" />
               </div>
-              <div className={classNames(
-                classes.h2,
-                classes.primaryText,
-                classes.mt30,
-              )}>
+              <div className={classNames(classes.h2, classes.primaryText, classes.mt30)}>
                 Quick takes tagged &quot;Effective Giving&quot;
               </div>
               <QuickTakesList
@@ -686,29 +646,24 @@ const EAGivingPortalPage = ({classes}: {classes: ClassesType<typeof styles>}) =>
             </div>
           </div>
         </div>
-        <div className={classNames(
-          classes.content,
-          classes.mt60,
-          classes.mb80,
-        )} id="opportunities">
+        <div className={classNames(classes.content, classes.mt60, classes.mb80)} id="opportunities">
           <div className={classes.h1}>Other featured charities</div>
           <div className={classNames(classes.text, classes.textWide)}>
-            More charities were featured and discussed on the Forum than appeared
-            as candidates in the Donation Election. If you were impressed by these
-            charities during <Link to="/s/xourt4HttDM5QcHsk">Marginal Funding Week</Link>{" "}
-            or afterwards, you can donate to them below.
+            More charities were featured and discussed on the Forum than appeared as candidates in the Donation
+            Election. If you were impressed by these charities during{" "}
+            <Link to="/s/xourt4HttDM5QcHsk">Marginal Funding Week</Link> or afterwards, you can donate to them below.
           </div>
           <div className={classNames(classes.text, classes.textWide)}>
-            Supporting high-impact work via donations is a core part of effective altruism.{" "}
-            Besides donating, you can also <Link to={setupFundraiserLink}>run custom fundraisers</Link>
-            , and <Link to="https://www.givingwhatwecan.org">take other kinds of action</Link>.
+            Supporting high-impact work via donations is a core part of effective altruism. Besides donating, you can
+            also <Link to={setupFundraiserLink}>run custom fundraisers</Link>, and{" "}
+            <Link to="https://www.givingwhatwecan.org">take other kinds of action</Link>.
           </div>
-          {!amountRaisedLoading &&
+          {!amountRaisedLoading && (
             <div className={classes.text}>
               Total donations raised through the Forum:{" "}
               <span className={classes.totalRaised}>{totalRaisedFormatted}</span>
             </div>
-          }
+          )}
           <div className={classNames(classes.grid, classes.mt10)}>
             {featuredCharities.map((candidate) => (
               <DonationOpportunity candidate={candidate} key={candidate._id} />
@@ -719,13 +674,9 @@ const EAGivingPortalPage = ({classes}: {classes: ClassesType<typeof styles>}) =>
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const EAGivingPortalPageComponent = registerComponent(
-  "EAGivingPortalPage",
-  EAGivingPortalPage,
-  {styles},
-);
+const EAGivingPortalPageComponent = registerComponent("EAGivingPortalPage", EAGivingPortalPage, { styles });
 
 declare global {
   interface ComponentTypes {

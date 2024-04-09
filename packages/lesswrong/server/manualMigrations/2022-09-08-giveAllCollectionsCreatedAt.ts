@@ -8,7 +8,7 @@ import PodcastEpisodes from "../../lib/collections/podcastEpisodes/collection";
 import DebouncerEvents from "../../lib/collections/debouncerEvents/collection";
 import Migrations from "../../lib/collections/migrations/collection";
 import ReadStatuses from "../../lib/collections/readStatus/collection";
-import {Votes} from "../../lib/collections/votes";
+import { Votes } from "../../lib/collections/votes";
 import Revisions from "../../lib/collections/revisions/collection";
 
 const initCreatedAt = <N extends CollectionNameString>(
@@ -20,12 +20,12 @@ const initCreatedAt = <N extends CollectionNameString>(
     description: `Filling createdAt for ${collection.options.collectionName}`,
     batchSize: 2000,
     unmigratedDocumentQuery: {
-      createdAt: {$exists: false},
+      createdAt: { $exists: false },
     },
     migrate: async (documents: ObjectsByCollectionName[N][]) => {
       const updates = documents.map((document: ObjectsByCollectionName[N]) => ({
         updateOne: {
-          filter: {_id: document._id},
+          filter: { _id: document._id },
           update: {
             $set: {
               createdAt: new Date((document as AnyBecauseObsolete)[existingField] ?? 0),
@@ -33,9 +33,9 @@ const initCreatedAt = <N extends CollectionNameString>(
           },
         },
       }));
-      await collection.rawCollection().bulkWrite(updates, {ordered: false});
+      await collection.rawCollection().bulkWrite(updates, { ordered: false });
     },
-    loadFactor: 0.8
+    loadFactor: 0.8,
   });
 
 /**

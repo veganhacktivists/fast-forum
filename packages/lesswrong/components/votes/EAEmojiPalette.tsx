@@ -1,10 +1,6 @@
 import React, { FC } from "react";
 import { registerComponent, Components } from "../../lib/vulcan-lib";
-import {
-  eaAnonymousEmojiPalette,
-  eaEmojiPalette,
-  EmojiOption,
-} from "../../lib/voting/eaEmojiPalette";
+import { eaAnonymousEmojiPalette, eaEmojiPalette, EmojiOption } from "../../lib/voting/eaEmojiPalette";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -48,40 +44,35 @@ const styles = (theme: ThemeType): JssStyles => ({
 });
 
 const PaletteSection: FC<{
-  title: string,
-  options: EmojiOption[],
-  onSelectEmoji: (emojiOption: EmojiOption) => void,
-  classes: ClassesType,
-}> = ({title, options, onSelectEmoji, classes}) => {
-  const {SectionTitle} = Components;
+  title: string;
+  options: EmojiOption[];
+  onSelectEmoji: (emojiOption: EmojiOption) => void;
+  classes: ClassesType;
+}> = ({ title, options, onSelectEmoji, classes }) => {
+  const { SectionTitle } = Components;
   return (
     <>
-      <SectionTitle
-        title={title}
-        className={classes.title}
-        noTopMargin
-      />
+      <SectionTitle title={title} className={classes.title} noTopMargin />
       <div>
-        {options.map((emojiOption) =>
-          <div
-            key={emojiOption.name}
-            onClick={() => onSelectEmoji(emojiOption)}
-            className={classes.emoji}
-          >
+        {options.map((emojiOption) => (
+          <div key={emojiOption.name} onClick={() => onSelectEmoji(emojiOption)} className={classes.emoji}>
             <div className={classes.icon}>
               <emojiOption.Component />
             </div>
             {emojiOption.label}
           </div>
-        )}
+        ))}
       </div>
     </>
   );
-}
+};
 
-const EAEmojiPalette = ({onSelectEmoji, classes}: {
-  onSelectEmoji: (emojiOption: EmojiOption) => void,
-  classes: ClassesType,
+const EAEmojiPalette = ({
+  onSelectEmoji,
+  classes,
+}: {
+  onSelectEmoji: (emojiOption: EmojiOption) => void;
+  classes: ClassesType;
 }) => {
   return (
     <div className={classes.root}>
@@ -92,24 +83,15 @@ const EAEmojiPalette = ({onSelectEmoji, classes}: {
         classes={classes}
       />
       <hr className={classes.divider} />
-      <PaletteSection
-        title="Non-anonymous"
-        options={eaEmojiPalette}
-        onSelectEmoji={onSelectEmoji}
-        classes={classes}
-      />
+      <PaletteSection title="Non-anonymous" options={eaEmojiPalette} onSelectEmoji={onSelectEmoji} classes={classes} />
     </div>
   );
-}
+};
 
-const EAEmojiPaletteComponent = registerComponent(
-  "EAEmojiPalette",
-  EAEmojiPalette,
-  {styles},
-);
+const EAEmojiPaletteComponent = registerComponent("EAEmojiPalette", EAEmojiPalette, { styles });
 
 declare global {
   interface ComponentTypes {
-    EAEmojiPalette: typeof EAEmojiPaletteComponent
+    EAEmojiPalette: typeof EAEmojiPaletteComponent;
   }
 }

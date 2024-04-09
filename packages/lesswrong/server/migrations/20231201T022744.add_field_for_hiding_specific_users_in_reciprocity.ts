@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-11-30T14:04:04.000Z by 20231130T140404.add_submissionComments.ts
  * +-- Overall schema hash: 2d5747e2acdbe83c754cbbda258623ed
- *  
+ *
  * @@ -251,3 +249,3 @@ CREATE TABLE "DebouncerEvents" (
- *  
+ *
  * --- Schema for "DialogueChecks", hash: 66f51efd1a8291432d232620b2979ede
  * +-- Schema for "DialogueChecks", hash: ebfbe6201ff8409ac44430c6e41d222c
  *  CREATE TABLE "DialogueChecks" (
@@ -26,7 +26,7 @@
  * @@ -1541 +1539,2 @@ CREATE OR REPLACE FUNCTION fm_comment_confidence(
  *    ;
  * +
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -37,13 +37,13 @@
  */
 export const acceptsSchemaHash = "2d5747e2acdbe83c754cbbda258623ed";
 
-import DialogueChecks from "../../lib/collections/dialogueChecks/collection"
-import { addField, dropField } from "./meta/utils"
+import DialogueChecks from "../../lib/collections/dialogueChecks/collection";
+import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, DialogueChecks, "hideInRecommendations")
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, DialogueChecks, "hideInRecommendations");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, DialogueChecks, "hideInRecommendations")
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, DialogueChecks, "hideInRecommendations");
+};

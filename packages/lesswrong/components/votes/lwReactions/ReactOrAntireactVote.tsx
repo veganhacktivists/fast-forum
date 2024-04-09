@@ -1,12 +1,12 @@
-import React from 'react';
-import { QuoteLocator, VoteOnReactionType } from '../../../lib/voting/namesAttachedReactions';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
-import classNames from 'classnames';
-import UpArrowIcon from '@material-ui/icons/KeyboardArrowUp';
+import React from "react";
+import { QuoteLocator, VoteOnReactionType } from "../../../lib/voting/namesAttachedReactions";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
+import classNames from "classnames";
+import UpArrowIcon from "@material-ui/icons/KeyboardArrowUp";
 
 const styles = (theme: ThemeType): JssStyles => ({
   reactOrAntireact: {
-    width: 55
+    width: 55,
   },
   reactionVoteCount: {
     display: "inline-block",
@@ -16,32 +16,43 @@ const styles = (theme: ThemeType): JssStyles => ({
     color: theme.palette.grey[400],
   },
   voteArrowIcon: {
-    fontSize: 'inherit',
+    fontSize: "inherit",
     padding: 0,
     width: 24,
     height: 24,
     verticalAlign: "middle",
-    cursor: 'pointer'
+    cursor: "pointer",
   },
   voteArrowLeft: {
-    transform: 'rotate(-90deg)',
+    transform: "rotate(-90deg)",
     marginRight: -4,
   },
   voteArrowRight: {
-    transform: 'rotate(-270deg)',
+    transform: "rotate(-270deg)",
     marginLeft: -4,
   },
-})
+});
 
-const ReactOrAntireactVote = ({reactionName, quote, netReactionCount, currentUserReaction, setCurrentUserReaction, classes}: {
-  reactionName: string
-  quote: QuoteLocator|null,
-  netReactionCount: number
-  currentUserReaction: VoteOnReactionType|null
-  setCurrentUserReaction: (reactionName: string, reaction: VoteOnReactionType|null, quote: QuoteLocator|null)=>void
-  classes: ClassesType
+const ReactOrAntireactVote = ({
+  reactionName,
+  quote,
+  netReactionCount,
+  currentUserReaction,
+  setCurrentUserReaction,
+  classes,
+}: {
+  reactionName: string;
+  quote: QuoteLocator | null;
+  netReactionCount: number;
+  currentUserReaction: VoteOnReactionType | null;
+  setCurrentUserReaction: (
+    reactionName: string,
+    reaction: VoteOnReactionType | null,
+    quote: QuoteLocator | null,
+  ) => void;
+  classes: ClassesType;
 }) => {
-  const onClick = (reaction: "reacted"|"disagreed") => {
+  const onClick = (reaction: "reacted" | "disagreed") => {
     if (reaction === "reacted") {
       if (currentUserReaction === "created" || currentUserReaction === "seconded") {
         setCurrentUserReaction(reactionName, null, quote);
@@ -55,54 +66,56 @@ const ReactOrAntireactVote = ({reactionName, quote, netReactionCount, currentUse
         setCurrentUserReaction(reactionName, "disagreed", quote);
       }
     }
-  }
+  };
 
-  return <div className={classes.reactOrAntireact}>
-    <ReactionVoteArrow
-      orientation="left"
-      onClick={() => onClick("disagreed")}
-      classes={classes}
-      color={currentUserReaction==="disagreed" ? "error" : "inherit"}
-    />
-    <span className={classes.reactionVoteCount}>
-      {netReactionCount}
-    </span>
-    <ReactionVoteArrow
-      orientation="right"
-      onClick={() => onClick("reacted")}
-      classes={classes}
-      color={(currentUserReaction==="created"||currentUserReaction==="seconded") ? "primary" : "inherit"}
-    />
-  </div>
-}
+  return (
+    <div className={classes.reactOrAntireact}>
+      <ReactionVoteArrow
+        orientation="left"
+        onClick={() => onClick("disagreed")}
+        classes={classes}
+        color={currentUserReaction === "disagreed" ? "error" : "inherit"}
+      />
+      <span className={classes.reactionVoteCount}>{netReactionCount}</span>
+      <ReactionVoteArrow
+        orientation="right"
+        onClick={() => onClick("reacted")}
+        classes={classes}
+        color={currentUserReaction === "created" || currentUserReaction === "seconded" ? "primary" : "inherit"}
+      />
+    </div>
+  );
+};
 
-const ReactionVoteArrow = ({orientation, onClick, color, classes}: {
-  orientation: "left"|"right",
-  onClick: ()=>void,
-  color: "inherit"|"primary"|"error",
-  classes: ClassesType,
+const ReactionVoteArrow = ({
+  orientation,
+  onClick,
+  color,
+  classes,
+}: {
+  orientation: "left" | "right";
+  onClick: () => void;
+  color: "inherit" | "primary" | "error";
+  classes: ClassesType;
 }) => {
-  return <span className={classes.voteArrow}>
-    <UpArrowIcon
-      onClick={onClick}
-      color={color}
-      className={classNames(
-        classes.voteArrowIcon,
-        {
-          [classes.voteArrowLeft]: orientation==="left",
-          [classes.voteArrowRight]: orientation==="right",
-        },
-      )}
-    />
-  </span>
-}
+  return (
+    <span className={classes.voteArrow}>
+      <UpArrowIcon
+        onClick={onClick}
+        color={color}
+        className={classNames(classes.voteArrowIcon, {
+          [classes.voteArrowLeft]: orientation === "left",
+          [classes.voteArrowRight]: orientation === "right",
+        })}
+      />
+    </span>
+  );
+};
 
-
-const ReactOrAntireactVoteComponent = registerComponent('ReactOrAntireactVote', ReactOrAntireactVote, {styles});
+const ReactOrAntireactVoteComponent = registerComponent("ReactOrAntireactVote", ReactOrAntireactVote, { styles });
 
 declare global {
   interface ComponentTypes {
-    ReactOrAntireactVote: typeof ReactOrAntireactVoteComponent
+    ReactOrAntireactVote: typeof ReactOrAntireactVoteComponent;
   }
 }
-

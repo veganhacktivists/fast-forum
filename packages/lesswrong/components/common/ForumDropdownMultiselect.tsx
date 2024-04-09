@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import Menu from '@material-ui/core/Menu';
-import { QueryLink } from '../../lib/reactRouterWrapper';
-import Button from '@material-ui/core/Button';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import classNames from 'classnames';
-import { SettingsOption } from '../../lib/collections/posts/dropdownOptions';
-import { isFriendlyUI } from '../../themes/forumTheme';
+import React, { useState } from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import Menu from "@material-ui/core/Menu";
+import { QueryLink } from "../../lib/reactRouterWrapper";
+import Button from "@material-ui/core/Button";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import classNames from "classnames";
+import { SettingsOption } from "../../lib/collections/posts/dropdownOptions";
+import { isFriendlyUI } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -26,7 +26,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     padding: 0,
     fontSize: "14px",
     minHeight: 32,
-    minWidth: 'unset',
+    minWidth: "unset",
     cursor: "pointer",
     color: theme.palette.primary.main,
     paddingLeft: 12,
@@ -49,7 +49,7 @@ const styles = (theme: ThemeType): JssStyles => ({
   dropdownIcon: {
     verticalAlign: "middle",
     position: "relative",
-    ...(isFriendlyUI && { width: 16, height: 16, marginLeft: 4, padding: 1}),
+    ...(isFriendlyUI && { width: 16, height: 16, marginLeft: 4, padding: 1 }),
   },
   padding: {
     width: 10,
@@ -70,14 +70,14 @@ const styles = (theme: ThemeType): JssStyles => ({
         opacity: "inherit",
       },
     }),
-    '& .MuiList-padding': {
-      padding: '4px 0px',
-    }
+    "& .MuiList-padding": {
+      padding: "4px 0px",
+    },
   },
   menuNoQueryParam: {
     // I have absolutely no idea what causes it but having queryParam undefined causes the
     // menu to be positioned 18px too high
-    marginTop: 46
+    marginTop: 46,
   },
   menuItem: {
     ...(isFriendlyUI && {
@@ -98,74 +98,93 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const ForumDropdownMultiselect = ({values, options, queryParam, onSelect, classes, className}:{
-  values: string[],
-  options: Record<string, SettingsOption>,
-  queryParam?: string,
-  onSelect?: (value: string) => void,
-  classes: ClassesType,
-  className?: string,
+const ForumDropdownMultiselect = ({
+  values,
+  options,
+  queryParam,
+  onSelect,
+  classes,
+  className,
+}: {
+  values: string[];
+  options: Record<string, SettingsOption>;
+  queryParam?: string;
+  onSelect?: (value: string) => void;
+  classes: ClassesType;
+  className?: string;
 }) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const label = values.reduce((prev, next) => {
-    const nextLabel = options[next].shortLabel || options[next].label
-    if (!prev) return nextLabel
-    return `${prev}, ${nextLabel}`
-  }, '')
+    const nextLabel = options[next].shortLabel || options[next].label;
+    if (!prev) return nextLabel;
+    return `${prev}, ${nextLabel}`;
+  }, "");
   const { MenuItem, ForumIcon } = Components;
 
-  const dropdownIcon = isFriendlyUI ? <ForumIcon icon="ThickChevronDown" className={classes.dropdownIcon} /> : <ArrowDropDownIcon className={classes.dropdownIcon}/>
+  const dropdownIcon = isFriendlyUI ? (
+    <ForumIcon icon="ThickChevronDown" className={classes.dropdownIcon} />
+  ) : (
+    <ArrowDropDownIcon className={classes.dropdownIcon} />
+  );
   return (
     <div className={classNames(classes.root, className)}>
       <Button
         variant="contained"
         onClick={(e) => {
-          setAnchorEl(e.currentTarget)
+          setAnchorEl(e.currentTarget);
         }}
         className={classNames(classes.button, { [classes.openButton]: Boolean(anchorEl) })}
       >
         {label} {dropdownIcon}
       </Button>
-      <Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => setAnchorEl(null)} className={classNames(classes.menu, {[classes.menuNoQueryParam]: !queryParam})}>
+      <Menu
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={() => setAnchorEl(null)}
+        className={classNames(classes.menu, { [classes.menuNoQueryParam]: !queryParam })}
+      >
         {Object.keys(options).map((option) => {
-          const menuItem = <MenuItem
-            key={option}
-            value={option}
-            onClick={() => {
-              setAnchorEl(null);
-              onSelect?.(option);
-            }}
-            className={classes.menuItem}
-          >
-            {options[option].label}
-            {values.includes(option) && isFriendlyUI && (
-              <>
-                <div className={classes.padding}></div>
-                <ForumIcon icon="Check" className={classes.selectedIcon} />
-              </>
-            )}
-          </MenuItem>
-          
+          const menuItem = (
+            <MenuItem
+              key={option}
+              value={option}
+              onClick={() => {
+                setAnchorEl(null);
+                onSelect?.(option);
+              }}
+              className={classes.menuItem}
+            >
+              {options[option].label}
+              {values.includes(option) && isFriendlyUI && (
+                <>
+                  <div className={classes.padding}></div>
+                  <ForumIcon icon="Check" className={classes.selectedIcon} />
+                </>
+              )}
+            </MenuItem>
+          );
+
           if (queryParam) {
-            return <QueryLink key={option} query={{ [queryParam]: option }} merge>
-              {menuItem}
-            </QueryLink>
+            return (
+              <QueryLink key={option} query={{ [queryParam]: option }} merge>
+                {menuItem}
+              </QueryLink>
+            );
           }
-          return menuItem
+          return menuItem;
         })}
       </Menu>
     </div>
   );
-}
+};
 
-const ForumDropdownMultiselectComponent = registerComponent(
-  'ForumDropdownMultiselect',
-  ForumDropdownMultiselect,
-  {styles, stylePriority: -2},
-);
+const ForumDropdownMultiselectComponent = registerComponent("ForumDropdownMultiselect", ForumDropdownMultiselect, {
+  styles,
+  stylePriority: -2,
+});
 
 declare global {
   interface ComponentTypes {
-    ForumDropdownMultiselect: typeof ForumDropdownMultiselectComponent
+    ForumDropdownMultiselect: typeof ForumDropdownMultiselectComponent;
   }
 }

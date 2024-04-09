@@ -1,62 +1,64 @@
-import React, { useState } from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { useCurrentUser } from '../common/withUser';
-import { Link } from '../../lib/reactRouterWrapper';
-import { useLocation } from '../../lib/routeUtil';
-import { useTimezone } from './withTimezone';
-import { AnalyticsContext, useOnMountTracking } from '../../lib/analyticsEvents';
-import { FilterSettings, useFilterSettings } from '../../lib/filterSettings';
-import moment from '../../lib/moment-timezone';
-import { useCurrentTime } from '../../lib/utils/timeUtil';
-import { isEAForum, isLW, isLWorAF, taggingNamePluralSetting, taggingNameSetting} from '../../lib/instanceSettings';
-import { sectionTitleStyle } from '../common/SectionTitle';
-import { AllowHidingFrontPagePostsContext } from '../dropdowns/posts/PostActions';
-import { HideRepeatedPostsProvider } from '../posts/HideRepeatedPostsContext';
-import classNames from 'classnames';
-import {useUpdateCurrentUser} from "../hooks/useUpdateCurrentUser";
-import { reviewIsActive } from '../../lib/reviewUtils';
-import { forumSelect } from '../../lib/forumTypeUtils';
-import { frontpageDaysAgoCutoffSetting } from '../../lib/scoring';
-import { isFriendlyUI } from '../../themes/forumTheme';
-import { EA_FORUM_TRANSLATION_TOPIC_ID } from '../../lib/collections/tags/collection';
+import React, { useState } from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useCurrentUser } from "../common/withUser";
+import { Link } from "../../lib/reactRouterWrapper";
+import { useLocation } from "../../lib/routeUtil";
+import { useTimezone } from "./withTimezone";
+import { AnalyticsContext, useOnMountTracking } from "../../lib/analyticsEvents";
+import { FilterSettings, useFilterSettings } from "../../lib/filterSettings";
+import moment from "../../lib/moment-timezone";
+import { useCurrentTime } from "../../lib/utils/timeUtil";
+import { isEAForum, isLW, isLWorAF, taggingNamePluralSetting, taggingNameSetting } from "../../lib/instanceSettings";
+import { sectionTitleStyle } from "../common/SectionTitle";
+import { AllowHidingFrontPagePostsContext } from "../dropdowns/posts/PostActions";
+import { HideRepeatedPostsProvider } from "../posts/HideRepeatedPostsContext";
+import classNames from "classnames";
+import { useUpdateCurrentUser } from "../hooks/useUpdateCurrentUser";
+import { reviewIsActive } from "../../lib/reviewUtils";
+import { forumSelect } from "../../lib/forumTypeUtils";
+import { frontpageDaysAgoCutoffSetting } from "../../lib/scoring";
+import { isFriendlyUI } from "../../themes/forumTheme";
+import { EA_FORUM_TRANSLATION_TOPIC_ID } from "../../lib/collections/tags/collection";
 
-const titleWrapper = isLWorAF ? {
-  marginBottom: 8
-} : {
-  display: "flex",
-  marginBottom: 8,
-  flexWrap: "wrap",
-  alignItems: "center"
-};
+const titleWrapper = isLWorAF
+  ? {
+      marginBottom: 8,
+    }
+  : {
+      display: "flex",
+      marginBottom: 8,
+      flexWrap: "wrap",
+      alignItems: "center",
+    };
 
 const styles = (theme: ThemeType): JssStyles => ({
   titleWrapper,
   title: {
     ...sectionTitleStyle(theme),
     display: "inline",
-    marginRight: "auto"
+    marginRight: "auto",
   },
   toggleFilters: {
-    [theme.breakpoints.up('sm')]: {
-      display: "none"
+    [theme.breakpoints.up("sm")]: {
+      display: "none",
     },
   },
   hide: {
-      display: "none"
+    display: "none",
   },
   hideOnMobile: {
-    [theme.breakpoints.down('sm')]: {
-      display: "none"
+    [theme.breakpoints.down("sm")]: {
+      display: "none",
     },
   },
   hideOnDesktop: {
-    [theme.breakpoints.up('md')]: {
-      display: "none"
+    [theme.breakpoints.up("md")]: {
+      display: "none",
     },
   },
-})
+});
 
-const latestPostsName = isFriendlyUI ? 'New & upvoted' : 'Latest Posts'
+const latestPostsName = isFriendlyUI ? "New & upvoted" : "Latest Posts";
 
 const filterSettingsToggleLabels = forumSelect({
   EAForum: {
@@ -70,12 +72,10 @@ const filterSettingsToggleLabels = forumSelect({
     desktopHidden: "Customize Feed",
     mobileVisible: "Customize Feed (Hide)",
     mobileHidden: "Customize Feed (Show)",
-  }
-})
+  },
+});
 
-const advancedSortingText = isFriendlyUI
-  ? "Advanced sorting & filtering"
-  : "Advanced Sorting/Filtering";
+const advancedSortingText = isFriendlyUI ? "Advanced sorting & filtering" : "Advanced Sorting/Filtering";
 
 const defaultLimit = isFriendlyUI ? 11 : 13;
 
@@ -83,9 +83,7 @@ const applyConstantFilters = (filterSettings: FilterSettings): FilterSettings =>
   if (!isEAForum) {
     return filterSettings;
   }
-  const tags = filterSettings.tags.filter(
-    ({tagId}) => tagId !== EA_FORUM_TRANSLATION_TOPIC_ID,
-  );
+  const tags = filterSettings.tags.filter(({ tagId }) => tagId !== EA_FORUM_TRANSLATION_TOPIC_ID);
   tags.push({
     tagId: EA_FORUM_TRANSLATION_TOPIC_ID,
     tagName: "Translation",
@@ -95,29 +93,48 @@ const applyConstantFilters = (filterSettings: FilterSettings): FilterSettings =>
     ...filterSettings,
     tags,
   };
-}
+};
 
-const HomeLatestPosts = ({classes}:{classes: ClassesType}) => {
+const HomeLatestPosts = ({ classes }: { classes: ClassesType }) => {
   const location = useLocation();
   const updateCurrentUser = useUpdateCurrentUser();
   const currentUser = useCurrentUser();
 
-  const {filterSettings, setPersonalBlogFilter, setTagFilter, removeTagFilter} = useFilterSettings()
+  const { filterSettings, setPersonalBlogFilter, setTagFilter, removeTagFilter } = useFilterSettings();
   // While hiding desktop settings is stateful over time, on mobile the filter settings always start out hidden
   // (except that on the EA Forum/FriendlyUI it always starts out hidden)
-  const [filterSettingsVisibleDesktop, setFilterSettingsVisibleDesktop] = useState(isFriendlyUI ? false : !currentUser?.hideFrontpageFilterSettingsDesktop);
+  const [filterSettingsVisibleDesktop, setFilterSettingsVisibleDesktop] = useState(
+    isFriendlyUI ? false : !currentUser?.hideFrontpageFilterSettingsDesktop,
+  );
   const [filterSettingsVisibleMobile, setFilterSettingsVisibleMobile] = useState(false);
   const { timezone } = useTimezone();
-  const { captureEvent } = useOnMountTracking({eventType:"frontpageFilterSettings", eventProps: {filterSettings, filterSettingsVisible: filterSettingsVisibleDesktop, pageSectionContext: "latestPosts"}, captureOnMount: true})
+  const { captureEvent } = useOnMountTracking({
+    eventType: "frontpageFilterSettings",
+    eventProps: {
+      filterSettings,
+      filterSettingsVisible: filterSettingsVisibleDesktop,
+      pageSectionContext: "latestPosts",
+    },
+    captureOnMount: true,
+  });
   const { query } = location;
   const {
-    SingleColumnSection, PostsList2, TagFilterSettings, LWTooltip, SettingsButton,
-    CuratedPostsList, SectionTitle, StickiedPosts
-  } = Components
+    SingleColumnSection,
+    PostsList2,
+    TagFilterSettings,
+    LWTooltip,
+    SettingsButton,
+    CuratedPostsList,
+    SectionTitle,
+    StickiedPosts,
+  } = Components;
   const limit = parseInt(query.limit) || defaultLimit;
 
   const now = useCurrentTime();
-  const dateCutoff = moment(now).tz(timezone).subtract(frontpageDaysAgoCutoffSetting.get(), 'days').format("YYYY-MM-DD");
+  const dateCutoff = moment(now)
+    .tz(timezone)
+    .subtract(frontpageDaysAgoCutoffSetting.get(), "days")
+    .format("YYYY-MM-DD");
 
   const recentPostsTerms = {
     ...query,
@@ -125,22 +142,22 @@ const HomeLatestPosts = ({classes}:{classes: ClassesType}) => {
     after: dateCutoff,
     view: "magic",
     forum: true,
-    limit:limit
-  }
-  
+    limit: limit,
+  };
+
   const changeShowTagFilterSettingsDesktop = () => {
-    setFilterSettingsVisibleDesktop(!filterSettingsVisibleDesktop)
+    setFilterSettingsVisibleDesktop(!filterSettingsVisibleDesktop);
     if (isLWorAF) {
-      void updateCurrentUser({hideFrontpageFilterSettingsDesktop: filterSettingsVisibleDesktop})
+      void updateCurrentUser({ hideFrontpageFilterSettingsDesktop: filterSettingsVisibleDesktop });
     }
-    
+
     captureEvent("filterSettingsClicked", {
       settingsVisible: !filterSettingsVisibleDesktop,
       settings: filterSettings,
-    })
-  }
+    });
+  };
 
-  const showCurated = isFriendlyUI || (isLW && reviewIsActive())
+  const showCurated = isFriendlyUI || (isLW && reviewIsActive());
 
   return (
     <AnalyticsContext pageSectionContext="latestPosts">
@@ -152,36 +169,46 @@ const HomeLatestPosts = ({classes}:{classes: ClassesType}) => {
           >
             <SettingsButton
               className={classes.hideOnMobile}
-              label={filterSettingsVisibleDesktop ?
-                filterSettingsToggleLabels.desktopVisible :
-                filterSettingsToggleLabels.desktopHidden}
+              label={
+                filterSettingsVisibleDesktop
+                  ? filterSettingsToggleLabels.desktopVisible
+                  : filterSettingsToggleLabels.desktopHidden
+              }
               showIcon={false}
               onClick={changeShowTagFilterSettingsDesktop}
             />
             <SettingsButton
               className={classes.hideOnDesktop}
-              label={filterSettingsVisibleMobile ?
-                filterSettingsToggleLabels.mobileVisible :
-                filterSettingsToggleLabels.mobileHidden}
+              label={
+                filterSettingsVisibleMobile
+                  ? filterSettingsToggleLabels.mobileVisible
+                  : filterSettingsToggleLabels.mobileHidden
+              }
               showIcon={false}
               onClick={() => {
-                setFilterSettingsVisibleMobile(!filterSettingsVisibleMobile)
+                setFilterSettingsVisibleMobile(!filterSettingsVisibleMobile);
                 captureEvent("filterSettingsClicked", {
                   settingsVisible: !filterSettingsVisibleMobile,
                   settings: filterSettings,
-                  pageSectionContext: "latestPosts"
-                })
-              }} />
+                  pageSectionContext: "latestPosts",
+                });
+              }}
+            />
           </LWTooltip>
         </SectionTitle>
-  
+
         <AnalyticsContext pageSectionContext="tagFilterSettings">
-          <div className={classNames({
-            [classes.hideOnDesktop]: !filterSettingsVisibleDesktop,
-            [classes.hideOnMobile]: !filterSettingsVisibleMobile,
-          })}>
+          <div
+            className={classNames({
+              [classes.hideOnDesktop]: !filterSettingsVisibleDesktop,
+              [classes.hideOnMobile]: !filterSettingsVisibleMobile,
+            })}
+          >
             <TagFilterSettings
-              filterSettings={filterSettings} setPersonalBlogFilter={setPersonalBlogFilter} setTagFilter={setTagFilter} removeTagFilter={removeTagFilter}
+              filterSettings={filterSettings}
+              setPersonalBlogFilter={setPersonalBlogFilter}
+              setTagFilter={setTagFilter}
+              removeTagFilter={removeTagFilter}
             />
           </div>
         </AnalyticsContext>
@@ -191,24 +218,19 @@ const HomeLatestPosts = ({classes}:{classes: ClassesType}) => {
           <AnalyticsContext listContext={"latestPosts"}>
             {/* Allow hiding posts from the front page*/}
             <AllowHidingFrontPagePostsContext.Provider value={true}>
-              <PostsList2
-                terms={recentPostsTerms}
-                alwaysShowLoadMore
-                hideHiddenFrontPagePosts
-              >
-              </PostsList2>
+              <PostsList2 terms={recentPostsTerms} alwaysShowLoadMore hideHiddenFrontPagePosts></PostsList2>
             </AllowHidingFrontPagePostsContext.Provider>
           </AnalyticsContext>
         </HideRepeatedPostsProvider>
       </SingleColumnSection>
     </AnalyticsContext>
-  )
-}
+  );
+};
 
-const HomeLatestPostsComponent = registerComponent('HomeLatestPosts', HomeLatestPosts, {styles});
+const HomeLatestPostsComponent = registerComponent("HomeLatestPosts", HomeLatestPosts, { styles });
 
 declare global {
   interface ComponentTypes {
-    HomeLatestPosts: typeof HomeLatestPostsComponent
+    HomeLatestPosts: typeof HomeLatestPostsComponent;
   }
 }

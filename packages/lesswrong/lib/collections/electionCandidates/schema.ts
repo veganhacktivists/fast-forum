@@ -85,7 +85,7 @@ const schema: SchemaType<"ElectionCandidates"> = {
     optional: true,
     nullable: true,
     control: "MuiTextField",
-    label: "GWWC fundraiser ID (\"Parfit slug\")",
+    label: 'GWWC fundraiser ID ("Parfit slug")',
   },
   /** Short plaintext description */
   description: {
@@ -116,7 +116,7 @@ const schema: SchemaType<"ElectionCandidates"> = {
     canRead: ["guests"],
     canCreate: ["sunshineRegiment", "admins"],
     canUpdate: ["sunshineRegiment", "admins"],
-    onCreate: ({currentUser}) => currentUser!._id,
+    onCreate: ({ currentUser }) => currentUser!._id,
     hidden: true,
   },
   /** Denormalized count of posts referencing this candidate in this election */

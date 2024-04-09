@@ -1,26 +1,23 @@
-import React from 'react';
-import Button from '@material-ui/core/Button';
-import {
-  Components,
-  registerComponent,
-} from '../../lib/vulcan-lib';
-import CloseIcon from '@material-ui/icons/Close';
+import React from "react";
+import Button from "@material-ui/core/Button";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import CloseIcon from "@material-ui/icons/Close";
 
-import classNames from 'classnames';
-import { CommentTreeNode } from '../../lib/utils/unflatten';
-import withErrorBoundary from '../common/withErrorBoundary'
+import classNames from "classnames";
+import { CommentTreeNode } from "../../lib/utils/unflatten";
+import withErrorBoundary from "../common/withErrorBoundary";
 
-import { Link } from '../../lib/reactRouterWrapper';
-import { postGetPageUrl } from '../../lib/collections/posts/helpers';
+import { Link } from "../../lib/reactRouterWrapper";
+import { postGetPageUrl } from "../../lib/collections/posts/helpers";
 import { AnalyticsContext } from "../../lib/analyticsEvents";
-import type { CommentTreeOptions } from '../comments/commentTree';
-import { useCurrentUser } from '../common/withUser';
-import { isFriendlyUI } from '../../themes/forumTheme';
-import { useRecentDiscussionThread } from './useRecentDiscussionThread';
+import type { CommentTreeOptions } from "../comments/commentTree";
+import { useCurrentUser } from "../common/withUser";
+import { isFriendlyUI } from "../../themes/forumTheme";
+import { useRecentDiscussionThread } from "./useRecentDiscussionThread";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
-    marginBottom: isFriendlyUI ? theme.spacing.unit*2 : theme.spacing.unit*4,
+    marginBottom: isFriendlyUI ? theme.spacing.unit * 2 : theme.spacing.unit * 4,
     position: "relative",
     minHeight: 58,
     boxShadow: theme.palette.boxShadow.default,
@@ -36,7 +33,7 @@ const styles = (theme: ThemeType): JssStyles => ({
   postItem: {
     // position: "absolute",
     // right: "100%",
-    paddingBottom:10,
+    paddingBottom: 10,
     ...theme.typography.postStyle,
     // width: 300,
     // marginTop: -2,
@@ -44,47 +41,47 @@ const styles = (theme: ThemeType): JssStyles => ({
     // marginRight: -theme.spacing.unit
   },
   continueReading: {
-    marginTop:theme.spacing.unit*2,
-    marginBottom:theme.spacing.unit*2,
+    marginTop: theme.spacing.unit * 2,
+    marginBottom: theme.spacing.unit * 2,
   },
   postHighlight: {
     overflow: "hidden",
-    '& a, & a:hover, & a:focus, & a:active, & a:visited': {
-      backgroundColor: "none"
-    }
+    "& a, & a:hover, & a:focus, & a:active, & a:visited": {
+      backgroundColor: "none",
+    },
   },
   noComments: {
-    paddingBottom: 16
+    paddingBottom: 16,
   },
   threadMeta: {
     cursor: "pointer",
 
     "&:hover $showHighlight": {
-      opacity: 1
+      opacity: 1,
     },
   },
   smallerMeta: {
-    '& .PostsItemMeta-info': {
-      fontSize: '1rem'
-    }
+    "& .PostsItemMeta-info": {
+      fontSize: "1rem",
+    },
   },
   showHighlight: {
     opacity: 0,
   },
-  content :{
+  content: {
     marginLeft: 4,
     marginRight: 4,
-    paddingBottom: 1
+    paddingBottom: 1,
   },
   commentsList: {
     marginTop: 12,
     marginLeft: 12,
     marginBottom: 8,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       marginLeft: 0,
       marginRight: 0,
-      marginBottom: 0
-    }
+      marginBottom: 0,
+    },
   },
   post: {
     paddingTop: isFriendlyUI ? 12 : 18,
@@ -92,8 +89,8 @@ const styles = (theme: ThemeType): JssStyles => ({
     paddingRight: 16,
     borderRadius: theme.borderRadius[isFriendlyUI ? "default" : "small"],
     marginBottom: 4,
-    
-    [theme.breakpoints.down('xs')]: {
+
+    [theme.breakpoints.down("xs")]: {
       paddingTop: 16,
       paddingLeft: 14,
       paddingRight: 14,
@@ -110,17 +107,19 @@ const styles = (theme: ThemeType): JssStyles => ({
     marginBottom: 8,
     display: "block",
     fontSize: "1.75rem",
-    ...(isFriendlyUI ? {
-      fontSize: 22,
-      fontWeight: 600,
-      lineHeight: 1.25,
-      fontFamily: theme.palette.fonts.sansSerifStack,
-      marginBottom: 10,
-    } : {})
+    ...(isFriendlyUI
+      ? {
+          fontSize: 22,
+          fontWeight: 600,
+          lineHeight: 1.25,
+          fontFamily: theme.palette.fonts.sansSerifStack,
+          marginBottom: 10,
+        }
+      : {}),
   },
   smallerTitle: {
-    fontSize: '1.5rem',
-    lineHeight: '1.5em'
+    fontSize: "1.5rem",
+    lineHeight: "1.5em",
   },
   actions: {
     "& .PostActionsButton-icon": {
@@ -138,15 +137,15 @@ const styles = (theme: ThemeType): JssStyles => ({
     margin: "-6px 4px 0em 0em",
     width: 32,
     height: 32,
-    minHeight: 'unset',
-    minWidth: 'unset',
+    minHeight: "unset",
+    minWidth: "unset",
   },
   closeIcon: {
-    width: '1em',
-    height: '1em',
+    width: "1em",
+    height: "1em",
     color: theme.palette.icon.dim6,
   },
-})
+});
 
 const RecentDiscussionThread = ({
   post,
@@ -160,121 +159,121 @@ const RecentDiscussionThread = ({
   dismissCallback = () => {},
   classes,
 }: {
-  post: PostsRecentDiscussion,
-  comments?: Array<CommentsList>,
-  refetch: () => void,
-  expandAllThreads?: boolean,
-  maxLengthWords?: number,
-  smallerFonts?: boolean,
-  isSubforumIntroPost?: boolean,
-  commentTreeOptions?: CommentTreeOptions,
-  dismissCallback?: () => void,
-  classes: ClassesType,
+  post: PostsRecentDiscussion;
+  comments?: Array<CommentsList>;
+  refetch: () => void;
+  expandAllThreads?: boolean;
+  maxLengthWords?: number;
+  smallerFonts?: boolean;
+  isSubforumIntroPost?: boolean;
+  commentTreeOptions?: CommentTreeOptions;
+  dismissCallback?: () => void;
+  classes: ClassesType;
 }) => {
   const currentUser = useCurrentUser();
-  const {
-    isSkippable,
-    showHighlight,
-    expandAllThreads,
-    lastVisitedAt,
-    nestedComments,
-    treeOptions,
-  } = useRecentDiscussionThread({
-    post,
-    comments,
-    refetch,
-    commentTreeOptions,
-    initialExpandAllThreads,
-  });
+  const { isSkippable, showHighlight, expandAllThreads, lastVisitedAt, nestedComments, treeOptions } =
+    useRecentDiscussionThread({
+      post,
+      comments,
+      refetch,
+      commentTreeOptions,
+      initialExpandAllThreads,
+    });
 
   if (isSkippable) {
-    return null
+    return null;
   }
 
   const highlightClasses = classNames(classes.postHighlight, {
     // TODO verify whether/how this should be interacting with afCommentCount
-    [classes.noComments]: post.commentCount === null
+    [classes.noComments]: post.commentCount === null,
   });
 
-  const {
-    PostsGroupDetails, PostsItemMeta, CommentsNode, PostsHighlight,
-    PostActionsButton,
-  } = Components;
+  const { PostsGroupDetails, PostsItemMeta, CommentsNode, PostsHighlight, PostActionsButton } = Components;
   return (
-    <AnalyticsContext pageSubSectionContext='recentDiscussionThread'>
-      <div className={classNames(
-        classes.root,
-        {
+    <AnalyticsContext pageSubSectionContext="recentDiscussionThread">
+      <div
+        className={classNames(classes.root, {
           [classes.plainBackground]: !isSubforumIntroPost,
-          [classes.primaryBackground]: isSubforumIntroPost
-        }
-      )}>
-        <div className={classNames(
-          classes.post,
-          {
+          [classes.primaryBackground]: isSubforumIntroPost,
+        })}
+      >
+        <div
+          className={classNames(classes.post, {
             [classes.plainBackground]: !isSubforumIntroPost,
-            [classes.primaryBackground]: isSubforumIntroPost
-          }
-        )}>
+            [classes.primaryBackground]: isSubforumIntroPost,
+          })}
+        >
           <div className={classes.postItem}>
             {post.group && <PostsGroupDetails post={post} documentId={post.group._id} inRecentDiscussion={true} />}
             <div className={classes.titleAndActions}>
-              <Link to={postGetPageUrl(post)} className={classNames(classes.title, {[classes.smallerTitle]: smallerFonts})} eventProps={{intent: 'expandPost'}}>
+              <Link
+                to={postGetPageUrl(post)}
+                className={classNames(classes.title, { [classes.smallerTitle]: smallerFonts })}
+                eventProps={{ intent: "expandPost" }}
+              >
                 {post.title}
               </Link>
-              {isSubforumIntroPost && currentUser ? <Button
-                className={classes.closeButton}
-                onClick={dismissCallback}
-              >
-                <CloseIcon className={classes.closeIcon} />
-              </Button> : <div className={classes.actions}>
-                <PostActionsButton post={post} autoPlace vertical />
-              </div>}
+              {isSubforumIntroPost && currentUser ? (
+                <Button className={classes.closeButton} onClick={dismissCallback}>
+                  <CloseIcon className={classes.closeIcon} />
+                </Button>
+              ) : (
+                <div className={classes.actions}>
+                  <PostActionsButton post={post} autoPlace vertical />
+                </div>
+              )}
             </div>
-            <div className={classNames(classes.threadMeta, {[classes.smallerMeta]: smallerFonts})} onClick={showHighlight}>
-              <PostsItemMeta post={post}/>
+            <div
+              className={classNames(classes.threadMeta, { [classes.smallerMeta]: smallerFonts })}
+              onClick={showHighlight}
+            >
+              <PostsItemMeta post={post} />
             </div>
           </div>
           <div className={highlightClasses}>
-            <PostsHighlight post={post} maxLengthWords={maxLengthWords ?? lastVisitedAt ? 50 : 170} smallerFonts={smallerFonts} />
+            <PostsHighlight
+              post={post}
+              maxLengthWords={maxLengthWords ?? lastVisitedAt ? 50 : 170}
+              smallerFonts={smallerFonts}
+            />
           </div>
         </div>
         <div className={classes.content}>
           <div className={classes.commentsList}>
-            {!!nestedComments.length && nestedComments.map((comment: CommentTreeNode<CommentsList>) =>
-              <div key={comment.item._id}>
-                <CommentsNode
-                  treeOptions={treeOptions}
-                  startThreadTruncated={true}
-                  expandAllThreads={expandAllThreads}
-                  expandNewComments={false}
-                  nestingLevel={1}
-                  comment={comment.item}
-                  childComments={comment.children}
-                  key={comment.item._id}
-                />
-              </div>
-            )}
+            {!!nestedComments.length &&
+              nestedComments.map((comment: CommentTreeNode<CommentsList>) => (
+                <div key={comment.item._id}>
+                  <CommentsNode
+                    treeOptions={treeOptions}
+                    startThreadTruncated={true}
+                    expandAllThreads={expandAllThreads}
+                    expandNewComments={false}
+                    nestingLevel={1}
+                    comment={comment.item}
+                    childComments={comment.children}
+                    key={comment.item._id}
+                  />
+                </div>
+              ))}
           </div>
         </div>
       </div>
     </AnalyticsContext>
-  )
+  );
 };
 
-const RecentDiscussionThreadComponent = registerComponent(
-  'RecentDiscussionThread', RecentDiscussionThread, {
-    styles,
-    hocs: [withErrorBoundary],
-    areEqual: {
-      post: (before, after) => (before?._id === after?._id),
-      refetch: "ignore",
-    },
-  }
-);
+const RecentDiscussionThreadComponent = registerComponent("RecentDiscussionThread", RecentDiscussionThread, {
+  styles,
+  hocs: [withErrorBoundary],
+  areEqual: {
+    post: (before, after) => before?._id === after?._id,
+    refetch: "ignore",
+  },
+});
 
 declare global {
   interface ComponentTypes {
-    RecentDiscussionThread: typeof RecentDiscussionThreadComponent,
+    RecentDiscussionThread: typeof RecentDiscussionThreadComponent;
   }
 }

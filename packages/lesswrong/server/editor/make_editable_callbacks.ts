@@ -1,98 +1,108 @@
-import {getCollectionHooks} from '../mutationCallbacks'
-import {ChangeMetrics, Revisions} from '../../lib/collections/revisions/collection'
-import {extractVersionsFromSemver} from '../../lib/editor/utils'
-import {ensureIndex} from '../../lib/collectionIndexUtils'
-import {htmlToPingbacks} from '../pingbacks'
-import {diff} from '../vendor/node-htmldiff/htmldiff'
+import { getCollectionHooks } from "../mutationCallbacks";
+import { ChangeMetrics, Revisions } from "../../lib/collections/revisions/collection";
+import { extractVersionsFromSemver } from "../../lib/editor/utils";
+import { ensureIndex } from "../../lib/collectionIndexUtils";
+import { htmlToPingbacks } from "../pingbacks";
+import { diff } from "../vendor/node-htmldiff/htmldiff";
 import {
   editableCollections,
   editableCollectionsFieldOptions,
   editableCollectionsFields,
   MakeEditableOptions,
   sealEditableFields,
-} from '../../lib/editor/make_editable'
-import {getCollection} from '../../lib/vulcan-lib/getCollection'
-import {CallbackHook} from '../../lib/vulcan-lib/callbacks'
-import {createMutator, validateCreateMutation} from '../vulcan-lib/mutators'
-import * as _ from 'underscore'
-import cheerio from 'cheerio'
-import {onStartup} from '../../lib/executionEnvironment'
-import {dataToHTML, dataToWordCount} from './conversionUtils'
-import {Globals} from '../../lib/vulcan-lib/config'
-import {notifyUsersAboutMentions, PingbackDocumentPartial} from './mentions-notify'
-import {isBeingUndrafted, MaybeDrafteable} from './utils'
-import { Comments } from '../../lib/collections/comments'
-import { cheerioParse } from '../utils/htmlUtil'
+} from "../../lib/editor/make_editable";
+import { getCollection } from "../../lib/vulcan-lib/getCollection";
+import { CallbackHook } from "../../lib/vulcan-lib/callbacks";
+import { createMutator, validateCreateMutation } from "../vulcan-lib/mutators";
+import * as _ from "underscore";
+import cheerio from "cheerio";
+import { onStartup } from "../../lib/executionEnvironment";
+import { dataToHTML, dataToWordCount } from "./conversionUtils";
+import { Globals } from "../../lib/vulcan-lib/config";
+import { notifyUsersAboutMentions, PingbackDocumentPartial } from "./mentions-notify";
+import { isBeingUndrafted, MaybeDrafteable } from "./utils";
+import { Comments } from "../../lib/collections/comments";
+import { cheerioParse } from "../utils/htmlUtil";
 
 // TODO: Now that the make_editable callbacks use createMutator to create
 // revisions, we can now add these to the regular ${collection}.create.after
 // callbacks
 interface AfterCreateRevisionCallbackContext {
-  revisionID: string
+  revisionID: string;
 }
-export const afterCreateRevisionCallback = new CallbackHook<[AfterCreateRevisionCallbackContext]>("revisions.afterRevisionCreated");
+export const afterCreateRevisionCallback = new CallbackHook<[AfterCreateRevisionCallbackContext]>(
+  "revisions.afterRevisionCreated",
+);
 
-function getInitialVersion(document: DbPost|DbObject) {
+function getInitialVersion(document: DbPost | DbObject) {
   if ((document as DbPost).draft) {
-    return '0.1.0'
+    return "0.1.0";
   } else {
-    return '1.0.0'
+    return "1.0.0";
   }
 }
 
-export async function getLatestRev(documentId: string, fieldName: string): Promise<DbRevision|null> {
-  return await Revisions.findOne({documentId: documentId, fieldName}, {sort: {editedAt: -1}})
+export async function getLatestRev(documentId: string, fieldName: string): Promise<DbRevision | null> {
+  return await Revisions.findOne({ documentId: documentId, fieldName }, { sort: { editedAt: -1 } });
 }
 
 /// Given a revision, return the last revision of the same document/field prior
 /// to it (null if the revision is the first).
-export async function getPrecedingRev(rev: DbRevision): Promise<DbRevision|null> {
+export async function getPrecedingRev(rev: DbRevision): Promise<DbRevision | null> {
   return await Revisions.findOne(
-    {documentId: rev.documentId, fieldName: rev.fieldName, editedAt: {$lt: rev.editedAt}},
-    {sort: {editedAt: -1}}
+    { documentId: rev.documentId, fieldName: rev.fieldName, editedAt: { $lt: rev.editedAt } },
+    { sort: { editedAt: -1 } },
   );
 }
 
-export function getNextVersion(previousRevision: DbRevision | null, updateType: DbRevision['updateType'] = 'minor', isDraft: boolean) {
-  const { major, minor, patch } = extractVersionsFromSemver(previousRevision?.version || "1.0.0")
+export function getNextVersion(
+  previousRevision: DbRevision | null,
+  updateType: DbRevision["updateType"] = "minor",
+  isDraft: boolean,
+) {
+  const { major, minor, patch } = extractVersionsFromSemver(previousRevision?.version || "1.0.0");
   switch (updateType) {
     case "patch":
-      return `${major}.${minor}.${patch + 1}`
+      return `${major}.${minor}.${patch + 1}`;
     case "minor":
-      return `${major}.${minor + 1}.0`
+      return `${major}.${minor + 1}.0`;
     case "major":
-      return `${major+1}.0.0`
+      return `${major + 1}.0.0`;
     case "initial":
-      return isDraft ? '0.1.0' : '1.0.0'
+      return isDraft ? "0.1.0" : "1.0.0";
     default:
-      throw new Error("Invalid updateType, must be one of 'patch', 'minor' or 'major'")
+      throw new Error("Invalid updateType, must be one of 'patch', 'minor' or 'major'");
   }
 }
 
 function versionIsDraft(semver: string, collectionName: CollectionNameString) {
-  if (collectionName === "Tags")
-    return false;
-  const { major, minor, patch } = extractVersionsFromSemver(semver)
-  return major===0;
+  if (collectionName === "Tags") return false;
+  const { major, minor, patch } = extractVersionsFromSemver(semver);
+  return major === 0;
 }
 
-ensureIndex(Revisions, {documentId: 1, version: 1, fieldName: 1, editedAt: 1})
+ensureIndex(Revisions, { documentId: 1, version: 1, fieldName: 1, editedAt: 1 });
 
-export async function buildRevision({ originalContents, currentUser, dataWithDiscardedSuggestions }:{
-  originalContents: DbRevision["originalContents"],
-  currentUser: DbUser,
-  dataWithDiscardedSuggestions?: string
+export async function buildRevision({
+  originalContents,
+  currentUser,
+  dataWithDiscardedSuggestions,
+}: {
+  originalContents: DbRevision["originalContents"];
+  currentUser: DbUser;
+  dataWithDiscardedSuggestions?: string;
 }) {
-
-  if (!originalContents) throw new Error ("Can't build revision without originalContents")
+  if (!originalContents) throw new Error("Can't build revision without originalContents");
 
   const { data, type } = originalContents;
-  const readerVisibleData = dataWithDiscardedSuggestions ?? data
-  const html = await dataToHTML(readerVisibleData, type, !currentUser.isAdmin)
-  const wordCount = await dataToWordCount(readerVisibleData, type)
+  const readerVisibleData = dataWithDiscardedSuggestions ?? data;
+  const html = await dataToHTML(readerVisibleData, type, !currentUser.isAdmin);
+  const wordCount = await dataToWordCount(readerVisibleData, type);
 
   return {
-    html, wordCount, originalContents,
+    html,
+    wordCount,
+    originalContents,
     editedAt: new Date(),
     userId: currentUser._id,
   };
@@ -104,49 +114,50 @@ export const revisionIsChange = async (doc: AnyBecauseTodo, fieldName: string): 
   const id = doc._id;
   const previousVersion = await getLatestRev(id, fieldName);
 
-  if (!previousVersion)
-    return true;
+  if (!previousVersion) return true;
 
   if (!_.isEqual(doc[fieldName].originalContents, previousVersion.originalContents)) {
     return true;
   }
 
-  if (doc[fieldName].commitMessage && doc[fieldName].commitMessage.length>0) {
+  if (doc[fieldName].commitMessage && doc[fieldName].commitMessage.length > 0) {
     return true;
   }
 
   return false;
-}
+};
 
-function addEditableCallbacks<N extends CollectionNameString>({collection, options = {}}: {
-  collection: CollectionBase<N>,
-  options: MakeEditableOptions
+function addEditableCallbacks<N extends CollectionNameString>({
+  collection,
+  options = {},
+}: {
+  collection: CollectionBase<N>;
+  options: MakeEditableOptions;
 }) {
-  const {
-    fieldName = "contents",
-    pingbacks = false,
-  } = options
+  const { fieldName = "contents", pingbacks = false } = options;
 
   const collectionName = collection.collectionName;
 
-  getCollectionHooks(collectionName).createBefore.add(
-    async function editorSerializationBeforeCreate (doc: AnyBecauseTodo, { currentUser, context }: AnyBecauseTodo)
-  {
+  getCollectionHooks(collectionName).createBefore.add(async function editorSerializationBeforeCreate(
+    doc: AnyBecauseTodo,
+    { currentUser, context }: AnyBecauseTodo,
+  ) {
     if (doc[fieldName]?.originalContents) {
-      if (!currentUser) { throw Error("Can't create document without current user") }
-      const { data, type } = doc[fieldName].originalContents
+      if (!currentUser) {
+        throw Error("Can't create document without current user");
+      }
+      const { data, type } = doc[fieldName].originalContents;
       const commitMessage = doc[fieldName].commitMessage;
-      const html = await dataToHTML(data, type, !currentUser.isAdmin)
-      const wordCount = await dataToWordCount(data, type)
-      const version = getInitialVersion(doc)
-      const userId = currentUser._id
-      const editedAt = new Date()
+      const html = await dataToHTML(data, type, !currentUser.isAdmin);
+      const wordCount = await dataToWordCount(data, type);
+      const version = getInitialVersion(doc);
+      const userId = currentUser._id;
+      const editedAt = new Date();
       const changeMetrics = htmlToChangeMetrics("", html);
-      const isFirstDebatePostComment = (collectionName === 'Posts' && 'debate' in doc)
-        ? (!!doc.debate && fieldName === 'contents')
-        : false;
+      const isFirstDebatePostComment =
+        collectionName === "Posts" && "debate" in doc ? !!doc.debate && fieldName === "contents" : false;
 
-      const originalContents: DbRevision["originalContents"] = doc[fieldName].originalContents
+      const originalContents: DbRevision["originalContents"] = doc[fieldName].originalContents;
 
       if (isFirstDebatePostComment) {
         const createFirstCommentParams: CreateMutatorParams<"Comments"> = {
@@ -165,7 +176,22 @@ function addEditableCallbacks<N extends CollectionNameString>({collection, optio
         await validateCreateMutation(createFirstCommentParams);
       }
 
-      const newRevision: Omit<DbRevision, "documentId" | "schemaVersion" | "_id" | "voteCount" | "baseScore" | "extendedScore" | "score" | "inactive" | "autosaveTimeoutStart" | "afBaseScore" | "afExtendedScore" | "afVoteCount" | "legacyData"> = {
+      const newRevision: Omit<
+        DbRevision,
+        | "documentId"
+        | "schemaVersion"
+        | "_id"
+        | "voteCount"
+        | "baseScore"
+        | "extendedScore"
+        | "score"
+        | "inactive"
+        | "autosaveTimeoutStart"
+        | "afBaseScore"
+        | "afExtendedScore"
+        | "afVoteCount"
+        | "legacyData"
+      > = {
         ...(await buildRevision({
           originalContents,
           currentUser,
@@ -174,7 +200,7 @@ function addEditableCallbacks<N extends CollectionNameString>({collection, optio
         collectionName,
         version,
         draft: versionIsDraft(version, collectionName),
-        updateType: 'initial',
+        updateType: "initial",
         commitMessage,
         changeMetrics,
         createdAt: editedAt,
@@ -182,60 +208,85 @@ function addEditableCallbacks<N extends CollectionNameString>({collection, optio
       const firstRevision = await createMutator({
         collection: Revisions,
         document: newRevision,
-        validate: false
+        validate: false,
       });
 
       return {
         ...doc,
         [fieldName]: {
           ...doc[fieldName],
-          html, version, userId, editedAt, wordCount,
-          updateType: 'initial'
+          html,
+          version,
+          userId,
+          editedAt,
+          wordCount,
+          updateType: "initial",
         },
         [`${fieldName}_latest`]: firstRevision.data._id,
-        ...(pingbacks ? {
-          pingbacks: await htmlToPingbacks(html, null),
-        } : null),
-      }
+        ...(pingbacks
+          ? {
+              pingbacks: await htmlToPingbacks(html, null),
+            }
+          : null),
+      };
     }
-    return doc
+    return doc;
   });
 
-  getCollectionHooks(collectionName).updateBefore.add(
-    async function editorSerializationEdit (docData: AnyBecauseTodo, { oldDocument: document, newDocument, currentUser }: AnyBecauseTodo)
-  {
+  getCollectionHooks(collectionName).updateBefore.add(async function editorSerializationEdit(
+    docData: AnyBecauseTodo,
+    { oldDocument: document, newDocument, currentUser }: AnyBecauseTodo,
+  ) {
     if (docData[fieldName]?.originalContents) {
-      if (!currentUser) { throw Error("Can't create document without current user") }
+      if (!currentUser) {
+        throw Error("Can't create document without current user");
+      }
 
-      const { data, type } = docData[fieldName].originalContents
+      const { data, type } = docData[fieldName].originalContents;
       const commitMessage = docData[fieldName].commitMessage;
-      const dataWithDiscardedSuggestions = docData[fieldName].dataWithDiscardedSuggestions
-      delete docData[fieldName].dataWithDiscardedSuggestions
+      const dataWithDiscardedSuggestions = docData[fieldName].dataWithDiscardedSuggestions;
+      delete docData[fieldName].dataWithDiscardedSuggestions;
 
-      const readerVisibleData = dataWithDiscardedSuggestions ?? data
-      const html = await dataToHTML(readerVisibleData, type, !currentUser.isAdmin)
-      const wordCount = await dataToWordCount(readerVisibleData, type)
-      const defaultUpdateType = docData[fieldName].updateType || (!document[fieldName] && 'initial') || 'minor'
+      const readerVisibleData = dataWithDiscardedSuggestions ?? data;
+      const html = await dataToHTML(readerVisibleData, type, !currentUser.isAdmin);
+      const wordCount = await dataToWordCount(readerVisibleData, type);
+      const defaultUpdateType = docData[fieldName].updateType || (!document[fieldName] && "initial") || "minor";
       // When a document is undrafted for the first time, we ensure that this constitutes a major update
-      const { major } = extractVersionsFromSemver((document[fieldName] && document[fieldName].version) ? document[fieldName].version : undefined)
-      const beingUndrafted = isBeingUndrafted(document as MaybeDrafteable, newDocument as MaybeDrafteable)
-      const updateType = (beingUndrafted && (major < 1)) ? 'major' : defaultUpdateType
-      const userId = currentUser._id
-      const editedAt = new Date()
+      const { major } = extractVersionsFromSemver(
+        document[fieldName] && document[fieldName].version ? document[fieldName].version : undefined,
+      );
+      const beingUndrafted = isBeingUndrafted(document as MaybeDrafteable, newDocument as MaybeDrafteable);
+      const updateType = beingUndrafted && major < 1 ? "major" : defaultUpdateType;
+      const userId = currentUser._id;
+      const editedAt = new Date();
       const previousRev = await getLatestRev(newDocument._id, fieldName);
-      const version = getNextVersion(previousRev, updateType, (newDocument as DbPost).draft)
+      const version = getNextVersion(previousRev, updateType, (newDocument as DbPost).draft);
 
       let newRevisionId;
       if (await revisionIsChange(newDocument, fieldName)) {
         const changeMetrics = htmlToChangeMetrics(previousRev?.html || "", html);
 
-        const newRevision: Omit<DbRevision, '_id' | 'schemaVersion' | "voteCount" | "baseScore" | "extendedScore"| "score" | "inactive" | "autosaveTimeoutStart" | "afBaseScore" | "afExtendedScore" | "afVoteCount" | "legacyData"> = {
+        const newRevision: Omit<
+          DbRevision,
+          | "_id"
+          | "schemaVersion"
+          | "voteCount"
+          | "baseScore"
+          | "extendedScore"
+          | "score"
+          | "inactive"
+          | "autosaveTimeoutStart"
+          | "afBaseScore"
+          | "afExtendedScore"
+          | "afVoteCount"
+          | "legacyData"
+        > = {
           documentId: document._id,
-          ...await buildRevision({
+          ...(await buildRevision({
             originalContents: newDocument[fieldName].originalContents,
             dataWithDiscardedSuggestions,
             currentUser,
-          }),
+          })),
           fieldName,
           collectionName,
           version,
@@ -244,11 +295,11 @@ function addEditableCallbacks<N extends CollectionNameString>({collection, optio
           commitMessage,
           changeMetrics,
           createdAt: editedAt,
-        }
+        };
         const newRevisionDoc = await createMutator({
           collection: Revisions,
           document: newRevision,
-          validate: false
+          validate: false,
         });
         newRevisionId = newRevisionDoc.data._id;
       } else {
@@ -263,52 +314,54 @@ function addEditableCallbacks<N extends CollectionNameString>({collection, optio
         ...docData,
         [fieldName]: {
           ...docData[fieldName],
-          html, version, userId, editedAt, wordCount
+          html,
+          version,
+          userId,
+          editedAt,
+          wordCount,
         },
         [`${fieldName}_latest`]: newRevisionId,
-        ...(pingbacks ? {
-          pingbacks: await htmlToPingbacks(html, [{
-              collectionName: collection.collectionName,
-              documentId: document._id,
-            }]
-          ),
-        } : null),
-      }
+        ...(pingbacks
+          ? {
+              pingbacks: await htmlToPingbacks(html, [
+                {
+                  collectionName: collection.collectionName,
+                  documentId: document._id,
+                },
+              ]),
+            }
+          : null),
+      };
     }
-    return docData
+    return docData;
   });
 
-  getCollectionHooks(collectionName).createAfter.add(
-    async function editorSerializationAfterCreate(newDoc: AnyBecauseTodo)
-  {
+  getCollectionHooks(collectionName).createAfter.add(async function editorSerializationAfterCreate(
+    newDoc: AnyBecauseTodo,
+  ) {
     // Update revision to point to the document that owns it.
     const revisionID = newDoc[`${fieldName}_latest`];
     if (revisionID) {
-      await Revisions.rawUpdateOne(
-        { _id: revisionID },
-        { $set: { documentId: newDoc._id } }
-      );
+      await Revisions.rawUpdateOne({ _id: revisionID }, { $set: { documentId: newDoc._id } });
       await afterCreateRevisionCallback.runCallbacksAsync([{ revisionID: revisionID }]);
     }
     return newDoc;
   });
 
-
-  getCollectionHooks(collectionName).createAfter.add(async (newDocument, {currentUser}) => {
-    if (currentUser && pingbacks && 'pingbacks' in newDocument) {
-      await notifyUsersAboutMentions(currentUser, collection.typeName, newDocument)
+  getCollectionHooks(collectionName).createAfter.add(async (newDocument, { currentUser }) => {
+    if (currentUser && pingbacks && "pingbacks" in newDocument) {
+      await notifyUsersAboutMentions(currentUser, collection.typeName, newDocument);
     }
 
-    return newDocument
-  })
+    return newDocument;
+  });
 
-  if (collectionName === 'Posts') {
-    getCollectionHooks(collectionName).createAfter.add(
-      async function updateFirstDebateCommentPostId(newDoc, { context, currentUser })
-    {
-      const isFirstDebatePostComment = 'debate' in newDoc
-          ? (!!newDoc.debate && fieldName === 'contents')
-          : false;
+  if (collectionName === "Posts") {
+    getCollectionHooks(collectionName).createAfter.add(async function updateFirstDebateCommentPostId(
+      newDoc,
+      { context, currentUser },
+    ) {
+      const isFirstDebatePostComment = "debate" in newDoc ? !!newDoc.debate && fieldName === "contents" : false;
       if (currentUser && isFirstDebatePostComment) {
         await createMutator({
           collection: Comments,
@@ -326,13 +379,18 @@ function addEditableCallbacks<N extends CollectionNameString>({collection, optio
     });
   }
 
-  getCollectionHooks(collectionName).updateAfter.add(async (newDocument, {oldDocument, currentUser}) => {
-    if (currentUser && pingbacks && 'pingbacks' in newDocument) {
-      await notifyUsersAboutMentions(currentUser, collection.typeName, newDocument, oldDocument as PingbackDocumentPartial)
+  getCollectionHooks(collectionName).updateAfter.add(async (newDocument, { oldDocument, currentUser }) => {
+    if (currentUser && pingbacks && "pingbacks" in newDocument) {
+      await notifyUsersAboutMentions(
+        currentUser,
+        collection.typeName,
+        newDocument,
+        oldDocument as PingbackDocumentPartial,
+      );
     }
 
-    return newDocument
-  })
+    return newDocument;
+  });
 
   /**
    * Reupload images to cloudinary. This is mainly for images pasted from google docs, because
@@ -344,20 +402,20 @@ function addEditableCallbacks<N extends CollectionNameString>({collection, optio
    * It's fine to leave it here just in case though
    */
   getCollectionHooks(collectionName).editAsync.add(async (doc: DbObject, oldDoc: DbObject) => {
-    const isPostContentsContext = collectionName === 'Posts' && fieldName === 'contents';
+    const isPostContentsContext = collectionName === "Posts" && fieldName === "contents";
     const hasChanged = (oldDoc as DbPost)?.contents?.html !== (doc as DbPost)?.contents?.html;
-    
+
     if (isPostContentsContext && !hasChanged) return;
 
     await Globals.convertImagesInObject(collectionName, doc._id, fieldName);
-  })
+  });
   getCollectionHooks(collectionName).newAsync.add(async (doc: DbObject) => {
-    await Globals.convertImagesInObject(collectionName, doc._id, fieldName)
-  })
-  if (collectionName === 'Posts') {
+    await Globals.convertImagesInObject(collectionName, doc._id, fieldName);
+  });
+  if (collectionName === "Posts") {
     getCollectionHooks("Posts").newAsync.add(async (doc: DbPost) => {
       await Globals.rehostPostMetaImages(doc);
-    })
+    });
   }
 }
 
@@ -367,7 +425,7 @@ export function addAllEditableCallbacks() {
     for (let fieldName of editableCollectionsFields[collectionName]) {
       const collection = getCollection(collectionName);
       const options = editableCollectionsFieldOptions[collectionName][fieldName];
-      addEditableCallbacks({collection, options});
+      addEditableCallbacks({ collection, options });
     }
   }
 }
@@ -385,20 +443,20 @@ const diffToChangeMetrics = (diffHtml: string): ChangeMetrics => {
   const removedChars = countCharsInTag(parsedHtml, "del");
 
   return { added: insertedChars, removed: removedChars };
-}
+};
 
 const countCharsInTag = (parsedHtml: cheerio.Root, tagName: string): number => {
   const instancesOfTag = parsedHtml(tagName);
   let cumulative = 0;
-  for (let i=0; i<instancesOfTag.length; i++) {
+  for (let i = 0; i < instancesOfTag.length; i++) {
     const tag = instancesOfTag[i];
     const text = cheerio(tag).text();
     cumulative += text.length;
   }
   return cumulative;
-}
+};
 
 export const htmlToChangeMetrics = (oldHtml: string, newHtml: string): ChangeMetrics => {
   const htmlDiff = diff(oldHtml, newHtml);
   return diffToChangeMetrics(htmlDiff);
-}
+};

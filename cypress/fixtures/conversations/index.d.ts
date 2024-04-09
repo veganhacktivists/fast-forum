@@ -1,4 +1,2 @@
-
-const testConversations: DbConversation[]
-export default testConversations
-
+const testConversations: DbConversation[];
+export default testConversations;

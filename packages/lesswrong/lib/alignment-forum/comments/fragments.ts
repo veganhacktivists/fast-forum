@@ -1,4 +1,4 @@
-import { registerFragment } from '../../vulcan-lib';
+import { registerFragment } from "../../vulcan-lib";
 
 registerFragment(`
   fragment SuggestAlignmentComment on Comment {
@@ -11,4 +11,4 @@ registerFragment(`
       _id
       displayName
     }
-  }`)
+  }`);

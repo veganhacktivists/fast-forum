@@ -19,7 +19,7 @@ const PostsTooltip = ({
   dialogueMessageInfo,
   hash,
   postsList,
-  inlineBlock=false,
+  inlineBlock = false,
   As,
   clickable,
   flip,
@@ -29,65 +29,48 @@ const PostsTooltip = ({
   pageElementSubContext,
   className,
 }: {
-  post?: PostsList | SunshinePostsList | null,
-  postId?: string,
-  comment?: CommentsList,
-  commentId?: string,
-  tagRelId?: string,
-  dialogueMessageInfo?: DialogueMessageInfo,
-  hash?: string | null,
-  postsList?: boolean,
-  inlineBlock?: boolean,
-  As?: keyof JSX.IntrinsicElements,
-  clickable?: boolean,
-  flip?: boolean,
-  placement?: PopperPlacementType,
-  children?: ReactNode,
-  pageElementContext?: string,
-  pageElementSubContext?: string,
-  className?: string,
+  post?: PostsList | SunshinePostsList | null;
+  postId?: string;
+  comment?: CommentsList;
+  commentId?: string;
+  tagRelId?: string;
+  dialogueMessageInfo?: DialogueMessageInfo;
+  hash?: string | null;
+  postsList?: boolean;
+  inlineBlock?: boolean;
+  As?: keyof JSX.IntrinsicElements;
+  clickable?: boolean;
+  flip?: boolean;
+  placement?: PopperPlacementType;
+  children?: ReactNode;
+  pageElementContext?: string;
+  pageElementSubContext?: string;
+  className?: string;
 }) => {
   const renderTitle = useCallback(() => {
     if (tagRelId) {
-      return (
-        <TaggedPostTooltipSingle tagRelId={tagRelId} />
-      );
+      return <TaggedPostTooltipSingle tagRelId={tagRelId} />;
     }
     if (post) {
-      return (
-        <PostsPreviewTooltip
-          post={post}
-          postsList={postsList}
-          comment={comment}
-          hash={hash}
-        />
-      );
+      return <PostsPreviewTooltip post={post} postsList={postsList} comment={comment} hash={hash} />;
     }
 
     if (postId) {
       if (dialogueMessageInfo) {
-        return <DialogueMessagePreviewTooltip postId={postId} dialogueMessageInfo={dialogueMessageInfo}/>
+        return <DialogueMessagePreviewTooltip postId={postId} dialogueMessageInfo={dialogueMessageInfo} />;
       }
 
       const actualCommentId = commentId ?? comment?._id;
-      return actualCommentId
-        ? (
-          <PostsPreviewTooltipSingleWithComment
-            postId={postId}
-            commentId={actualCommentId}
-          />
-        )
-        : (
-          <PostsPreviewTooltipSingle
-            postId={postId}
-            postsList={postsList}
-          />
-        );
+      return actualCommentId ? (
+        <PostsPreviewTooltipSingleWithComment postId={postId} commentId={actualCommentId} />
+      ) : (
+        <PostsPreviewTooltipSingle postId={postId} postsList={postsList} />
+      );
     }
     return null;
   }, [tagRelId, post, postId, postsList, comment, commentId, dialogueMessageInfo, hash]);
 
-  const {EAHoverOver, LWTooltip} = Components;
+  const { EAHoverOver, LWTooltip } = Components;
   const Tooltip = isFriendlyUI ? EAHoverOver : LWTooltip;
   return (
     <Tooltip
@@ -109,15 +92,12 @@ const PostsTooltip = ({
       {children}
     </Tooltip>
   );
-}
+};
 
-const PostsTooltipComponent = registerComponent(
-  "PostsTooltip",
-  PostsTooltip,
-);
+const PostsTooltipComponent = registerComponent("PostsTooltip", PostsTooltip);
 
 declare global {
   interface ComponentTypes {
-    PostsTooltip: typeof PostsTooltipComponent
+    PostsTooltip: typeof PostsTooltipComponent;
   }
 }

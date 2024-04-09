@@ -1,27 +1,31 @@
-import React from 'react';
-import { siteNameWithArticleSetting } from '../../lib/instanceSettings';
-import { registerComponent } from '../../lib/vulcan-lib';
-import { getSiteUrl } from '../../lib/vulcan-lib/utils';
+import React from "react";
+import { siteNameWithArticleSetting } from "../../lib/instanceSettings";
+import { registerComponent } from "../../lib/vulcan-lib";
+import { getSiteUrl } from "../../lib/vulcan-lib/utils";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     "& img": {
       maxWidth: "100%",
-    }
+    },
   },
-})
+});
 
 // Wrapper for top-level formatting of emails, eg controling width and
 // background color. See also the global CSS in renderEmail.js. Derived from
 // wrapper.handlebars in Vulcan-Starter.
-const EmailWrapper = ({unsubscribeAllLink, children, classes}: {
-  unsubscribeAllLink: string | null,
-  children: React.ReactNode,
-  classes: ClassesType,
+const EmailWrapper = ({
+  unsubscribeAllLink,
+  children,
+  classes,
+}: {
+  unsubscribeAllLink: string | null;
+  children: React.ReactNode;
+  classes: ClassesType;
 }) => {
-  const accountLink = `${getSiteUrl()}account`
-  const siteNameWithArticle = siteNameWithArticleSetting.get()
-  
+  const accountLink = `${getSiteUrl()}account`;
+  const siteNameWithArticle = siteNameWithArticleSetting.get();
+
   // Put props for some HTML elements in any-typed objects, because emails use
   // non-HTML5 attributes which the typechecker will complain about
   const bodyProps: any = {
@@ -43,7 +47,7 @@ const EmailWrapper = ({unsubscribeAllLink, children, classes}: {
     align: "center",
     valign: "top",
     bgcolor: "#ffffff",
-    style: {"backgroundColor": "#ffffff"},
+    style: { backgroundColor: "#ffffff" },
   };
   const innerTableProps: any = {
     border: "0",
@@ -55,10 +59,10 @@ const EmailWrapper = ({unsubscribeAllLink, children, classes}: {
   const innerTdProps: any = {
     bgcolor: "#ffffff",
   };
-  
+
   return (
     <body {...bodyProps}>
-      <br/>
+      <br />
 
       {/* 100% wrapper */}
       <div className={classes.root}>
@@ -66,25 +70,27 @@ const EmailWrapper = ({unsubscribeAllLink, children, classes}: {
           <tbody>
             <tr>
               <td className="wrapper" {...outerTdProps}>
-
                 {/* 600px container (white background) */}
                 <table className="container" {...innerTableProps}>
                   <tbody>
                     <tr>
                       <td className="container-padding" {...innerTdProps}>
-                        <br/>
+                        <br />
                         {children}
                       </td>
                     </tr>
-                    <tr><td className="container-padding">
-                      <br/>
-                      {unsubscribeAllLink && <>
-                        <a href={unsubscribeAllLink}>Unsubscribe</a>{' '}
-                        (from all emails from {siteNameWithArticle})
-                        or <a href={accountLink}>Change your notifications settings</a>
-                      </>}
-                      <br/>
-                    </td></tr>
+                    <tr>
+                      <td className="container-padding">
+                        <br />
+                        {unsubscribeAllLink && (
+                          <>
+                            <a href={unsubscribeAllLink}>Unsubscribe</a> (from all emails from {siteNameWithArticle}) or{" "}
+                            <a href={accountLink}>Change your notifications settings</a>
+                          </>
+                        )}
+                        <br />
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </td>
@@ -92,15 +98,16 @@ const EmailWrapper = ({unsubscribeAllLink, children, classes}: {
           </tbody>
         </table>
       </div>
-      <br/><br/>
+      <br />
+      <br />
     </body>
   );
-}
+};
 
-const EmailWrapperComponent = registerComponent("EmailWrapper", EmailWrapper, {styles});
+const EmailWrapperComponent = registerComponent("EmailWrapper", EmailWrapper, { styles });
 
 declare global {
   interface ComponentTypes {
-    EmailWrapper: typeof EmailWrapperComponent
+    EmailWrapper: typeof EmailWrapperComponent;
   }
 }

@@ -7,13 +7,14 @@ import { getSqlClientOrThrow } from "../../lib/sql/sqlClient";
  */
 class MoreFromAuthorStrategy extends RecommendationStrategy {
   async recommend(
-    _currentUser: DbUser|null,
+    _currentUser: DbUser | null,
     count: number,
-    {postId}: StrategySpecification,
+    { postId }: StrategySpecification,
   ): Promise<RecommendationResult> {
     const db = getSqlClientOrThrow();
     const postFilter = this.getDefaultPostFilter();
-    const posts = await db.any(`
+    const posts = await db.any(
+      `
       SELECT p.*
       FROM "Posts" p
       JOIN "Posts" src ON src."_id" = $(postId)
@@ -30,13 +31,15 @@ class MoreFromAuthorStrategy extends RecommendationStrategy {
         ))
       ORDER BY coauthor."status"->>'userId' = src."userId" DESC, p."score" DESC
       LIMIT $(count)
-    `, {
-      postId,
-      count,
-      ...postFilter.args,
-    });
-    return {posts, settings: {postId}};
-  };
+    `,
+      {
+        postId,
+        count,
+        ...postFilter.args,
+      },
+    );
+    return { posts, settings: { postId } };
+  }
 }
 
 export default MoreFromAuthorStrategy;

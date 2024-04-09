@@ -5,27 +5,27 @@ export type SearchResultHit = SearchDocument;
  * the server.
  */
 export type SearchResult = {
-  hits: SearchResultHit[],
-  nbHits: number,
-  page: number,
-  nbPages: number,
-  hitsPerPage: number,
-  exhaustiveNbHits: boolean,
-  exhaustiveType: boolean,
+  hits: SearchResultHit[];
+  nbHits: number;
+  page: number;
+  nbPages: number;
+  hitsPerPage: number;
+  exhaustiveNbHits: boolean;
+  exhaustiveType: boolean;
   exhaustive: {
-    nbHits: boolean,
-    typo: boolean,
-  },
-  query: string,
-  params: string,
-  index: string,
-  processingTimeMS: number,
+    nbHits: boolean;
+    typo: boolean;
+  };
+  query: string;
+  params: string;
+  index: string;
+  processingTimeMS: number;
   processingTimingsMS: {
     request: {
-      roundTrip: number,
-    },
-  },
-  serverTimeMS: number,
-  facets_stats?: Record<string, {min: number, max: number}>,
-  facets?: Record<string, Record<string | number, number>>,
-}
+      roundTrip: number;
+    };
+  };
+  serverTimeMS: number;
+  facets_stats?: Record<string, { min: number; max: number }>;
+  facets?: Record<string, Record<string | number, number>>;
+};

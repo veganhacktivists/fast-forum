@@ -1,4 +1,4 @@
-import { RichUtils } from 'draft-js';
+import { RichUtils } from "draft-js";
 
 const leaveList = (editorState) => {
   const contentState = editorState.getCurrentContent();

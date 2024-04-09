@@ -1,7 +1,7 @@
-import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
-import Posts from '../../lib/collections/posts/collection';
-import Comments from '../../lib/collections/comments/collection';
-import { cheerioParse } from '../utils/htmlUtil';
+import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
+import Posts from "../../lib/collections/posts/collection";
+import Comments from "../../lib/collections/comments/collection";
+import { cheerioParse } from "../utils/htmlUtil";
 
 const tryToFixUrl = (oldUrl: string, newUrl: string) => {
   try {
@@ -11,7 +11,7 @@ const tryToFixUrl = (oldUrl: string, newUrl: string) => {
   } catch (e) {
     return oldUrl;
   }
-}
+};
 
 const prependMailTo = (url: string) => tryToFixUrl(url, `mailto:${url}`);
 const prependHttps = (url: string) => tryToFixUrl(url, `https://${url}`);
@@ -34,16 +34,16 @@ const validateUrl = (url: string) => {
   }
 
   return url;
-}
+};
 
 const updateCollection = async (collection: AnyBecauseObsolete) => {
   await forEachDocumentBatchInCollection({
     collection,
     batchSize: 500,
     filter: {
-      'contents.html': { $exists: true },
+      "contents.html": { $exists: true },
     },
-    callback: async (documents: Array<DbPost|DbComment>) => {
+    callback: async (documents: Array<DbPost | DbComment>) => {
       // eslint-disable-next-line no-console
       console.log(`Migrating ${collection.collectionName} batch`);
 
@@ -54,14 +54,14 @@ const updateCollection = async (collection: AnyBecauseObsolete) => {
         const $ = cheerioParse(html);
         let edited = false;
 
-        $('a').each((i, link) => {
+        $("a").each((i, link) => {
           // @ts-ignore TextElement doesn't have attribs - this doesn't matter here
           const { href } = link.attribs ?? {};
           if (href) {
             const newUrl = validateUrl(href);
             if (href !== newUrl) {
               edited = true;
-              $(link).attr('href', newUrl);
+              $(link).attr("href", newUrl);
             }
           }
         });
@@ -70,16 +70,16 @@ const updateCollection = async (collection: AnyBecauseObsolete) => {
           changes.push({
             updateOne: {
               filter: { _id: document._id },
-              update: { $set: { "contents.html": $.html() } }
+              update: { $set: { "contents.html": $.html() } },
             },
           });
         }
       }
 
       await collection.rawCollection().bulkWrite(changes, { ordered: false });
-    }
+    },
   });
-}
+};
 
 registerMigration({
   name: "makeRelativeUrlsAbsolute",

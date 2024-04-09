@@ -23,7 +23,6 @@ import MentionUI from './mentionui';
  * @extends module:core/plugin~Plugin
  */
 export default class Mention extends Plugin {
-
 	/**
 	 * @inheritDoc
 	 */

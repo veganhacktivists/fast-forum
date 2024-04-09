@@ -1,18 +1,18 @@
-import { createCollection } from '../../vulcan-lib';
-import { Utils, slugify } from '../../vulcan-lib/utils';
-import { addUniversalFields, getDefaultResolvers, getDefaultMutations } from '../../collectionUtils'
-import { foreignKeyField, schemaDefaultValue } from '../../utils/schemaUtils';
-import './fragments';
-import './permissions';
-import { userOwns } from '../../vulcan-users/permissions';
-import moment from 'moment'
-import { makeEditable } from '../../editor/make_editable';
+import { createCollection } from "../../vulcan-lib";
+import { Utils, slugify } from "../../vulcan-lib/utils";
+import { addUniversalFields, getDefaultResolvers, getDefaultMutations } from "../../collectionUtils";
+import { foreignKeyField, schemaDefaultValue } from "../../utils/schemaUtils";
+import "./fragments";
+import "./permissions";
+import { userOwns } from "../../vulcan-users/permissions";
+import moment from "moment";
+import { makeEditable } from "../../editor/make_editable";
 
 function generateCode(length: number) {
-  let result = '';
-  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = "";
+  var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   var charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
+  for (var i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
@@ -26,27 +26,27 @@ export const eventTypes = [
   {
     value: "private",
     label: "Displayed only to you",
-  }
-]
+  },
+];
 
 const schema: SchemaType<"GardenCodes"> = {
   code: {
     type: String,
     optional: true,
-    canRead: ['guests'],
+    canRead: ["guests"],
     nullable: false,
     onInsert: (gardenCode) => {
-      return generateCode(4)
+      return generateCode(4);
     },
   },
   title: {
     type: String,
-    canRead: ['guests'],
-    canCreate: ['members'],
-    canUpdate: [userOwns, 'sunshineRegiment', 'admins'],
+    canRead: ["guests"],
+    canCreate: ["members"],
+    canUpdate: [userOwns, "sunshineRegiment", "admins"],
     label: "Event Name",
     ...schemaDefaultValue("Guest Day Pass"),
-    order: 10
+    order: 10,
   },
   userId: {
     ...foreignKeyField({
@@ -56,8 +56,8 @@ const schema: SchemaType<"GardenCodes"> = {
       type: "User",
       nullable: true,
     }),
-    onCreate: ({currentUser}) => currentUser!._id,
-    canRead: ['guests'],
+    onCreate: ({ currentUser }) => currentUser!._id,
+    canRead: ["guests"],
     optional: true,
     nullable: false,
   },
@@ -72,64 +72,64 @@ const schema: SchemaType<"GardenCodes"> = {
   slug: {
     type: String,
     optional: true,
-    canRead: ['guests'],
+    canRead: ["guests"],
     nullable: false,
     onInsert: async (gardenCode) => {
-      return await Utils.getUnusedSlugByCollectionName("GardenCodes", slugify(gardenCode.title))
+      return await Utils.getUnusedSlugByCollectionName("GardenCodes", slugify(gardenCode.title));
     },
   },
   startTime: {
     type: Date,
-    canRead: ['guests'],
-    canUpdate: [userOwns, 'sunshineRegiment', 'admins'],
-    canCreate: ['members'],
-    control: 'datetime',
+    canRead: ["guests"],
+    canUpdate: [userOwns, "sunshineRegiment", "admins"],
+    canCreate: ["members"],
+    control: "datetime",
     label: "Start Time",
     optional: true,
     onInsert: () => new Date(),
-    order: 20
+    order: 20,
   },
   endTime: {
     type: Date,
-    canRead: ['guests'],
-    canUpdate: ['admins'],
+    canRead: ["guests"],
+    canUpdate: ["admins"],
     // canCreate: ['members'],
-    control: 'datetime',
+    control: "datetime",
     label: "End Time",
     optional: true,
     nullable: false,
     order: 25,
     onInsert: (gardenCode) => {
-      return moment(gardenCode.startTime).add(12, 'hours').toDate()
-    }
+      return moment(gardenCode.startTime).add(12, "hours").toDate();
+    },
   },
   fbLink: {
     type: String,
-    canRead: ['guests'],
-    canCreate: ['members'],
-    canUpdate: [userOwns, 'sunshineRegiment', 'admins'],
+    canRead: ["guests"],
+    canCreate: ["members"],
+    canUpdate: [userOwns, "sunshineRegiment", "admins"],
     label: "FB Event Link",
     optional: true,
-    order: 25
+    order: 25,
   },
   type: {
     type: String,
-    canRead: ['guests'],
-    canCreate: ['members'],
-    canUpdate: [userOwns, 'sunshineRegiment', 'admins'],
+    canRead: ["guests"],
+    canCreate: ["members"],
+    canUpdate: [userOwns, "sunshineRegiment", "admins"],
     label: "Event Visibility:",
     optional: true,
     control: "radiogroup",
     ...schemaDefaultValue(eventTypes[0].value),
     form: {
-      options: eventTypes
+      options: eventTypes,
     },
     order: 30,
   },
   hidden: {
     type: Boolean,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
     optional: true,
     order: 32,
     hidden: true,
@@ -137,23 +137,23 @@ const schema: SchemaType<"GardenCodes"> = {
   },
   deleted: {
     type: Boolean,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
     optional: true,
     ...schemaDefaultValue(false),
-    order: 35
+    order: 35,
   },
   afOnly: {
     type: Boolean,
     label: "Limit attendance to AI Alignment Forum members",
-    canRead: ['guests'],
-    canCreate: ['alignmentForum'],
-    canUpdate: [userOwns, 'sunshineRegiment', 'admins'],
-    optional: true, 
+    canRead: ["guests"],
+    canCreate: ["alignmentForum"],
+    canUpdate: [userOwns, "sunshineRegiment", "admins"],
+    optional: true,
     ...schemaDefaultValue(false),
     order: 36,
-    control: 'checkbox'
-  }
+    control: "checkbox",
+  },
 
   // validOnlyWithHost: {
   //   type: Boolean,
@@ -164,8 +164,6 @@ const schema: SchemaType<"GardenCodes"> = {
   //   ...schemaDefaultValue(false),
   // },
 };
-
-
 
 //
 // const options = {
@@ -187,15 +185,15 @@ const schema: SchemaType<"GardenCodes"> = {
 // }
 //
 export const GardenCodes: GardenCodesCollection = createCollection({
-  collectionName: 'GardenCodes',
-  typeName: 'GardenCode',
+  collectionName: "GardenCodes",
+  typeName: "GardenCode",
   schema,
-  resolvers: getDefaultResolvers('GardenCodes'),
-  mutations: getDefaultMutations('GardenCodes'), //, options),
+  resolvers: getDefaultResolvers("GardenCodes"),
+  mutations: getDefaultMutations("GardenCodes"), //, options),
   logChanges: true,
 });
 
-addUniversalFields({collection: GardenCodes})
+addUniversalFields({ collection: GardenCodes });
 
 makeEditable({
   collection: GardenCodes,
@@ -204,8 +202,8 @@ makeEditable({
     commentEditor: true,
     commentStyles: true,
     hideControls: true,
-    order: 20
-  }
-})
+    order: 20,
+  },
+});
 
 export default GardenCodes;

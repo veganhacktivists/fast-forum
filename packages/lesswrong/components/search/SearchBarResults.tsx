@@ -1,10 +1,10 @@
-import React from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import { Hits, Configure, Index } from 'react-instantsearch-dom';
-import { SearchIndexCollectionName, getSearchIndexName } from '../../lib/search/searchUtil';
-import { Link } from '../../lib/reactRouterWrapper';
-import { HEADER_HEIGHT, MOBILE_HEADER_HEIGHT } from '../common/Header';
-import { SearchHitComponentProps } from './types';
+import React from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import { Hits, Configure, Index } from "react-instantsearch-dom";
+import { SearchIndexCollectionName, getSearchIndexName } from "../../lib/search/searchUtil";
+import { Link } from "../../lib/reactRouterWrapper";
+import { HEADER_HEIGHT, MOBILE_HEADER_HEIGHT } from "../common/Header";
+import { SearchHitComponentProps } from "./types";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -17,33 +17,33 @@ const styles = (theme: ThemeType): JssStyles => ({
     top: HEADER_HEIGHT,
     display: "flex",
     flexWrap: "wrap",
-    [theme.breakpoints.down('sm')]: {
-      width: "100%"
+    [theme.breakpoints.down("sm")]: {
+      width: "100%",
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       top: MOBILE_HEADER_HEIGHT,
     },
   },
   searchResults: {
-    overflow:"scroll",
+    overflow: "scroll",
     width: "100%",
     height: "calc(100vh - 48px)",
     backgroundColor: theme.palette.panelBackground.default,
     paddingBottom: 100,
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up("md")]: {
       marginLeft: 20,
       boxShadow: theme.palette.boxShadow.searchResults,
       height: "calc(100vh - 64px)",
     },
   },
   list: {
-    '& .ais-Hits-list':{
+    "& .ais-Hits-list": {
       paddingTop: 6,
       paddingBottom: 4,
       borderBottom: theme.palette.border.grey300,
     },
-    '& .ais-Hits-list:empty':{
-      display:"none"
+    "& .ais-Hits-list:empty": {
+      display: "none",
     },
   },
   seeAll: {
@@ -52,27 +52,31 @@ const styles = (theme: ThemeType): JssStyles => ({
     color: theme.palette.lwTertiary.main,
     marginTop: 10,
     display: "block",
-    textAlign: "center"
+    textAlign: "center",
   },
   header: {
     cursor: "pointer",
-    display:"flex",
-    justifyContent:"space-between",
+    display: "flex",
+    justifyContent: "space-between",
     alignItems: "center",
     paddingLeft: theme.spacing.unit,
     paddingRight: theme.spacing.unit,
-    '& h1': {
-      margin:0
-    }
+    "& h1": {
+      margin: 0,
+    },
   },
-})
+});
 
-const SearchBarResults = ({closeSearch, currentQuery, classes}: {
-  closeSearch: ()=>void,
-  currentQuery: string,
-  classes: ClassesType
+const SearchBarResults = ({
+  closeSearch,
+  currentQuery,
+  classes,
+}: {
+  closeSearch: () => void;
+  currentQuery: string;
+  classes: ClassesType;
 }) => {
-  const { PostsSearchHit, SequencesSearchHit, UsersSearchHit, TagsSearchHit, CommentsSearchHit } = Components
+  const { PostsSearchHit, SequencesSearchHit, UsersSearchHit, TagsSearchHit, CommentsSearchHit } = Components;
 
   const searchTypes: Array<{
     type: SearchIndexCollectionName;
@@ -85,14 +89,15 @@ const SearchBarResults = ({closeSearch, currentQuery, classes}: {
     { type: "Sequences", Component: SequencesSearchHit },
   ];
 
-  return <div className={classes.root}>
-    <div className={classes.searchResults}>
+  return (
+    <div className={classes.root}>
+      <div className={classes.searchResults}>
         {searchTypes.map(({ type, Component }) => (
           <Components.ErrorBoundary key={type}>
             <div className={classes.list}>
               <Index indexName={getSearchIndexName(type)}>
                 <Configure hitsPerPage={3} />
-                <Hits hitComponent={(props) => <Component clickAction={closeSearch} {...props} showIcon/>} />
+                <Hits hitComponent={(props) => <Component clickAction={closeSearch} {...props} showIcon />} />
               </Index>
             </div>
           </Components.ErrorBoundary>
@@ -100,14 +105,15 @@ const SearchBarResults = ({closeSearch, currentQuery, classes}: {
         <Link to={`/search?query=${currentQuery}`} className={classes.seeAll}>
           See all results
         </Link>
+      </div>
     </div>
-  </div>
-}
+  );
+};
 
-const SearchBarResultsComponent = registerComponent("SearchBarResults", SearchBarResults, {styles});
+const SearchBarResultsComponent = registerComponent("SearchBarResults", SearchBarResults, { styles });
 
 declare global {
   interface ComponentTypes {
-    SearchBarResults: typeof SearchBarResultsComponent
+    SearchBarResults: typeof SearchBarResultsComponent;
   }
 }

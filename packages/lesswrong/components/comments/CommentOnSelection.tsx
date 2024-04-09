@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib/components';
-import CommentIcon from '@material-ui/icons/ModeComment';
-import { useCurrentUser } from '../common/withUser';
-import { useOnNavigate } from '../hooks/useOnNavigate';
+import React, { useEffect, useState, useRef } from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib/components";
+import CommentIcon from "@material-ui/icons/ModeComment";
+import { useCurrentUser } from "../common/withUser";
+import { useOnNavigate } from "../hooks/useOnNavigate";
 import { useTracking, AnalyticsContext } from "../../lib/analyticsEvents";
-import { hasSideComments } from '../../lib/betas';
+import { hasSideComments } from "../../lib/betas";
 
 const selectedTextToolbarStyles = (theme: ThemeType): JssStyles => ({
   toolbar: {
@@ -15,21 +15,19 @@ const selectedTextToolbarStyles = (theme: ThemeType): JssStyles => ({
     zIndex: theme.zIndexes.lwPopper,
     padding: 8,
     cursor: "pointer",
-    
+
     "&:hover": {
       background: theme.palette.panelBackground.darken08,
     },
 
     // Hide on mobile to avoid horizontal scrolling
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       display: hasSideComments ? "none" : "initial",
     },
   },
 });
 
-type SelectedTextToolbarState =
-    {open: false}
-  | {open: true, x: number, y: number}
+type SelectedTextToolbarState = { open: false } | { open: true; x: number; y: number };
 
 /**
  * CommentOnSelectionPageWrapper: Wrapper around the entire page (used in
@@ -52,27 +50,25 @@ type SelectedTextToolbarState =
  * If there's no space in the right margin (eg on mobile), adding the button
  * might introduce horizontal scrolling.
  */
-const CommentOnSelectionPageWrapper = ({children}: {
-  children: React.ReactNode
-}) => {
+const CommentOnSelectionPageWrapper = ({ children }: { children: React.ReactNode }) => {
   const { SelectedTextToolbar } = Components;
-  const [toolbarState,setToolbarState] = useState<SelectedTextToolbarState>({open: false});
- 
+  const [toolbarState, setToolbarState] = useState<SelectedTextToolbarState>({ open: false });
+
   useEffect(() => {
     const selectionChangedHandler = () => {
       const selection = document.getSelection();
-      const selectionText = selection+"";
-      
+      const selectionText = selection + "";
+
       // Is this selection non-empty?
       if (!selection || !selectionText?.length) {
-        setToolbarState({open: false});
+        setToolbarState({ open: false });
         return;
       }
-      
+
       // Determine whether this selection is fully wrapped in a single CommentOnSelectionContentWrapper
-      let commonWrapper: HTMLElement|null = null;
+      let commonWrapper: HTMLElement | null = null;
       let hasCommonWrapper = true;
-      for (let i=0; i<selection.rangeCount; i++) {
+      for (let i = 0; i < selection.rangeCount; i++) {
         const range = selection.getRangeAt(i);
         const container = range.commonAncestorContainer;
         const wrapper = findAncestorElementWithCommentOnSelectionWrapper(container);
@@ -84,34 +80,37 @@ const CommentOnSelectionPageWrapper = ({children}: {
           commonWrapper = wrapper;
         }
       }
-      
+
       if (!commonWrapper || !hasCommonWrapper) {
-        setToolbarState({open: false});
+        setToolbarState({ open: false });
         return;
       }
-      
+
       // Get the bounding box of the selection
       const selectionBoundingRect = selection.getRangeAt(0).getBoundingClientRect();
       const wrapperBoundingRect = commonWrapper.getBoundingClientRect();
-      
+
       // Place the toolbar
-      const x = window.scrollX + Math.max(
-        selectionBoundingRect.x + selectionBoundingRect.width,
-        wrapperBoundingRect.x + wrapperBoundingRect.width);
+      const x =
+        window.scrollX +
+        Math.max(
+          selectionBoundingRect.x + selectionBoundingRect.width,
+          wrapperBoundingRect.x + wrapperBoundingRect.width,
+        );
       const y = selectionBoundingRect.y + window.scrollY;
-      setToolbarState({open: true, x,y});
+      setToolbarState({ open: true, x, y });
     };
-    document.addEventListener('selectionchange', selectionChangedHandler);
-    
+    document.addEventListener("selectionchange", selectionChangedHandler);
+
     return () => {
-      document.removeEventListener('selectionchange', selectionChangedHandler);
+      document.removeEventListener("selectionchange", selectionChangedHandler);
     };
   }, []);
-  
+
   useOnNavigate(() => {
-    setToolbarState({open: false});
+    setToolbarState({ open: false });
   });
-  
+
   const onClickComment = () => {
     const firstSelectedNode = document.getSelection()?.anchorNode;
     if (!firstSelectedNode) {
@@ -124,16 +123,17 @@ const CommentOnSelectionPageWrapper = ({children}: {
     const selectionHtml = selectionToBlockquoteHTML(document.getSelection());
     // This HTML is XSS-safe because it's copied from somewhere that was already in the page as HTML, and is copied in a way that is syntax-aware throughout.
     (contentWrapper as any).onClickComment(selectionHtml);
-  }
-  
-  return <>
-    {children}
-    {toolbarState.open && <SelectedTextToolbar
-      onClickComment={onClickComment}
-      x={toolbarState.x} y={toolbarState.y}
-    />}
-  </>
-}
+  };
+
+  return (
+    <>
+      {children}
+      {toolbarState.open && (
+        <SelectedTextToolbar onClickComment={onClickComment} x={toolbarState.x} y={toolbarState.y} />
+      )}
+    </>
+  );
+};
 
 /**
  * SelectedTextToolbar: The toolbar that pops up when you select content inside
@@ -144,23 +144,32 @@ const CommentOnSelectionPageWrapper = ({children}: {
  * x, y: In the page coordinate system, ie, relative to the top-left corner when
  *   the page is scrolled to the top.
  */
-const SelectedTextToolbar = ({onClickComment, x, y, classes}: {
-  onClickComment: (ev: React.MouseEvent)=>void,
-  x: number, y: number,
-  classes: ClassesType,
+const SelectedTextToolbar = ({
+  onClickComment,
+  x,
+  y,
+  classes,
+}: {
+  onClickComment: (ev: React.MouseEvent) => void;
+  x: number;
+  y: number;
+  classes: ClassesType;
 }) => {
-  const { captureEvent } = useTracking()
+  const { captureEvent } = useTracking();
 
-  return <div className={classes.toolbar} style={{left: x, top: y}}>
-    <AnalyticsContext pageElementContext="selectedTextToolbar">
-      <CommentIcon onClick={ev => {
-        captureEvent("commentOnSelectionClicked");
-        onClickComment(ev);
-      }}/>
-    </AnalyticsContext>
-  </div>
-}
-
+  return (
+    <div className={classes.toolbar} style={{ left: x, top: y }}>
+      <AnalyticsContext pageElementContext="selectedTextToolbar">
+        <CommentIcon
+          onClick={(ev) => {
+            captureEvent("commentOnSelectionClicked");
+            onClickComment(ev);
+          }}
+        />
+      </AnalyticsContext>
+    </div>
+  );
+};
 
 /**
  * CommentOnSelectionContentWrapper: Marks the contents inside it so that when
@@ -170,32 +179,37 @@ const SelectedTextToolbar = ({onClickComment, x, y, classes}: {
  *
  * See CommentOnSelectionPageWrapper for notes on implementation details.
  */
-const CommentOnSelectionContentWrapper = ({onClickComment, children}: {
-  onClickComment: (html: string)=>void,
-  children: React.ReactNode,
+const CommentOnSelectionContentWrapper = ({
+  onClickComment,
+  children,
+}: {
+  onClickComment: (html: string) => void;
+  children: React.ReactNode;
 }) => {
-  const wrapperDivRef = useRef<HTMLDivElement|null>(null);
+  const wrapperDivRef = useRef<HTMLDivElement | null>(null);
   const currentUser = useCurrentUser();
-  
+
   useEffect(() => {
     if (wrapperDivRef.current) {
-      let modifiedDiv = (wrapperDivRef.current as any)
+      let modifiedDiv = wrapperDivRef.current as any;
       modifiedDiv.onClickComment = onClickComment;
-      
+
       return () => {
         modifiedDiv.onClickComment = null;
-      }
+      };
     }
   }, [onClickComment]);
-  
+
   if (!hasSideComments) {
     return <>{children}</>;
   }
-  
-  return <div className="commentOnSelection" ref={wrapperDivRef}>
-    {children}
-  </div>
-}
+
+  return (
+    <div className="commentOnSelection" ref={wrapperDivRef}>
+      {children}
+    </div>
+  );
+};
 
 /**
  * Starting from an HTML node, climb the tree until one is found which matches
@@ -204,12 +218,11 @@ const CommentOnSelectionContentWrapper = ({onClickComment, children}: {
  *
  * Client-side only.
  */
-function nearestAncestorElementWith(start: Node|null, fn: (node: HTMLElement)=>boolean): HTMLElement|null {
-  if (!start)
-    return null;
-  
-  let pos: HTMLElement|null = start.parentElement;
-  while(pos && !fn(pos)) {
+function nearestAncestorElementWith(start: Node | null, fn: (node: HTMLElement) => boolean): HTMLElement | null {
+  if (!start) return null;
+
+  let pos: HTMLElement | null = start.parentElement;
+  while (pos && !fn(pos)) {
     pos = pos.parentElement;
   }
   return pos;
@@ -222,11 +235,8 @@ function nearestAncestorElementWith(start: Node|null, fn: (node: HTMLElement)=>b
  *
  * Client-side only.
  */
-function findAncestorElementWithCommentOnSelectionWrapper(start: Node): HTMLElement|null {
-  return nearestAncestorElementWith(
-    start,
-    n=>!!((n as any).onClickComment)
-  );
+function findAncestorElementWithCommentOnSelectionWrapper(start: Node): HTMLElement | null {
+  return nearestAncestorElementWith(start, (n) => !!(n as any).onClickComment);
 }
 
 /**
@@ -237,30 +247,33 @@ function findAncestorElementWithCommentOnSelectionWrapper(start: Node): HTMLElem
  *
  * Client-side only.
  */
-function selectionToBlockquoteHTML(selection: Selection|null): string {
-  if (!selection || !selection.rangeCount)
-    return "";
-  
+function selectionToBlockquoteHTML(selection: Selection | null): string {
+  if (!selection || !selection.rangeCount) return "";
+
   var container = document.createElement("div");
-  for (let i=0; i<selection.rangeCount; i++) {
+  for (let i = 0; i < selection.rangeCount; i++) {
     container.appendChild(selection.getRangeAt(i).cloneContents());
   }
   const selectedHTML = container.innerHTML;
   return `<blockquote>${selectedHTML}</blockquote><p></p>`;
 }
 
-
-const CommentOnSelectionPageWrapperComponent = registerComponent('CommentOnSelectionPageWrapper', CommentOnSelectionPageWrapper);
-const SelectedTextToolbarComponent = registerComponent(
-  'SelectedTextToolbar', SelectedTextToolbar,
-  {styles: selectedTextToolbarStyles}
+const CommentOnSelectionPageWrapperComponent = registerComponent(
+  "CommentOnSelectionPageWrapper",
+  CommentOnSelectionPageWrapper,
 );
-const CommentOnSelectionContentWrapperComponent = registerComponent("CommentOnSelectionContentWrapper", CommentOnSelectionContentWrapper);
+const SelectedTextToolbarComponent = registerComponent("SelectedTextToolbar", SelectedTextToolbar, {
+  styles: selectedTextToolbarStyles,
+});
+const CommentOnSelectionContentWrapperComponent = registerComponent(
+  "CommentOnSelectionContentWrapper",
+  CommentOnSelectionContentWrapper,
+);
 
 declare global {
   interface ComponentTypes {
-    CommentOnSelectionPageWrapper: typeof CommentOnSelectionPageWrapperComponent
-    SelectedTextToolbar: typeof SelectedTextToolbarComponent
-    CommentOnSelectionContentWrapper: typeof CommentOnSelectionContentWrapperComponent,
+    CommentOnSelectionPageWrapper: typeof CommentOnSelectionPageWrapperComponent;
+    SelectedTextToolbar: typeof SelectedTextToolbarComponent;
+    CommentOnSelectionContentWrapper: typeof CommentOnSelectionContentWrapperComponent;
   }
 }

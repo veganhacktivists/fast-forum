@@ -1,3 +1,3 @@
-export * from  './collection';
-import './fragments';
-import './views';
+export * from "./collection";
+import "./fragments";
+import "./views";

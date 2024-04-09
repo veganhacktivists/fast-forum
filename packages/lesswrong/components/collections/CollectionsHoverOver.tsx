@@ -8,7 +8,7 @@ import { isFriendlyUI } from "../../themes/forumTheme";
 const styles = (theme: ThemeType) => ({
   root: {
     padding: 16,
-    width: 450
+    width: 450,
   },
   title: {
     ...theme.typography.body1,
@@ -38,21 +38,24 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const CollectionsHoverOver = ({collection, classes}: {
-  collection: CollectionsBestOfFragment,
-  classes: ClassesType,
+const CollectionsHoverOver = ({
+  collection,
+  classes,
+}: {
+  collection: CollectionsBestOfFragment;
+  classes: ClassesType;
 }) => {
-  const {UsersName, ContentStyles, ContentItemTruncated} = Components;
+  const { UsersName, ContentStyles, ContentItemTruncated } = Components;
   return (
     <Card className={classes.root}>
       <Link to={collectionGetPageUrl(collection)}>
         <div className={classes.title}>{collection.title}</div>
       </Link>
-      {collection.user &&
+      {collection.user && (
         <div className={classes.author}>
           by <UsersName user={collection.user} />
         </div>
-      }
+      )}
       <ContentStyles contentType="postHighlight" className={classes.description}>
         <ContentItemTruncated
           maxLengthWords={100}
@@ -71,13 +74,9 @@ const CollectionsHoverOver = ({collection, classes}: {
       </div>
     </Card>
   );
-}
+};
 
-const CollectionsHoverOverComponent = registerComponent(
-  "CollectionsHoverOver",
-  CollectionsHoverOver,
-  {styles},
-);
+const CollectionsHoverOverComponent = registerComponent("CollectionsHoverOver", CollectionsHoverOver, { styles });
 
 declare global {
   interface ComponentTypes {

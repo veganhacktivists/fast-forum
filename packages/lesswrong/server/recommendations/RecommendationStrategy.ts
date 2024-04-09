@@ -1,20 +1,17 @@
 import { StrategySettings, StrategySpecification } from "../../lib/collections/users/recommendationSettings";
 import { getSqlClientOrThrow } from "../../lib/sql/sqlClient";
 import { postStatuses } from "../../lib/collections/posts/constants";
-import {
-  EA_FORUM_COMMUNITY_TOPIC_ID,
-  EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID,
-} from "../../lib/collections/tags/collection";
+import { EA_FORUM_COMMUNITY_TOPIC_ID, EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID } from "../../lib/collections/tags/collection";
 
 export type RecommendationStrategyConfig = {
-  maxRecommendationCount: number,
-  minimumBaseScore: number,
-}
+  maxRecommendationCount: number;
+  minimumBaseScore: number;
+};
 
 export type RecommendationResult = {
-  posts: DbPost[],
-  settings: StrategySettings,
-}
+  posts: DbPost[];
+  settings: StrategySettings;
+};
 
 /**
  * The recommendation system is built on smaller, self-contained, modular "strategies"
@@ -34,7 +31,7 @@ abstract class RecommendationStrategy {
   }
 
   abstract recommend(
-    currentUser: DbUser|null,
+    currentUser: DbUser | null,
     count: number,
     strategy: StrategySpecification,
   ): Promise<RecommendationResult>;
@@ -43,61 +40,61 @@ abstract class RecommendationStrategy {
    * Create SQL query fragments that filter out posts that the user has already
    * viewed.
    */
-  protected getAlreadyReadFilter(currentUser: DbUser|null) {
+  protected getAlreadyReadFilter(currentUser: DbUser | null) {
     return currentUser
       ? {
-        join: `
+          join: `
           LEFT JOIN "ReadStatuses" rs
             ON rs."userId" = $(userId)
             AND rs."postId" = p."_id"
         `,
-        filter: `
+          filter: `
           rs."isRead" IS NOT TRUE AND
         `,
-        args: {
-          userId: currentUser._id,
-        },
-      }
+          args: {
+            userId: currentUser._id,
+          },
+        }
       : {
-        join: "",
-        filter: "",
-        args: {},
-      };
+          join: "",
+          filter: "",
+          args: {},
+        };
   }
 
   /**
    * Create SQL query fragments that filter out posts that the user has already
    * been recommended.
    */
-  protected getAlreadyRecommendedFilter(currentUser: DbUser|null) {
+  protected getAlreadyRecommendedFilter(currentUser: DbUser | null) {
     return currentUser
       ? {
-        join: `
+          join: `
           LEFT JOIN "PostRecommendations" pr
             ON pr."userId" = $(userId)
             AND pr."postId" = p."_id"
         `,
-        filter: `
+          filter: `
           COALESCE(pr."recommendationCount", 0) < $(maxRecommendationCount) AND
           pr."clickedAt" IS NULL AND
         `,
-        args: {
-          userId: currentUser._id,
-          maxRecommendationCount: this.config.maxRecommendationCount,
-        },
-      }
+          args: {
+            userId: currentUser._id,
+            maxRecommendationCount: this.config.maxRecommendationCount,
+          },
+        }
       : {
-        join: "",
-        filter: "",
-        args: {},
-      };
+          join: "",
+          filter: "",
+          args: {},
+        };
   }
 
   /**
    * Create SQL query fragments that filter out posts that the user has already
    * viewed, or that have already been recommended.
    */
-  protected getUserFilter(currentUser: DbUser|null) {
+  protected getUserFilter(currentUser: DbUser | null) {
     const read = this.getAlreadyReadFilter(currentUser);
     const recommended = this.getAlreadyRecommendedFilter(currentUser);
     return {
@@ -163,7 +160,7 @@ abstract class RecommendationStrategy {
    * the default filters for users, posts and tags.
    */
   protected recommendDefaultWithPostFilter(
-    currentUser: DbUser|null,
+    currentUser: DbUser | null,
     count: number,
     postId: string,
     filter: string,
@@ -173,7 +170,8 @@ abstract class RecommendationStrategy {
     const db = getSqlClientOrThrow();
     const userFilter = this.getUserFilter(currentUser);
     const postFilter = this.getDefaultPostFilter();
-    return db.any(`
+    return db.any(
+      `
       SELECT p.*
       FROM "Posts" p
       ${userFilter.join}
@@ -185,14 +183,16 @@ abstract class RecommendationStrategy {
         ${filter}
       ORDER BY p."${sort}" DESC
       LIMIT $(count)
-    `, {
-      postId,
-      userId: currentUser?._id,
-      count,
-      ...userFilter.args,
-      ...postFilter.args,
-      ...args,
-    });
+    `,
+      {
+        postId,
+        userId: currentUser?._id,
+        count,
+        ...userFilter.args,
+        ...postFilter.args,
+        ...args,
+      },
+    );
   }
 }
 

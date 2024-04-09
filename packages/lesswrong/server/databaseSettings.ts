@@ -1,22 +1,31 @@
-import { DatabaseMetadata } from '../lib/collections/databaseMetadata/collection';
-import { isDevelopment } from '../lib/executionEnvironment';
-import { initializeSetting } from '../lib/publicSettings'
-import { getPublicSettings, getServerSettingsCache, getServerSettingsLoaded, registeredSettings } from '../lib/settingsCache';
-import groupBy from 'lodash/groupBy';
-import get from 'lodash/get'
-import { ensureIndex } from '../lib/collectionIndexUtils';
+import { DatabaseMetadata } from "../lib/collections/databaseMetadata/collection";
+import { isDevelopment } from "../lib/executionEnvironment";
+import { initializeSetting } from "../lib/publicSettings";
+import {
+  getPublicSettings,
+  getServerSettingsCache,
+  getServerSettingsLoaded,
+  registeredSettings,
+} from "../lib/settingsCache";
+import groupBy from "lodash/groupBy";
+import get from "lodash/get";
+import { ensureIndex } from "../lib/collectionIndexUtils";
 
-const runValidateSettings = false
+const runValidateSettings = false;
 
-ensureIndex(DatabaseMetadata, {
-  name: 1
-}, {
-  unique: true
-})
+ensureIndex(
+  DatabaseMetadata,
+  {
+    name: 1,
+  },
+  {
+    unique: true,
+  },
+);
 
 if (isDevelopment && runValidateSettings) {
   // On development we validate the settings files, but wait 30 seconds to make sure that everything has really been loaded
-  setTimeout(() => validateSettings(registeredSettings, getPublicSettings(), getServerSettingsCache()), 30000)
+  setTimeout(() => validateSettings(registeredSettings, getPublicSettings(), getServerSettingsCache()), 30000);
 }
 
 /* 
@@ -38,57 +47,68 @@ if (isDevelopment && runValidateSettings) {
 */
 export class DatabaseServerSetting<SettingValueType> {
   constructor(
-    private settingName: string, 
-    private defaultValue: SettingValueType
+    private settingName: string,
+    private defaultValue: SettingValueType,
   ) {
-    initializeSetting(settingName, "server")
+    initializeSetting(settingName, "server");
   }
   get(): SettingValueType {
-    if (!getServerSettingsLoaded())
-      throw new Error("Requested database setting before settings loaded");
+    if (!getServerSettingsLoaded()) throw new Error("Requested database setting before settings loaded");
     // eslint-disable-next-line no-console
-    const cacheValue = get(getServerSettingsCache(), this.settingName)
-    if (typeof cacheValue === 'undefined') return this.defaultValue
-    return cacheValue
+    const cacheValue = get(getServerSettingsCache(), this.settingName);
+    if (typeof cacheValue === "undefined") return this.defaultValue;
+    return cacheValue;
   }
 }
 
-function validateSettings(registeredSettings:Record<string, "server" | "public" | "instance">, publicSettings:Record<string, any>, serverSettings:Record<string, any>) {
+function validateSettings(
+  registeredSettings: Record<string, "server" | "public" | "instance">,
+  publicSettings: Record<string, any>,
+  serverSettings: Record<string, any>,
+) {
   Object.entries(registeredSettings).forEach(([key, value]) => {
     if (value === "server" && typeof get(serverSettings, key) === "undefined") {
       // eslint-disable-next-line no-console
-      console.log(`Unable to find server database setting ${key} in serverSetting database object despite it being registered as a setting`)
+      console.log(
+        `Unable to find server database setting ${key} in serverSetting database object despite it being registered as a setting`,
+      );
     } else if (value === "public" && typeof get(publicSettings, key) === "undefined") {
       // eslint-disable-next-line no-console
-      console.log(`Unable to find public database setting ${key} in publicSetting database object despite it being registered as a setting`)
-    } 
-  })
+      console.log(
+        `Unable to find public database setting ${key} in publicSetting database object despite it being registered as a setting`,
+      );
+    }
+  });
   Object.entries(serverSettings).forEach(([key, value]) => {
-    if(typeof value === "object") {
-      Object.keys(value).forEach(innerKey => {
+    if (typeof value === "object") {
+      Object.keys(value).forEach((innerKey) => {
         if (typeof registeredSettings[`${key}.${innerKey}`] === "undefined") {
           // eslint-disable-next-line no-console
-          console.log(`Spurious setting provided in the server settings cache despite it not being registered: ${`${key}.${innerKey}`}`)
+          console.log(
+            `Spurious setting provided in the server settings cache despite it not being registered: ${`${key}.${innerKey}`}`,
+          );
         }
-      })
+      });
     } else if (typeof registeredSettings[key] === "undefined") {
       // eslint-disable-next-line no-console
-      console.log(`Spurious setting provided in the server settings cache despite it not being registered: ${key}`)
+      console.log(`Spurious setting provided in the server settings cache despite it not being registered: ${key}`);
     }
-  })
+  });
   Object.entries(publicSettings).forEach(([key, value]) => {
     if (typeof value === "object") {
-      Object.keys(value).forEach(innerKey => {
+      Object.keys(value).forEach((innerKey) => {
         if (typeof registeredSettings[`${key}.${innerKey}`] === "undefined") {
           // eslint-disable-next-line no-console
-          console.log(`Spurious setting provided in the public settings cache despite it not being registered: ${`${key}.${innerKey}`}`)
+          console.log(
+            `Spurious setting provided in the public settings cache despite it not being registered: ${`${key}.${innerKey}`}`,
+          );
         }
-      })
+      });
     } else if (typeof registeredSettings[key] === "undefined") {
       // eslint-disable-next-line no-console
-      console.log(`Spurious setting provided in the public settings cache despite it not being registered: ${key}`)
+      console.log(`Spurious setting provided in the public settings cache despite it not being registered: ${key}`);
     }
-  })
+  });
   // eslint-disable-next-line no-console
-  console.log(groupBy(Object.keys(registeredSettings), key => registeredSettings[key]))
+  console.log(groupBy(Object.keys(registeredSettings), (key) => registeredSettings[key]));
 }

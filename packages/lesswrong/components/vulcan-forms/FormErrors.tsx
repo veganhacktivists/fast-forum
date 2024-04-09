@@ -1,17 +1,14 @@
-import React from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import classNames from 'classnames';
+import React from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import classNames from "classnames";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
-    ...theme.typography.errorStyle
-  }
-})
+    ...theme.typography.errorStyle,
+  },
+});
 
-const FormErrors = ({ errors, classes }: {
-  errors: any[]
-  classes: ClassesType
-}) => (
+const FormErrors = ({ errors, classes }: { errors: any[]; classes: ClassesType }) => (
   <div className={classNames(classes.root, "form-errors")}>
     {!!errors.length && (
       <Components.Alert className="flash-message" variant="danger">
@@ -26,10 +23,10 @@ const FormErrors = ({ errors, classes }: {
     )}
   </div>
 );
-const FormErrorsComponent = registerComponent('FormErrors', FormErrors, {styles});
+const FormErrorsComponent = registerComponent("FormErrors", FormErrors, { styles });
 
 declare global {
   interface ComponentTypes {
-    FormErrors: typeof FormErrorsComponent
+    FormErrors: typeof FormErrorsComponent;
   }
 }

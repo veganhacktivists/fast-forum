@@ -1,5 +1,5 @@
 import { addField, dropField } from "./meta/utils";
-import { Tags } from '../../lib/collections/tags/collection';
+import { Tags } from "../../lib/collections/tags/collection";
 
 /**
  * Generated on 2022-12-26T21:08:53.270Z by `yarn makemigrations`
@@ -15,9 +15,9 @@ import { Tags } from '../../lib/collections/tags/collection';
  * -
  * --- Accepted on 2022-12-24T17:14:07.000Z by 20221224T171407.add_comment_title.ts
  * +-- Overall schema hash: 746fe67809bf748504782256c202744c
- *  
+ *
  * @@ -784,3 +782,3 @@ CREATE TABLE "TagRels" (
- *  
+ *
  * --- Schema for "Tags", hash: c8efd9b78aa33886899a3cc6ef6425d1
  * +-- Schema for "Tags", hash: b913160871861a340a4047d39c047b52
  *  CREATE TABLE "Tags" (
@@ -26,7 +26,7 @@ import { Tags } from '../../lib/collections/tags/collection';
  * +    "autoTagModel" text DEFAULT '',
  * +    "autoTagPrompt" text DEFAULT '',
  *      "schemaVersion" double precision DEFAULT 1,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -37,12 +37,12 @@ import { Tags } from '../../lib/collections/tags/collection';
  */
 export const acceptsSchemaHash = "746fe67809bf748504782256c202744c";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Tags, "autoTagModel");
   await addField(db, Tags, "autoTagPrompt");
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Tags, "autoTagModel");
   await dropField(db, Tags, "autoTagPrompt");
-}
+};

@@ -1,29 +1,29 @@
-import { captureException } from '@sentry/core';
-import { captureEvent } from '../lib/analyticsEvents';
-import { onStartup, isAnyTest } from '../lib/executionEnvironment';
-import { DatabaseServerSetting } from './databaseSettings';
-import { printInFlightRequests, checkForMemoryLeaks } from './vulcan-lib/apollo-ssr/pageCache';
-import { printInProgressCallbacks } from '../lib/vulcan-lib/callbacks';
-import { Globals } from '../lib/vulcan-lib/config';
+import { captureException } from "@sentry/core";
+import { captureEvent } from "../lib/analyticsEvents";
+import { onStartup, isAnyTest } from "../lib/executionEnvironment";
+import { DatabaseServerSetting } from "./databaseSettings";
+import { printInFlightRequests, checkForMemoryLeaks } from "./vulcan-lib/apollo-ssr/pageCache";
+import { printInProgressCallbacks } from "../lib/vulcan-lib/callbacks";
+import { Globals } from "../lib/vulcan-lib/config";
 
-import * as Sentry from '@sentry/node';
-import * as SentryIntegrations from '@sentry/integrations';
-import { sentryUrlSetting, sentryEnvironmentSetting, sentryReleaseSetting } from '../lib/instanceSettings';
-import * as _ from 'underscore';
-import fs from 'fs';
-import type { AddMiddlewareType } from './apolloServer';
+import * as Sentry from "@sentry/node";
+import * as SentryIntegrations from "@sentry/integrations";
+import { sentryUrlSetting, sentryEnvironmentSetting, sentryReleaseSetting } from "../lib/instanceSettings";
+import * as _ from "underscore";
+import fs from "fs";
+import type { AddMiddlewareType } from "./apolloServer";
 
 // Log unhandled promise rejections, eg exceptions escaping from async
 // callbacks. The default node behavior is to silently ignore these exceptions,
 // which is terrible and has led to unnoticed bugs in the past.
 process.on("unhandledRejection", (r: any) => {
   captureException(r);
-  
+
   //eslint-disable-next-line no-console
   console.log("Unhandled rejection");
   //eslint-disable-next-line no-console
   console.log(r);
-  
+
   if (r.stack) {
     //eslint-disable-next-line no-console
     console.log(r.stack);
@@ -32,40 +32,38 @@ process.on("unhandledRejection", (r: any) => {
 
 captureEvent("serverStarted", {});
 
-
 onStartup(() => {
-  const sentryUrl = sentryUrlSetting.get()
-  const sentryEnvironment = sentryEnvironmentSetting.get()
-  const sentryRelease = sentryReleaseSetting.get()
-  
+  const sentryUrl = sentryUrlSetting.get();
+  const sentryEnvironment = sentryEnvironmentSetting.get();
+  const sentryRelease = sentryReleaseSetting.get();
+
   if (sentryUrl && sentryEnvironment && sentryRelease) {
     Sentry.init({
       dsn: sentryUrl,
       environment: sentryEnvironment,
       release: sentryRelease,
-      integrations: [
-        new SentryIntegrations.Dedupe(),
-        new SentryIntegrations.ExtraErrorData(),
-      ],
+      integrations: [new SentryIntegrations.Dedupe(), new SentryIntegrations.ExtraErrorData()],
     });
   } else {
     if (!isAnyTest) {
       // eslint-disable-next-line no-console
-      console.warn("Sentry is not configured. To activate error reporting, please set the sentry.url variable in your settings file.");
+      console.warn(
+        "Sentry is not configured. To activate error reporting, please set the sentry.url variable in your settings file.",
+      );
     }
   }
-  
+
   checkForCoreDumps();
 });
 
 export const addSentryMiddlewares = (addConnectHandler: AddMiddlewareType) => {
   addConnectHandler(Sentry.Handlers.requestHandler());
   addConnectHandler(Sentry.Handlers.errorHandler());
-}
+};
 
-const gigabytes = 1024*1024*1024;
-const consoleLogMemoryUsageThreshold = new DatabaseServerSetting<number>("consoleLogMemoryUsage", 1.5*gigabytes);
-const sentryErrorMemoryUsageThreshold = new DatabaseServerSetting<number>("sentryErrorMemoryUsage", 2.1*gigabytes);
+const gigabytes = 1024 * 1024 * 1024;
+const consoleLogMemoryUsageThreshold = new DatabaseServerSetting<number>("consoleLogMemoryUsage", 1.5 * gigabytes);
+const sentryErrorMemoryUsageThreshold = new DatabaseServerSetting<number>("sentryErrorMemoryUsage", 2.1 * gigabytes);
 const memoryUsageCheckInterval = new DatabaseServerSetting<number>("memoryUsageCheckInterval", 2000);
 
 onStartup(() => {
@@ -74,9 +72,11 @@ onStartup(() => {
       const memoryUsage = process.memoryUsage()?.heapTotal;
       if (memoryUsage > consoleLogMemoryUsageThreshold.get()) {
         // eslint-disable-next-line no-console
-        console.log(`Memory usage is high: ${memoryUsage} bytes (warning threshold: ${consoleLogMemoryUsageThreshold.get()})`);
+        console.log(
+          `Memory usage is high: ${memoryUsage} bytes (warning threshold: ${consoleLogMemoryUsageThreshold.get()})`,
+        );
         checkForMemoryLeaks();
-        
+
         logInFlightStuff();
       }
       if (memoryUsage > sentryErrorMemoryUsageThreshold.get()) {
@@ -88,12 +88,12 @@ onStartup(() => {
 
 function checkForCoreDumps() {
   const files = fs.readdirSync(".");
-  const coreFiles = _.filter(files, filename => filename.startsWith("core."));
+  const coreFiles = _.filter(files, (filename) => filename.startsWith("core."));
   if (coreFiles.length > 0) {
     Sentry.captureException(new Error("Server restarted after core dump"));
     for (let coreFile of coreFiles) {
       //eslint-disable-next-line no-console
-      console.log("Removing core file: "+coreFile);
+      console.log("Removing core file: " + coreFile);
       fs.unlinkSync(coreFile);
     }
   }
@@ -102,7 +102,7 @@ function checkForCoreDumps() {
 const logGraphqlQueriesSetting = new DatabaseServerSetting<boolean>("logGraphqlQueries", false);
 const logGraphqlMutationsSetting = new DatabaseServerSetting<boolean>("logGraphqlMutations", false);
 
-const queriesInProgress: Record<string,number> = {}; // operationName => number of copies in progress
+const queriesInProgress: Record<string, number> = {}; // operationName => number of copies in progress
 
 export function logGraphqlQueryStarted(operationName: string, queryString: string, variables: any) {
   if (operationName in queriesInProgress) {
@@ -110,7 +110,7 @@ export function logGraphqlQueryStarted(operationName: string, queryString: strin
   } else {
     queriesInProgress[operationName] = 1;
   }
-  
+
   if (logGraphqlQueriesSetting.get() && queryString && queryString.startsWith("query")) {
     const view = variables?.input?.terms?.view;
     if (view) {
@@ -135,12 +135,10 @@ export function logGraphqlQueryStarted(operationName: string, queryString: strin
 
 export function logGraphqlQueryFinished(operationName: string, queryString: string) {
   if (operationName in queriesInProgress) {
-    if (queriesInProgress[operationName] > 1)
-      queriesInProgress[operationName]--;
-    else
-      delete queriesInProgress[operationName];
+    if (queriesInProgress[operationName] > 1) queriesInProgress[operationName]--;
+    else delete queriesInProgress[operationName];
   }
-  
+
   if (logGraphqlQueriesSetting.get() && queryString && queryString.startsWith("query")) {
     // eslint-disable-next-line no-console
     console.log(`Finished query: ${operationName}`);
@@ -153,8 +151,10 @@ export function logGraphqlQueryFinished(operationName: string, queryString: stri
 
 function printInFlightGraphqlQueries() {
   const operationsInProgress = _.map(
-    _.filter(Object.keys(queriesInProgress), (operationName)=>queriesInProgress[operationName]>0),
-    (operationName) => queriesInProgress[operationName]>1 ? `${operationName}(${queriesInProgress[operationName]})` : operationName);
+    _.filter(Object.keys(queriesInProgress), (operationName) => queriesInProgress[operationName] > 0),
+    (operationName) =>
+      queriesInProgress[operationName] > 1 ? `${operationName}(${queriesInProgress[operationName]})` : operationName,
+  );
   if (operationsInProgress.length > 0) {
     // eslint-disable-next-line no-console
     console.log(`Graphql queries in progress: ${operationsInProgress.join(", ")}`);

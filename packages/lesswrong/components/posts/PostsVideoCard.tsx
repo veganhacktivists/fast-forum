@@ -42,11 +42,7 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const videoHosts = [
-  "https://www.youtube.com",
-  "https://youtube.com",
-  "https://youtu.be",
-];
+const videoHosts = ["https://www.youtube.com", "https://youtube.com", "https://youtu.be"];
 
 const getEmbedAttribsFromHtml = (html: string): Record<string, unknown> | null => {
   // @ts-ignore cheerio type definitions are broken
@@ -63,32 +59,23 @@ const getEmbedAttribsFromHtml = (html: string): Record<string, unknown> | null =
     }
   }
   return null;
-}
+};
 
-const PostsVideoCard = ({post, classes}: {
-  post: PostsBestOfList,
-  classes: ClassesType,
-}) => {
+const PostsVideoCard = ({ post, classes }: { post: PostsBestOfList; classes: ClassesType }) => {
   const authorExpandContainer = useRef(null);
-  const {eventHandlers} = useHover({
+  const { eventHandlers } = useHover({
     pageElementContext: "videoCard",
     documentId: post._id,
     documentSlug: post.slug,
   });
 
   const htmlHighlight = post.contents?.htmlHighlight ?? "";
-  const embedAttribs = useMemo(
-    () => getEmbedAttribsFromHtml(htmlHighlight),
-    [htmlHighlight],
-  );
+  const embedAttribs = useMemo(() => getEmbedAttribsFromHtml(htmlHighlight), [htmlHighlight]);
   if (!embedAttribs) {
     return null;
   }
 
-  const {
-    PostsItemTooltipWrapper, PostsTitle, TruncatedAuthorsList, PostsItemDate,
-    EAKarmaDisplay,
-  } = Components;
+  const { PostsItemTooltipWrapper, PostsTitle, TruncatedAuthorsList, PostsItemDate, EAKarmaDisplay } = Components;
   return (
     <AnalyticsContext documentSlug={post.slug}>
       <div {...eventHandlers} className={classes.root}>
@@ -99,10 +86,7 @@ const PostsVideoCard = ({post, classes}: {
               <PostsTitle post={post} wrap className={classes.postTitle} />
             </PostsItemTooltipWrapper>
             <div className={classes.metadata} ref={authorExpandContainer}>
-              <TruncatedAuthorsList
-                post={post}
-                expandContainer={authorExpandContainer}
-              />
+              <TruncatedAuthorsList post={post} expandContainer={authorExpandContainer} />
               <span>·</span>
               <PostsItemDate post={post} noStyles includeAgo />
             </div>
@@ -112,13 +96,9 @@ const PostsVideoCard = ({post, classes}: {
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const PostsVideoCardComponent = registerComponent(
-  "PostsVideoCard",
-  PostsVideoCard,
-  {styles},
-);
+const PostsVideoCardComponent = registerComponent("PostsVideoCard", PostsVideoCard, { styles });
 
 declare global {
   interface ComponentTypes {

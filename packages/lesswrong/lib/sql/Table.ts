@@ -61,10 +61,7 @@ class Table<T extends DbObject> {
     return this.indexes;
   }
 
-  static fromCollection<
-    N extends CollectionNameString,
-    T extends DbObject = ObjectsByCollectionName[N]
-  >(
+  static fromCollection<N extends CollectionNameString, T extends DbObject = ObjectsByCollectionName[N]>(
     collection: CollectionBase<N>,
     forumType?: ForumTypeString,
   ): Table<T> {
@@ -88,7 +85,7 @@ class Table<T extends DbObject> {
 
     const indexes = expectedIndexes[collection.collectionName] ?? [];
     for (const index of indexes) {
-      const {key, ...options} = index;
+      const { key, ...options } = index;
       table.addIndex(key, options);
     }
 

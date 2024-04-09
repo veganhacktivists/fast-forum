@@ -1,16 +1,21 @@
-import { LanguageModelTemplate, getOpenAI, wikiSlugToTemplate, substituteIntoTemplate } from './languageModelIntegration';
-import { CreateCallbackProperties, getCollectionHooks, UpdateCallbackProperties } from '../mutationCallbacks';
-import { truncate } from '../../lib/editor/ellipsize';
-import { dataToMarkdown, htmlToMarkdown } from '../editor/conversionUtils';
+import {
+  LanguageModelTemplate,
+  getOpenAI,
+  wikiSlugToTemplate,
+  substituteIntoTemplate,
+} from "./languageModelIntegration";
+import { CreateCallbackProperties, getCollectionHooks, UpdateCallbackProperties } from "../mutationCallbacks";
+import { truncate } from "../../lib/editor/ellipsize";
+import { dataToMarkdown, htmlToMarkdown } from "../editor/conversionUtils";
 import type OpenAI from "openai";
-import { Tags } from '../../lib/collections/tags/collection';
-import { addOrUpvoteTag } from '../tagging/tagsGraphQL';
-import { DatabaseServerSetting } from '../databaseSettings';
-import { Users } from '../../lib/collections/users/collection';
-import { cheerioParse } from '../utils/htmlUtil';
-import { isAnyTest, isProduction } from '../../lib/executionEnvironment';
-import { isEAForum } from '../../lib/instanceSettings';
-import type { PostIsCriticismRequest } from '../resolvers/postResolvers';
+import { Tags } from "../../lib/collections/tags/collection";
+import { addOrUpvoteTag } from "../tagging/tagsGraphQL";
+import { DatabaseServerSetting } from "../databaseSettings";
+import { Users } from "../../lib/collections/users/collection";
+import { cheerioParse } from "../utils/htmlUtil";
+import { isAnyTest, isProduction } from "../../lib/executionEnvironment";
+import { isEAForum } from "../../lib/instanceSettings";
+import type { PostIsCriticismRequest } from "../resolvers/postResolvers";
 
 /**
  * To set up automatic tagging:
@@ -105,8 +110,10 @@ import type { PostIsCriticismRequest } from '../resolvers/postResolvers';
  */
 
 const bodyWordCountLimit = 1500;
-const tagBotAccountSlug = new DatabaseServerSetting<string|null>('languageModels.autoTagging.taggerAccountSlug', null);
-
+const tagBotAccountSlug = new DatabaseServerSetting<string | null>(
+  "languageModels.autoTagging.taggerAccountSlug",
+  null,
+);
 
 /**
  * Preprocess HTML before converting to markdown to be then converted into a
@@ -120,27 +127,33 @@ const tagBotAccountSlug = new DatabaseServerSetting<string|null>('languageModels
  */
 function preprocessHtml(html: string): string {
   const $ = cheerioParse(html) as any;
-  $('a').contents().unwrap();
+  $("a").contents().unwrap();
   return $.html();
 }
 
-export async function postToPrompt({template, post, promptSuffix, postBodyCache, markdownBody}: {
-  template: LanguageModelTemplate,
-  post: DbPost|PostIsCriticismRequest,
-  promptSuffix: string
+export async function postToPrompt({
+  template,
+  post,
+  promptSuffix,
+  postBodyCache,
+  markdownBody,
+}: {
+  template: LanguageModelTemplate;
+  post: DbPost | PostIsCriticismRequest;
+  promptSuffix: string;
   // Optional mapping from post ID to markdown body, to avoid redoing the html-to-markdown conversions
-  postBodyCache?: PostBodyCache,
+  postBodyCache?: PostBodyCache;
   // Optionally pass in the post body as markdown
-  markdownBody?: string
+  markdownBody?: string;
 }): Promise<string> {
-  const {header, body} = template;
-  
-  const preprocessedBody = '_id' in post ? postBodyCache?.preprocessedBody?.[post._id] : null
-  const htmlPostBody = ('body' in post ? post.body : null) ?? ('contents' in post ? post.contents?.html : null) ?? ''
+  const { header, body } = template;
+
+  const preprocessedBody = "_id" in post ? postBodyCache?.preprocessedBody?.[post._id] : null;
+  const htmlPostBody = ("body" in post ? post.body : null) ?? ("contents" in post ? post.contents?.html : null) ?? "";
   const markdownPostBody = markdownBody ?? preprocessedBody ?? preprocessPostHtml(htmlPostBody);
-  
-  const linkpostMeta = ('url' in post && post.url) ? `\nThis is a linkpost for ${post.url}` : '';
-  
+
+  const linkpostMeta = "url" in post && post.url ? `\nThis is a linkpost for ${post.url}` : "";
+
   return substituteIntoTemplate({
     template,
     maxLengthTokens: parseInt(header["max-length-tokens"]),
@@ -150,7 +163,7 @@ export async function postToPrompt({template, post, promptSuffix, postBodyCache,
       linkpostMeta,
       text: markdownPostBody,
       tagPrompt: promptSuffix,
-    }
+    },
   });
 }
 
@@ -159,9 +172,9 @@ function preprocessPostHtml(postHtml: string): string {
   return markdownPostBody;
 }
 
-export type PostBodyCache = {preprocessedBody: Record<string,string>}
+export type PostBodyCache = { preprocessedBody: Record<string, string> };
 export function generatePostBodyCache(posts: DbPost[]): PostBodyCache {
-  const result: PostBodyCache = {preprocessedBody: {}};
+  const result: PostBodyCache = { preprocessedBody: {} };
   for (let post of posts) {
     result.preprocessedBody[post._id] = preprocessPostHtml(post.contents?.html);
   }
@@ -170,47 +183,45 @@ export function generatePostBodyCache(posts: DbPost[]): PostBodyCache {
 
 export async function checkTags(post: DbPost, tags: DbTag[], openAIApi: OpenAI) {
   const template = await wikiSlugToTemplate("lm-config-autotag");
-  
-  let tagsApplied: Record<string,boolean> = {};
-  
+
+  let tagsApplied: Record<string, boolean> = {};
+
   for (let tag of tags) {
-    if (!tag.autoTagPrompt || !tag.autoTagModel)
-      continue;
+    if (!tag.autoTagPrompt || !tag.autoTagModel) continue;
     const languageModelResult = await openAIApi.completions.create({
       model: tag.autoTagModel,
-      prompt: await postToPrompt({template, post, promptSuffix: tag.autoTagPrompt}),
+      prompt: await postToPrompt({ template, post, promptSuffix: tag.autoTagPrompt }),
       max_tokens: 1,
     });
     const completion = languageModelResult.choices[0].text!;
-    const hasTag = (completion.trim().toLowerCase() === "yes");
+    const hasTag = completion.trim().toLowerCase() === "yes";
     tagsApplied[tag.slug] = hasTag;
   }
-  
+
   return tagsApplied;
 }
 
-
-async function getTagBotAccount(context: ResolverContext): Promise<DbUser|null> {
+async function getTagBotAccount(context: ResolverContext): Promise<DbUser | null> {
   const accountSlug = tagBotAccountSlug.get();
   if (!accountSlug) return null;
-  const account = await Users.findOne({slug: accountSlug});
+  const account = await Users.findOne({ slug: accountSlug });
   if (!account) return null;
   return account;
 }
 
-let tagBotUserIdCache: Promise<{id:string|null}>|null = null;
-export async function getTagBotUserId(context: ResolverContext): Promise<string|null> {
+let tagBotUserIdCache: Promise<{ id: string | null }> | null = null;
+export async function getTagBotUserId(context: ResolverContext): Promise<string | null> {
   if (!tagBotUserIdCache) {
     tagBotUserIdCache = (async () => {
       const tagBotAccount = await getTagBotAccount(context);
-      return {id: tagBotAccount?._id ?? null};
+      return { id: tagBotAccount?._id ?? null };
     })();
   }
   return (await tagBotUserIdCache).id;
 }
 
 export async function getAutoAppliedTags(): Promise<DbTag[]> {
-  return await Tags.find({ autoTagPrompt: {$exists: true, $ne: ""} }).fetch();
+  return await Tags.find({ autoTagPrompt: { $exists: true, $ne: "" } }).fetch();
 }
 
 async function autoApplyTagsTo(post: DbPost, context: ResolverContext): Promise<void> {
@@ -228,13 +239,13 @@ async function autoApplyTagsTo(post: DbPost, context: ResolverContext): Promise<
     console.log("Skipping autotagging (no tag-bot account)");
     return;
   }
-  
+
   const tags = await getAutoAppliedTags();
   const tagsApplied = await checkTags(post, tags, api);
-  
+
   //eslint-disable-next-line no-console
   console.log(`Auto-applying tags to post ${post.title} (${post._id}): ${JSON.stringify(tagsApplied)}`);
-  
+
   for (let tag of tags) {
     if (tagsApplied[tag.slug]) {
       await addOrUpvoteTag({
@@ -265,45 +276,46 @@ async function autoApplyTagsTo(post: DbPost, context: ResolverContext): Promise<
 export async function postIsCriticism(post: PostIsCriticismRequest): Promise<boolean> {
   // Only run this on the EA Forum on production, since it costs money.
   // (In particular, this model will only work if run with EA Forum prod credentials.)
-  if (!isEAForum || !isProduction) return false
-  
-  const api = await getOpenAI()
+  if (!isEAForum || !isProduction) return false;
+
+  const api = await getOpenAI();
   if (!api) {
     if (!isAnyTest) {
       //eslint-disable-next-line no-console
-      console.log("Skipping checking if the post is criticism (API not configured)")
+      console.log("Skipping checking if the post is criticism (API not configured)");
     }
-    return false
+    return false;
   }
-  
-  const template = await wikiSlugToTemplate("lm-config-autotag")
-  const promptSuffix = 'Is this post critically examining the work, projects, or methodologies of specific individuals, organizations, or initiatives affiliated with the effective altruism (EA) movement or community?'
+
+  const template = await wikiSlugToTemplate("lm-config-autotag");
+  const promptSuffix =
+    "Is this post critically examining the work, projects, or methodologies of specific individuals, organizations, or initiatives affiliated with the effective altruism (EA) movement or community?";
   // This model was trained on ~2500 posts, generated using generateCandidateSetsForTagClassification
   // (posts published from Nov 1 2022 - Nov 1 2023 combined with *all* posts tagged with "criticism of work in effective altruism").
   // Since it's not super accurate, we may want to fine-tune a new version in the future.
   const languageModelResult = await api.completions.create({
-    model: 'ft:davinci-002:centre-for-effective-altruism::8PxrFevH',
+    model: "ft:davinci-002:centre-for-effective-altruism::8PxrFevH",
     prompt: await postToPrompt({
       template,
       post,
       promptSuffix,
-      ...(post.contentType === 'markdown' ? {markdownBody: post.body} : {})
+      ...(post.contentType === "markdown" ? { markdownBody: post.body } : {}),
     }),
     max_tokens: 1,
-  })
-  const completion = languageModelResult.choices[0].text!
-  return (completion.trim().toLowerCase() === "yes")
+  });
+  const completion = languageModelResult.choices[0].text!;
+  return completion.trim().toLowerCase() === "yes";
 }
 
-getCollectionHooks("Posts").updateAsync.add(async ({oldDocument, newDocument, context}) => {
+getCollectionHooks("Posts").updateAsync.add(async ({ oldDocument, newDocument, context }) => {
   if (oldDocument.draft && !newDocument.draft) {
     // Post was undrafted
     void autoApplyTagsTo(newDocument, context);
   }
-})
-getCollectionHooks("Posts").createAsync.add(async ({document, context}) => {
+});
+getCollectionHooks("Posts").createAsync.add(async ({ document, context }) => {
   if (!document.draft) {
     // Post created (and is not a draft)
     void autoApplyTagsTo(document, context);
   }
-})
+});

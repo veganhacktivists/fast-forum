@@ -1,30 +1,35 @@
-import React, { useEffect, useRef } from 'react';
-import { registerComponent } from '../../../lib/vulcan-lib';
-import { applePodcastIcon } from '../../icons/ApplePodcastIcon';
-import { spotifyPodcastIcon } from '../../icons/SpotifyPodcastIcon';
-import { useEventListener } from '../../hooks/useEventListener';
-import { useTracking } from '../../../lib/analyticsEvents';
+import React, { useEffect, useRef } from "react";
+import { registerComponent } from "../../../lib/vulcan-lib";
+import { applePodcastIcon } from "../../icons/ApplePodcastIcon";
+import { spotifyPodcastIcon } from "../../icons/SpotifyPodcastIcon";
+import { useEventListener } from "../../hooks/useEventListener";
+import { useTracking } from "../../../lib/analyticsEvents";
 
 const styles = (theme: ThemeType): JssStyles => ({
   embeddedPlayer: {
-    marginBottom: '2px',
+    marginBottom: "2px",
     opacity: theme.palette.embeddedPlayer.opacity,
   },
   podcastIconList: {
-    paddingLeft: '0px',
-    marginTop: '0px'
+    paddingLeft: "0px",
+    marginTop: "0px",
   },
   podcastIcon: {
-    display: 'inline-block',
-    marginRight: '8px'
-  }
+    display: "inline-block",
+    marginRight: "8px",
+  },
 });
 
-const PostsPodcastPlayer = ({ podcastEpisode, postId, hideIconList = false, classes }: {
-  podcastEpisode: PostsDetails_podcastEpisode,
-  postId: string,
-  hideIconList?: boolean,
-  classes: ClassesType
+const PostsPodcastPlayer = ({
+  podcastEpisode,
+  postId,
+  hideIconList = false,
+  classes,
+}: {
+  podcastEpisode: PostsDetails_podcastEpisode;
+  postId: string;
+  hideIconList?: boolean;
+  classes: ClassesType;
 }) => {
   const mouseOverDiv = useRef(false);
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -34,14 +39,14 @@ const PostsPodcastPlayer = ({ podcastEpisode, postId, hideIconList = false, clas
   // responsible for hydrating the player div (with the id
   // `buzzsprout-player-${externalEpisodeId}`).
   useEffect(() => {
-    const newScript = document.createElement('script');
-    newScript.async=true;
-    newScript.src=podcastEpisode.episodeLink;
+    const newScript = document.createElement("script");
+    newScript.async = true;
+    newScript.src = podcastEpisode.episodeLink;
     document.head.appendChild(newScript);
-    
+
     return () => {
       newScript.parentNode?.removeChild(newScript);
-    }
+    };
   }, [podcastEpisode.episodeLink]);
 
   const setMouseOverDiv = (isMouseOver: boolean) => {
@@ -51,31 +56,47 @@ const PostsPodcastPlayer = ({ podcastEpisode, postId, hideIconList = false, clas
   // Dumb hack to let us figure out when the iframe inside the div was clicked on, as a (fuzzy) proxy for people clicking the play button
   // Inspiration: https://gist.github.com/jaydson/1780598
   // This won't trigger more than once per page load, unless the user clicks outside the div element, which will reset it
-  useEventListener('blur', (e) => {
+  useEventListener("blur", (e) => {
     if (mouseOverDiv.current) {
-      captureEvent('clickInsidePodcastPlayer', { postId, externalEpisodeId: podcastEpisode.externalEpisodeId, playerType: "buzzSprout" });
+      captureEvent("clickInsidePodcastPlayer", {
+        postId,
+        externalEpisodeId: podcastEpisode.externalEpisodeId,
+        playerType: "buzzSprout",
+      });
     }
   });
 
-  return <>
-    <div
-      id={`buzzsprout-player-${podcastEpisode.externalEpisodeId}`}
-      className={classes.embeddedPlayer}
-      ref={divRef}
-      onMouseOver={() => setMouseOverDiv(true)}
-      onMouseOut={() => setMouseOverDiv(false)}
-    />
-    {!hideIconList && <ul className={classes.podcastIconList}>
-      {podcastEpisode.podcast.applePodcastLink && <li className={classes.podcastIcon}><a href={podcastEpisode.podcast.applePodcastLink}>{applePodcastIcon}</a></li>}
-      {podcastEpisode.podcast.spotifyPodcastLink && <li className={classes.podcastIcon}><a href={podcastEpisode.podcast.spotifyPodcastLink}>{spotifyPodcastIcon}</a></li>}
-    </ul>}
-  </>;
+  return (
+    <>
+      <div
+        id={`buzzsprout-player-${podcastEpisode.externalEpisodeId}`}
+        className={classes.embeddedPlayer}
+        ref={divRef}
+        onMouseOver={() => setMouseOverDiv(true)}
+        onMouseOut={() => setMouseOverDiv(false)}
+      />
+      {!hideIconList && (
+        <ul className={classes.podcastIconList}>
+          {podcastEpisode.podcast.applePodcastLink && (
+            <li className={classes.podcastIcon}>
+              <a href={podcastEpisode.podcast.applePodcastLink}>{applePodcastIcon}</a>
+            </li>
+          )}
+          {podcastEpisode.podcast.spotifyPodcastLink && (
+            <li className={classes.podcastIcon}>
+              <a href={podcastEpisode.podcast.spotifyPodcastLink}>{spotifyPodcastIcon}</a>
+            </li>
+          )}
+        </ul>
+      )}
+    </>
+  );
 };
 
-const PostsPodcastPlayerComponent = registerComponent('PostsPodcastPlayer', PostsPodcastPlayer, { styles });
+const PostsPodcastPlayerComponent = registerComponent("PostsPodcastPlayer", PostsPodcastPlayer, { styles });
 
 declare global {
   interface ComponentTypes {
-    PostsPodcastPlayer: typeof PostsPodcastPlayerComponent,
+    PostsPodcastPlayer: typeof PostsPodcastPlayerComponent;
   }
 }

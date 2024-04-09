@@ -1,5 +1,5 @@
-import './admin'
-export * from  './collection'
-import './fragments'
-import './permissions'
-import './views'
+import "./admin";
+export * from "./collection";
+import "./fragments";
+import "./permissions";
+import "./views";

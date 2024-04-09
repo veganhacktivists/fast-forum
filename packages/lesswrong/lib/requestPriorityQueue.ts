@@ -18,22 +18,22 @@ type DequeueWithPriorityResult<T extends RequestData> = RequestWithPriority<T> |
 
 /**
  * This is a special-cased "priority" queue meant to handle SSR requests when we have too many being rendered.
- * 
+ *
  * Requests are categorized into one of five priority levels (0 to 4), with each bucket corresponding to a priority level. Lower indices indicate higher priority.
- * 
+ *
  * Priority is assigned by {@link getItemPriority}, which deprioritizes requests accordingly:
  * - 1 point for not being from a logged-in user
  * - 1 point for having a user-agent which makes up 30% or more of the current queue
  * - 2 points for having an IP which makes up 30% or more of the current queue
- * 
+ *
  * Its performance is very different from a regular priority queue:
- * 
+ *
  * - Median enqueue and dequeue are O(1), not O(log n).
- * 
+ *
  * - Any enqueue or dequeue which causes the request to have a different priority after the operation than before rebuckets all the requests, which is O(n).
- * 
+ *
  * This doesn't happen with any guaranteed frequency; it only happens when some IP and/or user agent crosses a threshold percentage of all requests in the queue.
- * 
+ *
  * So in theory the worst-case amortized performance is O(n).
  * But in practice it's extremely unlikely for some IP or user agent to bounce above and below the threshold by accident (at larger queue sizes),
  * since by construction we prioritize dequeueing requests which are least likely to change any thresholds, and if someone wants to DoS us there are much easier ways.
@@ -79,7 +79,7 @@ export default class PriorityBucketQueue<T extends RequestData> {
    * DO NOT use this to interact with data in the queue.
    */
   getQueueState() {
-    return this.buckets.flatMap((bucket, priority) => bucket.map(request => [request, priority] as const));
+    return this.buckets.flatMap((bucket, priority) => bucket.map((request) => [request, priority] as const));
   }
 
   private dequeueWithPriority(options?: { peek: boolean }): DequeueWithPriorityResult<T> {
@@ -117,7 +117,9 @@ export default class PriorityBucketQueue<T extends RequestData> {
     const { request, preOpPriority } = requestWithPriority;
     const postOpPriority = this.getItemPriority(request);
     if (preOpPriority !== postOpPriority) {
-      const allRequestsWithNewPriorities = this.buckets.flatMap(requests => requests.map(request => [this.getItemPriority(request), request] as const));
+      const allRequestsWithNewPriorities = this.buckets.flatMap((requests) =>
+        requests.map((request) => [this.getItemPriority(request), request] as const),
+      );
       this.resetBuckets();
       allRequestsWithNewPriorities.forEach(([newPriority, request]) => this.buckets[newPriority].push(request));
     }
@@ -195,4 +197,3 @@ export default class PriorityBucketQueue<T extends RequestData> {
     return priority;
   }
 }
-

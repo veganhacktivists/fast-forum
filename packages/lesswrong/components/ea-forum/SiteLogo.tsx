@@ -33,7 +33,7 @@ const SiteLogo = ({ eaWhite, classes }: { eaWhite?: boolean; classes: ClassesTyp
       src={logoUrl}
       title={forumTitleSetting.get()}
       alt={`${forumTitleSetting.get()} Logo`}
-      style={{ width: '250px', height: '45px' }}
+      style={{ width: "250px", height: "45px" }}
     />
   );
 };
@@ -47,7 +47,7 @@ const SiteLogoSmall = ({ eaWhite, classes }: { eaWhite?: boolean; classes: Class
       src={smallUrl}
       title={forumTitleSetting.get()}
       alt={`${forumTitleSetting.get()} Logo`}
-      style={{ width: '150px', height: '46px' }}
+      style={{ width: "150px", height: "46px" }}
     />
   );
 };

@@ -1,7 +1,7 @@
-import React from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import { useCurrentUser } from '../common/withUser';
-import { useDialog } from '../common/withDialog';
+import React from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import { useCurrentUser } from "../common/withUser";
+import { useDialog } from "../common/withDialog";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -10,43 +10,50 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const LoginPopupButton = ({classes, children, title, className}: {
-  classes: ClassesType,
-  children: React.ReactNode,
-  title?: string,
-  className?: string
+const LoginPopupButton = ({
+  classes,
+  children,
+  title,
+  className,
+}: {
+  classes: ClassesType;
+  children: React.ReactNode;
+  title?: string;
+  className?: string;
 }) => {
   const currentUser = useCurrentUser();
-  // This component is intended only for buttons whose sole purpose is logging a user in 
+  // This component is intended only for buttons whose sole purpose is logging a user in
   // (not wrapped around other buttons with other functionality. For that, just add
   // openDialog + "LoginPopup" to their functionality
   const { openDialog } = useDialog();
 
-  const { LWTooltip } = Components
-  if (currentUser) return null
+  const { LWTooltip } = Components;
+  if (currentUser) return null;
 
   return (
     <LWTooltip title={title}>
-      <a className={className ? className : classes.root} onClick={(ev) => {
+      <a
+        className={className ? className : classes.root}
+        onClick={(ev) => {
           if (!currentUser) {
             openDialog({
               componentName: "LoginPopup",
-              componentProps: {}
+              componentProps: {},
             });
             ev.preventDefault();
           }
         }}
       >
-        { children }
+        {children}
       </a>
     </LWTooltip>
-  )
-}
+  );
+};
 
-const LoginPopupButtonComponent = registerComponent('LoginPopupButton', LoginPopupButton, {styles});
+const LoginPopupButtonComponent = registerComponent("LoginPopupButton", LoginPopupButton, { styles });
 
 declare global {
   interface ComponentTypes {
-    LoginPopupButton: typeof LoginPopupButtonComponent
+    LoginPopupButton: typeof LoginPopupButtonComponent;
   }
 }

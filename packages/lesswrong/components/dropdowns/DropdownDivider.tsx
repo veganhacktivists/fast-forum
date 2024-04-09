@@ -10,23 +10,14 @@ const styles = (_theme: ThemeType): JssStyles => ({
   },
 });
 
-const DropdownDivider = ({className, classes}: {
-  className?: string,
-  classes: ClassesType,
-}) => {
-  return (
-    <Divider className={classNames(className, classes.root)} />
-  );
-}
+const DropdownDivider = ({ className, classes }: { className?: string; classes: ClassesType }) => {
+  return <Divider className={classNames(className, classes.root)} />;
+};
 
-const DropdownDividerComponent = registerComponent(
-  "DropdownDivider",
-  DropdownDivider,
-  {styles},
-);
+const DropdownDividerComponent = registerComponent("DropdownDivider", DropdownDivider, { styles });
 
 declare global {
   interface ComponentTypes {
-    DropdownDivider: typeof DropdownDividerComponent
+    DropdownDivider: typeof DropdownDividerComponent;
   }
 }

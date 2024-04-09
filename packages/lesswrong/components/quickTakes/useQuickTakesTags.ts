@@ -13,42 +13,38 @@ const FRONTPAGE_DUMMY_TAG: ChecklistTag = {
 } as const;
 
 export type SelectedTag = {
-  tagId: string,
-  tagName: string,
-  parentTagId?: string,
+  tagId: string;
+  tagName: string;
+  parentTagId?: string;
 };
 
 export type QuickTakesTag = ChecklistTag | TagFragment;
 
-export type QuickTakesTags = {
-  loading: true,
-  frontpage?: never,
-  selectedTagIds?: never,
-  tags?: never,
-  frontpageTagId?: never,
-  onTagSelected?: never,
-  onTagRemoved?: never,
-} | {
-  loading: false,
-  frontpage: boolean,
-  selectedTagIds: string[],
-  tags: QuickTakesTag[],
-  frontpageTagId: typeof FRONTPAGE_TAG_ID,
-  onTagSelected: (
-    tag: SelectedTag,
-    existingTagIds: string[],
-  ) => void,
-  onTagRemoved: (
-    tag: SelectedTag,
-    existingTagIds: string[],
-  ) => void,
-};
+export type QuickTakesTags =
+  | {
+      loading: true;
+      frontpage?: never;
+      selectedTagIds?: never;
+      tags?: never;
+      frontpageTagId?: never;
+      onTagSelected?: never;
+      onTagRemoved?: never;
+    }
+  | {
+      loading: false;
+      frontpage: boolean;
+      selectedTagIds: string[];
+      tags: QuickTakesTag[];
+      frontpageTagId: typeof FRONTPAGE_TAG_ID;
+      onTagSelected: (tag: SelectedTag, existingTagIds: string[]) => void;
+      onTagRemoved: (tag: SelectedTag, existingTagIds: string[]) => void;
+    };
 
 export const useQuickTakesTags = (): QuickTakesTags => {
   const [frontpage, setFrontpage] = useState(true);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
-  const {results, loading} = useMulti({
+  const { results, loading } = useMulti({
     terms: {
       view: "coreAndSubforumTags",
     },
@@ -59,36 +55,28 @@ export const useQuickTakesTags = (): QuickTakesTags => {
 
   const tags = [FRONTPAGE_DUMMY_TAG, ...(results ?? [])];
 
-  const onTagSelected = useCallback((
-    tag: SelectedTag,
-    existingTagIds: string[],
-  ) => {
+  const onTagSelected = useCallback((tag: SelectedTag, existingTagIds: string[]) => {
     if (tag.tagId === FRONTPAGE_TAG_ID) {
       setFrontpage(true);
     } else {
-      setSelectedTagIds(filterDefined(Array.from(new Set([
-        ...existingTagIds.filter((id) => id !== FRONTPAGE_TAG_ID),
-        tag.tagId,
-        tag.parentTagId,
-      ]))));
+      setSelectedTagIds(
+        filterDefined(
+          Array.from(new Set([...existingTagIds.filter((id) => id !== FRONTPAGE_TAG_ID), tag.tagId, tag.parentTagId])),
+        ),
+      );
     }
   }, []);
 
-  const onTagRemoved = useCallback((
-    tag: SelectedTag,
-    existingTagIds: string[],
-  ) => {
+  const onTagRemoved = useCallback((tag: SelectedTag, existingTagIds: string[]) => {
     if (tag.tagId === FRONTPAGE_TAG_ID) {
       setFrontpage(false);
     } else {
-      setSelectedTagIds(existingTagIds.filter(
-        (id) => id !== tag.tagId && id !== FRONTPAGE_TAG_ID,
-      ));
+      setSelectedTagIds(existingTagIds.filter((id) => id !== tag.tagId && id !== FRONTPAGE_TAG_ID));
     }
   }, []);
 
   if (loading) {
-    return {loading};
+    return { loading };
   }
 
   return {
@@ -100,4 +88,4 @@ export const useQuickTakesTags = (): QuickTakesTags => {
     onTagSelected,
     onTagRemoved,
   };
-}
+};

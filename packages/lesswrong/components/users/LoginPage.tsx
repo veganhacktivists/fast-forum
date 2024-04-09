@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { Components, registerComponent, } from '../../lib/vulcan-lib';
-import { useCurrentUser } from '../common/withUser';
-import { useNavigate } from '../../lib/reactRouterWrapper';
+import React, { useEffect } from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useCurrentUser } from "../common/withUser";
+import { useNavigate } from "../../lib/reactRouterWrapper";
 
 const LoginPage = () => {
   const currentUser = useCurrentUser();
@@ -10,7 +10,7 @@ const LoginPage = () => {
   useEffect(() => {
     // If already logged in, redirect to the front page
     if (currentUser) {
-      navigate({pathname: "/"});
+      navigate({ pathname: "/" });
     }
   }, [currentUser, navigate]);
 
@@ -22,12 +22,12 @@ const LoginPage = () => {
   } else {
     return <Components.LoginForm />;
   }
-}
+};
 
-const LoginPageComponent = registerComponent('LoginPage', LoginPage);
+const LoginPageComponent = registerComponent("LoginPage", LoginPage);
 
 declare global {
   interface ComponentTypes {
-    LoginPage: typeof LoginPageComponent
+    LoginPage: typeof LoginPageComponent;
   }
 }

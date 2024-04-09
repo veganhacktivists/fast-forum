@@ -1,5 +1,5 @@
-import React from 'react';
-import { registerComponent } from '../../lib/vulcan-lib';
+import React from "react";
+import { registerComponent } from "../../lib/vulcan-lib";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -8,19 +8,17 @@ const styles = (theme: ThemeType): JssStyles => ({
     ...theme.typography.commentStyle,
     fontSize: ".9rem",
     color: theme.palette.grey[600],
-  }
+  },
 });
 
-const BetaTag = ({classes}: {
-  classes: ClassesType
-}) => {
-  return <span className={classes.root}>[Beta]</span>
-}
+const BetaTag = ({ classes }: { classes: ClassesType }) => {
+  return <span className={classes.root}>[Beta]</span>;
+};
 
-const BetaTagComponent = registerComponent('BetaTag', BetaTag, {styles});
+const BetaTagComponent = registerComponent("BetaTag", BetaTag, { styles });
 
 declare global {
   interface ComponentTypes {
-    BetaTag: typeof BetaTagComponent
+    BetaTag: typeof BetaTagComponent;
   }
 }

@@ -1,7 +1,6 @@
+import { registerMigration, fillDefaultValues } from "./migrationUtils";
 
-import { registerMigration, fillDefaultValues } from './migrationUtils';
-
-import { Users } from '../../lib/collections/users/collection';
+import { Users } from "../../lib/collections/users/collection";
 
 registerMigration({
   name: "notificationSubscribedTagPost",
@@ -12,5 +11,5 @@ registerMigration({
       collection: Users,
       fieldName: "notificationSubscribedTagPost",
     });
-  }
-})
+  },
+});

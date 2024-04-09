@@ -34,12 +34,12 @@ const EARecentDiscussionTagCommented = ({
   expandAllThreads,
   classes,
 }: {
-  tag: TagRecentDiscussion,
-  comments: CommentsList[],
-  refetch?: () => void,
-  expandAllThreads?: boolean
-  tagCommentType?: TagCommentType,
-  classes: ClassesType,
+  tag: TagRecentDiscussion;
+  comments: CommentsList[];
+  refetch?: () => void;
+  expandAllThreads?: boolean;
+  tagCommentType?: TagCommentType;
+  classes: ClassesType;
 }) => {
   if (!comments.length) {
     return null;
@@ -58,11 +58,9 @@ const EARecentDiscussionTagCommented = ({
     replyFormStyle: "default",
   };
 
-  const metadata = tag.wikiOnly
-    ? "Wiki page"
-    : `${taggingNameCapitalSetting.get()} page - ${tag.postCount} posts`;
+  const metadata = tag.wikiOnly ? "Wiki page" : `${taggingNameCapitalSetting.get()} page - ${tag.postCount} posts`;
 
-  const {EARecentDiscussionItem, TagExcerpt, CommentsNode} = Components;
+  const { EARecentDiscussionItem, TagExcerpt, CommentsNode } = Components;
   return (
     <EARecentDiscussionItem
       icon="CommentFilled"
@@ -79,7 +77,7 @@ const EARecentDiscussionTagCommented = ({
         <div className={classes.metadata}>{metadata}</div>
       </div>
       <TagExcerpt tag={tag} className={classes.excerpt} />
-      {nestedComments.map((comment: CommentTreeNode<CommentsList>) =>
+      {nestedComments.map((comment: CommentTreeNode<CommentsList>) => (
         <div key={comment.item._id}>
           <CommentsNode
             treeOptions={treeOptions}
@@ -91,19 +89,19 @@ const EARecentDiscussionTagCommented = ({
             childComments={comment.children}
           />
         </div>
-      )}
+      ))}
     </EARecentDiscussionItem>
   );
-}
+};
 
 const EARecentDiscussionTagCommentedComponent = registerComponent(
   "EARecentDiscussionTagCommented",
   EARecentDiscussionTagCommented,
-  {styles},
+  { styles },
 );
 
 declare global {
   interface ComponentTypes {
-    EARecentDiscussionTagCommented: typeof EARecentDiscussionTagCommentedComponent,
+    EARecentDiscussionTagCommented: typeof EARecentDiscussionTagCommentedComponent;
   }
 }

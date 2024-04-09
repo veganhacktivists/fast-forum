@@ -11,44 +11,41 @@ export interface ActivityWindowData {
  * When running this script locally we want it to use the real analytics events
  */
 const liveEnvDescriptions: Record<string, string> = {
-  "production": 'production',
-  "staging": 'staging',
-  "dev": 'development',
-  "local-dev-prod-db": 'production', // prod running locally
-  "local-dev-staging-db": 'staging', // staging running locally
-}
+  production: "production",
+  staging: "staging",
+  dev: "development",
+  "local-dev-prod-db": "production", // prod running locally
+  "local-dev-staging-db": "staging", // staging running locally
+};
 
 /**
  * Get an array of ActivityWindowData, one for each user or client that was active between startDate and endDate.
  *
  * In the typical case, this will be called with start date of 22 days ago (to the hour) and an end date of 24 hours ago.
  */
-export async function getUserActivityData(
-  startDate: Date,
-  endDate: Date
-): Promise<ActivityWindowData[]> {
+export async function getUserActivityData(startDate: Date, endDate: Date): Promise<ActivityWindowData[]> {
   const analyticsDb = await getAnalyticsConnection();
   if (!analyticsDb) {
-    throw new Error('Analytics database not available');
+    throw new Error("Analytics database not available");
   }
   // startDate and endDate must be exact hours
   if (startDate.getMinutes() !== 0 || startDate.getSeconds() !== 0) {
-    throw new Error('startDate must be an exact hour');
+    throw new Error("startDate must be an exact hour");
   }
   if (endDate.getMinutes() !== 0 || endDate.getSeconds() !== 0) {
-    throw new Error('endDate must be an exact hour');
+    throw new Error("endDate must be an exact hour");
   }
   if (startDate === endDate) {
     return [];
   }
   if (startDate > endDate) {
-    throw new Error('startDate must be before endDate');
+    throw new Error("startDate must be before endDate");
   }
-  const liveEnvDescription = liveEnvDescriptions[environmentDescriptionSetting.get()]
+  const liveEnvDescription = liveEnvDescriptions[environmentDescriptionSetting.get()];
   if (!liveEnvDescription) {
     throw new Error(`Unknown environmentDescriptionSetting: ${environmentDescriptionSetting.get()}`);
   }
-  
+
   const activityAnalyticsSql = `
     WITH hourly_activity AS (
       SELECT
@@ -89,7 +86,7 @@ export async function getUserActivityData(
       array_agg(activity ORDER BY hour DESC) AS "activityArray"
     FROM user_hourly_activity
     GROUP BY "userOrClientId";
-  `
+  `;
 
   // Get an array by the hour of whether a user was active between startDate and endDate
   // e.g. with startDate = 2020-01-01T00:00:00Z and endDate = 2020-01-02T00:00:00Z, the result might be:
@@ -97,7 +94,10 @@ export async function getUserActivityData(
   // u:cKttArH2Bok7B9zeT, {0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,0,0,0}
   // c:22g4uu6JdjYMBcvtm, {0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0}
   //                                                      ^ this indicates they were active around 2020-01-01T13:00:00Z
-  const result = await analyticsDb.any<ActivityWindowData>(activityAnalyticsSql, [startDate.toISOString(), endDate.toISOString()]);
+  const result = await analyticsDb.any<ActivityWindowData>(activityAnalyticsSql, [
+    startDate.toISOString(),
+    endDate.toISOString(),
+  ]);
 
   return result;
 }

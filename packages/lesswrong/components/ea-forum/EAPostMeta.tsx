@@ -42,20 +42,23 @@ const styles = (theme: ThemeType) => ({
   },
   authorsList: {
     fontSize: 14,
-  }
+  },
 });
 
-const EAPostMeta = ({post, useEventStyles, className, classes}: {
-  post: PostsList | SunshinePostsList,
-  useEventStyles?: boolean,
-  className?: string,
-  classes: ClassesType,
+const EAPostMeta = ({
+  post,
+  useEventStyles,
+  className,
+  classes,
+}: {
+  post: PostsList | SunshinePostsList;
+  useEventStyles?: boolean;
+  className?: string;
+  classes: ClassesType;
 }) => {
   const authorExpandContainer = useRef(null);
 
-  const {
-    TruncatedAuthorsList, PostsItemDate, ForumIcon, LWTooltip, EventTime,
-  } = Components;
+  const { TruncatedAuthorsList, PostsItemDate, ForumIcon, LWTooltip, EventTime } = Components;
 
   if (useEventStyles && post.isEvent) {
     return (
@@ -81,38 +84,30 @@ const EAPostMeta = ({post, useEventStyles, className, classes}: {
   }
 
   return (
-    <div
-      className={classNames(classes.root, className)}
-      ref={authorExpandContainer}
-    >
+    <div className={classNames(classes.root, className)} ref={authorExpandContainer}>
       <InteractionWrapper className={classes.interactionWrapper}>
-        <TruncatedAuthorsList
-          post={post}
-          expandContainer={authorExpandContainer}
-        />
+        <TruncatedAuthorsList post={post} expandContainer={authorExpandContainer} />
       </InteractionWrapper>
       <div>
         <span className={classes.date}>
           {" · "}
           <PostsItemDate post={post} noStyles includeAgo />
         </span>
-        {(!post.fmCrosspost?.isCrosspost || post.fmCrosspost.hostedHere) &&
+        {(!post.fmCrosspost?.isCrosspost || post.fmCrosspost.hostedHere) && (
           <span className={classes.readTime}>
-          {" · "}{post.readTimeMinutes || 1}m read
-        </span>}
+            {" · "}
+            {post.readTimeMinutes || 1}m read
+          </span>
+        )}
       </div>
     </div>
   );
-}
+};
 
-const EAPostMetaComponent = registerComponent(
-  "EAPostMeta",
-  EAPostMeta,
-  {styles, stylePriority: -1},
-);
+const EAPostMetaComponent = registerComponent("EAPostMeta", EAPostMeta, { styles, stylePriority: -1 });
 
 declare global {
   interface ComponentTypes {
-    EAPostMeta: typeof EAPostMetaComponent,
+    EAPostMeta: typeof EAPostMetaComponent;
   }
 }

@@ -1,9 +1,14 @@
 import range from "lodash/range";
-import { schemaDefaultValue, resolverOnlyField, accessFilterSingle, accessFilterMultiple } from "../../utils/schemaUtils";
+import {
+  schemaDefaultValue,
+  resolverOnlyField,
+  accessFilterSingle,
+  accessFilterMultiple,
+} from "../../utils/schemaUtils";
 import { getCollectionName } from "../../vulcan-lib";
 import { isLWorAF } from "../../instanceSettings";
 
-const DOCUMENT_TYPES = ['Sequence', 'Post'];
+const DOCUMENT_TYPES = ["Sequence", "Post"];
 
 interface ShiftSpotlightItemParams {
   startBound: number;
@@ -14,76 +19,84 @@ interface ShiftSpotlightItemParams {
 
 /**
  * Range is not inclusive of the "end"
- * 
+ *
  * ex: Moving item from position 7 to position 3.  We want to shift items in the range of positions [3..6] to [4..7].
- * 
+ *
  * So range(3, 7) gives us [3,4,5,6].
- * 
+ *
  * `offset: -1` is to push items "backward" (when you're either creating a new spotlight item in the middle of the existing set, or moving one earlier in the order)
- * 
+ *
  * `offset: 1` is to pull items "forward" (when you're moving an existing item back)
  */
 const shiftSpotlightItems = async ({ startBound, endBound, offset, context }: ShiftSpotlightItemParams) => {
   const shiftRange = range(startBound, endBound);
 
   // Shift the intermediate spotlights backward or forward (according to `offset`)
-  await context.Spotlights.rawUpdateMany({ position: { $in: shiftRange } }, { $inc: { position: offset } }, { multi:true });
+  await context.Spotlights.rawUpdateMany(
+    { position: { $in: shiftRange } },
+    { $inc: { position: offset } },
+    { multi: true },
+  );
 };
 
 const schema: SchemaType<"Spotlights"> = {
   documentId: {
     type: String,
     nullable: false,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
     order: 10,
     resolveAs: {
-      fieldName: 'document',
+      fieldName: "document",
       addOriginalField: true,
       // TODO: try a graphql union type?
-      type: 'Post!',
-      resolver: async (spotlight: DbSpotlight, args: void, context: ResolverContext): Promise<Partial<DbPost | DbSequence | DbCollection> | null> => {
-        const collectionName = getCollectionName(spotlight.documentType) as "Posts"|"Sequences";
+      type: "Post!",
+      resolver: async (
+        spotlight: DbSpotlight,
+        args: void,
+        context: ResolverContext,
+      ): Promise<Partial<DbPost | DbSequence | DbCollection> | null> => {
+        const collectionName = getCollectionName(spotlight.documentType) as "Posts" | "Sequences";
         const collection = context[collectionName];
         const document = await collection.findOne(spotlight.documentId);
         return accessFilterSingle(context.currentUser, collection, document, context);
-      }
+      },
     },
   },
-  
+
   /**
    * Type of document that is spotlighted, from the options in DOCUMENT_TYPES.
    * Note subtle distinction: those are type names, not collection names.
    */
   documentType: {
     type: String,
-    typescriptType: 'SpotlightDocumentType',
-    control: 'select',
+    typescriptType: "SpotlightDocumentType",
+    control: "select",
     form: {
-      options: () => DOCUMENT_TYPES.map(documentType => ({ label: documentType, value: documentType }))
+      options: () => DOCUMENT_TYPES.map((documentType) => ({ label: documentType, value: documentType })),
     },
     ...schemaDefaultValue(DOCUMENT_TYPES[0]),
     allowedValues: DOCUMENT_TYPES,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
     order: 20,
   },
   position: {
     type: Number,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
     order: 30,
     optional: true,
     nullable: false,
     onCreate: async ({ newDocument, context }) => {
       const [currentSpotlight, lastSpotlightByPosition] = await Promise.all([
         context.Spotlights.findOne({}, { sort: { lastPromotedAt: -1 } }),
-        context.Spotlights.findOne({}, { sort: { position: -1 } })
+        context.Spotlights.findOne({}, { sort: { position: -1 } }),
       ]);
-      
+
       // If we don't have an active spotlight (or any spotlight), the new one should be first
       if (!currentSpotlight || !lastSpotlightByPosition) {
         return 0;
@@ -91,7 +104,8 @@ const schema: SchemaType<"Spotlights"> = {
 
       // If we didn't specify a position, by default we probably want to be inserting it right after the currently-active spotlight
       // If we're instead putting the created spotlight somewhere before the last spotlight, shift everything at and after the desired position back
-      const startBound = typeof newDocument.position !== 'number' ? currentSpotlight.position + 1 : newDocument.position;
+      const startBound =
+        typeof newDocument.position !== "number" ? currentSpotlight.position + 1 : newDocument.position;
       const endBound = lastSpotlightByPosition.position + 1;
 
       // Don't let us create a new spotlight with an arbitrarily large position
@@ -106,7 +120,7 @@ const schema: SchemaType<"Spotlights"> = {
       return startBound;
     },
     onUpdate: async ({ data, oldDocument, context }) => {
-      if (typeof data.position === 'number' && data.position !== oldDocument.position) {
+      if (typeof data.position === "number" && data.position !== oldDocument.position) {
         // Figure out whether we're moving an existing spotlight item to an earlier position or a later position
         const pullingSpotlightForward = data.position < oldDocument.position;
 
@@ -119,38 +133,38 @@ const schema: SchemaType<"Spotlights"> = {
         await context.Spotlights.rawUpdateOne({ _id: oldDocument._id }, { $set: { position: 9001 } });
 
         // Shift the intermediate items backward
-        await shiftSpotlightItems({ startBound, endBound, offset, context });        
+        await shiftSpotlightItems({ startBound, endBound, offset, context });
 
         // The to-be-updated spotlight's position will get updated back to the desired position later in the mutator
         return data.position;
       }
-    }
+    },
   },
   duration: {
     type: Number,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
     order: 40,
     ...schemaDefaultValue(3),
   },
   customTitle: {
     type: String,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
     order: 50,
     optional: true,
-    nullable: true
+    nullable: true,
   },
   customSubtitle: {
     type: String,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
     order: 60,
     optional: true,
-    nullable: true
+    nullable: true,
   },
   headerTitle: {
     type: String,
@@ -182,50 +196,50 @@ const schema: SchemaType<"Spotlights"> = {
   lastPromotedAt: {
     type: Date,
     control: "datetime",
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
     order: 70,
     // Default to the epoch date if not specified
     ...schemaDefaultValue(new Date(0)),
   },
   draft: {
     type: Boolean,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
     order: 80,
     ...schemaDefaultValue(true),
   },
   showAuthor: {
     type: Boolean,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
     order: 85,
     ...schemaDefaultValue(false),
-   optional: true,
-   nullable: false,
+    optional: true,
+    nullable: false,
   },
   imageFade: {
     type: Boolean,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
     order: 86,
     optional: true,
     nullable: false,
     // we're not using schemaDefaultValue because we can't use forumType
     // conditionals without breaking schema hash logic
     defaultValue: true,
-    onCreate: ({document}) => document.imageFade ?? (isLWorAF ? false : true),
+    onCreate: ({ document }) => document.imageFade ?? (isLWorAF ? false : true),
     canAutofillDefault: true,
   },
   spotlightImageId: {
     type: String,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
     control: "ImageUpload",
     optional: true,
     nullable: true,
@@ -233,32 +247,39 @@ const schema: SchemaType<"Spotlights"> = {
   },
   spotlightDarkImageId: {
     type: String,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
     control: "ImageUpload",
     optional: true,
     nullable: true,
     order: 100,
   },
-  
+
   sequenceChapters: resolverOnlyField({
     type: Array,
-    graphQLtype: '[Chapter]',
-    canRead: ['guests'],
-    resolver: async (spotlight: DbSpotlight, args: void, context: ResolverContext): Promise<Partial<DbChapter>[]|null> => {
+    graphQLtype: "[Chapter]",
+    canRead: ["guests"],
+    resolver: async (
+      spotlight: DbSpotlight,
+      args: void,
+      context: ResolverContext,
+    ): Promise<Partial<DbChapter>[] | null> => {
       if (!spotlight.documentId || spotlight.documentType !== "Sequence") {
         return null;
       }
-      const chapters = await context.Chapters.find({
-        sequenceId: spotlight.documentId,
-      }, {
-        limit: 100,
-        sort: {number:1},
-      }).fetch();
-      
+      const chapters = await context.Chapters.find(
+        {
+          sequenceId: spotlight.documentId,
+        },
+        {
+          limit: 100,
+          sort: { number: 1 },
+        },
+      ).fetch();
+
       return await accessFilterMultiple(context.currentUser, context.Chapters, chapters, context);
-    }
+    },
   }),
   "sequenceChapters.$": {
     type: "Chapter",

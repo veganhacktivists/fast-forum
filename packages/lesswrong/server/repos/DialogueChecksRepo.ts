@@ -1,5 +1,5 @@
 import DialogueChecks from "../../lib/collections/dialogueChecks/collection";
-import {randomId} from "../../lib/random";
+import { randomId } from "../../lib/random";
 import AbstractRepo from "./AbstractRepo";
 import { recordPerfMetrics } from "./perfMetricWrapper";
 
@@ -20,28 +20,35 @@ class DialogueChecksRepo extends AbstractRepo<"DialogueChecks"> {
     super(DialogueChecks);
   }
   async upsertDialogueCheck(userId: string, targetUserId: string, checked: boolean) {
-    const checkedAt = new Date() // now
-    return this.one(`
+    const checkedAt = new Date(); // now
+    return this.one(
+      `
       -- DialogueChecksRepo.upsertDialogueCheck
       ${BASE_UPSERT_QUERY} DO UPDATE SET 
         "checked" = $4,
         "checkedAt" = $5
       RETURNING *
-    `, [randomId(), userId, targetUserId, checked, checkedAt, false])
+    `,
+      [randomId(), userId, targetUserId, checked, checkedAt, false],
+    );
   }
 
   async upsertDialogueHideInRecommendations(userId: string, targetUserId: string, hideInRecommendations: boolean) {
-    const checkedAt = new Date() // now
-    return this.one(`
+    const checkedAt = new Date(); // now
+    return this.one(
+      `
       -- DialogueChecksRepo.upsertDialogueHideInRecommendations
       ${BASE_UPSERT_QUERY} DO UPDATE SET 
         "hideInRecommendations" = $6
       RETURNING *
-    `, [randomId(), userId, targetUserId, false, checkedAt, hideInRecommendations])
+    `,
+      [randomId(), userId, targetUserId, false, checkedAt, hideInRecommendations],
+    );
   }
 
   async checkForMatch(userId1: string, userId2: string): Promise<DbDialogueCheck | null> {
-    return this.oneOrNone(`
+    return this.oneOrNone(
+      `
       -- DialogueChecksRepo.checkForMatch
       SELECT 
         * 
@@ -56,7 +63,9 @@ class DialogueChecksRepo extends AbstractRepo<"DialogueChecks"> {
         AND "userId" = $1 
         AND "checked" = true
       );
-    `, [userId1, userId2])
+    `,
+      [userId1, userId2],
+    );
   }
 }
 

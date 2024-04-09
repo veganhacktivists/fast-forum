@@ -1,5 +1,5 @@
-import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
-import Votes from '../../lib/collections/votes/collection';
+import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
+import Votes from "../../lib/collections/votes/collection";
 
 registerMigration({
   name: "removeVoteAuthorId",
@@ -20,12 +20,12 @@ registerMigration({
           return {
             updateOne: {
               filter: { _id },
-              update: {$unset: {authorId: ""}}
-            }
+              update: { $unset: { authorId: "" } },
+            },
           };
         });
         await Votes.rawCollection().bulkWrite(changes, { ordered: false });
-      }
+      },
     });
   },
 });

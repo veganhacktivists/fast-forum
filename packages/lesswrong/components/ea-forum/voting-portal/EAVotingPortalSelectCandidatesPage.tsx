@@ -37,13 +37,7 @@ const EAVotingPortalSelectCandidatesPageLoader = ({ classes }: { classes: Classe
 
   if (!electionVote?.vote) return null;
 
-  return (
-    <EAVotingPortalSelectCandidatesPage
-      electionVote={electionVote}
-      updateVote={updateVote}
-      classes={classes}
-    />
-  );
+  return <EAVotingPortalSelectCandidatesPage electionVote={electionVote} updateVote={updateVote} classes={classes} />;
 };
 
 const EAVotingPortalSelectCandidatesPage = ({
@@ -73,7 +67,7 @@ const EAVotingPortalSelectCandidatesPage = ({
         ? { [selectedIds[0]]: 1 } // If there is only one candidate, give them all the votes
         : selectedIds.reduce((acc, id) => ({ ...acc, [id]: electionVote.vote[id] ?? null }), {});
       // In case they are redoing this step, clear the compare state
-      await updateVote({vote: newVote, compareState: null});
+      await updateVote({ vote: newVote, compareState: null });
     } catch (e) {
       flash(e.message);
       return;
@@ -98,8 +92,8 @@ const EAVotingPortalSelectCandidatesPage = ({
         <div className={classes.content}>
           <div className={classes.h2}>1. Select candidates you want to give points to</div>
           <div className={classes.subtitle}>
-            <div className={classes.subtitleParagraph}>You'll assign points in the next steps.
-            For information about how voting works, check{" "}
+            <div className={classes.subtitleParagraph}>
+              You'll assign points in the next steps. For information about how voting works, check{" "}
               <Link to={processLink} target="_blank" rel="noopener noreferrer">
                 this post
               </Link>
@@ -142,7 +136,7 @@ const EAVotingPortalSelectCandidatesPage = ({
 const EAVotingPortalSelectCandidatesPageComponent = registerComponent(
   "EAVotingPortalSelectCandidatesPage",
   EAVotingPortalSelectCandidatesPageLoader,
-  { styles }
+  { styles },
 );
 
 declare global {

@@ -37,29 +37,37 @@ export default class AutoMath extends Plugin {
 			const rightLivePosition = LivePosition.fromPosition( firstRange.end );
 			rightLivePosition.stickiness = 'toNext';
 
-			modelDocument.once( 'change:data', () => {
-				this._mathBetweenPositions( leftLivePosition, rightLivePosition );
+			modelDocument.once(
+				'change:data',
+				() => {
+					this._mathBetweenPositions( leftLivePosition, rightLivePosition );
 
-				leftLivePosition.detach();
-				rightLivePosition.detach();
-			}, { priority: 'high' } );
+					leftLivePosition.detach();
+					rightLivePosition.detach();
+				},
+				{ priority: 'high' }
+			);
 		} );
 
-		editor.commands.get( 'undo' ).on( 'execute', () => {
-			if ( this._timeoutId ) {
-				global.window.clearTimeout( this._timeoutId );
-				this._positionToInsert.detach();
+		editor.commands.get( "undo" ).on(
+			'execute',
+			() => {
+				if ( this._timeoutId ) {
+					global.window.clearTimeout( this._timeoutId );
+					this._positionToInsert.detach();
 
-				this._timeoutId = null;
-				this._positionToInsert = null;
-			}
-		}, { priority: 'high' } );
+					this._timeoutId = null;
+					this._positionToInsert = null;
+				}
+			},
+			{ priority: 'high' }
+		);
 	}
 
 	_mathBetweenPositions( leftPosition, rightPosition ) {
 		const editor = this.editor;
 
-		const mathConfig = Object.assign( defaultConfig, this.editor.config.get( 'math' ) );
+		const mathConfig = Object.assign( defaultConfig, this.editor.config.get( "math" ) );
 
 		const equationRange = new LiveRange( leftPosition, rightPosition );
 		const walker = equationRange.getWalker( { ignoreElementEnd: true } );
@@ -68,7 +76,7 @@ export default class AutoMath extends Plugin {
 
 		// Get equation text
 		for ( const node of walker ) {
-			if ( node.item.is( '$textProxy' ) ) {
+			if ( node.item.is( "$textProxy" ) ) {
 				text += node.item.data;
 			}
 		}
@@ -80,7 +88,7 @@ export default class AutoMath extends Plugin {
 			return;
 		}
 
-		const mathCommand = editor.commands.get( 'math' );
+		const mathCommand = editor.commands.get( "math" );
 
 		// Do not anything if math element cannot be inserted at the current position
 		if ( !mathCommand.isEnabled ) {
@@ -91,7 +99,7 @@ export default class AutoMath extends Plugin {
 
 		// With timeout user can undo conversation if want use plain text
 		this._timeoutId = global.window.setTimeout( () => {
-			editor.model.change( writer => {
+			editor.model.change( ( writer ) => {
 				this._timeoutId = null;
 
 				writer.remove( equationRange );
@@ -99,19 +107,19 @@ export default class AutoMath extends Plugin {
 				let insertPosition;
 
 				// Check if position where the math element should be inserted is still valid.
-				if ( this._positionToInsert.root.rootName !== '$graveyard' ) {
+				if ( this._positionToInsert.root.rootName !== '$graveyard') {
 					insertPosition = this._positionToInsert;
 				}
 
-				editor.model.change( writer => {
+				editor.model.change( ( writer ) => {
 					const params = Object.assign( extractDelimiters( text ), {
 						type: mathConfig.outputType
-					} );
+					});
 					const mathElement = writer.createElement(params.display ? 'mathtex-display' : 'mathtex', params );
 
 					editor.model.insertContent( mathElement, insertPosition );
 
-					writer.setSelection( mathElement, 'after' );
+					writer.setSelection( mathElement, 'after');
 				} );
 
 				this._positionToInsert.detach();

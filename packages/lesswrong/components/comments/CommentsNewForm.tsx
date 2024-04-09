@@ -1,96 +1,105 @@
-import { Components, registerComponent, getFragment } from '../../lib/vulcan-lib';
-import React, {ComponentProps, useState, useEffect, useRef} from 'react';
-import Button from '@material-ui/core/Button';
-import classNames from 'classnames';
-import { useCurrentUser } from '../common/withUser'
-import withErrorBoundary from '../common/withErrorBoundary'
-import { useDialog } from '../common/withDialog';
-import { useSingle } from '../../lib/crud/withSingle';
-import { hideUnreviewedAuthorCommentsSettings } from '../../lib/publicSettings';
-import { userCanDo } from '../../lib/vulcan-users/permissions';
-import { requireNewUserGuidelinesAck, userIsAllowedToComment } from '../../lib/collections/users/helpers';
-import { useMessages } from '../common/withMessages';
+import { Components, registerComponent, getFragment } from "../../lib/vulcan-lib";
+import React, { ComponentProps, useState, useEffect, useRef } from "react";
+import Button from "@material-ui/core/Button";
+import classNames from "classnames";
+import { useCurrentUser } from "../common/withUser";
+import withErrorBoundary from "../common/withErrorBoundary";
+import { useDialog } from "../common/withDialog";
+import { useSingle } from "../../lib/crud/withSingle";
+import { hideUnreviewedAuthorCommentsSettings } from "../../lib/publicSettings";
+import { userCanDo } from "../../lib/vulcan-users/permissions";
+import { requireNewUserGuidelinesAck, userIsAllowedToComment } from "../../lib/collections/users/helpers";
+import { useMessages } from "../common/withMessages";
 import { useUpdate } from "../../lib/crud/withUpdate";
-import { afNonMemberDisplayInitialPopup, afNonMemberSuccessHandling } from "../../lib/alignment-forum/displayAFNonMemberPopups";
-import ArrowForward from '@material-ui/icons/ArrowForward';
-import { TagCommentType } from '../../lib/collections/comments/types';
-import { commentDefaultToAlignment } from '../../lib/collections/comments/helpers';
-import { isInFuture } from '../../lib/utils/timeUtil';
-import moment from 'moment';
-import { isLWorAF } from '../../lib/instanceSettings';
+import {
+  afNonMemberDisplayInitialPopup,
+  afNonMemberSuccessHandling,
+} from "../../lib/alignment-forum/displayAFNonMemberPopups";
+import ArrowForward from "@material-ui/icons/ArrowForward";
+import { TagCommentType } from "../../lib/collections/comments/types";
+import { commentDefaultToAlignment } from "../../lib/collections/comments/helpers";
+import { isInFuture } from "../../lib/utils/timeUtil";
+import moment from "moment";
+import { isLWorAF } from "../../lib/instanceSettings";
 import { useTracking } from "../../lib/analyticsEvents";
-import { isFriendlyUI } from '../../themes/forumTheme';
+import { isFriendlyUI } from "../../themes/forumTheme";
 
-export type CommentFormDisplayMode = "default" | "minimalist"
+export type CommentFormDisplayMode = "default" | "minimalist";
 
 const styles = (theme: ThemeType): JssStyles => ({
-  root: isFriendlyUI ? {
-    '& .form-component-EditorFormComponent': {
-      marginTop: 0
-    }
-  } : {},
+  root: isFriendlyUI
+    ? {
+        "& .form-component-EditorFormComponent": {
+          marginTop: 0,
+        },
+      }
+    : {},
   rootMinimalist: {
-    '& .form-input': {
+    "& .form-input": {
       width: "100%",
       margin: 0,
       marginTop: 4,
     },
-    '& form': {
+    "& form": {
       display: "flex",
       flexDirection: "row",
-    }
+    },
   },
   loadingRoot: {
-    opacity: 0.5
+    opacity: 0.5,
   },
   form: {
     padding: isFriendlyUI ? 12 : 10,
   },
   formMinimalist: {
-    padding: '12px 10px 8px 10px',
+    padding: "12px 10px 8px 10px",
   },
   rateLimitNote: {
-    paddingTop: '4px',
+    paddingTop: "4px",
     color: theme.palette.text.dim2,
   },
   modNote: {
-    paddingTop: '4px',
+    paddingTop: "4px",
     color: theme.palette.text.dim2,
   },
   submit: {
-    textAlign: 'right',
+    textAlign: "right",
   },
-  formButton: isFriendlyUI ? {
-    fontSize: 14,
-    textTransform: 'none',
-    padding: '6px 12px',
-    borderRadius: 6,
-    boxShadow: 'none',
-    marginLeft: 8,
-  } : {
-    paddingBottom: "2px",
-    fontSize: "16px",
-    color: theme.palette.lwTertiary.main,
-    marginLeft: "5px",
-    "&:hover": {
-      opacity: .5,
-      backgroundColor: "none",
-    },
-  },
+  formButton: isFriendlyUI
+    ? {
+        fontSize: 14,
+        textTransform: "none",
+        padding: "6px 12px",
+        borderRadius: 6,
+        boxShadow: "none",
+        marginLeft: 8,
+      }
+    : {
+        paddingBottom: "2px",
+        fontSize: "16px",
+        color: theme.palette.lwTertiary.main,
+        marginLeft: "5px",
+        "&:hover": {
+          opacity: 0.5,
+          backgroundColor: "none",
+        },
+      },
   cancelButton: {
     color: isFriendlyUI ? undefined : theme.palette.grey[400],
   },
-  submitButton: isFriendlyUI ? {
-    backgroundColor: theme.palette.buttons.alwaysPrimary,
-    color: theme.palette.text.alwaysWhite,
-    '&:disabled': {
-      backgroundColor: theme.palette.buttons.alwaysPrimary,
-      color: theme.palette.text.alwaysWhite,
-      opacity: .5,
-    }
-  } : {},
+  submitButton: isFriendlyUI
+    ? {
+        backgroundColor: theme.palette.buttons.alwaysPrimary,
+        color: theme.palette.text.alwaysWhite,
+        "&:disabled": {
+          backgroundColor: theme.palette.buttons.alwaysPrimary,
+          color: theme.palette.text.alwaysWhite,
+          opacity: 0.5,
+        },
+      }
+    : {},
   submitMinimalist: {
-    height: 'fit-content',
+    height: "fit-content",
     marginTop: "auto",
     marginBottom: 4,
   },
@@ -101,149 +110,160 @@ const styles = (theme: ThemeType): JssStyles => ({
     minHeight: 28,
     marginLeft: "5px",
     "&:hover": {
-      opacity: .8,
+      opacity: 0.8,
       backgroundColor: theme.palette.lwTertiary.main,
     },
     backgroundColor: theme.palette.lwTertiary.main,
     color: theme.palette.background.pageActiveAreaBackground,
-    overflowX: "hidden",  // to stop loading dots from wrapping around
+    overflowX: "hidden", // to stop loading dots from wrapping around
   },
   moderationGuidelinesWrapper: {
     backgroundColor: theme.palette.panelBackground.newCommentFormModerationGuidelines,
-  }
+  },
 });
 
-const shouldOpenNewUserGuidelinesDialog = (
-  maybeProps: { user: UsersCurrent | null, post?: PostsMinimumInfo }
-): maybeProps is Omit<ComponentProps<ComponentTypes['NewUserGuidelinesDialog']>, "onClose" | "classes"> => {
+const shouldOpenNewUserGuidelinesDialog = (maybeProps: {
+  user: UsersCurrent | null;
+  post?: PostsMinimumInfo;
+}): maybeProps is Omit<ComponentProps<ComponentTypes["NewUserGuidelinesDialog"]>, "onClose" | "classes"> => {
   const { user, post } = maybeProps;
   return !!user && requireNewUserGuidelinesAck(user) && !!post;
 };
 
 export type BtnProps = {
-  variant?: 'contained',
-  color?: 'primary',
-  disabled?: boolean
-}
+  variant?: "contained";
+  color?: "primary";
+  disabled?: boolean;
+};
 
 export type CommentSuccessCallback = (
   comment: CommentsList,
-  otherArgs: {form: AnyBecauseTodo},
+  otherArgs: { form: AnyBecauseTodo },
 ) => void | Promise<void>;
 export type CommentCancelCallback = (...args: unknown[]) => void | Promise<void>;
 
 export type CommentsNewFormProps = {
-  prefilledProps?: any,
-  post?: PostsMinimumInfo,
-  tag?: TagBasicInfo,
-  tagCommentType?: TagCommentType,
-  parentComment?: CommentsList,
-  successCallback?: CommentSuccessCallback,
-  cancelCallback?: CommentCancelCallback,
-  type: string,
-  removeFields?: any,
-  fragment?: FragmentName,
-  formProps?: any,
-  enableGuidelines?: boolean,
-  padding?: boolean
-  replyFormStyle?: CommentFormDisplayMode
-  classes: ClassesType
-  className?: string
-}
+  prefilledProps?: any;
+  post?: PostsMinimumInfo;
+  tag?: TagBasicInfo;
+  tagCommentType?: TagCommentType;
+  parentComment?: CommentsList;
+  successCallback?: CommentSuccessCallback;
+  cancelCallback?: CommentCancelCallback;
+  type: string;
+  removeFields?: any;
+  fragment?: FragmentName;
+  formProps?: any;
+  enableGuidelines?: boolean;
+  padding?: boolean;
+  replyFormStyle?: CommentFormDisplayMode;
+  classes: ClassesType;
+  className?: string;
+};
 
 const CommentsNewForm = ({
-  prefilledProps={},
+  prefilledProps = {},
   post,
   tag,
-  tagCommentType="DISCUSSION",
+  tagCommentType = "DISCUSSION",
   parentComment,
   successCallback,
   type,
   cancelCallback,
   removeFields,
-  fragment="CommentsList",
+  fragment = "CommentsList",
   formProps,
-  enableGuidelines=true,
-  padding=true,
-  replyFormStyle="default",
+  enableGuidelines = true,
+  padding = true,
+  replyFormStyle = "default",
   classes,
   className,
 }: CommentsNewFormProps) => {
   const currentUser = useCurrentUser();
-  const { captureEvent } = useTracking({eventProps: { postId: post?._id, tagId: tag?._id, tagCommentType}});
+  const { captureEvent } = useTracking({ eventProps: { postId: post?._id, tagId: tag?._id, tagCommentType } });
   const commentSubmitStartTimeRef = useRef(Date.now());
-  
+
   const userWithRateLimit = useSingle({
     documentId: currentUser?._id,
     collectionName: "Users",
     fragmentName: "UsersCurrentCommentRateLimit",
-    extraVariables: { postId: 'String' },
+    extraVariables: { postId: "String" },
     extraVariablesValues: { postId: post?._id },
     fetchPolicy: "cache-and-network",
     skip: !currentUser,
   });
   const userNextAbleToComment = userWithRateLimit?.document?.rateLimitNextAbleToComment;
-  const lastRateLimitExpiry: Date|null = (userNextAbleToComment && new Date(userNextAbleToComment.nextEligible)) ?? null;
-  const rateLimitMessage = userNextAbleToComment ? userNextAbleToComment.rateLimitMessage : null
-  
+  const lastRateLimitExpiry: Date | null =
+    (userNextAbleToComment && new Date(userNextAbleToComment.nextEligible)) ?? null;
+  const rateLimitMessage = userNextAbleToComment ? userNextAbleToComment.rateLimitMessage : null;
+
   // Disable the form if there's a rate limit and it's more than 1 minute until it
   // expires. (If the user is rate limited but it will expire sooner than that,
   // don't disable the form; it'll probably expire before they finish typing their
   // comment anyways, and this avoids an awkward interaction with the 15-second
   // rate limit that's only supposed to be there to prevent accidental double posts.
   // TODO
-  const formDisabledDueToRateLimit = lastRateLimitExpiry && isInFuture(moment(lastRateLimitExpiry).subtract(1,'minutes').toDate());
+  const formDisabledDueToRateLimit =
+    lastRateLimitExpiry && isInFuture(moment(lastRateLimitExpiry).subtract(1, "minutes").toDate());
 
-  const {flash} = useMessages();
+  const { flash } = useMessages();
   prefilledProps = {
     ...prefilledProps,
     af: commentDefaultToAlignment(currentUser, post, parentComment),
   };
-  
-  const isMinimalist = replyFormStyle === "minimalist"
-  const [showGuidelines, setShowGuidelines] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [_,setForceRefreshState] = useState(0);
-  const { ModerationGuidelinesBox, WrappedSmartForm, RecaptchaWarning, Loading, NewCommentModerationWarning, RateLimitWarning } = Components
-  
+
+  const isMinimalist = replyFormStyle === "minimalist";
+  const [showGuidelines, setShowGuidelines] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [_, setForceRefreshState] = useState(0);
+  const {
+    ModerationGuidelinesBox,
+    WrappedSmartForm,
+    RecaptchaWarning,
+    Loading,
+    NewCommentModerationWarning,
+    RateLimitWarning,
+  } = Components;
+
   const { openDialog } = useDialog();
   const { mutate: updateComment } = useUpdate({
     collectionName: "Comments",
-    fragmentName: 'SuggestAlignmentComment',
-  })
-  
+    fragmentName: "SuggestAlignmentComment",
+  });
+
   // On focus (this bubbles out from the text editor), show moderation guidelines.
   // Defer this through a setTimeout, because otherwise clicking the Cancel button
   // doesn't work (the focus event fires before the click event, the state change
   // causes DOM nodes to get replaced, and replacing the DOM nodes prevents the
   // rest of the click event handlers from firing.)
-  const onFocusCommentForm = () => setTimeout(() => {
-    // TODO: user field for showing new user guidelines
-    // TODO: decide if post should be required?  We might not have a post param in the case of shortform, not sure where else
-    const dialogProps = { user: currentUser, post };
-    if (shouldOpenNewUserGuidelinesDialog(dialogProps)) {
-      openDialog({
-        componentName: 'NewUserGuidelinesDialog',
-        componentProps: dialogProps,
-        noClickawayCancel: true
-      });
-    }
-    if (isLWorAF) {
-      setShowGuidelines(true);
-    }
-  }, 0);
+  const onFocusCommentForm = () =>
+    setTimeout(() => {
+      // TODO: user field for showing new user guidelines
+      // TODO: decide if post should be required?  We might not have a post param in the case of shortform, not sure where else
+      const dialogProps = { user: currentUser, post };
+      if (shouldOpenNewUserGuidelinesDialog(dialogProps)) {
+        openDialog({
+          componentName: "NewUserGuidelinesDialog",
+          componentProps: dialogProps,
+          noClickawayCancel: true,
+        });
+      }
+      if (isLWorAF) {
+        setShowGuidelines(true);
+      }
+    }, 0);
 
-  const wrappedSuccessCallback = (comment: CommentsList, { form }: {form: any}) => {
-    afNonMemberSuccessHandling({currentUser, document: comment, openDialog, updateDocument: updateComment })
+  const wrappedSuccessCallback = (comment: CommentsList, { form }: { form: any }) => {
+    afNonMemberSuccessHandling({ currentUser, document: comment, openDialog, updateDocument: updateComment });
     if (comment.deleted) {
       flash(comment.deletedReason);
     }
     if (successCallback) {
-      void successCallback(comment, {form});
+      void successCallback(comment, { form });
     }
-    setLoading(false)
+    setLoading(false);
     const timeElapsed = Date.now() - commentSubmitStartTimeRef.current;
-    captureEvent("wrappedSuccessCallbackFinished", {timeElapsed, commentId: comment._id})
+    captureEvent("wrappedSuccessCallbackFinished", { timeElapsed, commentId: comment._id });
     userWithRateLimit.refetch();
   };
 
@@ -251,13 +271,13 @@ const CommentsNewForm = ({
     if (cancelCallback) {
       void cancelCallback(...args);
     }
-    setLoading(false)
+    setLoading(false);
   };
 
   if (post) {
     prefilledProps = {
       ...prefilledProps,
-      postId: post._id
+      postId: post._id,
     };
   }
 
@@ -276,80 +296,95 @@ const CommentsNewForm = ({
     };
   }
 
-  const SubmitComponent = ({submitLabel = "Submit"}) => {
-    const formButtonClass = isMinimalist ? classes.formButtonMinimalist : classes.formButton
+  const SubmitComponent = ({ submitLabel = "Submit" }) => {
+    const formButtonClass = isMinimalist ? classes.formButtonMinimalist : classes.formButton;
     // by default, the EA Forum uses MUI contained buttons here
-    const cancelBtnProps: BtnProps = isFriendlyUI && !isMinimalist ? {variant: 'contained'} : {}
-    const submitBtnProps: BtnProps = isFriendlyUI && !isMinimalist ? {variant: 'contained', color: 'primary'} : {}
+    const cancelBtnProps: BtnProps = isFriendlyUI && !isMinimalist ? { variant: "contained" } : {};
+    const submitBtnProps: BtnProps = isFriendlyUI && !isMinimalist ? { variant: "contained", color: "primary" } : {};
     if (formDisabledDueToRateLimit) {
-      submitBtnProps.disabled = true
+      submitBtnProps.disabled = true;
     }
-    
-    return <div className={classNames(classes.submit, {[classes.submitMinimalist]: isMinimalist})}>
-      {(type === "reply" && !isMinimalist) && <Button
-        onClick={cancelCallback}
-        className={classNames(formButtonClass, classes.cancelButton)}
-        {...cancelBtnProps}
-      >
-        Cancel
-      </Button>}
-      <Button
-        type="submit"
-        id="new-comment-submit"
-        className={classNames(formButtonClass, classes.submitButton)}
-        onClick={(ev) => {
-          if (!currentUser) {
-            openDialog({
-              componentName: "LoginPopup",
-              componentProps: {}
-            });
-            ev.preventDefault();
-          }
-        }}
-        {...submitBtnProps}
-      >
-        {loading ? <Loading /> : (isMinimalist ? <ArrowForward /> : submitLabel)}
-      </Button>
-    </div>
+
+    return (
+      <div className={classNames(classes.submit, { [classes.submitMinimalist]: isMinimalist })}>
+        {type === "reply" && !isMinimalist && (
+          <Button
+            onClick={cancelCallback}
+            className={classNames(formButtonClass, classes.cancelButton)}
+            {...cancelBtnProps}
+          >
+            Cancel
+          </Button>
+        )}
+        <Button
+          type="submit"
+          id="new-comment-submit"
+          className={classNames(formButtonClass, classes.submitButton)}
+          onClick={(ev) => {
+            if (!currentUser) {
+              openDialog({
+                componentName: "LoginPopup",
+                componentProps: {},
+              });
+              ev.preventDefault();
+            }
+          }}
+          {...submitBtnProps}
+        >
+          {loading ? <Loading /> : isMinimalist ? <ArrowForward /> : submitLabel}
+        </Button>
+      </div>
+    );
   };
 
-  const hideDate = hideUnreviewedAuthorCommentsSettings.get()
-  const commentWillBeHidden = hideDate && new Date(hideDate) < new Date() &&
-    currentUser && !currentUser.isReviewed 
-  const extraFormProps = isMinimalist ? {commentMinimalistStyle: true, editorHintText: "Reply..."} : {}
-  const parentDocumentId = post?._id || tag?._id
+  const hideDate = hideUnreviewedAuthorCommentsSettings.get();
+  const commentWillBeHidden = hideDate && new Date(hideDate) < new Date() && currentUser && !currentUser.isReviewed;
+  const extraFormProps = isMinimalist ? { commentMinimalistStyle: true, editorHintText: "Reply..." } : {};
+  const parentDocumentId = post?._id || tag?._id;
 
   useEffect(() => {
     // If disabled due to rate limit, set a timer to reenable the comment form when the rate limit expires
     if (formDisabledDueToRateLimit && userNextAbleToComment) {
-      const timeLeftOnUserRateLimitMS = new Date(userNextAbleToComment).getTime() - new Date().getTime()
+      const timeLeftOnUserRateLimitMS = new Date(userNextAbleToComment).getTime() - new Date().getTime();
       const timer = setTimeout(() => {
-        setForceRefreshState((n) => (n+1));
+        setForceRefreshState((n) => n + 1);
       }, timeLeftOnUserRateLimitMS);
-      
+
       return () => clearTimeout(timer);
     }
   }, [userNextAbleToComment, formDisabledDueToRateLimit]);
-  
+
   // @ts-ignore FIXME: Not enforcing that the post-author fragment has enough fields for userIsAllowedToComment
-  if (currentUser && !userCanDo(currentUser, `posts.moderate.all`) && !userIsAllowedToComment(currentUser, prefilledProps, post?.user, !!parentComment)
+  if (
+    currentUser &&
+    !userCanDo(currentUser, `posts.moderate.all`) &&
+    !userIsAllowedToComment(currentUser, prefilledProps, post?.user, !!parentComment)
   ) {
-    return <span>Sorry, you do not have permission to comment at this time.</span>
+    return <span>Sorry, you do not have permission to comment at this time.</span>;
   }
 
   return (
-    <div className={classNames(
-      className,
-      isMinimalist ? classes.rootMinimalist : classes.root,
-      {[classes.loadingRoot]: loading}
-    )} onFocus={onFocusCommentForm}>
+    <div
+      className={classNames(className, isMinimalist ? classes.rootMinimalist : classes.root, {
+        [classes.loadingRoot]: loading,
+      })}
+      onFocus={onFocusCommentForm}
+    >
       <RecaptchaWarning currentUser={currentUser}>
-        <div className={padding ? classNames({[classes.form]: !isMinimalist, [classes.formMinimalist]: isMinimalist}) : undefined}>
-          {formDisabledDueToRateLimit && <RateLimitWarning lastRateLimitExpiry={lastRateLimitExpiry} rateLimitMessage={rateLimitMessage} />}
-          <div onFocus={(ev) => {
-            afNonMemberDisplayInitialPopup(currentUser, openDialog)
-            ev.preventDefault()
-          }}>
+        <div
+          className={
+            padding ? classNames({ [classes.form]: !isMinimalist, [classes.formMinimalist]: isMinimalist }) : undefined
+          }
+        >
+          {formDisabledDueToRateLimit && (
+            <RateLimitWarning lastRateLimitExpiry={lastRateLimitExpiry} rateLimitMessage={rateLimitMessage} />
+          )}
+          <div
+            onFocus={(ev) => {
+              afNonMemberDisplayInitialPopup(currentUser, openDialog);
+              ev.preventDefault();
+            }}
+          >
             <WrappedSmartForm
               id="new-comment-form"
               collectionName="Comments"
@@ -358,16 +393,16 @@ const CommentsNewForm = ({
               cancelCallback={wrappedCancelCallback}
               submitCallback={(data: unknown) => {
                 setLoading(true);
-                commentSubmitStartTimeRef.current = Date.now()
-                captureEvent("wrappedSubmitCallbackStarted")
-                return data
+                commentSubmitStartTimeRef.current = Date.now();
+                captureEvent("wrappedSubmitCallbackStarted");
+                return data;
               }}
               errorCallback={() => setLoading(false)}
               prefilledProps={prefilledProps}
               layout="elementOnly"
               formComponents={{
                 FormSubmit: SubmitComponent,
-                FormGroupLayout: Components.DefaultStyleFormGroup
+                FormGroupLayout: Components.DefaultStyleFormGroup,
               }}
               alignmentForumPost={post?.af}
               addFields={currentUser ? [] : ["title", "contents"]}
@@ -376,28 +411,32 @@ const CommentsNewForm = ({
                 ...extraFormProps,
                 ...formProps,
               }}
-              submitLabel={isFriendlyUI && !prefilledProps.shortform ? 'Comment' : 'Submit'}
+              submitLabel={isFriendlyUI && !prefilledProps.shortform ? "Comment" : "Submit"}
             />
           </div>
         </div>
-        {parentDocumentId && enableGuidelines && showGuidelines && <div className={classes.moderationGuidelinesWrapper}>
-          {commentWillBeHidden && <div className={classes.modNote}>
-            <NewCommentModerationWarning />
-          </div>}
-          <ModerationGuidelinesBox documentId={parentDocumentId} commentType={post?._id ? "post" : "subforum"} />
-        </div>}
+        {parentDocumentId && enableGuidelines && showGuidelines && (
+          <div className={classes.moderationGuidelinesWrapper}>
+            {commentWillBeHidden && (
+              <div className={classes.modNote}>
+                <NewCommentModerationWarning />
+              </div>
+            )}
+            <ModerationGuidelinesBox documentId={parentDocumentId} commentType={post?._id ? "post" : "subforum"} />
+          </div>
+        )}
       </RecaptchaWarning>
     </div>
   );
 };
 
-const CommentsNewFormComponent = registerComponent('CommentsNewForm', CommentsNewForm, {
+const CommentsNewFormComponent = registerComponent("CommentsNewForm", CommentsNewForm, {
   styles,
-  hocs: [withErrorBoundary]
+  hocs: [withErrorBoundary],
 });
 
 declare global {
   interface ComponentTypes {
-    CommentsNewForm: typeof CommentsNewFormComponent,
+    CommentsNewForm: typeof CommentsNewFormComponent;
   }
 }

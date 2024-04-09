@@ -79,13 +79,13 @@ const styles = (theme: ThemeType) => ({
 });
 
 export type CommonExcerptProps = {
-  lines?: number,
-  hideMoreLink?: boolean,
-  smallText?: boolean,
-  noLinkStyling?: boolean,
-  hideMultimedia?: boolean,
-  className?: string,
-}
+  lines?: number;
+  hideMoreLink?: boolean;
+  smallText?: boolean;
+  noLinkStyling?: boolean;
+  hideMultimedia?: boolean;
+  className?: string;
+};
 
 const ContentExcerpt = ({
   contentHtml,
@@ -100,19 +100,19 @@ const ContentExcerpt = ({
   className,
   classes,
 }: CommonExcerptProps & {
-  contentHtml: string,
-  moreLink: string,
-  contentType: ContentStyleType,
-  alwaysExpandInPlace?: boolean,
-  classes: ClassesType,
+  contentHtml: string;
+  moreLink: string;
+  contentType: ContentStyleType;
+  alwaysExpandInPlace?: boolean;
+  classes: ClassesType;
 }) => {
   const [expanded, setExpanded] = useState(false);
 
   const onExpand = useCallback(() => setExpanded(true), []);
 
   const isTruncated = contentHtml.length > HTML_CHARS_PER_LINE_HEURISTIC * lines;
-  const expandInPlace = alwaysExpandInPlace ||
-    contentHtml.length < HTML_CHARS_PER_LINE_HEURISTIC * EXPAND_IN_PLACE_LINES;
+  const expandInPlace =
+    alwaysExpandInPlace || contentHtml.length < HTML_CHARS_PER_LINE_HEURISTIC * EXPAND_IN_PLACE_LINES;
 
   // We use `truncate` here rather than webkit-box overflow shenanigans
   // because of bugs in certain versions of ios safari
@@ -124,15 +124,12 @@ const ContentExcerpt = ({
     false,
   );
 
-  const {ContentStyles, ContentItemBody} = Components;
+  const { ContentStyles, ContentItemBody } = Components;
   return (
     <div className={classNames(classes.root, className)}>
-      <ContentStyles
-        contentType={contentType}
-        className={classes.excerpt}
-      >
+      <ContentStyles contentType={contentType} className={classes.excerpt}>
         <ContentItemBody
-          dangerouslySetInnerHTML={{__html: expanded ? contentHtml : truncatedHtml}}
+          dangerouslySetInnerHTML={{ __html: expanded ? contentHtml : truncatedHtml }}
           className={classNames({
             [classes.contentNormalText]: !smallText,
             [classes.contentSmallText]: smallText,
@@ -141,37 +138,26 @@ const ContentExcerpt = ({
           })}
         />
       </ContentStyles>
-      {!hideMoreLink && (expandInPlace
-        ? (
-          expanded
-            ? null
-            : (
-              <div onClick={onExpand} className={classes.continueReading}>
-                Continue reading
-              </div>
-            )
-        )
-        : (
-          <Link to={moreLink} className={classes.continueReading} eventProps={{intent: 'expandPost'}}>
-            {isTruncated
-              ? "Continue reading"
-              : `View ${contentTypeMap[contentType]}`
-            }
+      {!hideMoreLink &&
+        (expandInPlace ? (
+          expanded ? null : (
+            <div onClick={onExpand} className={classes.continueReading}>
+              Continue reading
+            </div>
+          )
+        ) : (
+          <Link to={moreLink} className={classes.continueReading} eventProps={{ intent: "expandPost" }}>
+            {isTruncated ? "Continue reading" : `View ${contentTypeMap[contentType]}`}
           </Link>
-        )
-      )}
+        ))}
     </div>
   );
-}
+};
 
-const ContentExcerptComponent = registerComponent(
-  "ContentExcerpt",
-  ContentExcerpt,
-  {styles, stylePriority: -1},
-);
+const ContentExcerptComponent = registerComponent("ContentExcerpt", ContentExcerpt, { styles, stylePriority: -1 });
 
 declare global {
   interface ComponentTypes {
-    ContentExcerpt: typeof ContentExcerptComponent,
+    ContentExcerpt: typeof ContentExcerptComponent;
   }
 }

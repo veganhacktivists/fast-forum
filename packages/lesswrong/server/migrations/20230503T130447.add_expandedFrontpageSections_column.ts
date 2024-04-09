@@ -41,15 +41,18 @@ const grandfatheredUsers = [
   "9YxYPxzvtc38xNCuk",
 ];
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Users, "expandedFrontpageSections");
-  await db.none(`
+  await db.none(
+    `
     UPDATE "Users"
     SET "expandedFrontpageSections" = '{"community":false}'::JSONB
     WHERE "_id" IN ($1:csv)
-  `, [grandfatheredUsers]);
-}
+  `,
+    [grandfatheredUsers],
+  );
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Users, "expandedFrontpageSections");
-}
+};

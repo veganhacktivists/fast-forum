@@ -8,13 +8,13 @@ tracer.init({
   // logger rather than using console.log
   // logInjection: true
 });
-tracer.use('express', {
-  service: 'forummagnum'
-})
+tracer.use("express", {
+  service: "forummagnum",
+});
 
 export const dogstatsd = new StatsD({
   host: process.env.IS_DOCKER ? "172.17.0.1" : undefined,
-  prefix: 'forummagnum.'
+  prefix: "forummagnum.",
 });
 
 export default tracer;

@@ -16,12 +16,16 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const EAKarmaDisplay = ({post, className, classes}: {
-  post: PostsList,
-  className?: string,
-  classes: ClassesType,
+const EAKarmaDisplay = ({
+  post,
+  className,
+  classes,
+}: {
+  post: PostsList;
+  className?: string;
+  classes: ClassesType;
 }) => {
-  const {KarmaDisplay} = Components;
+  const { KarmaDisplay } = Components;
   return (
     <div className={classNames(classes.root, className)}>
       <div className={classes.voteArrow}>
@@ -32,14 +36,10 @@ const EAKarmaDisplay = ({post, className, classes}: {
   );
 };
 
-const EAKarmaDisplayComponent = registerComponent(
-  "EAKarmaDisplay",
-  EAKarmaDisplay,
-  {styles, stylePriority: -1},
-);
+const EAKarmaDisplayComponent = registerComponent("EAKarmaDisplay", EAKarmaDisplay, { styles, stylePriority: -1 });
 
 declare global {
   interface ComponentTypes {
-    EAKarmaDisplay: typeof EAKarmaDisplayComponent,
+    EAKarmaDisplay: typeof EAKarmaDisplayComponent;
   }
 }

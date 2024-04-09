@@ -8,14 +8,14 @@ const EARecentDiscussionTagRevision = ({
   headingStyle,
   documentId,
 }: {
-  tag: TagRecentDiscussion,
-  revision: RevisionMetadataWithChangeMetrics,
-  collapsed?: boolean,
-  headingStyle: "full"|"abridged",
-  documentId: string,
-  classes: ClassesType,
+  tag: TagRecentDiscussion;
+  revision: RevisionMetadataWithChangeMetrics;
+  collapsed?: boolean;
+  headingStyle: "full" | "abridged";
+  documentId: string;
+  classes: ClassesType;
 }) => {
-  const {EARecentDiscussionItem, TagRevisionItem} = Components;
+  const { EARecentDiscussionItem, TagRevisionItem } = Components;
   return (
     <EARecentDiscussionItem
       icon="TagFilled"
@@ -36,7 +36,7 @@ const EARecentDiscussionTagRevision = ({
       />
     </EARecentDiscussionItem>
   );
-}
+};
 
 const EARecentDiscussionTagRevisionComponent = registerComponent(
   "EARecentDiscussionTagRevision",
@@ -45,6 +45,6 @@ const EARecentDiscussionTagRevisionComponent = registerComponent(
 
 declare global {
   interface ComponentTypes {
-    EARecentDiscussionTagRevision: typeof EARecentDiscussionTagRevisionComponent,
+    EARecentDiscussionTagRevision: typeof EARecentDiscussionTagRevisionComponent;
   }
 }

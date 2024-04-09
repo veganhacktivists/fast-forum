@@ -1,4 +1,2 @@
-
-const testUsers: DbUser[]
-export default testUsers
-
+const testUsers: DbUser[];
+export default testUsers;

@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-01-30T15:00:41.000Z by 20230130T150041.create_cronHistory_collection.ts
  * +-- Overall schema hash: c4ad9670df04a3753f9e2db9bb5bade8
- *  
+ *
  * @@ -874,3 +872,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * --- Schema for "Users", hash: c75f16a2463de260e70fd3818c296e50
  * +-- Schema for "Users", hash: 4419e2e0d0d92ec2f6a4d8b2a653ddcb
  *  CREATE TABLE "Users" (
@@ -22,7 +22,7 @@
  *      "noCollapseCommentsFrontpage" bool DEFAULT false,
  * +    "showCommunityInRecentDiscussion" bool DEFAULT false,
  *      "petrovOptOut" bool DEFAULT false,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -33,13 +33,13 @@
  */
 export const acceptsSchemaHash = "dbc3a1a821f459ad60e85420d4c287c0";
 
-import Users from "../../lib/collections/users/collection"
-import { addField, dropField } from "./meta/utils"
+import Users from "../../lib/collections/users/collection";
+import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Users, "showCommunityInRecentDiscussion")
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Users, "showCommunityInRecentDiscussion");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Users, "showCommunityInRecentDiscussion")
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Users, "showCommunityInRecentDiscussion");
+};

@@ -1,21 +1,21 @@
-import { Globals } from '../../lib/vulcan-lib/config';
+import { Globals } from "../../lib/vulcan-lib/config";
 import OpenAI from "openai";
-import { Tags } from '../../lib/collections/tags/collection';
-import { dataToMarkdown } from '../editor/conversionUtils';
-import { DatabaseServerSetting } from '../databaseSettings';
-import { encode as gpt3encode, decode as gpt3decode } from 'gpt-3-encoder'
-import drop from 'lodash/drop';
-import take from 'lodash/take';
+import { Tags } from "../../lib/collections/tags/collection";
+import { dataToMarkdown } from "../editor/conversionUtils";
+import { DatabaseServerSetting } from "../databaseSettings";
+import { encode as gpt3encode, decode as gpt3decode } from "gpt-3-encoder";
+import drop from "lodash/drop";
+import take from "lodash/take";
 
-const openAIApiKey = new DatabaseServerSetting<string|null>('languageModels.openai.apiKey', null);
-const openAIOrganizationId = new DatabaseServerSetting<string|null>('languageModels.openai.organizationId', null);
+const openAIApiKey = new DatabaseServerSetting<string | null>("languageModels.openai.apiKey", null);
+const openAIOrganizationId = new DatabaseServerSetting<string | null>("languageModels.openai.organizationId", null);
 
-let openAIApi: OpenAI|null = null;
-export async function getOpenAI(): Promise<OpenAI|null> {
-  if (!openAIApi){
+let openAIApi: OpenAI | null = null;
+export async function getOpenAI(): Promise<OpenAI | null> {
+  if (!openAIApi) {
     const apiKey = openAIApiKey.get();
     const organizationId = openAIOrganizationId.get();
-    
+
     if (apiKey) {
       openAIApi = new OpenAI({
         apiKey,
@@ -26,27 +26,27 @@ export async function getOpenAI(): Promise<OpenAI|null> {
   return openAIApi;
 }
 
-type LanguageModelAPI = "disabled"|"stub"|"openai";
-type LanguageModelClassificationTask = "isSpam"|"isFrontpage";
-type LanguageModelGenerationTask = "summarize"|"authorFeedback";
-type LanguageModelTask = LanguageModelClassificationTask|LanguageModelGenerationTask;
+type LanguageModelAPI = "disabled" | "stub" | "openai";
+type LanguageModelClassificationTask = "isSpam" | "isFrontpage";
+type LanguageModelGenerationTask = "summarize" | "authorFeedback";
+type LanguageModelTask = LanguageModelClassificationTask | LanguageModelGenerationTask;
 
 export type LanguageModelTemplate = {
-  header: Record<string,string>
-  body: string
-}
+  header: Record<string, string>;
+  body: string;
+};
 
 type LanguageModelConfig = {
-  template: LanguageModelTemplate,
-  task: LanguageModelTask,
-  api: LanguageModelAPI,
-  model: string,
-}
+  template: LanguageModelTemplate;
+  task: LanguageModelTask;
+  api: LanguageModelAPI;
+  model: string;
+};
 
 type LanguageModelJob = LanguageModelConfig & {
-  maxTokens: number
-  inputs: Record<string,string>
-}
+  maxTokens: number;
+  inputs: Record<string, string>;
+};
 
 /**
  * canDoLanguageModelTask: Returns true if we're configured with an API key,
@@ -59,7 +59,7 @@ type LanguageModelJob = LanguageModelConfig & {
  */
 export async function canDoLanguageModelTask(task: LanguageModelTask, context: ResolverContext): Promise<boolean> {
   const config = await getLMConfigForTask(task, context);
-  return (config && config.api!=="disabled");
+  return config && config.api !== "disabled";
 }
 
 function taskToWikiSlug(task: LanguageModelTask): string {
@@ -72,8 +72,8 @@ function taskToWikiSlug(task: LanguageModelTask): string {
  */
 async function getLMConfigForTask(task: LanguageModelTask, context: ResolverContext): Promise<LanguageModelConfig> {
   const wikiPageSlug = taskToWikiSlug(task);
-  const tag = await Tags.findOne({slug: wikiPageSlug});
-  
+  const tag = await Tags.findOne({ slug: wikiPageSlug });
+
   if (tag) {
     return tagToLMConfig(tag, task);
   } else {
@@ -81,7 +81,7 @@ async function getLMConfigForTask(task: LanguageModelTask, context: ResolverCont
       task,
       api: "stub",
       template: {
-        header: {api: "stub"},
+        header: { api: "stub" },
         body: "Test ${input}", //eslint-disable-line no-template-curly-in-string
       },
       model: "stub-model",
@@ -91,46 +91,50 @@ async function getLMConfigForTask(task: LanguageModelTask, context: ResolverCont
 
 function tagToLMConfig(tag: DbTag, task: LanguageModelTask): LanguageModelConfig {
   if (!tag) throw new Error("Tag not found");
-  
+
   const template = wikiPageToTemplate(tag);
-  const {header, body} = template;
+  const { header, body } = template;
   return {
     api: (header["api"] ?? "disabled") as LanguageModelAPI,
     model: header["model"] ?? "stub",
-    task, template,
+    task,
+    template,
   };
 }
 
 export async function wikiSlugToTemplate(slug: string): Promise<LanguageModelTemplate> {
-  const wikiConfig = await Tags.findOne({slug});
+  const wikiConfig = await Tags.findOne({ slug });
   if (!wikiConfig) throw new Error(`No LM config page ${slug}`);
   return wikiPageToTemplate(wikiConfig);
 }
 
 export function wikiPageToTemplate(wikiPage: DbTag): LanguageModelTemplate {
-  let header: Record<string,string> = {};
+  let header: Record<string, string> = {};
   let body = "";
 
-  if (!wikiPage.description?.originalContents?.type) throw new Error("Missing description type")
-  
-  const descriptionMarkdown = dataToMarkdown(wikiPage.description?.originalContents?.data, wikiPage.description.originalContents.type);
+  if (!wikiPage.description?.originalContents?.type) throw new Error("Missing description type");
+
+  const descriptionMarkdown = dataToMarkdown(
+    wikiPage.description?.originalContents?.data,
+    wikiPage.description.originalContents.type,
+  );
   const lines = descriptionMarkdown
     .trim()
-    .split('\n')
+    .split("\n")
     .map((line: string) => line.trim());
-  
-  for (let i=0; i<lines.length; i++) {
+
+  for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (line.trim()==="") {
-      body = drop(lines,i+1).join("\n");
+    if (line.trim() === "") {
+      body = drop(lines, i + 1).join("\n");
       break;
     } else {
-      const [_headerLine,headerName,headerValue] = line.match(/^([a-zA-Z0-9_-]+):\s*([^\s]*)\s*$/)
+      const [_headerLine, headerName, headerValue] = line.match(/^([a-zA-Z0-9_-]+):\s*([^\s]*)\s*$/);
       header[headerName.toLowerCase()] = headerValue;
     }
   }
-  
-  return {header, body};
+
+  return { header, body };
 }
 
 /**
@@ -142,28 +146,39 @@ export function wikiPageToTemplate(wikiPage: DbTag): LanguageModelTemplate {
  * This is NOT safe for SQL, HTML rendering, or anything else that's sensitive
  * to quoting. It is intended only for use with language-model prompting.
  */
-export function substituteIntoTemplate({template, variables, maxLengthTokens, truncatableVariable}: {
-  template: LanguageModelTemplate,
-  variables: Record<string,string>
-  maxLengthTokens?: number,
-  truncatableVariable?: string,
+export function substituteIntoTemplate({
+  template,
+  variables,
+  maxLengthTokens,
+  truncatableVariable,
+}: {
+  template: LanguageModelTemplate;
+  variables: Record<string, string>;
+  maxLengthTokens?: number;
+  truncatableVariable?: string;
 }): string {
   let withVarsSubstituted = template.body;
-  
+
   // Substitute everything except the truncatable variable
   for (let key of Object.keys(variables)) {
     if (key !== truncatableVariable || !maxLengthTokens)
-      withVarsSubstituted = withVarsSubstituted.replace(new RegExp("\\${"+key+"}", "g"), variables[key]);
+      withVarsSubstituted = withVarsSubstituted.replace(new RegExp("\\${" + key + "}", "g"), variables[key]);
   }
-  
+
   if (maxLengthTokens && truncatableVariable) {
-    const withVarsSubstitutedAndTruncVarRemoved = withVarsSubstituted.replace(new RegExp("\\${"+truncatableVariable+"}", "g"), "");
+    const withVarsSubstitutedAndTruncVarRemoved = withVarsSubstituted.replace(
+      new RegExp("\\${" + truncatableVariable + "}", "g"),
+      "",
+    );
     const tokensSpent = countGptTokens(withVarsSubstitutedAndTruncVarRemoved);
     const tokensAvailable = maxLengthTokens - tokensSpent;
-    const truncatedVar = truncateByTokenCount(variables[truncatableVariable]||"", tokensAvailable);
-    withVarsSubstituted = withVarsSubstituted.replace(new RegExp("\\${"+truncatableVariable+"}", "g"), truncatedVar);
+    const truncatedVar = truncateByTokenCount(variables[truncatableVariable] || "", tokensAvailable);
+    withVarsSubstituted = withVarsSubstituted.replace(
+      new RegExp("\\${" + truncatableVariable + "}", "g"),
+      truncatedVar,
+    );
   }
-  
+
   return withVarsSubstituted;
 }
 
@@ -171,7 +186,7 @@ function countGptTokens(str: string): number {
   if (!str) return 0;
   try {
     return gpt3encode(str).length;
-  } catch(e) {
+  } catch (e) {
     return str.length;
   }
 }
@@ -184,18 +199,16 @@ function countGptTokens(str: string): number {
  * some character sequences don't roundtrip.)
  */
 function truncateByTokenCount(str: string, tokens: number): string {
-  if (!str || !str.length)
-    return "";
-  if (str.length < tokens)
-    return str;
-  
+  if (!str || !str.length) return "";
+  if (str.length < tokens) return str;
+
   // First try an encode-then-decode roundtrip
   try {
     const encoded = gpt3encode(str);
-    
+
     if (encoded.length <= tokens) return str;
-    const redecoded = gpt3decode(take(encoded,tokens));
-    if (redecoded === str.substring(0,redecoded.length)) {
+    const redecoded = gpt3decode(take(encoded, tokens));
+    if (redecoded === str.substring(0, redecoded.length)) {
       return redecoded;
     } else {
       // eslint-disable-next-line no-console
@@ -204,21 +217,22 @@ function truncateByTokenCount(str: string, tokens: number): string {
   } catch {
     console.log(`Could not encode string for truncation length estimate: ${JSON.stringify(str)}`); //eslint-disable-line no-console
   }
-  
+
   // If that didn't work, binary-search string truncations to find one that has the right token count
-  let low=0, high=str.length;
-  let mid=(low+high)/2 | 0; //Midpoint, round down (bitwise-or-0 is a JS cast-to-int idiom)
-  
-  while (high>low) {
-    if (countGptTokens(str.substring(0,mid)) > tokens) {
+  let low = 0,
+    high = str.length;
+  let mid = ((low + high) / 2) | 0; //Midpoint, round down (bitwise-or-0 is a JS cast-to-int idiom)
+
+  while (high > low) {
+    if (countGptTokens(str.substring(0, mid)) > tokens) {
       high = mid;
     } else {
-      low = mid+1;
+      low = mid + 1;
     }
-    mid=(low+high)/2|0;
+    mid = ((low + high) / 2) | 0;
   }
-  
-  return str.substring(0,mid);
+
+  return str.substring(0, mid);
 }
 
 /**
@@ -226,11 +240,15 @@ function truncateByTokenCount(str: string, tokens: number): string {
  * input is the text that is being classified; it does *not* include the wrapping
  * template, which is admin-configurable and loaded from the database.
  */
-export async function languageModelClassify({taskName, inputs, context}: {
-  taskName: LanguageModelClassificationTask,
-  inputs: Record<string,string>,
-  context: ResolverContext,
-}): Promise<boolean|"maybe"> {
+export async function languageModelClassify({
+  taskName,
+  inputs,
+  context,
+}: {
+  taskName: LanguageModelClassificationTask;
+  inputs: Record<string, string>;
+  context: ResolverContext;
+}): Promise<boolean | "maybe"> {
   const lmConfig = await getLMConfigForTask(taskName, context);
   const continuation = await languageModelExecute({
     template: lmConfig.template,
@@ -242,13 +260,10 @@ export async function languageModelClassify({taskName, inputs, context}: {
   });
   const tokenizedContinuation = continuation.split(/\s+/);
   const firstToken = tokenizedContinuation[0];
-  
-  if (firstToken.toLowerCase()==="yes")
-    return true;
-  else if (firstToken.toLowerCase()==="no")
-    return false;
-  else
-    return "maybe";
+
+  if (firstToken.toLowerCase() === "yes") return true;
+  else if (firstToken.toLowerCase() === "no") return false;
+  else return "maybe";
 }
 
 /**
@@ -256,11 +271,16 @@ export async function languageModelClassify({taskName, inputs, context}: {
  the text that is being classified; it does *not* include the wrapping template,
  * which is admin-configurable and loaded from the database.
  */
-export async function languageModelGenerateText({taskName, inputs, maxTokens, context}: {
-  taskName: LanguageModelGenerationTask,
-  inputs: Record<string,string>,
-  maxTokens: number,
-  context: ResolverContext,
+export async function languageModelGenerateText({
+  taskName,
+  inputs,
+  maxTokens,
+  context,
+}: {
+  taskName: LanguageModelGenerationTask;
+  inputs: Record<string, string>;
+  maxTokens: number;
+  context: ResolverContext;
 }): Promise<string> {
   const lmConfig = await getLMConfigForTask(taskName, context);
   const continuation = await languageModelExecute({
@@ -276,8 +296,8 @@ export async function languageModelGenerateText({taskName, inputs, maxTokens, co
 
 async function languageModelExecute(job: LanguageModelJob): Promise<string> {
   // TODO: Check and populate the cache
-  
-  switch(job.api) {
+
+  switch (job.api) {
     case "disabled": {
       throw new Error(`Language model not available for job type: ${job.task}`);
     }
@@ -290,7 +310,7 @@ async function languageModelExecute(job: LanguageModelJob): Promise<string> {
       if (!api) throw new Error("OpenAI API not configured");
       const prompt = substituteIntoTemplate({
         template: job.template,
-        variables: job.inputs
+        variables: job.inputs,
       });
       const response = await api.completions.create({
         model: job.model,

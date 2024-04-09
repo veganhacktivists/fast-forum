@@ -6,7 +6,13 @@ import { Link, useNavigate } from "../../../lib/reactRouterWrapper";
 import { useElectionVote } from "./hooks";
 import { useElectionCandidates } from "../giving-portal/hooks";
 import classNames from "classnames";
-import { CompareStateUI, convertCompareStateToVote, getCompareKey, getInitialCompareState, validateCompareState } from "../../../lib/collections/electionVotes/helpers";
+import {
+  CompareStateUI,
+  convertCompareStateToVote,
+  getCompareKey,
+  getInitialCompareState,
+  validateCompareState,
+} from "../../../lib/collections/electionVotes/helpers";
 import { useMessages } from "../../common/withMessages";
 import { eaGivingSeason23ElectionName, userCanVoteInDonationElection } from "../../../lib/eaGivingSeason";
 import { useCurrentUser } from "../../common/withUser";
@@ -28,17 +34,17 @@ const styles = (theme: ThemeType) => ({
     padding: 20,
     fontWeight: 500,
     fontSize: 16,
-    gap: "16px"
+    gap: "16px",
   },
   controls: {
     width: "100%",
     display: "flex",
     alignItems: "center",
-    gap: '16px',
+    gap: "16px",
     [theme.breakpoints.down("xs")]: {
       flexDirection: "column",
       alignItems: "flex-end",
-      padding: '16px 8px'
+      padding: "16px 8px",
     },
   },
   controlsTopRow: {
@@ -64,7 +70,7 @@ const styles = (theme: ThemeType) => ({
     },
   },
   pairCounter: {
-    marginLeft: "auto"
+    marginLeft: "auto",
   },
   arrowIcon: {
     fontSize: 18,
@@ -112,9 +118,7 @@ const EAVotingPortalComparePageLoader = ({ classes }: { classes: ClassesType }) 
 
   const selectedResults = results?.filter((candidate) => vote[candidate._id] !== undefined);
   // Get n - 1 pairs of candidates, using the same (random) order as the results
-  const pairs = selectedResults?.slice(0, -1).map((candidate, index) =>
-    ([candidate, selectedResults[index + 1]])
-  );
+  const pairs = selectedResults?.slice(0, -1).map((candidate, index) => [candidate, selectedResults[index + 1]]);
 
   return (
     <EAVotingPortalComparePage
@@ -141,7 +145,7 @@ const EAVotingPortalComparePage = ({
   const navigate = useNavigate();
   const { flash } = useMessages();
   const [compareState, setCompareState] = useState<CompareStateUI>(
-    electionVote.compareState ?? getInitialCompareState(candidatePairs)
+    electionVote.compareState ?? getInitialCompareState(candidatePairs),
   );
   const [currentPairIndex, setCurrentPairIndex] = useState(0);
 
@@ -160,28 +164,36 @@ const EAVotingPortalComparePage = ({
   const nextDisabled = currentPairIndex === candidatePairs.length - 1;
   const prevDisabled = currentPairIndex === 0;
 
-  const setCurrentPairState = useCallback((newState: {multiplier: number | string, AtoB: boolean}) => {
-    setCompareState((prev) => ({...prev, [currentPairKey]: newState}));
-  }, [currentPairKey]);
+  const setCurrentPairState = useCallback(
+    (newState: { multiplier: number | string; AtoB: boolean }) => {
+      setCompareState((prev) => ({ ...prev, [currentPairKey]: newState }));
+    },
+    [currentPairKey],
+  );
 
   const saveComparison = useCallback(async () => {
     // Convert all strings to numbers with parseFloat (currently assuming no zeros/nulls TODO handle this properly)
     const newCompareState = Object.fromEntries(
-      Object.entries(compareState).map(([key, value]) => [key, { ...value, multiplier: parseFloat(value.multiplier as string) }])
+      Object.entries(compareState).map(([key, value]) => [
+        key,
+        { ...value, multiplier: parseFloat(value.multiplier as string) },
+      ]),
     );
 
     try {
-      validateCompareState({ data: { compareState: newCompareState }});
+      validateCompareState({ data: { compareState: newCompareState } });
       const newVote = convertCompareStateToVote(newCompareState);
 
       await updateVote({
         vote: newVote,
         compareState: newCompareState,
-      })
+      });
     } catch (e) {
       // If any of the multipliers are 0 or empty , give that as the error message
       if (Object.values(newCompareState).some((value) => !value.multiplier)) {
-        flash("Error: all values must be filled in and non-zero. You can remove a candidate in the previous step if needed.");
+        flash(
+          "Error: all values must be filled in and non-zero. You can remove a candidate in the previous step if needed.",
+        );
         return;
       }
       flash(e.message);
@@ -198,7 +210,8 @@ const EAVotingPortalComparePage = ({
           <div className={classes.h2}>2. Compare candidates to get a suggested point allocation</div>
           <div className={classes.subtitle}>
             <div className={classes.subtitleParagraph}>
-            We'll auto-generate a point allocation based on your comparisons here, which you'll finalize in the next step.
+              We'll auto-generate a point allocation based on your comparisons here, which you'll finalize in the next
+              step.
             </div>
             <div>You can skip this step if you prefer to allocate points manually.</div>
           </div>
@@ -267,7 +280,7 @@ const EAVotingPortalComparePage = ({
 const EAVotingPortalComparePageComponent = registerComponent(
   "EAVotingPortalComparePage",
   EAVotingPortalComparePageLoader,
-  {styles},
+  { styles },
 );
 
 declare global {
@@ -275,4 +288,3 @@ declare global {
     EAVotingPortalComparePage: typeof EAVotingPortalComparePageComponent;
   }
 }
-

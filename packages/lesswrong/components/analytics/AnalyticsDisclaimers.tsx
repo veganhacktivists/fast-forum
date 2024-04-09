@@ -20,7 +20,7 @@ const dataCollectionFirstDay = forumSelect({
 });
 
 const styles = (theme: ThemeType): JssStyles => ({
-  root: {}
+  root: {},
 });
 
 const AnalyticsDisclaimers = ({ earliestDate }: { earliestDate: Date }) => {

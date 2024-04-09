@@ -1,11 +1,11 @@
-import React from 'react';
-import { registerComponent, Components } from '../../../lib/vulcan-lib';
-import { userGetDisplayName } from '../../../lib/collections/users/helpers';
-import { useCurrentUser } from '../../common/withUser';
-import { subscriptionTypes } from '../../../lib/collections/subscriptions/schema';
-import { isBookUI, isFriendlyUI } from '../../../themes/forumTheme';
-import { hasCuratedPostsSetting } from '../../../lib/instanceSettings';
-import { isDialogueParticipant } from '../../posts/PostsPage/PostsPage';
+import React from "react";
+import { registerComponent, Components } from "../../../lib/vulcan-lib";
+import { userGetDisplayName } from "../../../lib/collections/users/helpers";
+import { useCurrentUser } from "../../common/withUser";
+import { subscriptionTypes } from "../../../lib/collections/subscriptions/schema";
+import { isBookUI, isFriendlyUI } from "../../../themes/forumTheme";
+import { hasCuratedPostsSetting } from "../../../lib/instanceSettings";
+import { isDialogueParticipant } from "../../posts/PostsPage/PostsPage";
 
 // We use a context here vs. passing in a boolean prop because we'd need to pass
 // through ~4 layers of hierarchy
@@ -16,27 +16,46 @@ const styles = (_theme: ThemeType): JssStyles => ({
     minWidth: isFriendlyUI ? undefined : 300,
     maxWidth: "calc(100vw - 100px)",
   },
-})
+});
 
-const PostActions = ({post, closeMenu, includeBookmark=true, classes}: {
-  post: PostsList|SunshinePostsList,
-  closeMenu: ()=>void,
-  includeBookmark?: boolean,
-  classes: ClassesType,
+const PostActions = ({
+  post,
+  closeMenu,
+  includeBookmark = true,
+  classes,
+}: {
+  post: PostsList | SunshinePostsList;
+  closeMenu: () => void;
+  includeBookmark?: boolean;
+  classes: ClassesType;
 }) => {
   const currentUser = useCurrentUser();
 
   const {
-    MoveToDraftDropdownItem, BookmarkDropdownItem, SuggestCuratedDropdownItem,
-    SuggestAlignmentPostDropdownItem, ReportPostDropdownItem, DeleteDraftDropdownItem,
-    HideFrontpagePostDropdownItem, SetSideCommentVisibility, NotifyMeDropdownItem,
-    MarkAsReadDropdownItem, SummarizeDropdownItem, MoveToFrontpageDropdownItem,
-    MoveToAlignmentPostDropdownItem, ShortformDropdownItem, DropdownMenu,
-    EditTagsDropdownItem, EditPostDropdownItem, DuplicateEventDropdownItem,
-    PostAnalyticsDropdownItem, ExcludeFromRecommendationsDropdownItem,
-    ApproveNewUserDropdownItem, SharePostSubmenu, ResyncRssDropdownItem
+    MoveToDraftDropdownItem,
+    BookmarkDropdownItem,
+    SuggestCuratedDropdownItem,
+    SuggestAlignmentPostDropdownItem,
+    ReportPostDropdownItem,
+    DeleteDraftDropdownItem,
+    HideFrontpagePostDropdownItem,
+    SetSideCommentVisibility,
+    NotifyMeDropdownItem,
+    MarkAsReadDropdownItem,
+    SummarizeDropdownItem,
+    MoveToFrontpageDropdownItem,
+    MoveToAlignmentPostDropdownItem,
+    ShortformDropdownItem,
+    DropdownMenu,
+    EditTagsDropdownItem,
+    EditPostDropdownItem,
+    DuplicateEventDropdownItem,
+    PostAnalyticsDropdownItem,
+    ExcludeFromRecommendationsDropdownItem,
+    ApproveNewUserDropdownItem,
+    SharePostSubmenu,
+    ResyncRssDropdownItem,
   } = Components;
-
 
   if (!post) return null;
   const postAuthor = post.user;
@@ -55,7 +74,7 @@ const PostActions = ({post, closeMenu, includeBookmark=true, classes}: {
   // thing.
 
   return (
-    <DropdownMenu className={classes.root} >
+    <DropdownMenu className={classes.root}>
       <EditPostDropdownItem post={post} />
       <ResyncRssDropdownItem post={post} closeMenu={closeMenu} />
       {isBookUI && <SharePostSubmenu post={post} closeMenu={closeMenu} />}
@@ -80,14 +99,16 @@ const PostActions = ({post, closeMenu, includeBookmark=true, classes}: {
         subscribeMessage={`Subscribe to posts by ${userGetDisplayName(postAuthor)}`}
         unsubscribeMessage={`Unsubscribe from posts by ${userGetDisplayName(postAuthor)}`}
       />
-      {showSubscribeToDialogueButton && <NotifyMeDropdownItem
-        document={post}
-        enabled={!!post.collabEditorDialogue}
-        subscribeMessage="Subscribe to dialogue"
-        unsubscribeMessage="Unsubscribe from dialogue"
-        subscriptionType={subscriptionTypes.newPublishedDialogueMessages}
-        tooltip="Notifies you when there is new activity in the dialogue"
-      />}
+      {showSubscribeToDialogueButton && (
+        <NotifyMeDropdownItem
+          document={post}
+          enabled={!!post.collabEditorDialogue}
+          subscribeMessage="Subscribe to dialogue"
+          unsubscribeMessage="Unsubscribe from dialogue"
+          subscriptionType={subscriptionTypes.newPublishedDialogueMessages}
+          tooltip="Notifies you when there is new activity in the dialogue"
+        />
+      )}
       <NotifyMeDropdownItem
         document={post}
         subscribeMessage="Subscribe to comments"
@@ -96,7 +117,7 @@ const PostActions = ({post, closeMenu, includeBookmark=true, classes}: {
       {includeBookmark && <BookmarkDropdownItem post={post} />}
       <SetSideCommentVisibility />
       <HideFrontpagePostDropdownItem post={post} />
-      <ReportPostDropdownItem post={post}/>
+      <ReportPostDropdownItem post={post} />
       {currentUser && <EditTagsDropdownItem post={post} closeMenu={closeMenu} />}
       <SummarizeDropdownItem post={post} closeMenu={closeMenu} />
       {currentUser && <MarkAsReadDropdownItem post={post} />}
@@ -107,16 +128,16 @@ const PostActions = ({post, closeMenu, includeBookmark=true, classes}: {
       <ShortformDropdownItem post={post} />
       <ExcludeFromRecommendationsDropdownItem post={post} />
       <ApproveNewUserDropdownItem post={post} />
-      <SuggestAlignmentPostDropdownItem post={post}/>
-      <MoveToAlignmentPostDropdownItem post={post}/>
+      <SuggestAlignmentPostDropdownItem post={post} />
+      <MoveToAlignmentPostDropdownItem post={post} />
     </DropdownMenu>
   );
-}
+};
 
-const PostActionsComponent = registerComponent('PostActions', PostActions, {styles});
+const PostActionsComponent = registerComponent("PostActions", PostActions, { styles });
 
 declare global {
   interface ComponentTypes {
-    PostActions: typeof PostActionsComponent
+    PostActions: typeof PostActionsComponent;
   }
 }

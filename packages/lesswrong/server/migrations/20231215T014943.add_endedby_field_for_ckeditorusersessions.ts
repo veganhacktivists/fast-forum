@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-12-12T22:35:11.000Z by 20231212T223511.add_table_for_ckeditorusersessions.ts
  * +-- Overall schema hash: 592612513ed7bd3260014fe27c8ae328
- *  
+ *
  * @@ -81,3 +79,3 @@ CREATE TABLE "Chapters" (
- *  
+ *
  * --- Schema for "CkEditorUserSessions", hash: b9eaf9c72e9640972611847068931528
  * +-- Schema for "CkEditorUserSessions", hash: c2661309fbf1ff8da6742725ec19ffdc
  *  CREATE TABLE "CkEditorUserSessions" (
@@ -22,7 +22,7 @@
  *      "endedAt" timestamptz,
  * +    "endedBy" text,
  *      "schemaVersion" double precision NOT NULL DEFAULT 1,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -33,13 +33,13 @@
  */
 export const acceptsSchemaHash = "592612513ed7bd3260014fe27c8ae328";
 
-import CkEditorUserSessions from "../../lib/collections/ckEditorUserSessions/collection"
-import { addField, dropField } from "./meta/utils"
+import CkEditorUserSessions from "../../lib/collections/ckEditorUserSessions/collection";
+import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, CkEditorUserSessions, "endedBy")
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, CkEditorUserSessions, "endedBy");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, CkEditorUserSessions, "endedBy")
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, CkEditorUserSessions, "endedBy");
+};

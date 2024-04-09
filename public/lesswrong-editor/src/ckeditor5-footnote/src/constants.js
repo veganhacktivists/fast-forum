@@ -23,7 +23,7 @@ export const CLASSES = {
 
 export const COMMANDS = {
 	insertFootnote: "InsertFootnote",
-}
+};
 
 export const ATTRIBUTES = {
 	footnoteContent: "data-footnote-content",

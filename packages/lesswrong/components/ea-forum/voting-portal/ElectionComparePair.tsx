@@ -21,7 +21,7 @@ const styles = (theme: ThemeType) => ({
       fontSize: 16,
       fontWeight: 500,
       color: theme.palette.grey[1000],
-      zIndex: theme.zIndexes.singleColumnSection
+      zIndex: theme.zIndexes.singleColumnSection,
     },
     "& .MuiNotchedOutline-focused": {
       border: `2px solid ${theme.palette.givingPortal[1000]} !important`,
@@ -65,10 +65,10 @@ const styles = (theme: ThemeType) => ({
     color: theme.palette.givingPortal[1000],
     fontSize: 16,
     fontWeight: 600,
-    '&:hover': {
-      textUnderlineOffset: '3px',
-      textDecoration: 'underline',
-    }
+    "&:hover": {
+      textUnderlineOffset: "3px",
+      textDecoration: "underline",
+    },
   },
   switchOrderButton: {
     gap: "6px",
@@ -104,18 +104,14 @@ const CandidateDetails = ({
           <img src={logoSrc} className={classes.image} />
         </Link>
       </div>
-      <LWTooltip
-        title={description}
-        placement="bottom"
-        popperClassName={classes.descriptionTooltip}
-      >
+      <LWTooltip title={description} placement="bottom" popperClassName={classes.descriptionTooltip}>
         <Link to={href || ""} target="_blank" rel="noopener noreferrer" className={classes.candidateName}>
           {name}
         </Link>
       </LWTooltip>
     </div>
   );
-}
+};
 
 const ElectionComparePair = ({
   candidateA,
@@ -126,8 +122,8 @@ const ElectionComparePair = ({
 }: {
   candidateA: ElectionCandidateBasicInfo;
   candidateB: ElectionCandidateBasicInfo;
-  value: {multiplier: number | string, AtoB: boolean};
-  setValue: (newState: {multiplier: number | string, AtoB: boolean}) => void;
+  value: { multiplier: number | string; AtoB: boolean };
+  setValue: (newState: { multiplier: number | string; AtoB: boolean }) => void;
   classes: ClassesType<typeof styles>;
 }) => {
   const firstCandidate = value.AtoB ? candidateA : candidateB;
@@ -135,7 +131,7 @@ const ElectionComparePair = ({
 
   // If multiplier is a number, convert it to a string NOT using scientific notation
   const multiplierString =
-    typeof value.multiplier === "string" ? value.multiplier : numberToEditableString(value.multiplier)
+    typeof value.multiplier === "string" ? value.multiplier : numberToEditableString(value.multiplier);
 
   const { ForumIcon } = Components;
   return (
@@ -169,7 +165,7 @@ const ElectionComparePair = ({
             ? // Invert, truncate to 5 significant figures, and then remove trailing zeros by doing parseFloat again
               parseFloat((1 / parseFloat(value.multiplier as string)).toPrecision(5)).toString()
             : "";
-          setValue({ multiplier: invertedMultiplier, AtoB: !value.AtoB })
+          setValue({ multiplier: invertedMultiplier, AtoB: !value.AtoB });
         }}
       >
         <ForumIcon icon="ArrowCircle" className={classes.switchOrderIcon} /> Reverse order

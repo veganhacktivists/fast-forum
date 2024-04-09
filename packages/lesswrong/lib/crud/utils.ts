@@ -1,6 +1,6 @@
-import type { ApolloCache } from '@apollo/client';
-import { camelCaseify, pluralize } from '../vulcan-lib';
-import * as _ from 'underscore';
+import type { ApolloCache } from "@apollo/client";
+import { camelCaseify, pluralize } from "../vulcan-lib";
+import * as _ from "underscore";
 
 export const getMultiQueryName = (typeName: string) => `multi${typeName}Query`;
 export const getMultiResolverName = (typeName: string) => camelCaseify(pluralize(typeName));
@@ -41,13 +41,13 @@ export const findWatchesByTypeName = (store: ApolloCache<any>, typeName: string)
   // offer a more elegant solution.)
   //FIXME likely to be trouble if/when we upgrade apollo-client
   const watches = Array.from((store as any).watches);
-  
+
   return watches.filter((watch: any) => {
-    const name = getQueryName(watch.query)
+    const name = getQueryName(watch.query);
     const multiQueryName = getMultiQueryName(typeName);
-    return name === multiQueryName
-  })
-}
+    return name === multiQueryName;
+  });
+};
 
 /**
  * Extract `extraVariables` (fed to resolvers where referenced in fragments)
@@ -56,5 +56,5 @@ export const findWatchesByTypeName = (store: ApolloCache<any>, typeName: string)
  * mutation usages still hanging on.
  */
 export const getExtraVariables = (props: any, extraVariables: any) => {
-  return _.pick(props || {}, Object.keys(extraVariables || {}))
-}
+  return _.pick(props || {}, Object.keys(extraVariables || {}));
+};

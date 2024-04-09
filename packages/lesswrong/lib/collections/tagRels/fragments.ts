@@ -1,4 +1,4 @@
-import { registerFragment } from '../../vulcan-lib';
+import { registerFragment } from "../../vulcan-lib";
 
 registerFragment(`
   fragment TagRelBasicInfo on TagRel {
@@ -13,7 +13,6 @@ registerFragment(`
     autoApplied
   }
 `);
-
 
 registerFragment(`
   fragment TagRelFragment on TagRel {
@@ -72,7 +71,6 @@ registerFragment(`
     currentUserCanVote
   }
 `);
-
 
 // This fragment has to be fully dereferences, because the context of vote fragments doesn't allow for spreading other fragments
 registerFragment(`

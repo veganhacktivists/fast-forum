@@ -1,17 +1,19 @@
-import Spotlights from '../lib/collections/spotlights/collection';
-import { addCronJob } from './cronUtil';
+import Spotlights from "../lib/collections/spotlights/collection";
+import { addCronJob } from "./cronUtil";
 
 const MS_IN_DAY = 1000 * 60 * 60 * 24;
 
 addCronJob({
-  name: 'updatePromotedSpotlightItem',
+  name: "updatePromotedSpotlightItem",
   interval: `every 30 minutes`,
   async job() {
     const spotlights = await Spotlights.find({ draft: false }).fetch();
     if (!spotlights.length) return;
 
     // Ascending order
-    const mostRecentlyPromotedSpotlights = [...spotlights].sort((first, second) => first.lastPromotedAt.valueOf() - second.lastPromotedAt.valueOf());
+    const mostRecentlyPromotedSpotlights = [...spotlights].sort(
+      (first, second) => first.lastPromotedAt.valueOf() - second.lastPromotedAt.valueOf(),
+    );
     const positionAscOrderedSpotlights = [...spotlights].sort((first, second) => first.position - second.position);
 
     const [currentSpotlight] = mostRecentlyPromotedSpotlights.slice(-1);
@@ -34,9 +36,8 @@ addCronJob({
 
     // If we have any further spotlight items after the current one, promote the next one
     // Otherwise, roll over to the start
-    const promoteIndex = lastSpotlightPosition > currentSpotlightPosition
-      ? positionAscOrderedSpotlights.indexOf(currentSpotlight) + 1
-      : 0;
+    const promoteIndex =
+      lastSpotlightPosition > currentSpotlightPosition ? positionAscOrderedSpotlights.indexOf(currentSpotlight) + 1 : 0;
 
     const { position: positionToPromote } = positionAscOrderedSpotlights[promoteIndex];
 
@@ -46,6 +47,9 @@ addCronJob({
     const newPromotionDate = new Date(lastPromotionDate);
     newPromotionDate.setDate(lastPromotionDate.getDate() + currentSpotlight.duration);
 
-    await Spotlights.rawUpdateOne({ position: positionToPromote, draft: false }, { $set: { lastPromotedAt: newPromotionDate } });
-  }
+    await Spotlights.rawUpdateOne(
+      { position: positionToPromote, draft: false },
+      { $set: { lastPromotedAt: newPromotionDate } },
+    );
+  },
 });

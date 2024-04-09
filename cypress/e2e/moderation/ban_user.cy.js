@@ -29,10 +29,10 @@
 //     cy.loginAs(this.testUser);
 //     cy.visit('/');
 //     cy.reload(true);
-    
+
 //     // the banned user's post should no longer be on the front page
 //     cy.contains(this.bannedUserPost.title).should('not.exist');
-    
+
 //     // the banned user should see a logged out version of the forum
 //     cy.contains(this.testUser.displayName).should('not.exist');
 //     cy.contains('.UsersAccountMenu-userButton', 'Login').should('exist');

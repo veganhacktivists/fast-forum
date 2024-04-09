@@ -1,5 +1,4 @@
-import { registerFragment } from '../../vulcan-lib';
-
+import { registerFragment } from "../../vulcan-lib";
 
 registerFragment(`
   fragment SuggestAlignmentPost on Post {
@@ -8,4 +7,4 @@ registerFragment(`
       _id
       displayName
     }
-  }`)
+  }`);

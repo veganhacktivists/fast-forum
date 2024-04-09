@@ -1,11 +1,10 @@
-import React from 'react';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
-import type { NamesAttachedReactionsList, QuoteLocator } from '../../../lib/voting/namesAttachedReactions';
-import type { VotingProps } from '../votingProps';
-import Card from '@material-ui/core/Card';
+import React from "react";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
+import type { NamesAttachedReactionsList, QuoteLocator } from "../../../lib/voting/namesAttachedReactions";
+import type { VotingProps } from "../votingProps";
+import Card from "@material-ui/core/Card";
 
-const styles = (theme: ThemeType): JssStyles => ({
-})
+const styles = (theme: ThemeType): JssStyles => ({});
 
 /**
  * The hover that's shown when you hover over a passage which has an inline
@@ -14,37 +13,41 @@ const styles = (theme: ThemeType): JssStyles => ({
  * multiple different types of reactions here, if different users reacted
  * differently.
  */
-const InlineReactHoverInfo = ({quote, reactions, voteProps, classes}: {
-  quote: QuoteLocator,
-  reactions: NamesAttachedReactionsList,
-  voteProps: VotingProps<VoteableTypeClient>,
-  classes: ClassesType,
+const InlineReactHoverInfo = ({
+  quote,
+  reactions,
+  voteProps,
+  classes,
+}: {
+  quote: QuoteLocator;
+  reactions: NamesAttachedReactionsList;
+  voteProps: VotingProps<VoteableTypeClient>;
+  classes: ClassesType;
 }) => {
   const { ReactionHoverTopRow, ReactionQuotesHoverInfo } = Components;
   const reactionNames = Object.keys(reactions);
 
-  return <Card>
-    {reactionNames.map(reactionName => <div key={reactionName}>
-      <ReactionHoverTopRow
-        reactionName={reactionName}
-        userReactions={reactions[reactionName] ?? []}
-        showNonInlineVoteButtons={false}
-        voteProps={voteProps}
-      />
-      <ReactionQuotesHoverInfo
-        react={reactionName}
-        quote={quote}
-        voteProps={voteProps}
-      />
-    </div>)}
-  </Card>
-}
+  return (
+    <Card>
+      {reactionNames.map((reactionName) => (
+        <div key={reactionName}>
+          <ReactionHoverTopRow
+            reactionName={reactionName}
+            userReactions={reactions[reactionName] ?? []}
+            showNonInlineVoteButtons={false}
+            voteProps={voteProps}
+          />
+          <ReactionQuotesHoverInfo react={reactionName} quote={quote} voteProps={voteProps} />
+        </div>
+      ))}
+    </Card>
+  );
+};
 
-const InlineReactHoverInfoComponent = registerComponent('InlineReactHoverInfo', InlineReactHoverInfo, {styles});
+const InlineReactHoverInfoComponent = registerComponent("InlineReactHoverInfo", InlineReactHoverInfo, { styles });
 
 declare global {
   interface ComponentTypes {
-    InlineReactHoverInfo: typeof InlineReactHoverInfoComponent
+    InlineReactHoverInfo: typeof InlineReactHoverInfoComponent;
   }
 }
-

@@ -12,7 +12,8 @@ export default class DatabaseMetadataRepo extends AbstractRepo<"DatabaseMetadata
   private getByName(name: string): Promise<DbDatabaseMetadata | null> {
     // We use getRawDb here as this may be executed during server startup
     // before the collection is properly initialized
-    return this.getRawDb().oneOrNone(`
+    return this.getRawDb().oneOrNone(
+      `
       -- DatabaseMetadataRepo.getByName
       SELECT * from "DatabaseMetadata" WHERE "name" = $1
     `,
@@ -34,7 +35,8 @@ export default class DatabaseMetadataRepo extends AbstractRepo<"DatabaseMetadata
   }
 
   upsertKarmaInflationSeries(karmaInflationSeries: TimeSeries): Promise<null> {
-    return this.none(`
+    return this.none(
+      `
       INSERT INTO "DatabaseMetadata" (
         "_id",
         "name",
@@ -48,13 +50,15 @@ export default class DatabaseMetadataRepo extends AbstractRepo<"DatabaseMetadata
       )
       DO UPDATE SET
         "value" = $(value)
-      `, {
-      _id: randomId(),
-      name: "karmaInflationSeries",
-      value: {...karmaInflationSeries},
-      schemaVersion: 1,
-      createdAt: new Date(),
-    });
+      `,
+      {
+        _id: randomId(),
+        name: "karmaInflationSeries",
+        value: { ...karmaInflationSeries },
+        schemaVersion: 1,
+        createdAt: new Date(),
+      },
+    );
   }
 
   private electionNameToMetadataName(electionName: string): string {
@@ -63,7 +67,8 @@ export default class DatabaseMetadataRepo extends AbstractRepo<"DatabaseMetadata
 
   async getGivingSeasonHearts(electionName: string): Promise<GivingSeasonHeart[]> {
     const metadataName = this.electionNameToMetadataName(electionName);
-    const result = await this.getRawDb().oneOrNone(`
+    const result = await this.getRawDb().oneOrNone(
+      `
       -- DatabaseMetadataRepo.getGivingSeasonHearts
       SELECT ARRAY_AGG(q."value" || JSONB_BUILD_OBJECT(
         'userId', u."_id",
@@ -75,7 +80,9 @@ export default class DatabaseMetadataRepo extends AbstractRepo<"DatabaseMetadata
         WHERE "name" = $1
       ) q
       JOIN "Users" u ON q."key" = u."_id"
-    `, [metadataName]);
+    `,
+      [metadataName],
+    );
     return result?.hearts ?? [];
   }
 
@@ -87,30 +94,29 @@ export default class DatabaseMetadataRepo extends AbstractRepo<"DatabaseMetadata
     theta: number,
   ): Promise<GivingSeasonHeart[]> {
     const metadataName = this.electionNameToMetadataName(electionName);
-    await this.none(`
+    await this.none(
+      `
       -- DatabaseMetadataRepo.addGivingSeasonHeart
       INSERT INTO "DatabaseMetadata" ("_id", "name", "value", "createdAt")
       VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
       ON CONFLICT ("name") DO UPDATE SET "value" = "DatabaseMetadata"."value" || $3
-    `, [
-      randomId(),
-      metadataName,
-      {[userId]: {x, y, theta}},
-    ]);
+    `,
+      [randomId(), metadataName, { [userId]: { x, y, theta } }],
+    );
     return this.getGivingSeasonHearts(electionName);
   }
 
-  async removeGivingSeasonHeart(
-    electionName: string,
-    userId: string,
-  ): Promise<GivingSeasonHeart[]> {
+  async removeGivingSeasonHeart(electionName: string, userId: string): Promise<GivingSeasonHeart[]> {
     const metadataName = this.electionNameToMetadataName(electionName);
-    await this.none(`
+    await this.none(
+      `
       -- DatabaseMetadataRepo.removeGivingSeasonHeart
       UPDATE "DatabaseMetadata"
       SET "value" = "value" - $1
       WHERE "name" = $2
-    `, [userId, metadataName]);
+    `,
+      [userId, metadataName],
+    );
     return this.getGivingSeasonHearts(electionName);
   }
 }

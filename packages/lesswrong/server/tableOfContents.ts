@@ -1,20 +1,20 @@
-import cheerio from 'cheerio';
-import * as _ from 'underscore';
-import { cheerioParse } from './utils/htmlUtil';
-import { Comments } from '../lib/collections/comments/collection';
-import { questionAnswersSortings } from '../lib/collections/comments/views';
-import { postGetCommentCountStr } from '../lib/collections/posts/helpers';
-import { Revisions } from '../lib/collections/revisions/collection';
-import { answerTocExcerptFromHTML, truncate } from '../lib/editor/ellipsize';
-import { isAF } from '../lib/instanceSettings';
-import { Utils } from '../lib/vulcan-lib';
-import { updateDenormalizedHtmlAttributions } from './tagging/updateDenormalizedHtmlAttributions';
-import { annotateAuthors } from './attributeEdits';
-import { getDefaultViewSelector } from '../lib/utils/viewUtils';
-import type { ToCData, ToCSection } from '../lib/tableOfContents';
-import { defineQuery } from './utils/serverGraphqlUtil';
-import { htmlToTextDefault } from '../lib/htmlToText';
-import { commentsTableOfContentsEnabled } from '../lib/betas';
+import cheerio from "cheerio";
+import * as _ from "underscore";
+import { cheerioParse } from "./utils/htmlUtil";
+import { Comments } from "../lib/collections/comments/collection";
+import { questionAnswersSortings } from "../lib/collections/comments/views";
+import { postGetCommentCountStr } from "../lib/collections/posts/helpers";
+import { Revisions } from "../lib/collections/revisions/collection";
+import { answerTocExcerptFromHTML, truncate } from "../lib/editor/ellipsize";
+import { isAF } from "../lib/instanceSettings";
+import { Utils } from "../lib/vulcan-lib";
+import { updateDenormalizedHtmlAttributions } from "./tagging/updateDenormalizedHtmlAttributions";
+import { annotateAuthors } from "./attributeEdits";
+import { getDefaultViewSelector } from "../lib/utils/viewUtils";
+import type { ToCData, ToCSection } from "../lib/tableOfContents";
+import { defineQuery } from "./utils/serverGraphqlUtil";
+import { htmlToTextDefault } from "../lib/htmlToText";
+import { commentsTableOfContentsEnabled } from "../lib/betas";
 
 // Number of headings below which a table of contents won't be generated.
 // If comments-ToC is enabled, this is 0 because we need a post-ToC (even if
@@ -33,7 +33,7 @@ const headingTags = {
   // <b> and <strong> are at the same level
   strong: 7,
   b: 7,
-}
+};
 
 const headingIfWholeParagraph = {
   strong: true,
@@ -56,17 +56,16 @@ const headingSelector = _.keys(headingTags).join(",");
 //       {title: "Conclusion", anchor: "conclusion", level: 1},
 //     ]
 //   }
-export function extractTableOfContents(postHTML: string | null)
-{
+export function extractTableOfContents(postHTML: string | null) {
   if (!postHTML) return null;
   const postBody = cheerioParse(postHTML);
   let headings: Array<ToCSection> = [];
-  let usedAnchors: Record<string,boolean> = {};
+  let usedAnchors: Record<string, boolean> = {};
 
   // First, find the headings in the document, create a linear list of them,
   // and insert anchors at each one.
   let headingTags = postBody(headingSelector);
-  for (let i=0; i<headingTags.length; i++) {
+  for (let i = 0; i < headingTags.length; i++) {
     let tag = headingTags[i];
 
     if (tag.type !== "tag") {
@@ -77,8 +76,8 @@ export function extractTableOfContents(postHTML: string | null)
     }
 
     let title = elementToToCText(tag);
-    
-    if (title && title.trim()!=="") {
+
+    if (title && title.trim() !== "") {
       let anchor = titleToAnchor(title, usedAnchors);
       usedAnchors[anchor] = true;
       cheerio(tag).attr("id", anchor);
@@ -95,28 +94,25 @@ export function extractTableOfContents(postHTML: string | null)
   // will be levels 1, 2, and 3 (not 1, 3 and 7).
 
   // Get a list of heading levels used
-  let headingLevelsUsedDict: Partial<Record<number,boolean>> = {};
-  for(let i=0; i<headings.length; i++)
-    headingLevelsUsedDict[headings[i].level] = true;
+  let headingLevelsUsedDict: Partial<Record<number, boolean>> = {};
+  for (let i = 0; i < headings.length; i++) headingLevelsUsedDict[headings[i].level] = true;
 
   // Generate a mapping from raw heading levels to compressed heading levels
   let headingLevelsUsed = _.keys(headingLevelsUsedDict).sort();
   let headingLevelMap: Record<string, number> = {};
-  for(let i=0; i<headingLevelsUsed.length; i++)
-    headingLevelMap[ headingLevelsUsed[i] ] = i;
+  for (let i = 0; i < headingLevelsUsed.length; i++) headingLevelMap[headingLevelsUsed[i]] = i;
 
   // Mark sections with compressed heading levels
-  for(let i=0; i<headings.length; i++)
-    headings[i].level = headingLevelMap[headings[i].level]+1;
+  for (let i = 0; i < headings.length; i++) headings[i].level = headingLevelMap[headings[i].level] + 1;
 
   if (headings.length) {
-    headings.push({divider:true, level: 0, anchor: "postHeadingsDivider"})
+    headings.push({ divider: true, level: 0, anchor: "postHeadingsDivider" });
   }
   return {
     html: postBody.html(),
     sections: headings,
-    headingsCount: headings.length
-  }
+    headingsCount: headings.length,
+  };
 }
 
 function elementToToCText(cheerioTag: cheerio.Element) {
@@ -133,49 +129,45 @@ const reservedAnchorNames = ["top", "comments"];
 // in the post so far, generate an anchor, and return it. An anchor is a
 // URL-safe string that can be used for within-document links, and which is
 // not one of a few reserved anchor names.
-function titleToAnchor(title: string, usedAnchors: Record<string,boolean>): string
-{
+function titleToAnchor(title: string, usedAnchors: Record<string, boolean>): string {
   let charsToUse = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
   let sb: Array<string> = [];
 
-  for(let i=0; i<title.length; i++) {
+  for (let i = 0; i < title.length; i++) {
     let ch = title.charAt(i);
-    if(charsToUse.indexOf(ch) >= 0) {
+    if (charsToUse.indexOf(ch) >= 0) {
       sb.push(ch);
     } else {
-      sb.push('_');
+      sb.push("_");
     }
   }
 
-  let anchor = sb.join('');
-  if(!usedAnchors[anchor] && !_.find(reservedAnchorNames, x=>x===anchor))
-    return anchor;
+  let anchor = sb.join("");
+  if (!usedAnchors[anchor] && !_.find(reservedAnchorNames, (x) => x === anchor)) return anchor;
 
   let anchorSuffix = 1;
-  while(usedAnchors[anchor + anchorSuffix])
-    anchorSuffix++;
-  return anchor+anchorSuffix;
+  while (usedAnchors[anchor + anchorSuffix]) anchorSuffix++;
+  return anchor + anchorSuffix;
 }
 
 // `<b>` and `<strong>` tags are headings iff they are the only thing in their
 // paragraph. Return whether the given tag name is a tag with that property
 // (ie, is `<strong>` or `<b>`).
 // See tagIsWholeParagraph
-function tagIsHeadingIfWholeParagraph(tagName: string): boolean
-{
+function tagIsHeadingIfWholeParagraph(tagName: string): boolean {
   return tagName.toLowerCase() in headingIfWholeParagraph;
 }
 
 const tagIsAlien = (baseTag: cheerio.TagElement, potentialAlienTag: cheerio.Element): boolean => {
   switch (potentialAlienTag.type) {
-    case 'tag':
+    case "tag":
       return baseTag.name !== potentialAlienTag.name;
-    case 'text':
+    case "text":
       return (potentialAlienTag.data?.trim().length ?? 0) > 0;
     default:
       return true;
   }
-}
+};
 
 // `<b>` and `<strong>` tags are headings iff they are the only thing in their
 // paragraph. Return whether or not the given cheerio tag satisfies these heuristics.
@@ -187,7 +179,7 @@ const tagIsWholeParagraph = (tag?: cheerio.TagElement): boolean => {
 
   // Ensure the tag's parent is valid
   const parents = cheerio(tag).parent();
-  if (!parents || !parents.length || parents[0].type !== 'tag') {
+  if (!parents || !parents.length || parents[0].type !== "tag") {
     return false;
   }
 
@@ -199,44 +191,41 @@ const tagIsWholeParagraph = (tag?: cheerio.TagElement): boolean => {
 
   // Ensure that the tag is inside a 'p' element and that all the text in that 'p' is in tags of
   // the same type as our base tag
-  const para = cheerio(tag).closest('p');
+  const para = cheerio(tag).closest("p");
   if (para.length < 1 || para.text().trim() !== para.find(tag.name).text().trim()) {
     return false;
   }
 
   return true;
-}
+};
 
-function tagToHeadingLevel(tagName: string): number
-{
+function tagToHeadingLevel(tagName: string): number {
   let lowerCaseTagName = tagName.toLowerCase();
-  if (lowerCaseTagName in headingTags)
-    return headingTags[lowerCaseTagName as keyof typeof headingTags];
+  if (lowerCaseTagName in headingTags) return headingTags[lowerCaseTagName as keyof typeof headingTags];
   else if (lowerCaseTagName in headingIfWholeParagraph)
     // TODO: this seems wrong??? It's returning a boolean when it should be returning a number
     // @ts-ignore
     return headingIfWholeParagraph[lowerCaseTagName as keyof typeof headingIfWholeParagraph];
-  else
-    return 0;
+  else return 0;
 }
 
-async function getTocAnswers (document: DbPost) {
-  if (!document.question) return []
+async function getTocAnswers(document: DbPost) {
+  if (!document.question) return [];
 
   let answersTerms: MongoSelector<DbComment> = {
-    answer:true,
+    answer: true,
     postId: document._id,
-    deleted:false,
-  }
+    deleted: false,
+  };
   if (isAF) {
-    answersTerms.af = true
+    answersTerms.af = true;
   }
-  const answers = await Comments.find(answersTerms, {sort:questionAnswersSortings.top}).fetch();
+  const answers = await Comments.find(answersTerms, { sort: questionAnswersSortings.top }).fetch();
   const answerSections: ToCSection[] = answers.map((answer: DbComment): ToCSection => {
-    const { html = "" } = answer.contents || {}
-    const highlight = truncate(html, 900)
+    const { html = "" } = answer.contents || {};
+    const highlight = truncate(html, 900);
     let shortHighlight = htmlToTextDefault(answerTocExcerptFromHTML(html));
-    
+
     return {
       title: `${answer.baseScore} ${answer.author}`,
       answer: {
@@ -244,90 +233,97 @@ async function getTocAnswers (document: DbPost) {
         voteCount: answer.voteCount,
         postedAt: answer.postedAt,
         author: answer.author,
-        highlight, shortHighlight,
+        highlight,
+        shortHighlight,
       },
       anchor: answer._id,
-      level: 2
+      level: 2,
     };
-  })
+  });
 
   if (answerSections.length) {
     return [
-      {anchor: "answers", level:1, title:'Answers'}, 
+      { anchor: "answers", level: 1, title: "Answers" },
       ...answerSections,
-      {divider:true, level: 0, anchor: "postAnswersDivider"}
-    ]
+      { divider: true, level: 0, anchor: "postAnswersDivider" },
+    ];
   } else {
-    return []
+    return [];
   }
 }
 
-async function getTocComments (document: DbPost) {
+async function getTocComments(document: DbPost) {
   const commentSelector: any = {
     ...getDefaultViewSelector("Comments"),
     answer: false,
     parentAnswerId: null,
-    postId: document._id
-  }
+    postId: document._id,
+  };
   if (document.af && isAF) {
-    commentSelector.af = true
+    commentSelector.af = true;
   }
-  const commentCount = await Comments.find(commentSelector).count()
-  return [{anchor:"comments", level:0, title: postGetCommentCountStr(document, commentCount)}]
+  const commentCount = await Comments.find(commentSelector).count();
+  return [{ anchor: "comments", level: 0, title: postGetCommentCountStr(document, commentCount) }];
 }
 
-export const getToCforPost = async ({document, version, context}: {
-  document: DbPost,
-  version: string|null,
-  context: ResolverContext,
-}): Promise<ToCData|null> => {
+export const getToCforPost = async ({
+  document,
+  version,
+  context,
+}: {
+  document: DbPost;
+  version: string | null;
+  context: ResolverContext;
+}): Promise<ToCData | null> => {
   let html: string;
   if (version) {
-    const revision = await Revisions.findOne({documentId: document._id, version, fieldName: "contents"})
+    const revision = await Revisions.findOne({ documentId: document._id, version, fieldName: "contents" });
     if (!revision?.html) return null;
-    if (!await Revisions.checkAccess(context.currentUser, revision, context))
-      return null;
+    if (!(await Revisions.checkAccess(context.currentUser, revision, context))) return null;
     html = revision.html;
   } else {
     html = document?.contents?.html;
   }
-  
-  const tableOfContents = extractTableOfContents(html)
-  let tocSections = tableOfContents?.sections || []
-  
+
+  const tableOfContents = extractTableOfContents(html);
+  let tocSections = tableOfContents?.sections || [];
+
   if (tocSections.length >= MIN_HEADINGS_FOR_TOC) {
-    const tocAnswers = await getTocAnswers(document)
-    const tocComments = await getTocComments(document)
-    tocSections.push(...tocAnswers)
-    tocSections.push(...tocComments)
-  
+    const tocAnswers = await getTocAnswers(document);
+    const tocComments = await getTocComments(document);
+    tocSections.push(...tocAnswers);
+    tocSections.push(...tocComments);
+
     return {
-      html: tableOfContents?.html||null,
+      html: tableOfContents?.html || null,
       sections: tocSections,
-      headingsCount: tocSections.length
-    }
+      headingsCount: tocSections.length,
+    };
   }
   return null;
-}
+};
 
-const getToCforTag = async ({document, version, context}: {
-  document: DbTag,
-  version: string|null,
-  context: ResolverContext,
-}): Promise<ToCData|null> => {
+const getToCforTag = async ({
+  document,
+  version,
+  context,
+}: {
+  document: DbTag;
+  version: string | null;
+  context: ResolverContext;
+}): Promise<ToCData | null> => {
   let html: string;
   if (version) {
     try {
       html = await annotateAuthors(document._id, "Tags", "description", version);
-    } catch(e) {
+    } catch (e) {
       // eslint-disable-next-line no-console
       console.log("Author annotation failed");
       // eslint-disable-next-line no-console
       console.log(e);
-      const revision = await Revisions.findOne({documentId: document._id, version, fieldName: "description"})
+      const revision = await Revisions.findOne({ documentId: document._id, version, fieldName: "description" });
       if (!revision?.html) return null;
-      if (!await Revisions.checkAccess(context.currentUser, revision, context))
-        return null;
+      if (!(await Revisions.checkAccess(context.currentUser, revision, context))) return null;
       html = revision.html;
     }
   } else {
@@ -337,7 +333,7 @@ const getToCforTag = async ({document, version, context}: {
       } else {
         html = await updateDenormalizedHtmlAttributions(document);
       }
-    } catch(e) {
+    } catch (e) {
       // eslint-disable-next-line no-console
       console.log("Author annotation failed");
       // eslint-disable-next-line no-console
@@ -345,16 +341,16 @@ const getToCforTag = async ({document, version, context}: {
       html = document.description?.html;
     }
   }
-  
-  const tableOfContents = extractTableOfContents(html)
-  let tocSections = tableOfContents?.sections || []
-  
+
+  const tableOfContents = extractTableOfContents(html);
+  let tocSections = tableOfContents?.sections || [];
+
   return {
-    html: tableOfContents?.html||null,
+    html: tableOfContents?.html || null,
     sections: tocSections,
-    headingsCount: tocSections.length
-  }
-}
+    headingsCount: tocSections.length,
+  };
+};
 
 Utils.getToCforPost = getToCforPost;
 Utils.getToCforTag = getToCforTag;
@@ -363,11 +359,11 @@ defineQuery({
   name: "generateTableOfContents",
   resultType: "JSON",
   argTypes: "(html: String!)",
-  fn: (root: void, {html}:{html:string}, context: ResolverContext) => {
+  fn: (root: void, { html }: { html: string }, context: ResolverContext) => {
     if (html) {
-      return extractTableOfContents(html)
+      return extractTableOfContents(html);
     } else {
-      return {html: null, sections: [], headingsCount: 0}
+      return { html: null, sections: [], headingsCount: 0 };
     }
-  }
-})
+  },
+});

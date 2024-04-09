@@ -1,9 +1,6 @@
 import React from "react";
 import { Components, registerComponent, combineUrls } from "../../../lib/vulcan-lib";
-import {
-  fmCrosspostSiteNameSetting,
-  fmCrosspostBaseUrlSetting,
-} from "../../../lib/instanceSettings";
+import { fmCrosspostSiteNameSetting, fmCrosspostBaseUrlSetting } from "../../../lib/instanceSettings";
 import { useCrosspostContext } from "./PostsPageCrosspostWrapper";
 import { postGetPageUrl } from "../../../lib/collections/posts/helpers";
 
@@ -18,12 +15,12 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const PostsPageCrosspostComments = ({classes}: {classes: ClassesType}) => {
+const PostsPageCrosspostComments = ({ classes }: { classes: ClassesType }) => {
   const context = useCrosspostContext();
   if (!context?.foreignPost) {
     return null;
   }
-  const {hostedHere, foreignPost} = context;
+  const { hostedHere, foreignPost } = context;
 
   const relation = hostedHere ? "to" : "from";
   const commentCount = foreignPost.commentCount ?? 0;
@@ -32,9 +29,12 @@ const PostsPageCrosspostComments = ({classes}: {classes: ClassesType}) => {
   const commentsText = noComments
     ? "Click to view."
     : `Click to view ${commentCount} comment${commentCount === 1 ? "" : "s"}.`;
-  const link = combineUrls(fmCrosspostBaseUrlSetting.get() ?? "", `${postGetPageUrl(foreignPost)}${noComments ? "" : "#comments"}`);
+  const link = combineUrls(
+    fmCrosspostBaseUrlSetting.get() ?? "",
+    `${postGetPageUrl(foreignPost)}${noComments ? "" : "#comments"}`,
+  );
 
-  const {Typography} = Components;
+  const { Typography } = Components;
   return (
     <div>
       <a href={link} target="_blank" rel="noreferrer">
@@ -44,12 +44,16 @@ const PostsPageCrosspostComments = ({classes}: {classes: ClassesType}) => {
       </a>
     </div>
   );
-}
+};
 
-const PostsPageCrosspostCommentsComponent = registerComponent("PostsPageCrosspostComments", PostsPageCrosspostComments, {styles});
+const PostsPageCrosspostCommentsComponent = registerComponent(
+  "PostsPageCrosspostComments",
+  PostsPageCrosspostComments,
+  { styles },
+);
 
 declare global {
   interface ComponentTypes {
-    PostsPageCrosspostComments: typeof PostsPageCrosspostCommentsComponent
+    PostsPageCrosspostComments: typeof PostsPageCrosspostCommentsComponent;
   }
 }

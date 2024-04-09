@@ -1,5 +1,5 @@
-import { foreignKeyField, schemaDefaultValue } from '../../utils/schemaUtils';
-import { userOwns } from '../../vulcan-users/permissions';
+import { foreignKeyField, schemaDefaultValue } from "../../utils/schemaUtils";
+import { userOwns } from "../../vulcan-users/permissions";
 
 const schema: SchemaType<"UserMostValuablePosts"> = {
   userId: {
@@ -11,9 +11,9 @@ const schema: SchemaType<"UserMostValuablePosts"> = {
       type: "User",
       nullable: true,
     }),
-    canRead: [userOwns, 'admins'],
-    canCreate: ['members'],
-    canUpdate: [userOwns, 'admins'],
+    canRead: [userOwns, "admins"],
+    canCreate: ["members"],
+    canUpdate: [userOwns, "admins"],
   },
   postId: {
     nullable: false,
@@ -24,15 +24,15 @@ const schema: SchemaType<"UserMostValuablePosts"> = {
       type: "Post",
       nullable: true,
     }),
-    canRead: [userOwns, 'admins'],
-    canCreate: ['members'],
-    canUpdate: [userOwns, 'admins'],
+    canRead: [userOwns, "admins"],
+    canCreate: ["members"],
+    canUpdate: [userOwns, "admins"],
   },
   deleted: {
     type: Boolean,
-    canRead: [userOwns, 'admins'],
-    canCreate: ['members'],
-    canUpdate: [userOwns, 'admins'],
+    canRead: [userOwns, "admins"],
+    canCreate: ["members"],
+    canUpdate: [userOwns, "admins"],
     hidden: true,
     optional: true,
     ...schemaDefaultValue(false),

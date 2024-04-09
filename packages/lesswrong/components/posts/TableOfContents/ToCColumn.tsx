@@ -1,33 +1,33 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { registerComponent, Components } from '../../../lib/vulcan-lib';
-import { MAX_COLUMN_WIDTH } from '../PostsPage/PostsPage';
-import { SidebarsContext } from '../../common/SidebarsWrapper';
-import { useTracking } from '../../../lib/analyticsEvents';
-import { isClient } from '../../../lib/executionEnvironment';
-import classNames from 'classnames';
-import { isFriendlyUI } from '../../../themes/forumTheme';
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import { registerComponent, Components } from "../../../lib/vulcan-lib";
+import { MAX_COLUMN_WIDTH } from "../PostsPage/PostsPage";
+import { SidebarsContext } from "../../common/SidebarsWrapper";
+import { useTracking } from "../../../lib/analyticsEvents";
+import { isClient } from "../../../lib/executionEnvironment";
+import classNames from "classnames";
+import { isFriendlyUI } from "../../../themes/forumTheme";
 
-const DEFAULT_TOC_MARGIN = 100
-const MAX_TOC_WIDTH = 270
-const MIN_TOC_WIDTH = 200
+const DEFAULT_TOC_MARGIN = 100;
+const MAX_TOC_WIDTH = 270;
+const MIN_TOC_WIDTH = 200;
 export const MAX_CONTENT_WIDTH = 720;
-const TOC_OFFSET_TOP = 92
-const TOC_OFFSET_BOTTOM = 64
+const TOC_OFFSET_TOP = 92;
+const TOC_OFFSET_BOTTOM = 64;
 
 export const styles = (theme: ThemeType): JssStyles => ({
   root: {
     position: "relative",
-    [theme.breakpoints.down('sm')]: {
-      paddingTop: 12
-    }
+    [theme.breakpoints.down("sm")]: {
+      paddingTop: 12,
+    },
   },
   header: {
-    gridArea: 'title',
+    gridArea: "title",
   },
   tocActivated: {
     // Check for support for template areas before applying
     '@supports (grid-template-areas: "title")': {
-      display: 'grid',
+      display: "grid",
       gridTemplateColumns: `
         1fr
         minmax(${MIN_TOC_WIDTH}px, ${MAX_TOC_WIDTH}px)
@@ -43,29 +43,29 @@ export const styles = (theme: ThemeType): JssStyles => ({
         "... toc gap1 content gap2 rhs gap3 ..."
       `,
     },
-    [theme.breakpoints.down('sm')]: {
-      display: 'block'
-    }
+    [theme.breakpoints.down("sm")]: {
+      display: "block",
+    },
   },
   sideCommentsActive: {
     gridTemplateColumns: `
       1fr minmax(200px,270px) minmax(10px,25px) minmax(min-content,${MAX_CONTENT_WIDTH}px) minmax(10px, 25px) min-content 350px 1fr !important
-    `
+    `,
   },
   toc: {
     '@supports (grid-template-areas: "title")': {
-      gridArea: 'toc',
-      position: 'unset',
-      width: 'unset'
+      gridArea: "toc",
+      position: "unset",
+      width: "unset",
     },
     //Fallback styles in case we don't have CSS-Grid support. These don't get applied if we have a grid
-    position: 'absolute',
+    position: "absolute",
     width: MAX_TOC_WIDTH,
     left: -DEFAULT_TOC_MARGIN,
     marginTop: -TOC_OFFSET_TOP,
     marginBottom: -TOC_OFFSET_BOTTOM,
 
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down("sm")]: {
       display: "none",
       marginTop: 0,
       marginBottom: 0,
@@ -77,33 +77,34 @@ export const styles = (theme: ThemeType): JssStyles => ({
     top: 0,
     lineHeight: 1.0,
     marginLeft: 1,
-    paddingLeft: theme.spacing.unit*2,
+    paddingLeft: theme.spacing.unit * 2,
     textAlign: "left",
     maxHeight: "100vh",
     overflowY: "auto",
-    
+
     scrollbarWidth: "none", //Firefox-specific
-    "&::-webkit-scrollbar": { //Everything-else
+    "&::-webkit-scrollbar": {
+      //Everything-else
       width: 0,
     },
 
-    [theme.breakpoints.down('sm')]:{
-      display:'none'
-    }
+    [theme.breakpoints.down("sm")]: {
+      display: "none",
+    },
   },
   stickyBlock: {
     // Cancels the direction:rtl in stickyBlockScroller
     direction: "ltr",
-    
+
     paddingTop: TOC_OFFSET_TOP,
     paddingBottom: TOC_OFFSET_BOTTOM,
   },
-  content: { gridArea: 'content' },
-  gap1: { gridArea: 'gap1'},
-  gap2: { gridArea: 'gap2'},
-  gap3: { gridArea: 'gap3' },
+  content: { gridArea: "content" },
+  gap1: { gridArea: "gap1" },
+  gap2: { gridArea: "gap2" },
+  gap3: { gridArea: "gap3" },
   rhs: {
-    gridArea: 'rhs',
+    gridArea: "rhs",
   },
   hideTocButton: {
     position: "fixed",
@@ -133,7 +134,7 @@ const shouldHideToggleContentsButton = () => {
     return false;
   }
 
-  const {scrollY, innerHeight} = window;
+  const { scrollY, innerHeight } = window;
   const scrollEnd = document.body.scrollHeight - innerHeight;
   // We hide the button when:
   //  - scrolled to 0 to prevent showing the button above the page header when
@@ -141,7 +142,7 @@ const shouldHideToggleContentsButton = () => {
   //  - scrolled all the way to the end of the page to prevent the button
   //    colliding with the table of contents
   return scrollY > 0 && scrollY < scrollEnd * 0.99;
-}
+};
 
 export const ToCColumn = ({
   tableOfContents,
@@ -151,43 +152,38 @@ export const ToCColumn = ({
   children,
   classes,
 }: {
-  tableOfContents: React.ReactNode|null,
-  header?: React.ReactNode,
-  rightColumnChildren?: React.ReactNode,
-  notHideable?: boolean,
-  children: React.ReactNode,
-  classes: ClassesType,
+  tableOfContents: React.ReactNode | null;
+  header?: React.ReactNode;
+  rightColumnChildren?: React.ReactNode;
+  notHideable?: boolean;
+  children: React.ReactNode;
+  classes: ClassesType;
 }) => {
-  const {captureEvent} = useTracking();
-  const {sideCommentsActive} = useContext(SidebarsContext)!;
-  const [hideTocButtonHidden, setHideTocButtonHidden] = useState(
-    shouldHideToggleContentsButton,
-  );
+  const { captureEvent } = useTracking();
+  const { sideCommentsActive } = useContext(SidebarsContext)!;
+  const [hideTocButtonHidden, setHideTocButtonHidden] = useState(shouldHideToggleContentsButton);
   const [hidden, setHidden] = useState(false);
   const hideable = isFriendlyUI && !notHideable && !!tableOfContents;
 
   useEffect(() => {
-    const handler = () => setHideTocButtonHidden(
-      shouldHideToggleContentsButton(),
-    );
+    const handler = () => setHideTocButtonHidden(shouldHideToggleContentsButton());
     window.addEventListener("scroll", handler);
     () => window.removeEventListener("scroll", handler);
   });
 
   const toggleHideContents = useCallback(() => {
     setHidden(!hidden);
-    captureEvent("toggleHideContents", {hidden: !hidden});
+    captureEvent("toggleHideContents", { hidden: !hidden });
   }, [hidden, captureEvent]);
 
   return (
-    <div className={classNames(
-      classes.root,
-      {
+    <div
+      className={classNames(classes.root, {
         [classes.tocActivated]: !!tableOfContents || !!rightColumnChildren,
         [classes.sideCommentsActive]: sideCommentsActive,
-      }
-    )}>
-      {hideable &&
+      })}
+    >
+      {hideable && (
         <div
           onClick={toggleHideContents}
           className={classNames(classes.hideTocButton, {
@@ -197,40 +193,32 @@ export const ToCColumn = ({
           <Components.ForumIcon icon="ListBullet" />
           {hidden ? "Show" : "Hide"} table of contents
         </div>
-      }
-      <div className={classes.header}>
-        {header}
-      </div>
-      {!hidden &&
+      )}
+      <div className={classes.header}>{header}</div>
+      {!hidden && (
         <>
-          {tableOfContents && <div className={classes.toc}>
-            <div className={classes.stickyBlockScroller}>
-              <div className={classes.stickyBlock}>
-                {tableOfContents}
+          {tableOfContents && (
+            <div className={classes.toc}>
+              <div className={classes.stickyBlockScroller}>
+                <div className={classes.stickyBlock}>{tableOfContents}</div>
               </div>
             </div>
-          </div>}
-          <div className={classes.gap1}/>
+          )}
+          <div className={classes.gap1} />
         </>
-      }
-      <div className={classes.content}>
-        {children}
-      </div>
-      <div className={classes.gap2}/>
-      {rightColumnChildren &&
-        <div className={classes.rhs}>
-          {rightColumnChildren}
-        </div>
-      }
-      <div className={classes.gap3}/>
+      )}
+      <div className={classes.content}>{children}</div>
+      <div className={classes.gap2} />
+      {rightColumnChildren && <div className={classes.rhs}>{rightColumnChildren}</div>}
+      <div className={classes.gap3} />
     </div>
   );
-}
+};
 
-const ToCColumnComponent = registerComponent("ToCColumn", ToCColumn, {styles});
+const ToCColumnComponent = registerComponent("ToCColumn", ToCColumn, { styles });
 
 declare global {
   interface ComponentTypes {
-    ToCColumn: typeof ToCColumnComponent
+    ToCColumn: typeof ToCColumnComponent;
   }
 }

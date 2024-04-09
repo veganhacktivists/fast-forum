@@ -27,12 +27,13 @@ const BotSiteBanner = ({ classes }: { classes: ClassesType }) => {
   return (
     <SingleColumnSection className={classes.root}>
       <div>
-        Welcome to the FAST Forum bot site. If you are trying to access the Forum programmatically (either by scraping or
-        via the api) please use this site rather than <Link to={"https://forum.fastcommunity.org"}>forum.effectivealtruism.org</Link>.
+        Welcome to the FAST Forum bot site. If you are trying to access the Forum programmatically (either by scraping
+        or via the api) please use this site rather than{" "}
+        <Link to={"https://forum.fastcommunity.org"}>forum.effectivealtruism.org</Link>.
         <br />
         <br />
-        This site has the same content as the main site, but is run in a separate environment to avoid bots overloading the main site
-        and affecting performance for human users.
+        This site has the same content as the main site, but is run in a separate environment to avoid bots overloading
+        the main site and affecting performance for human users.
       </div>
     </SingleColumnSection>
   );

@@ -1,12 +1,12 @@
-import React from 'react';
-import { registerComponent, Components } from '../../../lib/vulcan-lib';
-import { userCanDo } from '../../../lib/vulcan-users/permissions';
-import { useCurrentUser } from '../../common/withUser';
-import { useDialog } from '../../common/withDialog'
+import React from "react";
+import { registerComponent, Components } from "../../../lib/vulcan-lib";
+import { userCanDo } from "../../../lib/vulcan-users/permissions";
+import { useCurrentUser } from "../../common/withUser";
+import { useDialog } from "../../common/withDialog";
 
-const ReportPostDropdownItem = ({post}: {post: PostsBase}) => {
+const ReportPostDropdownItem = ({ post }: { post: PostsBase }) => {
   const currentUser = useCurrentUser();
-  const {openDialog} = useDialog();
+  const { openDialog } = useDialog();
 
   if (!userCanDo(currentUser, "reports.new")) {
     return null;
@@ -24,25 +24,16 @@ const ReportPostDropdownItem = ({post}: {post: PostsBase}) => {
         userId: currentUser._id,
       },
     });
-  }
+  };
 
-  const {DropdownItem} = Components;
-  return (
-    <DropdownItem
-      title="Report"
-      onClick={showReport}
-      icon="Report"
-    />
-  );
+  const { DropdownItem } = Components;
+  return <DropdownItem title="Report" onClick={showReport} icon="Report" />;
 };
 
-const ReportPostDropdownItemComponent = registerComponent(
-  'ReportPostDropdownItem',
-  ReportPostDropdownItem,
-);
+const ReportPostDropdownItemComponent = registerComponent("ReportPostDropdownItem", ReportPostDropdownItem);
 
 declare global {
   interface ComponentTypes {
-    ReportPostDropdownItem: typeof ReportPostDropdownItemComponent
+    ReportPostDropdownItem: typeof ReportPostDropdownItemComponent;
   }
 }

@@ -1,15 +1,14 @@
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import React from 'react';
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import React from "react";
 
 const CoreSequences = () => {
-  return <Components.CollectionsPage documentId={'oneQyj4pw77ynzwAF'} />
+  return <Components.CollectionsPage documentId={"oneQyj4pw77ynzwAF"} />;
 };
 
-const CoreSequencesComponent = registerComponent('CoreSequences', CoreSequences);
+const CoreSequencesComponent = registerComponent("CoreSequences", CoreSequences);
 
 declare global {
   interface ComponentTypes {
-    CoreSequences: typeof CoreSequencesComponent
+    CoreSequences: typeof CoreSequencesComponent;
   }
 }
-

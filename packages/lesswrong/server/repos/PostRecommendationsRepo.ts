@@ -1,10 +1,7 @@
 import AbstractRepo from "./AbstractRepo";
 import PostRecommendations from "../../lib/collections/postRecommendations/collection";
 import { randomId } from "../../lib/random";
-import type {
-  RecommendationStrategyName,
-  StrategySettings,
-} from "../../lib/collections/users/recommendationSettings";
+import type { RecommendationStrategyName, StrategySettings } from "../../lib/collections/users/recommendationSettings";
 import { recordPerfMetrics } from "./perfMetricWrapper";
 
 class PostRecommendationsRepo extends AbstractRepo<"PostRecommendations"> {
@@ -13,8 +10,8 @@ class PostRecommendationsRepo extends AbstractRepo<"PostRecommendations"> {
   }
 
   async recordRecommendations(
-    currentUser: DbUser|null,
-    clientId: string|null,
+    currentUser: DbUser | null,
+    clientId: string | null,
     strategyName: RecommendationStrategyName,
     strategySettings: StrategySettings,
     posts: DbPost[],
@@ -26,7 +23,10 @@ class PostRecommendationsRepo extends AbstractRepo<"PostRecommendations"> {
       return;
     }
     const settings = strategySettings as unknown as JsonRecord;
-    await Promise.all(posts.map(({_id: postId}) => this.none(`
+    await Promise.all(
+      posts.map(({ _id: postId }) =>
+        this.none(
+          `
       -- PostRecommendationsRepo.recordRecommendations
       INSERT INTO "PostRecommendations" (
         "_id",
@@ -48,50 +48,58 @@ class PostRecommendationsRepo extends AbstractRepo<"PostRecommendations"> {
         "strategyName" = $5,
         "strategySettings" = $6,
         "lastRecommendedAt" = CURRENT_TIMESTAMP
-    `, [randomId(), userId, clientId, postId, strategyName, settings])));
+    `,
+          [randomId(), userId, clientId, postId, strategyName, settings],
+        ),
+      ),
+    );
   }
 
-  async markRecommendationAsObserved(
-    userId: string | null,
-    clientId: string | null,
-    postId: string,
-  ): Promise<void> {
+  async markRecommendationAsObserved(userId: string | null, clientId: string | null, postId: string): Promise<void> {
     if (userId) {
-      await this.none(`
+      await this.none(
+        `
         -- PostRecommendationsRepo.markRecommendationAsObserved
         UPDATE "PostRecommendations"
         SET "recommendationCount" = "recommendationCount" + 1
         WHERE "userId" = $1 AND "postId" = $2
-      `, [userId, postId]);
+      `,
+        [userId, postId],
+      );
     } else if (clientId) {
-      await this.none(`
+      await this.none(
+        `
         -- PostRecommendationsRepo.markRecommendationAsObserved
         UPDATE "PostRecommendations"
         SET "recommendationCount" = "recommendationCount" + 1
         WHERE "clientId" = $1 AND "postId" = $2
-      `, [clientId, postId]);
+      `,
+        [clientId, postId],
+      );
     }
   }
 
-  async markRecommendationAsClicked(
-    userId: string | null,
-    clientId: string | null,
-    postId: string,
-  ): Promise<void> {
+  async markRecommendationAsClicked(userId: string | null, clientId: string | null, postId: string): Promise<void> {
     if (userId) {
-      await this.none(`
+      await this.none(
+        `
         -- PostRecommendationsRepo.markRecommendationAsClicked
         UPDATE "PostRecommendations"
         SET "clickedAt" = CURRENT_TIMESTAMP
         WHERE "userId" = $1 AND "postId" = $2
-      `, [userId, postId]);
+      `,
+        [userId, postId],
+      );
     } else if (clientId) {
-      await this.none(`
+      await this.none(
+        `
         -- PostRecommendationsRepo.markRecommendationAsClicked
         UPDATE "PostRecommendations"
         SET "clickedAt" = CURRENT_TIMESTAMP
         WHERE "clientId" = $1 AND "postId" = $2
-      `, [clientId, postId]);
+      `,
+        [clientId, postId],
+      );
     }
   }
 

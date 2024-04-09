@@ -1,9 +1,9 @@
-import React from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { Link } from '../../lib/reactRouterWrapper';
-import { taggingNameCapitalSetting } from '../../lib/instanceSettings';
-import type { ToCDisplayOptions } from '../posts/TableOfContents/TableOfContentsList';
-import { tagGetDiscussionUrl, tagGetSubforumUrl } from '../../lib/collections/tags/helpers';
+import React from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { Link } from "../../lib/reactRouterWrapper";
+import { taggingNameCapitalSetting } from "../../lib/instanceSettings";
+import type { ToCDisplayOptions } from "../posts/TableOfContents/TableOfContentsList";
+import { tagGetDiscussionUrl, tagGetSubforumUrl } from "../../lib/collections/tags/helpers";
 
 export const styles = (theme: ThemeType): JssStyles => ({
   tableOfContentsWrapper: {
@@ -20,20 +20,26 @@ export const styles = (theme: ThemeType): JssStyles => ({
   },
   unreadCount: {
     color: theme.palette.primary.main,
-  }
+  },
 });
 
-
-const TagTableOfContents = ({tag, expandAll, showContributors, onHoverContributor, displayOptions, classes}: {
-  tag: TagPageFragment|AllTagsPageFragment
-  expandAll?: ()=>void,
-  showContributors: boolean,
-  onHoverContributor?: (contributorId: string)=>void,
-  displayOptions?: ToCDisplayOptions,
-  classes: ClassesType,
+const TagTableOfContents = ({
+  tag,
+  expandAll,
+  showContributors,
+  onHoverContributor,
+  displayOptions,
+  classes,
+}: {
+  tag: TagPageFragment | AllTagsPageFragment;
+  expandAll?: () => void;
+  showContributors: boolean;
+  onHoverContributor?: (contributorId: string) => void;
+  displayOptions?: ToCDisplayOptions;
+  classes: ClassesType;
 }) => {
   const { TableOfContents, TableOfContentsRow, TagContributorsList } = Components;
-  
+
   if (!tag.tableOfContents) {
     return null;
   }
@@ -56,12 +62,12 @@ const TagTableOfContents = ({tag, expandAll, showContributors, onHoverContributo
       )}
     </span>
   );
-}
+};
 
-const TagTableOfContentsComponent = registerComponent("TagTableOfContents", TagTableOfContents, {styles});
+const TagTableOfContentsComponent = registerComponent("TagTableOfContents", TagTableOfContents, { styles });
 
 declare global {
   interface ComponentTypes {
-    TagTableOfContents: typeof TagTableOfContentsComponent
+    TagTableOfContents: typeof TagTableOfContentsComponent;
   }
 }

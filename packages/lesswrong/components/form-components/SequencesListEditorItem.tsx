@@ -1,8 +1,8 @@
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { useSingle } from '../../lib/crud/withSingle';
-import React from 'react';
-import DragIcon from '@material-ui/icons/DragHandle';
-import RemoveIcon from '@material-ui/icons/Close';
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useSingle } from "../../lib/crud/withSingle";
+import React from "react";
+import DragIcon from "@material-ui/icons/DragHandle";
+import RemoveIcon from "@material-ui/icons/Close";
 
 const styles = (theme: ThemeType): JssStyles => ({
   box: {
@@ -10,7 +10,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     marginLeft: 30,
     "&:hover $remove": {
       opacity: 1,
-    }
+    },
   },
   title: {
     display: "inline",
@@ -25,7 +25,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     "& div": {
       display: "inline-block",
       marginRight: 5,
-    }
+    },
   },
   remove: {
     opacity: 0,
@@ -34,7 +34,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     cursor: "pointer",
   },
   removeIcon: {
-    color: `${theme.palette.icon.dim5} !important`
+    color: `${theme.palette.icon.dim5} !important`,
   },
   dragHandle: {
     pointerEvents: "none",
@@ -44,11 +44,15 @@ const styles = (theme: ThemeType): JssStyles => ({
     margin: "auto",
     top: "0px",
     bottom: "0px",
-    cursor: "pointer"
+    cursor: "pointer",
   },
 });
 
-const SequencesListEditorItem = ({documentId, removeItem, classes}: {
+const SequencesListEditorItem = ({
+  documentId,
+  removeItem,
+  classes,
+}: {
   documentId: string;
   removeItem: (itemId: string) => void;
   classes: ClassesType;
@@ -56,35 +60,37 @@ const SequencesListEditorItem = ({documentId, removeItem, classes}: {
   const { document, loading } = useSingle({
     documentId,
     collectionName: "Sequences",
-    fragmentName: 'SequencesPageFragment',
+    fragmentName: "SequencesPageFragment",
   });
-  
+
   if (document && !loading) {
-    return <div>
-      <DragIcon className={classes.dragHandle}/>
-      <div className={classes.box}>
-        <div className={classes.title}>
-          {document.title || "Undefined Title"}
-        </div>
-        <div className={classes.meta}>
-          <div className="sequences-list-edit-item-author">
-            {(document.user && document.user.displayName) || "Undefined Author"}
-          </div>
-          <div className={classes.remove}>
-            <RemoveIcon className={classes.removeIcon} onClick={() => removeItem(documentId)} />
+    return (
+      <div>
+        <DragIcon className={classes.dragHandle} />
+        <div className={classes.box}>
+          <div className={classes.title}>{document.title || "Undefined Title"}</div>
+          <div className={classes.meta}>
+            <div className="sequences-list-edit-item-author">
+              {(document.user && document.user.displayName) || "Undefined Author"}
+            </div>
+            <div className={classes.remove}>
+              <RemoveIcon className={classes.removeIcon} onClick={() => removeItem(documentId)} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    );
   } else {
-    return <Components.Loading />
+    return <Components.Loading />;
   }
 };
 
-const SequencesListEditorItemComponent = registerComponent('SequencesListEditorItem', SequencesListEditorItem, {styles});
+const SequencesListEditorItemComponent = registerComponent("SequencesListEditorItem", SequencesListEditorItem, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    SequencesListEditorItem: typeof SequencesListEditorItemComponent
+    SequencesListEditorItem: typeof SequencesListEditorItemComponent;
   }
 }

@@ -38,7 +38,7 @@ const styles = createStyles(
       marginLeft: "auto",
       width: "fit-content",
     },
-  })
+  }),
 );
 
 const MaintenanceBanner = ({ classes }: { classes: ClassesType }) => {

@@ -1,9 +1,8 @@
-import * as _ from 'underscore';
-import { isServer, isAnyTest, isMigrations } from './executionEnvironment';
-import { disableEnsureIndexSetting } from './instanceSettings';
-import { getSqlClientOrThrow } from './sql/sqlClient';
+import * as _ from "underscore";
+import { isServer, isAnyTest, isMigrations } from "./executionEnvironment";
+import { disableEnsureIndexSetting } from "./instanceSettings";
+import { getSqlClientOrThrow } from "./sql/sqlClient";
 import { sleep } from "./utils/asyncUtils";
-
 
 export const expectedIndexes: Partial<Record<CollectionNameString, Array<MongoIndexSpecification<any>>>> = {};
 
@@ -16,44 +15,47 @@ async function conflictingIndexExists<N extends CollectionNameString>(
   index: any,
   options: any,
 ) {
-  if (!options.name)
-    return false;
-  
+  if (!options.name) return false;
+
   let existingIndexes;
   try {
     existingIndexes = await collection.rawCollection().indexes();
-  } catch(e) {
+  } catch (e) {
     // If the database is uninitialized (eg, running unit tests starting with a
     // blank DB), this will fail. But the collection will be created by the
     // ensureIndex operation.
     return false;
   }
-  
+
   for (let existingIndex of existingIndexes) {
     if (existingIndex.name === options.name) {
-      if (!_.isEqual(existingIndex.key, index)
-         || !_.isEqual(existingIndex.partialFilterExpression, options.partialFilterExpression))
-      {
+      if (
+        !_.isEqual(existingIndex.key, index) ||
+        !_.isEqual(existingIndex.partialFilterExpression, options.partialFilterExpression)
+      ) {
         //eslint-disable-next-line no-console
-        console.log(`Expected index: ${JSON.stringify({index, partialFilterExpression: options.partialFilterExpression})}`);
+        console.log(
+          `Expected index: ${JSON.stringify({ index, partialFilterExpression: options.partialFilterExpression })}`,
+        );
         //eslint-disable-next-line no-console
-        console.log(`Found in DB: ${JSON.stringify({index: existingIndex.key, partialFilterExpression: existingIndex.partialFilterExpression})}`);
-        
+        console.log(
+          `Found in DB: ${JSON.stringify({ index: existingIndex.key, partialFilterExpression: existingIndex.partialFilterExpression })}`,
+        );
+
         return true;
       }
     }
   }
-  
+
   return false;
 }
 
 export function ensureIndex<N extends CollectionNameString>(
   collection: CollectionBase<N>,
   index: any,
-  options: any={},
+  options: any = {},
 ): void {
-  if (!expectedIndexes[collection.collectionName])
-    expectedIndexes[collection.collectionName] = [];
+  if (!expectedIndexes[collection.collectionName]) expectedIndexes[collection.collectionName] = [];
   expectedIndexes[collection.collectionName]!.push({
     ...options,
     key: index,
@@ -61,31 +63,27 @@ export function ensureIndex<N extends CollectionNameString>(
   void ensureIndexAsync(collection, index, options);
 }
 
-const canEnsureIndexes = () =>
-  isServer && !isAnyTest && !isMigrations && !disableEnsureIndexSetting.get();
-
+const canEnsureIndexes = () => isServer && !isAnyTest && !isMigrations && !disableEnsureIndexSetting.get();
 
 export async function ensureIndexAsync<N extends CollectionNameString>(
   collection: CollectionBase<N>,
   index: any,
-  options: any={},
+  options: any = {},
 ) {
-  if (!canEnsureIndexes())
-    return;
+  if (!canEnsureIndexes()) return;
 
   await createOrDeferIndex(async () => {
-    if (!collection.isConnected())
-      return;
+    if (!collection.isConnected()) return;
     try {
-      if (options.name && await conflictingIndexExists(collection, index, options)) {
+      if (options.name && (await conflictingIndexExists(collection, index, options))) {
         //eslint-disable-next-line no-console
         console.log(`Differing index exists with the same name: ${options.name}. Dropping.`);
-        
+
         collection.rawCollection().dropIndex(options.name);
       }
-      const mergedOptions = {background: true, ...options};
+      const mergedOptions = { background: true, ...options };
       collection._ensureIndex(index, mergedOptions);
-    } catch(e) {
+    } catch (e) {
       //eslint-disable-next-line no-console
       console.error(`Error in ${collection.collectionName}.ensureIndex: ${e}`);
     }
@@ -106,14 +104,13 @@ export const ensureCustomPgIndex = async (sql: string, options: EnsureCustomPgIn
 
   let { runImmediately = false, overrideCanEnsureIndexes = false, client } = options;
 
-  if (!canEnsureIndexes() && !overrideCanEnsureIndexes)
-    return;
+  if (!canEnsureIndexes() && !overrideCanEnsureIndexes) return;
 
   await createOrDeferIndex(async () => {
     client ??= getSqlClientOrThrow();
     await client.any(sql);
   }, runImmediately);
-}
+};
 
 // Given an index partial definition for a collection's default view,
 // represented as an index field-list prefix and suffix, plus an index partial
@@ -132,28 +129,29 @@ export const ensureCustomPgIndex = async (sql: string, options: EnsureCustomPgIn
 //   prefix: [ordered dictionary] Collection fields from the default view
 //   suffix: [ordered dictionary] Collection fields from the default view
 //
-export function combineIndexWithDefaultViewIndex<T extends DbObject>({viewFields, prefix, suffix}: {
-  viewFields: MongoIndexKeyObj<T>,
-  prefix: MongoIndexKeyObj<T>,
-  suffix: MongoIndexKeyObj<T>,
+export function combineIndexWithDefaultViewIndex<T extends DbObject>({
+  viewFields,
+  prefix,
+  suffix,
+}: {
+  viewFields: MongoIndexKeyObj<T>;
+  prefix: MongoIndexKeyObj<T>;
+  suffix: MongoIndexKeyObj<T>;
 }): MongoIndexKeyObj<T> {
-  let combinedIndex = {...prefix};
+  let combinedIndex = { ...prefix };
   for (let key in viewFields) {
-    const keyWithType = key as keyof(typeof viewFields)
-    if (!(key in combinedIndex))
-      combinedIndex[keyWithType] = viewFields[keyWithType];
+    const keyWithType = key as keyof typeof viewFields;
+    if (!(key in combinedIndex)) combinedIndex[keyWithType] = viewFields[keyWithType];
   }
   for (let key in suffix) {
-    const keyWithType = key as keyof(typeof suffix)
-    if (!(key in combinedIndex))
-      combinedIndex[keyWithType] = suffix[keyWithType];
+    const keyWithType = key as keyof typeof suffix;
+    if (!(key in combinedIndex)) combinedIndex[keyWithType] = suffix[keyWithType];
   }
   return combinedIndex;
 }
 
-
-let deferredIndexes: Array<()=>Promise<void>> = [];
-let deferredIndexesTimer: NodeJS.Timeout|null = null;
+let deferredIndexes: Array<() => Promise<void>> = [];
+let deferredIndexesTimer: NodeJS.Timeout | null = null;
 
 /**
  * If running a normal server, defer index creation until 25s after
@@ -169,17 +167,17 @@ const createOrDeferIndex = async (buildIndex: () => Promise<void>, runImmediatel
     await buildIndex();
   } else {
     deferredIndexes.push(buildIndex);
-    if (deferredIndexesTimer===null) {
+    if (deferredIndexesTimer === null) {
       deferredIndexesTimer = setTimeout(createDeferredIndexes, 25000);
     }
   }
-}
+};
 
 async function createDeferredIndexes() {
   deferredIndexesTimer = null;
   const deferredIndexesCopy = deferredIndexes;
   deferredIndexes = [];
-  
+
   for (let createIndex of deferredIndexesCopy) {
     await createIndex();
     await sleep(500);

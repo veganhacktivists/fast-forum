@@ -1,22 +1,28 @@
-import React from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
+import React from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
-    display: "flex"
+    display: "flex",
   },
   list: {
     display: "flex",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
   },
   item: {
     listStyle: "none",
-    fontFamily: theme.typography.fontFamily
+    fontFamily: theme.typography.fontFamily,
   },
 });
 
-const SearchSingleUser = ({value, path, label, classes, updateCurrentValues}: FormComponentProps<string> & {
-  classes: ClassesType,
+const SearchSingleUser = ({
+  value,
+  path,
+  label,
+  classes,
+  updateCurrentValues,
+}: FormComponentProps<string> & {
+  classes: ClassesType;
 }) => {
   return (
     <div className={classes.root}>
@@ -28,15 +34,17 @@ const SearchSingleUser = ({value, path, label, classes, updateCurrentValues}: Fo
           label={label}
         />
       </Components.ErrorBoundary>
-      {value && <Components.SingleUsersItem userId={value} removeItem={() => updateCurrentValues({ [path]: undefined}) } />}
+      {value && (
+        <Components.SingleUsersItem userId={value} removeItem={() => updateCurrentValues({ [path]: undefined })} />
+      )}
     </div>
-  )
+  );
 };
 
-const SearchSingleUserComponent = registerComponent("SearchSingleUser", SearchSingleUser, {styles});
+const SearchSingleUserComponent = registerComponent("SearchSingleUser", SearchSingleUser, { styles });
 
 declare global {
   interface ComponentTypes {
-    SearchSingleUser: typeof SearchSingleUserComponent
+    SearchSingleUser: typeof SearchSingleUserComponent;
   }
 }

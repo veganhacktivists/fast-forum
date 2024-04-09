@@ -1,5 +1,11 @@
-import { schemaDefaultValue, foreignKeyField, accessFilterSingle, accessFilterMultiple, resolverOnlyField } from '../../utils/schemaUtils';
-import { getWithCustomLoader } from '../../loaders';
+import {
+  schemaDefaultValue,
+  foreignKeyField,
+  accessFilterSingle,
+  accessFilterMultiple,
+  resolverOnlyField,
+} from "../../utils/schemaUtils";
+import { getWithCustomLoader } from "../../loaders";
 
 const schema: SchemaType<"Sequences"> = {
   userId: {
@@ -12,67 +18,64 @@ const schema: SchemaType<"Sequences"> = {
     }),
     optional: true,
     nullable: false,
-    canRead: ['guests'],
-    canCreate: ['admins'],
-    canUpdate: ['admins'],
-    control: 'text',
-    tooltip: 'The user id of the author',
+    canRead: ["guests"],
+    canCreate: ["admins"],
+    canUpdate: ["admins"],
+    control: "text",
+    tooltip: "The user id of the author",
   },
 
   title: {
     type: String,
     optional: false,
-    canRead: ['guests'],
-    canUpdate: ['members'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canUpdate: ["members"],
+    canCreate: ["members"],
     order: 10,
     placeholder: "Sequence Title",
-    control: 'EditSequenceTitle',
+    control: "EditSequenceTitle",
   },
 
   // This resolver isn't used within LessWrong AFAICT, but is used by an external API user
   chaptersDummy: {
     type: Array,
     optional: true,
-    canRead: ['guests'],
+    canRead: ["guests"],
     resolveAs: {
-      fieldName: 'chapters',
-      type: '[Chapter]',
+      fieldName: "chapters",
+      type: "[Chapter]",
       resolver: async (sequence: DbSequence, args: void, context: ResolverContext): Promise<Partial<DbChapter>[]> => {
-        const chapters = await context.Chapters.find(
-          {sequenceId: sequence._id},
-          {sort: {number: 1}},
-        ).fetch();
+        const chapters = await context.Chapters.find({ sequenceId: sequence._id }, { sort: { number: 1 } }).fetch();
         return await accessFilterMultiple(context.currentUser, context.Chapters, chapters, context);
-      }
-    }
+      },
+    },
   },
 
-  'chaptersDummy.$': {
+  "chaptersDummy.$": {
     type: String,
     foreignKey: "Chapters",
     optional: true,
   },
-  
+
   //Cloudinary image id for the grid Image
   gridImageId: {
     type: String,
     optional: true,
-    order:25,
-    canRead: ['guests'],
-    canUpdate: ['members'],
-    canCreate: ['members'],
+    order: 25,
+    canRead: ["guests"],
+    canUpdate: ["members"],
+    canCreate: ["members"],
     control: "ImageUpload",
-    label: "Card Image"
+    label: "Card Image",
   },
 
   //Cloudinary image id for the banner image (high resolution)
   bannerImageId: {
     type: String,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['members'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canUpdate: ["members"],
+    canCreate: ["members"],
     label: "Banner Image",
     control: "ImageUpload",
   },
@@ -80,25 +83,25 @@ const schema: SchemaType<"Sequences"> = {
   curatedOrder: {
     type: Number,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['admins'],
-    canCreate: ['admins'],
+    canRead: ["guests"],
+    canUpdate: ["admins"],
+    canCreate: ["admins"],
   },
 
   userProfileOrder: {
     type: Number,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
   },
 
   draft: {
     type: Boolean,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['members'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canUpdate: ["members"],
+    canCreate: ["members"],
     control: "checkbox",
     ...schemaDefaultValue(false),
   },
@@ -106,9 +109,9 @@ const schema: SchemaType<"Sequences"> = {
   isDeleted: {
     type: Boolean,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['members'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canUpdate: ["members"],
+    canCreate: ["members"],
     hidden: true,
     control: "checkbox",
     ...schemaDefaultValue(false),
@@ -121,58 +124,63 @@ const schema: SchemaType<"Sequences"> = {
       field: "slug",
     },
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['admins'],
-    canCreate: ['admins'],
+    canRead: ["guests"],
+    canUpdate: ["admins"],
+    canCreate: ["admins"],
     hidden: false,
     control: "text",
     order: 30,
     label: "Collection Slug",
-    tooltip: "The machine-readable slug for the collection this sequence belongs to. Will affect links, so don't set it unless you have the slug exactly right.",
+    tooltip:
+      "The machine-readable slug for the collection this sequence belongs to. Will affect links, so don't set it unless you have the slug exactly right.",
     resolveAs: {
-      fieldName: 'canonicalCollection',
+      fieldName: "canonicalCollection",
       addOriginalField: true,
       type: "Collection",
       // TODO: Make sure we run proper access checks on this. Using slugs means it doesn't
       // work out of the box with the id-resolver generators
-      resolver: async (sequence: DbSequence, args: void, context: ResolverContext): Promise<Partial<DbCollection>|null> => {
+      resolver: async (
+        sequence: DbSequence,
+        args: void,
+        context: ResolverContext,
+      ): Promise<Partial<DbCollection> | null> => {
         if (!sequence.canonicalCollectionSlug) return null;
-        const collection = await context.Collections.findOne({slug: sequence.canonicalCollectionSlug})
+        const collection = await context.Collections.findOne({ slug: sequence.canonicalCollectionSlug });
         return await accessFilterSingle(context.currentUser, context.Collections, collection, context);
-      }
-    }
+      },
+    },
   },
 
   hidden: {
     type: Boolean,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['admins', 'sunshineRegiment'],
-    canCreate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canUpdate: ["admins", "sunshineRegiment"],
+    canCreate: ["admins", "sunshineRegiment"],
     ...schemaDefaultValue(false),
   },
 
   hideFromAuthorPage: {
     type: Boolean,
     optional: true,
-    canRead: ['guests'],
-    canUpdate: ['members'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canUpdate: ["members"],
+    canCreate: ["members"],
     ...schemaDefaultValue(false),
   },
 
   noindex: {
     type: Boolean,
     optional: true,
-    canRead: ['guests'],
-    canCreate: ['admins', 'sunshineRegiment'],
-    canUpdate: ['admins', 'sunshineRegiment'],
+    canRead: ["guests"],
+    canCreate: ["admins", "sunshineRegiment"],
+    canUpdate: ["admins", "sunshineRegiment"],
     ...schemaDefaultValue(false),
   },
 
   postsCount: resolverOnlyField({
     type: Number,
-    canRead: ['guests'],
+    canRead: ["guests"],
     resolver: async (sequence: DbSequence, args: void, context: ResolverContext) => {
       const count = await getWithCustomLoader<number, string>(
         context,
@@ -180,25 +188,25 @@ const schema: SchemaType<"Sequences"> = {
         sequence._id,
         (sequenceIds): Promise<number[]> => {
           return context.repos.sequences.postsCount(sequenceIds);
-        }
+        },
       );
 
       return count;
-    }
+    },
   }),
 
   readPostsCount: resolverOnlyField({
     type: Number,
-    canRead: ['guests'],
+    canRead: ["guests"],
     resolver: async (sequence: DbSequence, args: void, context: ResolverContext) => {
       const currentUser = context.currentUser;
-      
+
       if (!currentUser) return 0;
 
       const createCompositeId = (sequenceId: string, userId: string) => `${sequenceId}-${userId}`;
       const splitCompositeId = (compositeId: string) => {
-        const [sequenceId, userId] = compositeId.split('-')
-        return {sequenceId, userId};
+        const [sequenceId, userId] = compositeId.split("-");
+        return { sequenceId, userId };
       };
 
       const count = await getWithCustomLoader<number, string>(
@@ -207,11 +215,11 @@ const schema: SchemaType<"Sequences"> = {
         createCompositeId(sequence._id, currentUser._id),
         (compositeIds): Promise<number[]> => {
           return context.repos.sequences.readPostsCount(compositeIds.map(splitCompositeId));
-        }
+        },
       );
 
       return count;
-    }
+    },
   }),
 
   /* Alignment Forum fields */
@@ -222,9 +230,9 @@ const schema: SchemaType<"Sequences"> = {
     nullable: false,
     label: "Alignment Forum",
     ...schemaDefaultValue(false),
-    canRead: ['guests'],
-    canUpdate: ['alignmentVoters'],
-    canCreate: ['alignmentVoters'],
+    canRead: ["guests"],
+    canUpdate: ["alignmentVoters"],
+    canCreate: ["alignmentVoters"],
   },
 };
 

@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-05-24T18:34:35.000Z by 20230524T183435.add_hidePostsRecommendations_field.ts
  * +-- Overall schema hash: 6e28f55ed0de0da2c75b4284178ba6e1
- *  
+ *
  * @@ -945,3 +943,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * --- Schema for "Users", hash: 6f8226d2c58e8bd70923fed15ffa4938
  * +-- Schema for "Users", hash: d64da8350def59cbeb640f264a7b09a4
  *  CREATE TABLE "Users" (
@@ -22,7 +22,7 @@
  *      "sortDraftsBy" text,
  * +    "reactPaletteStyle" text DEFAULT 'listView',
  *      "noKibitz" bool,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -36,11 +36,10 @@ export const acceptsSchemaHash = "6e28f55ed0de0da2c75b4284178ba6e1";
 import Users from "../../lib/collections/users/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Users, "reactPaletteStyle");
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Users, "reactPaletteStyle");
-}
-
+};

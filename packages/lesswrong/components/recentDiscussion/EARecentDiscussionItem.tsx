@@ -76,25 +76,27 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-type EARecentDiscussionItemDocument = {
-  post: PostsRecentDiscussion,
-  tag?: never,
-} | {
-  post?: never,
-  tag: TagPreviewFragment,
-};
+type EARecentDiscussionItemDocument =
+  | {
+      post: PostsRecentDiscussion;
+      tag?: never;
+    }
+  | {
+      post?: never;
+      tag: TagPreviewFragment;
+    };
 
 export type EARecentDiscussionItemProps = EARecentDiscussionItemDocument & {
-  icon: ForumIconName,
-  iconVariant: "primary" | "grey" | "green" | "givingSeason",
-  user?: UsersMinimumInfo | null,
-  action: ReactNode,
-  postTitleOverride?: string,
-  postUrlOverride?: string,
-  timestamp: Date,
-  anonymous?: boolean,
-  pageSubSectionContext?: string,
-}
+  icon: ForumIconName;
+  iconVariant: "primary" | "grey" | "green" | "givingSeason";
+  user?: UsersMinimumInfo | null;
+  action: ReactNode;
+  postTitleOverride?: string;
+  postUrlOverride?: string;
+  timestamp: Date;
+  anonymous?: boolean;
+  pageSubSectionContext?: string;
+};
 
 const EARecentDiscussionItem = ({
   icon,
@@ -111,73 +113,60 @@ const EARecentDiscussionItem = ({
   children,
   classes,
 }: EARecentDiscussionItemProps & {
-  children?: ReactNode,
-  classes: ClassesType<typeof styles>,
+  children?: ReactNode;
+  classes: ClassesType<typeof styles>;
 }) => {
-  const {
-    ForumIcon, UsersNameDisplay, FormatDate, TagTooltipWrapper,
-  } = Components;
+  const { ForumIcon, UsersNameDisplay, FormatDate, TagTooltipWrapper } = Components;
   return (
     <AnalyticsContext pageSubSectionContext={pageSubSectionContext}>
       <div className={classes.root}>
         <div className={classes.container}>
-          <div className={classNames(classes.iconContainer, {
-            [classes.iconPrimary]: iconVariant === "primary",
-            [classes.iconGrey]: iconVariant === "grey",
-            [classes.iconGreen]: iconVariant === "green",
-            [classes.iconGivingSeason]: iconVariant === "givingSeason",
-          })}>
+          <div
+            className={classNames(classes.iconContainer, {
+              [classes.iconPrimary]: iconVariant === "primary",
+              [classes.iconGrey]: iconVariant === "grey",
+              [classes.iconGreen]: iconVariant === "green",
+              [classes.iconGivingSeason]: iconVariant === "givingSeason",
+            })}
+          >
             <ForumIcon icon={icon} />
           </div>
           <div className={classes.meta}>
-            {anonymous
-              ? "Somebody"
-              : <UsersNameDisplay user={user} className={classes.primaryText} />
-            }
-            {" "}
-            {action}
-            {" "}
-            {post &&
+            {anonymous ? "Somebody" : <UsersNameDisplay user={user} className={classes.primaryText} />} {action}{" "}
+            {post && (
               <Link
                 to={postUrlOverride ?? postGetPageUrl(post)}
                 className={classes.primaryText}
-                eventProps={postUrlOverride ? undefined : {intent: 'expandPost'}}
+                eventProps={postUrlOverride ? undefined : { intent: "expandPost" }}
               >
                 {postTitleOverride ?? post.title}
               </Link>
-            }
-            {tag &&
+            )}
+            {tag && (
               <TagTooltipWrapper tag={tag} As="span">
                 <Link to={tagGetUrl(tag)} className={classes.primaryText}>
                   {tag.name}
                 </Link>
               </TagTooltipWrapper>
-            }
-            {" "}
+            )}{" "}
             <FormatDate date={timestamp} includeAgo />
           </div>
         </div>
-        {children &&
+        {children && (
           <div className={classes.container}>
             <div className={classNames(classes.iconContainer, classes.hideOnMobile)} />
-            <div className={classes.content}>
-              {children}
-            </div>
+            <div className={classes.content}>{children}</div>
           </div>
-        }
+        )}
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const EARecentDiscussionItemComponent = registerComponent(
-  "EARecentDiscussionItem",
-  EARecentDiscussionItem,
-  {styles},
-);
+const EARecentDiscussionItemComponent = registerComponent("EARecentDiscussionItem", EARecentDiscussionItem, { styles });
 
 declare global {
   interface ComponentTypes {
-    EARecentDiscussionItem: typeof EARecentDiscussionItemComponent,
+    EARecentDiscussionItem: typeof EARecentDiscussionItemComponent;
   }
 }

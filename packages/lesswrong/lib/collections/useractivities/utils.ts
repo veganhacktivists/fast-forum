@@ -1,20 +1,20 @@
 /* See lib/collections/useractivities/collection.ts for a high-level overview */
-import sum from 'lodash/sum';
+import sum from "lodash/sum";
 
 function expandActivityInfluence(input: number[], influenceHours: number): number[] {
   const output: number[] = new Array(input.length).fill(0);
-  
+
   for (let i = 0; i < input.length; i++) {
     if (input[i] === 1) {
       const start = Math.max(0, i - influenceHours);
       const end = Math.min(input.length, i + influenceHours + 1);
-      
+
       for (let j = start; j < end; j++) {
         output[j] = 1;
       }
     }
   }
-  
+
   return output;
 }
 
@@ -32,7 +32,7 @@ export const calculateActivityFactor = (activityArray: number[] | undefined, hal
 
   const expandedActivityArray: number[] = expandActivityInfluence(activityArray, 11);
   const decayConstant = Math.log(2) / halfLifeHours;
-  const rawActivityFactor = sum(expandedActivityArray.map((n, idx) => n * Math.exp(-decayConstant * idx)))
+  const rawActivityFactor = sum(expandedActivityArray.map((n, idx) => n * Math.exp(-decayConstant * idx)));
   const normalisationConstant = 1 / (1 - Math.exp(-decayConstant));
   return rawActivityFactor / normalisationConstant;
-}
+};

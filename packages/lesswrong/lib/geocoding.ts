@@ -25,10 +25,8 @@ export function pickBestReverseGeocodingResult(results: any[]) {
   const locationTypePreferenceOrdering = ["neighborhood", "postal_code", "locality", "political"];
   for (let locationType of locationTypePreferenceOrdering) {
     for (let result of results) {
-      if (result.types.indexOf(locationType) >= 0)
-        return result;
+      if (result.types.indexOf(locationType) >= 0) return result;
     }
   }
   return results[0];
 }
-

@@ -1,6 +1,6 @@
-import { registerMigration } from './migrationUtils';
+import { registerMigration } from "./migrationUtils";
 
-import { Users } from '../../lib/collections/users/collection';
+import { Users } from "../../lib/collections/users/collection";
 
 registerMigration({
   name: "petrovButtonReset",
@@ -8,11 +8,13 @@ registerMigration({
   idempotent: true,
   action: async () => {
     await Users.rawUpdateMany(
-      { petrovPressedButtonDate: {$exists:true} },
-      { $unset: {
-        petrovPressedButtonDate: 1
-      } },
-      { multi: true }
+      { petrovPressedButtonDate: { $exists: true } },
+      {
+        $unset: {
+          petrovPressedButtonDate: 1,
+        },
+      },
+      { multi: true },
     );
-  }
-})
+  },
+});

@@ -1,38 +1,35 @@
-import React from 'react';
-import { registerComponent, Components } from '../../../lib/vulcan-lib';
-import { useUpdate } from '../../../lib/crud/withUpdate';
-import { useCurrentUser } from '../../common/withUser';
-import { userCanDo } from '../../../lib/vulcan-users/permissions';
-import { preferredHeadingCase } from '../../../themes/forumTheme';
+import React from "react";
+import { registerComponent, Components } from "../../../lib/vulcan-lib";
+import { useUpdate } from "../../../lib/crud/withUpdate";
+import { useCurrentUser } from "../../common/withUser";
+import { userCanDo } from "../../../lib/vulcan-users/permissions";
+import { preferredHeadingCase } from "../../../themes/forumTheme";
 
-
-const ToggleIsModeratorCommentDropdownItem = ({comment}: {comment: CommentsList}) => {
+const ToggleIsModeratorCommentDropdownItem = ({ comment }: { comment: CommentsList }) => {
   const currentUser = useCurrentUser();
-  const {mutate: updateComment} = useUpdate({
+  const { mutate: updateComment } = useUpdate({
     collectionName: "Comments",
     fragmentName: "CommentsList",
   });
 
-  if (!currentUser || !userCanDo(currentUser, 'posts.moderate.all')) {
+  if (!currentUser || !userCanDo(currentUser, "posts.moderate.all")) {
     return null;
   }
 
-  const handleMarkAsModeratorComment = (modHatVisibility?: {
-    hideModeratorHat: boolean,
-  }) => () => {
+  const handleMarkAsModeratorComment = (modHatVisibility?: { hideModeratorHat: boolean }) => () => {
     void updateComment({
       selector: { _id: comment._id },
-      data: {moderatorHat: true, ...modHatVisibility},
+      data: { moderatorHat: true, ...modHatVisibility },
     });
-  }
+  };
   const handleUnmarkAsModeratorComment = () => {
     void updateComment({
       selector: { _id: comment._id },
-      data: {moderatorHat: false},
+      data: { moderatorHat: false },
     });
-  }
+  };
 
-  const {DropdownItem} = Components;
+  const { DropdownItem } = Components;
   if (comment.moderatorHat) {
     return (
       <DropdownItem
@@ -54,14 +51,15 @@ const ToggleIsModeratorCommentDropdownItem = ({comment}: {comment: CommentsList}
       />
     </>
   );
-}
+};
 
 const ToggleIsModeratorCommentDropdownItemComponent = registerComponent(
-  "ToggleIsModeratorCommentDropdownItem", ToggleIsModeratorCommentDropdownItem,
+  "ToggleIsModeratorCommentDropdownItem",
+  ToggleIsModeratorCommentDropdownItem,
 );
 
 declare global {
   interface ComponentTypes {
-    ToggleIsModeratorCommentDropdownItem: typeof ToggleIsModeratorCommentDropdownItemComponent
+    ToggleIsModeratorCommentDropdownItem: typeof ToggleIsModeratorCommentDropdownItemComponent;
   }
 }

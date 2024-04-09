@@ -1,9 +1,5 @@
 import { getCollection, Vulcan } from "./vulcan-lib";
-import {
-  TIME_DECAY_FACTOR,
-  getSubforumScoreBoost,
-  SCORE_BIAS,
-} from '../lib/scoring';
+import { TIME_DECAY_FACTOR, getSubforumScoreBoost, SCORE_BIAS } from "../lib/scoring";
 import { Posts } from "../lib/collections/posts";
 import { runSqlQuery } from "../lib/sql/sqlClient";
 import chunk from "lodash/chunk";
@@ -36,7 +32,7 @@ const getPgCollectionProjections = (collectionName: CollectionNameString) => {
         (CASE WHEN "curatedDate" IS NULL THEN 0 ELSE 10 END)) AS "baseScore"`;
       break;
     case "Comments":
-      const {base, magnitude, duration, exponent} = getSubforumScoreBoost();
+      const { base, magnitude, duration, exponent } = getSubforumScoreBoost();
       const ageHours = '(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP - "createdAt") / 3600)';
       proj.baseScore = `("baseScore" + (CASE WHEN "tagCommentType" = 'SUBFORUM'
         THEN GREATEST(
@@ -47,16 +43,21 @@ const getPgCollectionProjections = (collectionName: CollectionNameString) => {
       break;
   }
   return Object.values(proj);
-}
+};
 
-const getBatchItemsPg = async <N extends CollectionNameString>(collection: CollectionBase<N>, inactive: boolean, forceUpdate: boolean) => {
-  const {collectionName} = collection;
+const getBatchItemsPg = async <N extends CollectionNameString>(
+  collection: CollectionBase<N>,
+  inactive: boolean,
+  forceUpdate: boolean,
+) => {
+  const { collectionName } = collection;
   if (!["Posts", "Comments"].includes(collectionName)) {
     return [];
   }
 
   const ageHours = 'EXTRACT(EPOCH FROM CURRENT_TIMESTAMP - "postedAt") / 3600';
-  return runSqlQuery(`
+  return runSqlQuery(
+    `
     -- updateScores.getBatchItemsPg
     SELECT
       q.*,
@@ -77,52 +78,69 @@ const getBatchItemsPg = async <N extends CollectionNameString>(collection: Colle
       1.0 / POW(${ageHours} + $2, $3) AS "singleVotePower"
     ) ns
     ${forceUpdate ? "" : 'WHERE ABS("score" - ns."newScore") > ns."singleVotePower" OR NOT q."inactive"'}
-  `, [INACTIVITY_THRESHOLD_DAYS, SCORE_BIAS, TIME_DECAY_FACTOR.get()], "read");
-}
+  `,
+    [INACTIVITY_THRESHOLD_DAYS, SCORE_BIAS, TIME_DECAY_FACTOR.get()],
+    "read",
+  );
+};
 
-const getBatchItems = <N extends CollectionNameString>(collection: CollectionBase<N>, inactive: boolean, forceUpdate: boolean) => {
-  return getBatchItemsPg(collection, inactive, forceUpdate)
-}
+const getBatchItems = <N extends CollectionNameString>(
+  collection: CollectionBase<N>,
+  inactive: boolean,
+  forceUpdate: boolean,
+) => {
+  return getBatchItemsPg(collection, inactive, forceUpdate);
+};
 
-export const batchUpdateScore = async ({collection, inactive = false, forceUpdate = false}: BatchUpdateParams & { collection: CollectionBase<CollectionNameString> }) => {
+export const batchUpdateScore = async ({
+  collection,
+  inactive = false,
+  forceUpdate = false,
+}: BatchUpdateParams & { collection: CollectionBase<CollectionNameString> }) => {
   const items = await getBatchItems(collection, inactive, forceUpdate);
   let updatedDocumentsCounter = 0;
 
   const batches = chunk(items, 1000); // divide items into chunks of 1000
 
   for (let batch of batches) {
-    let itemUpdates = compact(batch.map((i: AnyBecauseTodo) => {
-      if (forceUpdate || i.scoreDiffSignificant) {
-        updatedDocumentsCounter++;
-        return {
-          updateOne: {
-            filter: {_id: i._id},
-            update: {$set: {score: i.newScore, inactive: false}},
-            upsert: false,
-          }
+    let itemUpdates = compact(
+      batch.map((i: AnyBecauseTodo) => {
+        if (forceUpdate || i.scoreDiffSignificant) {
+          updatedDocumentsCounter++;
+          return {
+            updateOne: {
+              filter: { _id: i._id },
+              update: { $set: { score: i.newScore, inactive: false } },
+              upsert: false,
+            },
+          };
+        } else if (i.oldEnough && !i.inactive) {
+          // only set a post as inactive if it's older than n days
+          return {
+            updateOne: {
+              filter: { _id: i._id },
+              update: { $set: { inactive: true } },
+              upsert: false,
+            },
+          };
         }
-      } else if (i.oldEnough && !i.inactive) {
-        // only set a post as inactive if it's older than n days
-        return {
-          updateOne: {
-            filter: {_id: i._id},
-            update: {$set: {inactive: true}},
-            upsert: false,
-          }
-        }
-      }
-    }));
+      }),
+    );
 
     if (itemUpdates && itemUpdates.length) {
-      await collection.rawCollection().bulkWrite(itemUpdates, {ordered: false});
+      await collection.rawCollection().bulkWrite(itemUpdates, { ordered: false });
     }
   }
   return updatedDocumentsCounter;
-}
+};
 
-export const batchUpdateScoreByName = ({collectionName, inactive = false, forceUpdate = false}: BatchUpdateParams & { collectionName: CollectionNameString }) => {
+export const batchUpdateScoreByName = ({
+  collectionName,
+  inactive = false,
+  forceUpdate = false,
+}: BatchUpdateParams & { collectionName: CollectionNameString }) => {
   const collection = getCollection(collectionName);
-  return batchUpdateScore({collection, inactive, forceUpdate});
-}
+  return batchUpdateScore({ collection, inactive, forceUpdate });
+};
 
 Vulcan.batchUpdateScoreByName = batchUpdateScoreByName;

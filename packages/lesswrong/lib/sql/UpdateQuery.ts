@@ -4,13 +4,13 @@ import SelectQuery from "./SelectQuery";
 import { JsonType, Type } from "./Type";
 
 export type UpdateOptions = Partial<{
-  limit: number,
-  returnUpdated: boolean,
-}>
+  limit: number;
+  returnUpdated: boolean;
+}>;
 
 interface CompileUpdateExpressionOptions {
-  skipTypeHint?: boolean,
-  jsonType?: JsonType
+  skipTypeHint?: boolean;
+  jsonType?: JsonType;
 }
 
 /**
@@ -63,10 +63,10 @@ class UpdateQuery<T extends DbObject> extends Query<T> {
     this.atoms = this.atoms.concat(compiledUpdates.slice(1));
 
     if (typeof selector === "string") {
-      selector = {_id: selector};
+      selector = { _id: selector };
     }
 
-    const {limit, returnUpdated} = updateOptions ?? {};
+    const { limit, returnUpdated } = updateOptions ?? {};
 
     if (selector && Object.keys(selector).length > 0) {
       this.atoms.push("WHERE");
@@ -74,14 +74,14 @@ class UpdateQuery<T extends DbObject> extends Query<T> {
       if (limit) {
         this.atoms = this.atoms.concat([
           "_id IN",
-          new SelectQuery(table, selector, {limit, projection: {_id: 1}}, {forUpdate: true}),
+          new SelectQuery(table, selector, { limit, projection: { _id: 1 } }, { forUpdate: true }),
         ]);
       } else {
         this.appendSelector(selector);
       }
     } else if (limit) {
       this.atoms = this.atoms.concat([
-        "WHERE _id IN ( SELECT \"_id\" FROM",
+        'WHERE _id IN ( SELECT "_id" FROM',
         table,
         "LIMIT",
         this.createArg(limit),
@@ -97,20 +97,37 @@ class UpdateQuery<T extends DbObject> extends Query<T> {
   }
 
   private compileSetFields(sets: Partial<Record<keyof T, any>>): Atom<T>[] {
-    const format = (resolvedField: string, updateValue: Atom<T>[]): Atom<T>[] =>
-      [",", resolvedField, "=", ...updateValue];
+    const format = (resolvedField: string, updateValue: Atom<T>[]): Atom<T>[] => [
+      ",",
+      resolvedField,
+      "=",
+      ...updateValue,
+    ];
     return this.compileUpdateFields(sets, format);
   }
 
   private compilePushFields(pushes: Partial<Record<keyof T, any>>): Atom<T>[] {
-    const format = (resolvedField: string, updateValue: Atom<T>[]): Atom<T>[] =>
-      [",", resolvedField, "= ARRAY_APPEND(", resolvedField, ",",  ...updateValue, ")"];
+    const format = (resolvedField: string, updateValue: Atom<T>[]): Atom<T>[] => [
+      ",",
+      resolvedField,
+      "= ARRAY_APPEND(",
+      resolvedField,
+      ",",
+      ...updateValue,
+      ")",
+    ];
     return this.compileUpdateFields(pushes, format);
   }
 
   private compileIncFields(incs: Partial<Record<keyof T, any>>): Atom<T>[] {
-    const format = (resolvedField: string, updateValue: Atom<T>[]): Atom<T>[] =>
-      [",", resolvedField, "= COALESCE(", resolvedField, ", 0 ) +",  ...updateValue];
+    const format = (resolvedField: string, updateValue: Atom<T>[]): Atom<T>[] => [
+      ",",
+      resolvedField,
+      "= COALESCE(",
+      resolvedField,
+      ", 0 ) +",
+      ...updateValue,
+    ];
     return this.compileUpdateFields(incs, format);
   }
 
@@ -132,7 +149,7 @@ class UpdateQuery<T extends DbObject> extends Query<T> {
     let jsonUpdates: Atom<T>[] = [];
 
     for (const jsonUpdate of Object.keys(jsonArrays)) {
-      const {column, path} = this.buildJsonUpdatePath(jsonUpdate);
+      const { column, path } = this.buildJsonUpdatePath(jsonUpdate);
       const updateValue = this.compileUpdateExpression((jsonArrays as AnyBecauseTodo)[jsonUpdate]);
       jsonUpdates = jsonUpdates.concat(
         ",",
@@ -147,19 +164,25 @@ class UpdateQuery<T extends DbObject> extends Query<T> {
       );
     }
 
-    const format = (resolvedField: string, updateValue: Atom<T>[]): Atom<T>[] =>
-      [",", resolvedField, "= fm_add_to_set(", resolvedField, ",",  ...updateValue, ")"];
-    return [
-      ...jsonUpdates,
-      ...this.compileUpdateFields(nativeArrays, format),
+    const format = (resolvedField: string, updateValue: Atom<T>[]): Atom<T>[] => [
+      ",",
+      resolvedField,
+      "= fm_add_to_set(",
+      resolvedField,
+      ",",
+      ...updateValue,
+      ")",
     ];
+    return [...jsonUpdates, ...this.compileUpdateFields(nativeArrays, format)];
   }
 
   private compileUpdateFields(
     updates: Partial<Record<keyof T, any>>,
     format: (resolvedField: string, updateValue: Atom<T>[]) => Atom<T>[],
   ): Atom<T>[] {
-    return Object.keys(updates).flatMap((field) => this.compileUpdateField(field, (updates as AnyBecauseTodo)[field], format));
+    return Object.keys(updates).flatMap((field) =>
+      this.compileUpdateField(field, (updates as AnyBecauseTodo)[field], format),
+    );
   }
 
   private compileUpdateField(
@@ -172,22 +195,20 @@ class UpdateQuery<T extends DbObject> extends Query<T> {
       // it then we need to wrap the update in a call to `JSONB_SET`.
       if (field.includes(".")) {
         const updateValue = this.compileUpdateExpression(value, { skipTypeHint: true });
-        const {column, path} = this.buildJsonUpdatePath(field);
-        return format(
-          column,
-          ["JSONB_SET(", column, ",", path, "::TEXT[],", ...updateValue, ", TRUE)"],
-        );
+        const { column, path } = this.buildJsonUpdatePath(field);
+        return format(column, ["JSONB_SET(", column, ",", path, "::TEXT[],", ...updateValue, ", TRUE)"]);
       }
-  
+
       const fieldType = this.getField(field);
-      const arrayValueInNonArrayJsonbField = fieldType && !fieldType.isArray() && fieldType.toConcrete() instanceof JsonType && Array.isArray(value);
+      const arrayValueInNonArrayJsonbField =
+        fieldType && !fieldType.isArray() && fieldType.toConcrete() instanceof JsonType && Array.isArray(value);
       const typeForArg = arrayValueInNonArrayJsonbField ? new JsonType() : undefined;
       const updateValue = this.compileUpdateExpression(value, { jsonType: typeForArg });
       const resolvedField = this.resolveFieldName(field);
       return format(resolvedField, updateValue);
     } catch (e) {
       // @ts-ignore
-      throw new Error(`Field "${field}" is not recognized - is it missing from the schema?`, {cause: e});
+      throw new Error(`Field "${field}" is not recognized - is it missing from the schema?`, { cause: e });
     }
   }
 
@@ -201,7 +222,7 @@ class UpdateQuery<T extends DbObject> extends Query<T> {
         arg.typehint = this.getTypeHint(value);
       }
       if (skipTypeHint) {
-        arg.typehint = "" 
+        arg.typehint = "";
       }
       return [arg];
     }

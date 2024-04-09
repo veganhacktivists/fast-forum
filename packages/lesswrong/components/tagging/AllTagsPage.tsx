@@ -1,22 +1,26 @@
-import React, { useState } from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import { useTagBySlug } from './useTag';
-import { EditTagForm } from './EditTagPage';
-import { userCanEditTagPortal } from '../../lib/betas'
-import { useCurrentUser } from '../common/withUser';
+import React, { useState } from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import { useTagBySlug } from "./useTag";
+import { EditTagForm } from "./EditTagPage";
+import { userCanEditTagPortal } from "../../lib/betas";
+import { useCurrentUser } from "../common/withUser";
 import { AnalyticsContext } from "../../lib/analyticsEvents";
-import { Link } from '../../lib/reactRouterWrapper';
-import AddBoxIcon from '@material-ui/icons/AddBox';
-import { useDialog } from '../common/withDialog';
-import { taggingNameCapitalSetting, taggingNameIsSet, taggingNamePluralCapitalSetting, taggingNamePluralSetting } from '../../lib/instanceSettings';
-import { forumSelect } from '../../lib/forumTypeUtils';
-import { tagCreateUrl, tagUserHasSufficientKarma } from '../../lib/collections/tags/helpers';
+import { Link } from "../../lib/reactRouterWrapper";
+import AddBoxIcon from "@material-ui/icons/AddBox";
+import { useDialog } from "../common/withDialog";
+import {
+  taggingNameCapitalSetting,
+  taggingNameIsSet,
+  taggingNamePluralCapitalSetting,
+  taggingNamePluralSetting,
+} from "../../lib/instanceSettings";
+import { forumSelect } from "../../lib/forumTypeUtils";
+import { tagCreateUrl, tagUserHasSufficientKarma } from "../../lib/collections/tags/helpers";
 
 const styles = (theme: ThemeType): JssStyles => ({
-  root: {
-  },
+  root: {},
   topSection: {
-    marginBottom: theme.spacing.unit*8
+    marginBottom: theme.spacing.unit * 8,
   },
   alphabetical: {
     columns: 5,
@@ -24,18 +28,18 @@ const styles = (theme: ThemeType): JssStyles => ({
     columnGap: 0,
     background: theme.palette.panelBackground.default,
     padding: 20,
-    marginBottom: 24
+    marginBottom: 24,
   },
   portal: {
     marginBottom: 18,
     position: "relative",
-    [theme.breakpoints.down('xs')]: {
-      '& td': {
-        display: 'block',
-        width: '100% !important',
-        height: 'inherit !important'
-      }
-    }
+    [theme.breakpoints.down("xs")]: {
+      "& td": {
+        display: "block",
+        width: "100% !important",
+        height: "inherit !important",
+      },
+    },
   },
   edit: {
     float: "right",
@@ -45,30 +49,36 @@ const styles = (theme: ThemeType): JssStyles => ({
   addTagButton: {
     verticalAlign: "middle",
   },
-})
+});
 
-
-const AllTagsPage = ({classes}: {
-  classes: ClassesType,
-}) => {
-  const { openDialog } = useDialog()
-  const currentUser = useCurrentUser()
+const AllTagsPage = ({ classes }: { classes: ClassesType }) => {
+  const { openDialog } = useDialog();
+  const currentUser = useCurrentUser();
   const { tag } = useTagBySlug("portal", "AllTagsPageFragment");
-  const [ editing, setEditing ] = useState(false)
+  const [editing, setEditing] = useState(false);
 
-  const { AllTagsAlphabetical, SectionButton, SectionTitle, ContentItemBody, ContentStyles, ToCColumn, TagTableOfContents, Loading } = Components;
+  const {
+    AllTagsAlphabetical,
+    SectionButton,
+    SectionTitle,
+    ContentItemBody,
+    ContentStyles,
+    ToCColumn,
+    TagTableOfContents,
+    Loading,
+  } = Components;
 
   let sectionTitle = forumSelect({
-    EAForum: 'FAST Forum Wiki',
-    default: 'Concepts Portal'
-  })
+    EAForum: "FAST Forum Wiki",
+    default: "Concepts Portal",
+  });
   if (taggingNameIsSet.get()) {
     sectionTitle = forumSelect({
       EAForum: `FAST Forum ${taggingNamePluralCapitalSetting.get()} Wiki`,
-      default: `${taggingNamePluralCapitalSetting.get()} Portal`
-    })
+      default: `${taggingNamePluralCapitalSetting.get()} Portal`,
+    });
   }
-  
+
   const htmlWithAnchors = tag?.tableOfContents?.html || tag?.description?.html || "";
 
   return (
@@ -77,60 +87,76 @@ const AllTagsPage = ({classes}: {
         <div className={classes.topSection}>
           <AnalyticsContext pageSectionContext="tagPortal">
             <ToCColumn
-              tableOfContents={tag ? <TagTableOfContents
-                tag={tag} showContributors={false}
-                displayOptions={{
-                  addedRows: [
-                    {
-                      title: `All ${taggingNamePluralCapitalSetting.get()}`,
-                      anchor: `all-${taggingNamePluralSetting.get()}`,
-                      level: 0,
-                    },
-                  ],
-                  ...forumSelect({
-                    // Changes to ToC presentation that're specific to the content on LW's version of the Concepts page
-                    LessWrong: {
-                      downcaseAllCapsHeadings: true,
-                      maxHeadingDepth: 1,
-                    },
-                    default: undefined,
-                  })
-                }}
-              /> : <div/>}
-              header={<SectionTitle title={sectionTitle}>
-                <SectionButton>
-                  {currentUser && tagUserHasSufficientKarma(currentUser, "new") && <Link
-                    to={tagCreateUrl}
-                  >
-                    <AddBoxIcon className={classes.addTagButton}/>
-                    New {taggingNameCapitalSetting.get()}
-                  </Link>}
-                  {!currentUser && <a onClick={(ev) => {
-                    openDialog({
-                      componentName: "LoginPopup",
-                      componentProps: {}
-                    });
-                    ev.preventDefault();
-                  }}>
-                    <AddBoxIcon className={classes.addTagButton}/>
-                    New {taggingNameCapitalSetting.get()}
-                  </a>}
-                </SectionButton>
-              </SectionTitle>}
+              tableOfContents={
+                tag ? (
+                  <TagTableOfContents
+                    tag={tag}
+                    showContributors={false}
+                    displayOptions={{
+                      addedRows: [
+                        {
+                          title: `All ${taggingNamePluralCapitalSetting.get()}`,
+                          anchor: `all-${taggingNamePluralSetting.get()}`,
+                          level: 0,
+                        },
+                      ],
+                      ...forumSelect({
+                        // Changes to ToC presentation that're specific to the content on LW's version of the Concepts page
+                        LessWrong: {
+                          downcaseAllCapsHeadings: true,
+                          maxHeadingDepth: 1,
+                        },
+                        default: undefined,
+                      }),
+                    }}
+                  />
+                ) : (
+                  <div />
+                )
+              }
+              header={
+                <SectionTitle title={sectionTitle}>
+                  <SectionButton>
+                    {currentUser && tagUserHasSufficientKarma(currentUser, "new") && (
+                      <Link to={tagCreateUrl}>
+                        <AddBoxIcon className={classes.addTagButton} />
+                        New {taggingNameCapitalSetting.get()}
+                      </Link>
+                    )}
+                    {!currentUser && (
+                      <a
+                        onClick={(ev) => {
+                          openDialog({
+                            componentName: "LoginPopup",
+                            componentProps: {},
+                          });
+                          ev.preventDefault();
+                        }}
+                      >
+                        <AddBoxIcon className={classes.addTagButton} />
+                        New {taggingNameCapitalSetting.get()}
+                      </a>
+                    )}
+                  </SectionButton>
+                </SectionTitle>
+              }
             >
               <ContentStyles contentType="comment" className={classes.portal}>
-                {!tag && <Loading/>}
-                {userCanEditTagPortal(currentUser) && <a onClick={() => setEditing(true)} className={classes.edit}>
-                  Edit
-                </a>}
-                {editing && tag ?
-                  <EditTagForm tag={tag} successCallback={()=>setEditing(false)}/>
-                  :
+                {!tag && <Loading />}
+                {userCanEditTagPortal(currentUser) && (
+                  <a onClick={() => setEditing(true)} className={classes.edit}>
+                    Edit
+                  </a>
+                )}
+                {editing && tag ? (
+                  <EditTagForm tag={tag} successCallback={() => setEditing(false)} />
+                ) : (
                   <ContentItemBody
-                    dangerouslySetInnerHTML={{__html: htmlWithAnchors}}
-                    description={`tag ${tag?.name}`} noHoverPreviewPrefetch
+                    dangerouslySetInnerHTML={{ __html: htmlWithAnchors }}
+                    description={`tag ${tag?.name}`}
+                    noHoverPreviewPrefetch
                   />
-                }
+                )}
               </ContentStyles>
               <AnalyticsContext pageSectionContext="allTagsAlphabetical">
                 <AllTagsAlphabetical />
@@ -141,12 +167,12 @@ const AllTagsPage = ({classes}: {
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const AllTagsPageComponent = registerComponent("AllTagsPage", AllTagsPage, {styles});
+const AllTagsPageComponent = registerComponent("AllTagsPage", AllTagsPage, { styles });
 
 declare global {
   interface ComponentTypes {
-    AllTagsPage: typeof AllTagsPageComponent
+    AllTagsPage: typeof AllTagsPageComponent;
   }
 }

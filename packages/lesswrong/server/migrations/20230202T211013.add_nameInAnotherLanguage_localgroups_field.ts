@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-02-01T15:58:39.000Z by 20230201T155839.add_importAsDraft_field.ts
  * +-- Overall schema hash: df6daf9edd46c15e6eb9a3862852ae85
- *  
+ *
  * @@ -311,3 +309,3 @@ CREATE TABLE "LegacyData" (
- *  
+ *
  * --- Schema for "Localgroups", hash: 0cad75cd4e4327d68d37f6a649cbd92c
  * +-- Schema for "Localgroups", hash: ceb5bb8e5888f0ed3be16247c77cc701
  *  CREATE TABLE "Localgroups" (
@@ -22,7 +22,7 @@
  *      "name" text,
  * +    "nameInAnotherLanguage" text,
  *      "organizerIds" varchar(27)[] DEFAULT '{}' ::varchar(27)[],
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -36,12 +36,12 @@ export const acceptsSchemaHash = "df6daf9edd46c15e6eb9a3862852ae85";
 import Localgroups from "../../lib/collections/localgroups/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Localgroups, "nameInAnotherLanguage");
   await addField(db, Localgroups, "salesforceId");
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Localgroups, "nameInAnotherLanguage");
   await dropField(db, Localgroups, "salesforceId");
-}
+};

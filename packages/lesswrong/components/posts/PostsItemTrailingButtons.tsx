@@ -15,16 +15,12 @@ const restoreDraftTooltip = "Restore this draft (include in your main draft list
 
 type DismissButtonProps = Pick<UsePostsItem, "showDismissButton" | "onDismiss">;
 
-export const DismissButton: FC<DismissButtonProps> = ({
-  showDismissButton,
-  onDismiss,
-}) => showDismissButton
-  ? (
+export const DismissButton: FC<DismissButtonProps> = ({ showDismissButton, onDismiss }) =>
+  showDismissButton ? (
     <Components.LWTooltip title={dismissRecommendationTooltip} placement="right">
       <CloseIcon onClick={onDismiss} />
     </Components.LWTooltip>
-  )
-  : null;
+  ) : null;
 
 const styles = (theme: ThemeType): JssStyles => ({
   actions: {
@@ -38,7 +34,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     cursor: "pointer",
     alignItems: "center",
     justifyContent: "center",
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       display: "none",
     },
   },
@@ -47,13 +43,13 @@ const styles = (theme: ThemeType): JssStyles => ({
     display: "flex",
     position: "absolute",
     top: 1,
-    right: -3*MENU_WIDTH,
+    right: -3 * MENU_WIDTH,
     width: MENU_WIDTH,
     height: "100%",
     cursor: "pointer",
     alignItems: "center",
     justifyContent: "center",
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       display: "none",
     },
   },
@@ -61,15 +57,15 @@ const styles = (theme: ThemeType): JssStyles => ({
 
 type PostsItemTrailingButtonsProps = Pick<
   UsePostsItem,
-  "post" |
-  "showTrailingButtons" |
-  "showMostValuableCheckbox" |
-  "showDismissButton" |
-  "showArchiveButton" |
-  "resumeReading" |
-  "onDismiss" |
-  "onArchive"
-> & {classes: ClassesType};
+  | "post"
+  | "showTrailingButtons"
+  | "showMostValuableCheckbox"
+  | "showDismissButton"
+  | "showArchiveButton"
+  | "resumeReading"
+  | "onDismiss"
+  | "onArchive"
+> & { classes: ClassesType };
 
 const PostsItemTrailingButtons = ({
   post,
@@ -82,41 +78,44 @@ const PostsItemTrailingButtons = ({
   onArchive,
   classes,
 }: PostsItemTrailingButtonsProps) => {
-  const currentUser = useCurrentUser()
+  const currentUser = useCurrentUser();
   if (!showTrailingButtons || showMostValuableCheckbox) {
     return null;
   }
 
-  const {LWTooltip, PostActionsButton} = Components;
+  const { LWTooltip, PostActionsButton } = Components;
 
   return (
     <>
-      {(showDismissButton || resumeReading || isBookUI) && <div className={classes.actions}>
-        <DismissButton {...{showDismissButton, onDismiss}} />
-        {isBookUI && !resumeReading && currentUser && <PostActionsButton post={post} vertical />}
-      </div>}
-      {showArchiveButton && <div className={classes.archiveButton}>
-        { post.deletedDraft ?
+      {(showDismissButton || resumeReading || isBookUI) && (
+        <div className={classes.actions}>
+          <DismissButton {...{ showDismissButton, onDismiss }} />
+          {isBookUI && !resumeReading && currentUser && <PostActionsButton post={post} vertical />}
+        </div>
+      )}
+      {showArchiveButton && (
+        <div className={classes.archiveButton}>
+          {post.deletedDraft ? (
             <LWTooltip title={restoreDraftTooltip} placement="right">
               <UnarchiveIcon onClick={onArchive} />
-            </LWTooltip> :
+            </LWTooltip>
+          ) : (
             <LWTooltip title={archiveDraftTooltip} placement="right">
               <ArchiveIcon onClick={onArchive} />
             </LWTooltip>
-        }
-      </div>}
+          )}
+        </div>
+      )}
     </>
   );
-}
+};
 
-const PostsItemTrailingButtonsComponent = registerComponent(
-  "PostsItemTrailingButtons",
-  PostsItemTrailingButtons,
-  {styles},
-);
+const PostsItemTrailingButtonsComponent = registerComponent("PostsItemTrailingButtons", PostsItemTrailingButtons, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    PostsItemTrailingButtons: typeof PostsItemTrailingButtonsComponent
+    PostsItemTrailingButtons: typeof PostsItemTrailingButtonsComponent;
   }
 }

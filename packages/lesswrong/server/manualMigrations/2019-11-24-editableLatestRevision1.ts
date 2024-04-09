@@ -1,7 +1,7 @@
-import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
-import { getCollection } from '../../lib/vulcan-lib';
-import { editableCollections, editableCollectionsFields } from '../../lib/editor/make_editable';
-import { Revisions } from '../../lib/collections/revisions/collection';
+import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
+import { getCollection } from "../../lib/vulcan-lib";
+import { editableCollections, editableCollectionsFields } from "../../lib/editor/make_editable";
+import { Revisions } from "../../lib/collections/revisions/collection";
 
 // The upgrade procedure here is:
 //  1. Attach an instance to the database and run editableAddLatestRevisionField.
@@ -21,56 +21,59 @@ registerMigration({
   idempotent: true,
   action: async () => {
     for (let collectionName of editableCollections)
-    for (let fieldName of editableCollectionsFields[collectionName]!)
-    {
-      const collection = getCollection(collectionName);
-      // eslint-disable-next-line no-console
-      console.log(`Updating ${collectionName}.${fieldName}_latest`);
-      await forEachDocumentBatchInCollection({
-        collection: collection,
-        filter: {
-          [fieldName]: {$exists: true},
-          [`${fieldName}_latest`]: {$exists: false},
-        },
-        batchSize: 1000,
-        callback: async (documents: any[]) => {
-          const updates: Array<any> = [];
-          await Promise.all(
-            documents.map(async doc => {
-              if (doc[fieldName]) {
-                const latestRev = await Revisions.findOne({
-                  documentId: doc._id,
-                  fieldName: fieldName,
-                  version: doc[fieldName].version,
-                }, {}, {_id: 1});
-                if (latestRev) {
-                  updates.push({
-                    updateOne: {
-                      filter: { _id: doc._id },
-                      update: {
-                        $set: {
-                          [`${fieldName}_latest`]: latestRev._id
-                        }
-                      }
-                    }
-                  });
-                } else {
-                  // eslint-disable-next-line no-console
-                  console.log(`Warning: document is missing its corresponding revision object`);
+      for (let fieldName of editableCollectionsFields[collectionName]!) {
+        const collection = getCollection(collectionName);
+        // eslint-disable-next-line no-console
+        console.log(`Updating ${collectionName}.${fieldName}_latest`);
+        await forEachDocumentBatchInCollection({
+          collection: collection,
+          filter: {
+            [fieldName]: { $exists: true },
+            [`${fieldName}_latest`]: { $exists: false },
+          },
+          batchSize: 1000,
+          callback: async (documents: any[]) => {
+            const updates: Array<any> = [];
+            await Promise.all(
+              documents.map(async (doc) => {
+                if (doc[fieldName]) {
+                  const latestRev = await Revisions.findOne(
+                    {
+                      documentId: doc._id,
+                      fieldName: fieldName,
+                      version: doc[fieldName].version,
+                    },
+                    {},
+                    { _id: 1 },
+                  );
+                  if (latestRev) {
+                    updates.push({
+                      updateOne: {
+                        filter: { _id: doc._id },
+                        update: {
+                          $set: {
+                            [`${fieldName}_latest`]: latestRev._id,
+                          },
+                        },
+                      },
+                    });
+                  } else {
+                    // eslint-disable-next-line no-console
+                    console.log(`Warning: document is missing its corresponding revision object`);
+                  }
                 }
-              }
-            })
-          );
-          
-          if (updates.length > 0) {
-            // eslint-disable-next-line no-console
-            console.log(`Updating ${updates.length} documents in ${collectionName}`);
-            await collection.rawCollection().bulkWrite(updates, { ordered: false });
-          }
-        }
-      });
-    }
-  }
+              }),
+            );
+
+            if (updates.length > 0) {
+              // eslint-disable-next-line no-console
+              console.log(`Updating ${updates.length} documents in ${collectionName}`);
+              await collection.rawCollection().bulkWrite(updates, { ordered: false });
+            }
+          },
+        });
+      }
+  },
 });
 
 /*registerMigration({

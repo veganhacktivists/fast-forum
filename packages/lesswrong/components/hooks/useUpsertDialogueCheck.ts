@@ -1,7 +1,7 @@
-import { useMutation, gql } from '@apollo/client';
-import { getFragmentText } from '../../lib/vulcan-lib';
-import { randomId } from '../../lib/random';
-import {useCurrentUser} from '../common/withUser';
+import { useMutation, gql } from "@apollo/client";
+import { getFragmentText } from "../../lib/vulcan-lib";
+import { randomId } from "../../lib/random";
+import { useCurrentUser } from "../common/withUser";
 
 interface UpsertDialogueCheckArgs {
   targetUserId: string;
@@ -16,15 +16,24 @@ export const useUpsertDialogueCheck = () => {
 
   const [upsertDialogueCheck] = useMutation(gql`
     mutation upsertUserDialogueCheck($targetUserId: String!, $checked: Boolean, $hideInRecommendations: Boolean) {
-      upsertUserDialogueCheck(targetUserId: $targetUserId, checked: $checked, hideInRecommendations: $hideInRecommendations) {
+      upsertUserDialogueCheck(
+        targetUserId: $targetUserId
+        checked: $checked
+        hideInRecommendations: $hideInRecommendations
+      ) {
         ...DialogueCheckInfo
       }
     }
-    ${getFragmentText('DialogueCheckInfo')}
-    ${getFragmentText('DialogueMatchPreferencesDefaultFragment')}
+    ${getFragmentText("DialogueCheckInfo")}
+    ${getFragmentText("DialogueMatchPreferencesDefaultFragment")}
   `);
 
-  const upsert = async ({ targetUserId, checked = null, hideInRecommendations = null, checkId }: UpsertDialogueCheckArgs) => {
+  const upsert = async ({
+    targetUserId,
+    checked = null,
+    hideInRecommendations = null,
+    checkId,
+  }: UpsertDialogueCheckArgs) => {
     if (typeof checked === typeof hideInRecommendations) {
       throw new Error("Exactly one of checked or hideInRecommendations must be provided");
     }
@@ -33,7 +42,7 @@ export const useUpsertDialogueCheck = () => {
       variables: {
         targetUserId,
         checked,
-        hideInRecommendations
+        hideInRecommendations,
       },
       update(cache, { data }) {
         if (!checkId) {
@@ -43,24 +52,24 @@ export const useUpsertDialogueCheck = () => {
                 const newCheckRef = cache.writeFragment({
                   data: data.upsertUserDialogueCheck,
                   fragment: gql`
-                    ${getFragmentText('DialogueCheckInfo')}
-                    ${getFragmentText('DialogueMatchPreferencesDefaultFragment')}
+                    ${getFragmentText("DialogueCheckInfo")}
+                    ${getFragmentText("DialogueMatchPreferencesDefaultFragment")}
                   `,
-                  fragmentName: 'DialogueCheckInfo'
+                  fragmentName: "DialogueCheckInfo",
                 });
                 return {
                   ...existingChecksRef,
-                  results: [...existingChecksRef.results, newCheckRef]
-                }
-              }
-            }
+                  results: [...existingChecksRef.results, newCheckRef],
+                };
+              },
+            },
           });
         }
       },
       optimisticResponse: {
         upsertUserDialogueCheck: {
           _id: checkId ?? randomId(),
-          __typename: 'DialogueCheck',
+          __typename: "DialogueCheck",
           userId: currentUserId,
           targetUserId,
           checked: checked,
@@ -68,9 +77,9 @@ export const useUpsertDialogueCheck = () => {
           hideInRecommendations: hideInRecommendations,
           match: false,
           matchPreference: null,
-          reciprocalMatchPreference: null
-        }
-      }
+          reciprocalMatchPreference: null,
+        },
+      },
     });
 
     return response;

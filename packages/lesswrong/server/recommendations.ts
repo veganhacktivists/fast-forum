@@ -1,67 +1,71 @@
-import * as _ from 'underscore';
-import { Posts } from '../lib/collections/posts/collection';
-import { Sequences } from '../lib/collections/sequences/collection';
-import { Collections } from '../lib/collections/collections/collection';
-import { ensureIndex } from '../lib/collectionIndexUtils';
-import { accessFilterSingle, accessFilterMultiple } from '../lib/utils/schemaUtils';
-import { setUserPartiallyReadSequences } from './partiallyReadSequences';
-import { addGraphQLMutation, addGraphQLQuery, addGraphQLResolvers, addGraphQLSchema } from './vulcan-lib';
-import { WeightedList } from './weightedList';
+import * as _ from "underscore";
+import { Posts } from "../lib/collections/posts/collection";
+import { Sequences } from "../lib/collections/sequences/collection";
+import { Collections } from "../lib/collections/collections/collection";
+import { ensureIndex } from "../lib/collectionIndexUtils";
+import { accessFilterSingle, accessFilterMultiple } from "../lib/utils/schemaUtils";
+import { setUserPartiallyReadSequences } from "./partiallyReadSequences";
+import { addGraphQLMutation, addGraphQLQuery, addGraphQLResolvers, addGraphQLSchema } from "./vulcan-lib";
+import { WeightedList } from "./weightedList";
 import {
   DefaultRecommendationsAlgorithm,
   RecommendationsAlgorithm,
   recommendationsAlgorithmHasStrategy,
-} from '../lib/collections/users/recommendationSettings';
-import { isEAForum } from '../lib/instanceSettings';
+} from "../lib/collections/users/recommendationSettings";
+import { isEAForum } from "../lib/instanceSettings";
 import SelectQuery from "../lib/sql/SelectQuery";
-import { getPositiveVoteThreshold } from '../lib/reviewUtils';
-import { getDefaultViewSelector } from '../lib/utils/viewUtils';
-import { EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID } from '../lib/collections/tags/collection';
-import RecommendationService from './recommendations/RecommendationService';
-import PgCollection from '../lib/sql/PgCollection';
+import { getPositiveVoteThreshold } from "../lib/reviewUtils";
+import { getDefaultViewSelector } from "../lib/utils/viewUtils";
+import { EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID } from "../lib/collections/tags/collection";
+import RecommendationService from "./recommendations/RecommendationService";
+import PgCollection from "../lib/sql/PgCollection";
 
-const MINIMUM_BASE_SCORE = 50
+const MINIMUM_BASE_SCORE = 50;
 
 // The set of fields on Posts which are used for deciding which posts to
 // recommend. Fields other than these will be projected out before downloading
 // from the database.
-const scoreRelevantFields = {_id:1, baseScore:1, curatedDate:1, frontpageDate:1, defaultRecommendation: 1};
-
+const scoreRelevantFields = { _id: 1, baseScore: 1, curatedDate: 1, frontpageDate: 1, defaultRecommendation: 1 };
 
 // Returns part of a mongodb aggregate pipeline, which will join against the
 // ReadStatuses collection and filter out any posts which have been read by the
 // current user. Returns as an array, so you can spread this into a pipeline
 // with ...pipelineFilterUnread(currentUser). If currentUser is null, returns
 // an empty array (no aggregation pipeline stages), so all posts are included.
-const pipelineFilterUnread = ({currentUser}: {
-  currentUser: DbUser|null
-}) => {
-  if (!currentUser)
-    return [];
+const pipelineFilterUnread = ({ currentUser }: { currentUser: DbUser | null }) => {
+  if (!currentUser) return [];
 
   return [
-    { $lookup: {
-      from: "readstatuses",
-      let: { documentId: "$_id", },
-      pipeline: [
-        { $match: {
-          userId: currentUser._id,
-        } },
-        { $match: { $expr: {
-          $and: [
-            {$eq: ["$postId", "$$documentId"]},
-          ]
-        } } },
-        { $limit: 1},
-      ],
-      as: "views",
-    } },
+    {
+      $lookup: {
+        from: "readstatuses",
+        let: { documentId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              userId: currentUser._id,
+            },
+          },
+          {
+            $match: {
+              $expr: {
+                $and: [{ $eq: ["$postId", "$$documentId"] }],
+              },
+            },
+          },
+          { $limit: 1 },
+        ],
+        as: "views",
+      },
+    },
 
-    { $match: {
-      "views": {$size:0}
-    } },
+    {
+      $match: {
+        views: { $size: 0 },
+      },
+    },
   ];
-}
+};
 
 // Given an algorithm with a set of inclusion criteria, return a mongoDB
 // selector that only allows the included posts
@@ -77,63 +81,68 @@ const pipelineFilterUnread = ({currentUser}: {
 const getInclusionSelector = (algorithm: DefaultRecommendationsAlgorithm) => {
   if (algorithm.coronavirus) {
     return {
-      ["tagRelevance.tNsqhzTibgGJKPEWB"]: {$gte: 1},
-      question: true
-    }
+      ["tagRelevance.tNsqhzTibgGJKPEWB"]: { $gte: 1 },
+      question: true,
+    };
   }
   // NOTE: this section is currently unused and should probably be removed -Ray
   if (algorithm.reviewReviews) {
     if (isEAForum) {
       return {
-        postedAt: {$lt: new Date(`${(algorithm.reviewReviews as number) + 1}-01-01`)},
-        positiveReviewVoteCount: {$gte: getPositiveVoteThreshold()}, // EA-forum look here
-      }
+        postedAt: { $lt: new Date(`${(algorithm.reviewReviews as number) + 1}-01-01`) },
+        positiveReviewVoteCount: { $gte: getPositiveVoteThreshold() }, // EA-forum look here
+      };
     }
     return {
       postedAt: {
         $gt: new Date(`${algorithm.reviewReviews}-01-01`),
-        $lt: new Date(`${(algorithm.reviewReviews as number) + 1}-01-01`)
+        $lt: new Date(`${(algorithm.reviewReviews as number) + 1}-01-01`),
       },
-      positiveReviewVoteCount: {$gte: getPositiveVoteThreshold()},
-    }
+      positiveReviewVoteCount: { $gte: getPositiveVoteThreshold() },
+    };
   }
   if (algorithm.lwRationalityOnly) {
     return {
       $or: [
-        {"tagRelevance.Ng8Gice9KNkncxqcj": {$gt:0}}, // rationality tag
-        {"tagRelevance.3uE2pXvbcnS9nnZRE": {$gt:0}}, // world modeling tag
-      ]
-      
-    }
+        { "tagRelevance.Ng8Gice9KNkncxqcj": { $gt: 0 } }, // rationality tag
+        { "tagRelevance.3uE2pXvbcnS9nnZRE": { $gt: 0 } }, // world modeling tag
+      ],
+    };
   }
   if (algorithm.reviewNominations) {
     if (isEAForum) {
-      return {postedAt: {$lt: new Date(`${(algorithm.reviewNominations as number) + 1}-01-01`)}}
+      return { postedAt: { $lt: new Date(`${(algorithm.reviewNominations as number) + 1}-01-01`) } };
     }
     return {
       isEvent: false,
-      postedAt: {$gt: new Date(`${algorithm.reviewNominations}-01-01`), $lt: new Date(`${(algorithm.reviewNominations as number) + 1}-01-01`)},
-      meta: false
-    }
+      postedAt: {
+        $gt: new Date(`${algorithm.reviewNominations}-01-01`),
+        $lt: new Date(`${(algorithm.reviewNominations as number) + 1}-01-01`),
+      },
+      meta: false,
+    };
   }
   if (algorithm.reviewFinal) {
     return {
-      postedAt: {$gt: new Date(`${algorithm.reviewFinal}-01-01`), $lt: new Date(`${(algorithm.reviewFinal as number) + 1}-01-01`)},
-      reviewCount: {$gte: 1},
-      finalReviewVoteScoreHighKarma: {$gte: 10}
-    }
+      postedAt: {
+        $gt: new Date(`${algorithm.reviewFinal}-01-01`),
+        $lt: new Date(`${(algorithm.reviewFinal as number) + 1}-01-01`),
+      },
+      reviewCount: { $gte: 1 },
+      finalReviewVoteScoreHighKarma: { $gte: 10 },
+    };
   }
   if (algorithm.includePersonal) {
     if (algorithm.includeMeta) {
-      return {}
+      return {};
     }
-    return {meta: false}
+    return { meta: false };
   }
   if (algorithm.includeMeta) {
-    return {$or: [{frontpageDate: {$exists: true}}, {meta: true}]}
+    return { $or: [{ frontpageDate: { $exists: true } }, { meta: true }] };
   }
-  return {$and: [{frontpageDate: {$exists: true}}, {meta: false}]}
-}
+  return { $and: [{ frontpageDate: { $exists: true } }, { meta: false }] };
+};
 
 // A filter (mongodb selector) for which posts should be considered at all as
 // recommendations.
@@ -146,26 +155,30 @@ const recommendablePostFilter = (algorithm: DefaultRecommendationsAlgorithm) => 
     // Only consider recommending posts if they hit the minimum base score. This has a big
     // effect on the size of the recommendable-post set, which needs to not be
     // too big for performance reasons.
-    baseScore: {$gt: algorithm.minimumBaseScore || MINIMUM_BASE_SCORE},
+    baseScore: { $gt: algorithm.minimumBaseScore || MINIMUM_BASE_SCORE },
 
     ...getInclusionSelector(algorithm),
 
     // Enforce the disableRecommendation flag
-    disableRecommendation: {$ne: true},
-  }
+    disableRecommendation: { $ne: true },
+  };
 
   if (isEAForum) {
-    recommendationFilter = {$and: [
-      recommendationFilter,
-      {$or: [
-        {[`tagRelevance.${EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID}`]: {$exists: false}},
-        {[`tagRelevance.${EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID}`]: {$lt: 1}},
-      ]},
-    ]};
+    recommendationFilter = {
+      $and: [
+        recommendationFilter,
+        {
+          $or: [
+            { [`tagRelevance.${EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID}`]: { $exists: false } },
+            { [`tagRelevance.${EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID}`]: { $lt: 1 } },
+          ],
+        },
+      ],
+    };
   }
 
   if (algorithm.excludeDefaultRecommendations) {
-    return recommendationFilter
+    return recommendationFilter;
   } else {
     return {
       $or: [
@@ -177,39 +190,35 @@ const recommendablePostFilter = (algorithm: DefaultRecommendationsAlgorithm) => 
       ],
     };
   }
-}
+};
 
-ensureIndex(Posts, {defaultRecommendation: 1})
+ensureIndex(Posts, { defaultRecommendation: 1 });
 
 // Return the set of all posts that are eligible for being recommended, with
 // scoreRelevantFields included (but other fields projected away). If
 // onlyUnread is true and currentUser is nonnull, posts that the user has
 // already read are filtered out.
-const allRecommendablePosts = async ({currentUser, algorithm}: {
-  currentUser: DbUser|null,
-  algorithm: DefaultRecommendationsAlgorithm,
+const allRecommendablePosts = async ({
+  currentUser,
+  algorithm,
+}: {
+  currentUser: DbUser | null;
+  algorithm: DefaultRecommendationsAlgorithm;
 }): Promise<Array<DbPost>> => {
   if (!(Posts instanceof PgCollection)) {
     throw new Error("Posts is not a Postgres collection");
   }
-  const joinHook = algorithm.onlyUnread && currentUser
-    ? `LEFT JOIN "ReadStatuses" rs ON rs."postId" = "Posts"._id AND rs."userId" = '${currentUser._id}' WHERE rs."isRead" IS NOT TRUE`
-    : undefined;
+  const joinHook =
+    algorithm.onlyUnread && currentUser
+      ? `LEFT JOIN "ReadStatuses" rs ON rs."postId" = "Posts"._id AND rs."userId" = '${currentUser._id}' WHERE rs."isRead" IS NOT TRUE`
+      : undefined;
   const query = new SelectQuery(
-    new SelectQuery(
-      new SelectQuery(
-        Posts.getTable(),
-        {},
-        {},
-        {joinHook},
-      ),
-      recommendablePostFilter(algorithm),
-    ),
+    new SelectQuery(new SelectQuery(Posts.getTable(), {}, {}, { joinHook }), recommendablePostFilter(algorithm)),
     {},
-    {projection: scoreRelevantFields},
+    { projection: scoreRelevantFields },
   );
   return Posts.executeReadQuery(query) as Promise<DbPost[]>;
-}
+};
 
 // Returns the top-rated posts (rated by scoreFn) to recommend to a user.
 //   count: The maximum number of posts to return. May return fewer, if there
@@ -220,28 +229,32 @@ const allRecommendablePosts = async ({currentUser, algorithm}: {
 //   scoreFn: Function which takes a post (with at least scoreRelevantFields
 //     included), and returns a number. The posts with the highest scoreFn
 //     return value will be the ones returned.
-const topPosts = async ({count, currentUser, algorithm, scoreFn}: {
-  count: number,
-  currentUser: DbUser|null,
-  algorithm: DefaultRecommendationsAlgorithm,
-  scoreFn: (post: DbPost)=>number,
+const topPosts = async ({
+  count,
+  currentUser,
+  algorithm,
+  scoreFn,
+}: {
+  count: number;
+  currentUser: DbUser | null;
+  algorithm: DefaultRecommendationsAlgorithm;
+  scoreFn: (post: DbPost) => number;
 }) => {
-  const recommendablePostsMetadata  = await allRecommendablePosts({currentUser, algorithm});
+  const recommendablePostsMetadata = await allRecommendablePosts({ currentUser, algorithm });
 
-  const defaultRecommendations = algorithm.excludeDefaultRecommendations ? [] : recommendablePostsMetadata.filter(p=> !!p.defaultRecommendation)
+  const defaultRecommendations = algorithm.excludeDefaultRecommendations
+    ? []
+    : recommendablePostsMetadata.filter((p) => !!p.defaultRecommendation);
 
-  const sortedTopRecommendations = _.sortBy(recommendablePostsMetadata, post => -scoreFn(post))
-  const unreadTopPosts = _.first([
-    ...defaultRecommendations,
-    ...sortedTopRecommendations
-  ], count)
-  const unreadTopPostIds = _.map(unreadTopPosts, p=>p._id)
+  const sortedTopRecommendations = _.sortBy(recommendablePostsMetadata, (post) => -scoreFn(post));
+  const unreadTopPosts = _.first([...defaultRecommendations, ...sortedTopRecommendations], count);
+  const unreadTopPostIds = _.map(unreadTopPosts, (p) => p._id);
 
   return await Posts.find(
-    { _id: {$in: unreadTopPostIds} },
-    { sort: {defaultRecommendation: -1, baseScore: -1} }
+    { _id: { $in: unreadTopPostIds } },
+    { sort: { defaultRecommendation: -1, baseScore: -1 } },
   ).fetch();
-}
+};
 
 // Returns a random weighted sampling of highly-rated posts (weighted by
 // sampleWeightFn) to recommend to a user.
@@ -254,58 +267,70 @@ const topPosts = async ({count, currentUser, algorithm, scoreFn}: {
 //   sampleWeightFn: Function which takes a post (with at least
 //     scoreRelevantFields included), and returns a number. Higher numbers are
 //     more likely to be recommended.
-const samplePosts = async ({count, currentUser, algorithm, sampleWeightFn}: {
-  count: number,
-  currentUser: DbUser|null,
-  algorithm: DefaultRecommendationsAlgorithm,
-  sampleWeightFn: (post: DbPost)=>number,
+const samplePosts = async ({
+  count,
+  currentUser,
+  algorithm,
+  sampleWeightFn,
+}: {
+  count: number;
+  currentUser: DbUser | null;
+  algorithm: DefaultRecommendationsAlgorithm;
+  sampleWeightFn: (post: DbPost) => number;
 }) => {
-  const recommendablePostsMetadata  = await allRecommendablePosts({currentUser, algorithm});
+  const recommendablePostsMetadata = await allRecommendablePosts({ currentUser, algorithm });
 
-  const numPostsToReturn = Math.max(0, Math.min(recommendablePostsMetadata.length, count))
+  const numPostsToReturn = Math.max(0, Math.min(recommendablePostsMetadata.length, count));
 
-  const defaultRecommendations = algorithm.excludeDefaultRecommendations ? [] : recommendablePostsMetadata.filter(p=> !!p.defaultRecommendation).map(p=>p._id)
+  const defaultRecommendations = algorithm.excludeDefaultRecommendations
+    ? []
+    : recommendablePostsMetadata.filter((p) => !!p.defaultRecommendation).map((p) => p._id);
 
   const sampledPosts = new WeightedList(
-    _.map(recommendablePostsMetadata, post => [post._id, sampleWeightFn(post)])
-  ).pop(Math.max(numPostsToReturn - defaultRecommendations.length, 0))
+    _.map(recommendablePostsMetadata, (post) => [post._id, sampleWeightFn(post)]),
+  ).pop(Math.max(numPostsToReturn - defaultRecommendations.length, 0));
 
-  const recommendedPosts = _.first([...defaultRecommendations, ...sampledPosts], numPostsToReturn)
+  const recommendedPosts = _.first([...defaultRecommendations, ...sampledPosts], numPostsToReturn);
 
-  return await Posts.find(
-    { _id: {$in: recommendedPosts} },
-    { sort: {defaultRecommendation: -1} }
-  ).fetch();
-}
+  return await Posts.find({ _id: { $in: recommendedPosts } }, { sort: { defaultRecommendation: -1 } }).fetch();
+};
 
 const getModifierName = (post: DbPost) => {
-  if (post.curatedDate) return 'curatedModifier'
-  if (post.frontpageDate) return 'frontpageModifier'
-  return 'personalBlogpostModifier'
-}
+  if (post.curatedDate) return "curatedModifier";
+  if (post.frontpageDate) return "frontpageModifier";
+  return "personalBlogpostModifier";
+};
 
-const getRecommendedPosts = async ({count, algorithm, currentUser}: {
-  count: number,
-  algorithm: DefaultRecommendationsAlgorithm,
-  currentUser: DbUser|null
+const getRecommendedPosts = async ({
+  count,
+  algorithm,
+  currentUser,
+}: {
+  count: number;
+  algorithm: DefaultRecommendationsAlgorithm;
+  currentUser: DbUser | null;
 }) => {
   const scoreFn = (post: DbPost) => {
-    const sectionModifier = algorithm[getModifierName(post)]||0;
-    const weight = sectionModifier + Math.pow(post.baseScore - algorithm.scoreOffset, algorithm.scoreExponent)
+    const sectionModifier = algorithm[getModifierName(post)] || 0;
+    const weight = sectionModifier + Math.pow(post.baseScore - algorithm.scoreOffset, algorithm.scoreExponent);
     return Math.max(0, weight);
-  }
+  };
 
   // Cases here should match recommendationAlgorithms in RecommendationsAlgorithmPicker.jsx
-  switch(algorithm.method) {
+  switch (algorithm.method) {
     case "top": {
       return await topPosts({
-        count, currentUser, algorithm,
-        scoreFn
+        count,
+        currentUser,
+        algorithm,
+        scoreFn,
       });
     }
     case "sample": {
       return await samplePosts({
-        count, currentUser, algorithm,
+        count,
+        currentUser,
+        algorithm,
         sampleWeightFn: scoreFn,
       });
     }
@@ -315,7 +340,7 @@ const getRecommendedPosts = async ({count, algorithm, currentUser}: {
   }
 };
 
-const getDefaultResumeSequence = (): Array<{collectionId: string, nextPostId: string}> => {
+const getDefaultResumeSequence = (): Array<{ collectionId: string; nextPostId: string }> => {
   return [
     {
       // HPMOR
@@ -332,25 +357,24 @@ const getDefaultResumeSequence = (): Array<{collectionId: string, nextPostId: st
       collectionId: "oneQyj4pw77ynzwAF",
       nextPostId: "2ftJ38y9SRBCBsCzy",
     },
-  ]
-}
+  ];
+};
 
-const getResumeSequences = async (currentUser: DbUser|null, context: ResolverContext) => {
-  const sequences = currentUser ? currentUser.partiallyReadSequences : getDefaultResumeSequence()
+const getResumeSequences = async (currentUser: DbUser | null, context: ResolverContext) => {
+  const sequences = currentUser ? currentUser.partiallyReadSequences : getDefaultResumeSequence();
 
-  if (!sequences)
-    return [];
+  if (!sequences) return [];
 
-  const results = await Promise.all(_.map(sequences,
-    async (partiallyReadSequence: any) => {
+  const results = await Promise.all(
+    _.map(sequences, async (partiallyReadSequence: any) => {
       const { sequenceId, collectionId, nextPostId, numRead, numTotal, lastReadTime } = partiallyReadSequence;
-      
+
       const [sequence, collection, nextPost] = await Promise.all([
         sequenceId ? context.loaders.Sequences.load(sequenceId) : null,
         collectionId ? context.loaders.Collections.load(collectionId) : null,
         context.loaders.Posts.load(nextPostId),
       ]);
-      
+
       return {
         sequence: await accessFilterSingle(currentUser, Sequences, sequence, context),
         collection: await accessFilterSingle(currentUser, Collections, collection, context),
@@ -358,16 +382,15 @@ const getResumeSequences = async (currentUser: DbUser|null, context: ResolverCon
         numRead: numRead,
         numTotal: numTotal,
         lastReadTime: lastReadTime,
-      }
-    }
-  ));
-  
+      };
+    }),
+  );
+
   // Filter out results where nextPost is null. (Specifically, this filters out
   // the default sequences on dev databases, which would otherwise cause a crash
   // down the line.)
-  return _.filter(results, result=>!!result.nextPost);
-}
-
+  return _.filter(results, (result) => !!result.nextPost);
+};
 
 addGraphQLResolvers({
   Query: {
@@ -377,42 +400,39 @@ addGraphQLResolvers({
       return await getResumeSequences(currentUser, context);
     },
 
-    async Recommendations(root: void, {count,algorithm}: {count: number, algorithm: RecommendationsAlgorithm}, context: ResolverContext) {
+    async Recommendations(
+      root: void,
+      { count, algorithm }: { count: number; algorithm: RecommendationsAlgorithm },
+      context: ResolverContext,
+    ) {
       const { currentUser, clientId } = context;
 
       if (recommendationsAlgorithmHasStrategy(algorithm)) {
         const service = new RecommendationService();
-        return service.recommend(
-          currentUser,
-          clientId,
-          count,
-          algorithm.strategy,
-          algorithm.disableFallbacks,
-        );
+        return service.recommend(currentUser, clientId, count, algorithm.strategy, algorithm.disableFallbacks);
       }
 
-      const recommendedPosts = await getRecommendedPosts({count, algorithm, currentUser})
+      const recommendedPosts = await getRecommendedPosts({ count, algorithm, currentUser });
       const accessFilteredPosts = await accessFilterMultiple(currentUser, Posts, recommendedPosts, context);
       if (recommendedPosts.length !== accessFilteredPosts.length) {
         // eslint-disable-next-line no-console
         console.error("Recommendation engine returned a post which permissions filtered out as inaccessible");
       }
       return accessFilteredPosts;
-    }
+    },
   },
   Mutation: {
-    async dismissRecommendation(root: void, {postId}: {postId: string}, context: ResolverContext) {
+    async dismissRecommendation(root: void, { postId }: { postId: string }, context: ResolverContext) {
       const { currentUser } = context;
       if (!currentUser) return false;
 
-      if (currentUser.partiallyReadSequences?.some((s)=>s.nextPostId===postId)) {
-        const newPartiallyRead = _.filter(currentUser.partiallyReadSequences,
-          (s)=>s.nextPostId !== postId);
+      if (currentUser.partiallyReadSequences?.some((s) => s.nextPostId === postId)) {
+        const newPartiallyRead = _.filter(currentUser.partiallyReadSequences, (s) => s.nextPostId !== postId);
         await setUserPartiallyReadSequences(currentUser._id, newPartiallyRead);
         return true;
       }
       return false;
-    }
+    },
   },
 });
 

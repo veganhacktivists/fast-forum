@@ -24,7 +24,7 @@ class CreateIndexQuery<T extends DbObject> extends Query<T> {
     this.isIndex = true;
     this.calculateIsUnique(index);
 
-    const {useGin, fields} = this.getFieldList(index);
+    const { useGin, fields } = this.getFieldList(index);
     this.atoms = [
       `CREATE ${this.isUnique ? "UNIQUE " : ""}INDEX${ifNotExists ? " IF NOT EXISTS" : ""}`,
       `"${index.getName()}"`,
@@ -44,19 +44,17 @@ class CreateIndexQuery<T extends DbObject> extends Query<T> {
   }
 
   private calculateIsUnique(index: TableIndex<T>) {
-    const {useGin} = this.getFieldList(index);
+    const { useGin } = this.getFieldList(index);
     this.isUnique = index.isUnique() && !useGin;
   }
 
-  private getFieldList(index: TableIndex<T>): {useGin: boolean, fields: Atom<T>[]} {
+  private getFieldList(index: TableIndex<T>): { useGin: boolean; fields: Atom<T>[] } {
     const isCaseInsensitive = index.isCaseInsensitive();
-    const fields = index.getFields().map((field) =>
-      this.fieldNameToIndexField(field, isCaseInsensitive),
-    );
-    const useGin = fields.some(({useGin}) => useGin);
+    const fields = index.getFields().map((field) => this.fieldNameToIndexField(field, isCaseInsensitive));
+    const useGin = fields.some(({ useGin }) => useGin);
     return {
       useGin,
-      fields: fields.flatMap(({field}) => [",", field]).slice(1),
+      fields: fields.flatMap(({ field }) => [",", field]).slice(1),
     };
   }
 
@@ -74,14 +72,10 @@ class CreateIndexQuery<T extends DbObject> extends Query<T> {
     const coalesceValue = type?.getIndexCoalesceValue();
     const tokens = fieldName.split(".");
     const name = this.getIndexFieldName(tokens);
-    const field = coalesceValue && this.isUnique
-      ? `COALESCE(${name}, ${coalesceValue})`
-      : name;
+    const field = coalesceValue && this.isUnique ? `COALESCE(${name}, ${coalesceValue})` : name;
     return {
       useGin: tokens.length > 1 || this.table.getField(fieldName)?.isArray(),
-      field: isCaseInsensitive && type?.toConcrete() instanceof StringType
-        ? `LOWER(${field})`
-        : field,
+      field: isCaseInsensitive && type?.toConcrete() instanceof StringType ? `LOWER(${field})` : field,
     };
   }
 
@@ -96,7 +90,10 @@ class CreateIndexQuery<T extends DbObject> extends Query<T> {
     }
     return tokens.length === 1 || this.getField(tokens[0])?.isArray()
       ? `"${tokens[0]}"`
-      : `("${tokens[0]}"${tokens.slice(1).map((field) => `->'${field}'`).join("")})`;
+      : `("${tokens[0]}"${tokens
+          .slice(1)
+          .map((field) => `->'${field}'`)
+          .join("")})`;
   }
 }
 

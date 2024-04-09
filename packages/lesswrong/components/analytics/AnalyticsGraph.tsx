@@ -27,31 +27,31 @@ const styles = (theme: ThemeType): JssStyles => ({
     justifyContent: "space-between",
     flexDirection: "row",
     marginBottom: 12,
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       flexDirection: "column",
       // Make it the same height with or without "checking latest data..." to avoid layout shift on mobile
       minHeight: 56,
       marginBottom: 0,
-    }
+    },
   },
   graphHeaderSmallerTitle: {
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       minHeight: 42,
-    }
+    },
   },
   graphHeaderNoTitle: {
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       minHeight: 0,
-    }
+    },
   },
   graphHeading: {
     fontSize: 32,
     fontWeight: "600",
     fontFamily: theme.palette.fonts.sansSerifStack,
     color: theme.palette.grey[1000],
-    [theme.breakpoints.down('xs')]: {
-      lineHeight: '1.2em',
-    }
+    [theme.breakpoints.down("xs")]: {
+      lineHeight: "1.2em",
+    },
   },
   smallerTitle: {
     fontSize: 20,
@@ -62,10 +62,10 @@ const styles = (theme: ThemeType): JssStyles => ({
     fontWeight: 500,
     // stick to bottom
     alignSelf: "flex-end",
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       alignSelf: "flex-start",
-      marginBottom: 'auto',
-    }
+      marginBottom: "auto",
+    },
   },
   tooltip: {
     backgroundColor: theme.palette.background.paper,
@@ -91,9 +91,9 @@ const styles = (theme: ThemeType): JssStyles => ({
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       flexDirection: "column",
-    }
+    },
   },
   controlFields: {
     display: "flex",
@@ -101,8 +101,8 @@ const styles = (theme: ThemeType): JssStyles => ({
     color: theme.palette.grey[600],
     fontSize: 14,
     fontWeight: 500,
-    [theme.breakpoints.down('xs')]: {
-      width: '100%',
+    [theme.breakpoints.down("xs")]: {
+      width: "100%",
       display: "grid",
       // Flow into grid with 2 per row on large screens, 1 per row on small screens. Ideally never 3 per row.
       gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
@@ -113,7 +113,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     alignItems: "center",
   },
   checkbox: {
-    padding: '8px 12px',
+    padding: "8px 12px",
   },
   checkboxIcon: {
     width: 20,
@@ -133,8 +133,8 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   dateDropdown: {
     alignSelf: "flex-start",
-    margin: '4px 0',
-  }
+    margin: "4px 0",
+  },
 });
 
 const LINE_COLORS: Record<AnalyticsField, string> = {
@@ -164,7 +164,7 @@ const dateOptions = {
   custom: {
     label: "Custom",
     value: "custom",
-  }
+  },
 } as const;
 
 const startEndDateFromOption = (option: string) => {
@@ -196,7 +196,7 @@ const startEndDateFromOption = (option: string) => {
         endDate: moment(now).utc().endOf("day").toDate(),
       };
   }
-}
+};
 
 interface ColoredCheckboxProps extends CheckboxProps {
   fillColor: string;
@@ -238,7 +238,7 @@ export const AnalyticsGraph = ({
   const [displayFields, setDisplayFields] = useState<AnalyticsField[]>(initialDisplayFields);
   const [dateOption, setDateOption] = useState<string>(dateOptions.last30Days.value);
 
-  const {startDate: fallbackStartDate, endDate: fallbackEndDate} = startEndDateFromOption(dateOption);
+  const { startDate: fallbackStartDate, endDate: fallbackEndDate } = startEndDateFromOption(dateOption);
   const [displayStartDate, setDisplayStartDate] = useState<Date | null>(fallbackStartDate);
   const [displayEndDate, setDisplayEndDate] = useState<Date>(fallbackEndDate);
 
@@ -264,23 +264,26 @@ export const AnalyticsGraph = ({
     setDisplayEndDate(endDate);
   }, []);
 
-  const handleDateOptionChange = useCallback((option: string) => {
-    setDateOption(option);
+  const handleDateOptionChange = useCallback(
+    (option: string) => {
+      setDateOption(option);
 
-    if (option !== dateOptions.custom.value) {
-      const {startDate, endDate} = startEndDateFromOption(option);
-      updateDisplayDates(startDate, endDate);
-    } else {
-      openDialog({
-        componentName: 'DateRangeModal',
-        componentProps: {
-          startDate: displayStartDate,
-          endDate: displayEndDate,
-          updateDisplayDates
-        },
-      });
-    }
-  }, [displayEndDate, displayStartDate, openDialog, updateDisplayDates]);
+      if (option !== dateOptions.custom.value) {
+        const { startDate, endDate } = startEndDateFromOption(option);
+        updateDisplayDates(startDate, endDate);
+      } else {
+        openDialog({
+          componentName: "DateRangeModal",
+          componentProps: {
+            startDate: displayStartDate,
+            endDate: displayEndDate,
+            updateDisplayDates,
+          },
+        });
+      }
+    },
+    [displayEndDate, displayStartDate, openDialog, updateDisplayDates],
+  );
 
   const dataSeriesToDisplay = dataSeries?.map((dataPoint) => {
     // only select the fields we want to display
@@ -293,22 +296,25 @@ export const AnalyticsGraph = ({
     };
   });
 
-  const getTooltipContent = useCallback(({ active, payload, label }: TooltipProps<string, string>) => {
-    if (!(active && payload && payload.length)) return null;
+  const getTooltipContent = useCallback(
+    ({ active, payload, label }: TooltipProps<string, string>) => {
+      if (!(active && payload && payload.length)) return null;
 
-    const date = new Date(payload[0].payload["date"]);
+      const date = new Date(payload[0].payload["date"]);
 
-    return (
-      <div className={classes.tooltip}>
-        <p className={classes.date}>{moment(date).format("MMM DD YYYY")}</p>
-        {displayFields.map((field) => (
-          <p key={field} className={classes.tooltipLabel}>
-            {`${startCase(field)}: ${payload[0].payload[field].toLocaleString()}`}
-          </p>
-        ))}
-      </div>
-    );
-  }, [classes.date, classes.tooltip, classes.tooltipLabel, displayFields]);
+      return (
+        <div className={classes.tooltip}>
+          <p className={classes.date}>{moment(date).format("MMM DD YYYY")}</p>
+          {displayFields.map((field) => (
+            <p key={field} className={classes.tooltipLabel}>
+              {`${startCase(field)}: ${payload[0].payload[field].toLocaleString()}`}
+            </p>
+          ))}
+        </div>
+      );
+    },
+    [classes.date, classes.tooltip, classes.tooltipLabel, displayFields],
+  );
 
   if (!dataSeriesToDisplay?.length || dataSeriesToDisplay.length === 1) {
     return (
@@ -319,23 +325,29 @@ export const AnalyticsGraph = ({
   }
 
   const maxValue = dataSeriesToDisplay.reduce((maxVal, dataPoint) => {
-    const currentMaxValue = Math.max(...displayFields.map(field => dataPoint[field as AnalyticsField] ?? 0));
+    const currentMaxValue = Math.max(...displayFields.map((field) => dataPoint[field as AnalyticsField] ?? 0));
     return Math.max(maxVal, currentMaxValue);
   }, 0);
-  
+
   // Unfortunately this is the best workaround, see here: https://github.com/recharts/recharts/issues/2027
   const yAxisWidth = 26 + Math.ceil(maxValue.toLocaleString().length * 6);
   const strokeWidth = dataSeriesToDisplay.length > 180 ? 2 : 3;
 
   return (
     <div className={classes.root}>
-      <div className={classNames(classes.graphHeader, {[classes.graphHeaderSmallerTitle]: smallerTitle, [classes.graphHeaderNoTitle]: !title})}>
-        <Typography variant="headline" className={classNames(classes.graphHeading, {[classes.smallerTitle]: smallerTitle})}>
+      <div
+        className={classNames(classes.graphHeader, {
+          [classes.graphHeaderSmallerTitle]: smallerTitle,
+          [classes.graphHeaderNoTitle]: !title,
+        })}
+      >
+        <Typography
+          variant="headline"
+          className={classNames(classes.graphHeading, { [classes.smallerTitle]: smallerTitle })}
+        >
           {title}
         </Typography>
-        {maybeStale && <span className={classes.fetchingLatest}>
-          checking latest data...
-        </span>}
+        {maybeStale && <span className={classes.fetchingLatest}>checking latest data...</span>}
       </div>
       <div className={classes.controls}>
         <div className={classes.controlFields}>
@@ -351,7 +363,12 @@ export const AnalyticsGraph = ({
             </label>
           ))}
         </div>
-        <ForumDropdown value={dateOption} options={dateOptions} className={classes.dateDropdown} onSelect={handleDateOptionChange} />
+        <ForumDropdown
+          value={dateOption}
+          options={dateOptions}
+          className={classes.dateDropdown}
+          onSelect={handleDateOptionChange}
+        />
       </div>
       <ResponsiveContainer width="100%" height={GRAPH_HEIGHT} className={classes.graphContainer}>
         <LineChart data={dataSeriesToDisplay} height={300} margin={{ right: 30 }}>
@@ -364,7 +381,14 @@ export const AnalyticsGraph = ({
           <CartesianGrid strokeDasharray="3 3" />
           <Tooltip content={getTooltipContent} />
           {displayFields.map((field) => (
-            <Line key={field} dataKey={field} stroke={LINE_COLORS[field]} strokeWidth={strokeWidth} dot={false} animationDuration={300} />
+            <Line
+              key={field}
+              dataKey={field}
+              stroke={LINE_COLORS[field]}
+              strokeWidth={strokeWidth}
+              dot={false}
+              animationDuration={300}
+            />
           ))}
         </LineChart>
       </ResponsiveContainer>

@@ -1,4 +1,4 @@
-import type { Rule, Stylesheet } from 'react-jss/lib/jss';
+import type { Rule, Stylesheet } from "react-jss/lib/jss";
 
 export const generateClassName = (rule: typeof Rule, styleSheet: typeof Stylesheet): string => {
   const prefix = styleSheet?.options?.classNamePrefix;

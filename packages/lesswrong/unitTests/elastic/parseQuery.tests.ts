@@ -5,9 +5,9 @@ describe("elastic - parseQuery", () => {
     const result = parseQuery("a test query");
     expect(result).toStrictEqual({
       tokens: [
-        {type: "should", "token": "a"},
-        {type: "should", "token": "test"},
-        {type: "should", "token": "query"},
+        { type: "should", token: "a" },
+        { type: "should", token: "test" },
+        { type: "should", token: "query" },
       ],
       isAdvanced: false,
     });
@@ -16,20 +16,20 @@ describe("elastic - parseQuery", () => {
     const result = parseQuery("a test -query");
     expect(result).toStrictEqual({
       tokens: [
-        {type: "should", "token": "a"},
-        {type: "should", "token": "test"},
-        {type: "not", "token": "query"},
+        { type: "should", token: "a" },
+        { type: "should", token: "test" },
+        { type: "not", token: "query" },
       ],
       isAdvanced: true,
     });
   });
   it("can parse queries with double-quoted 'required' tokens", () => {
-    const result = parseQuery("a test \"query\"");
+    const result = parseQuery('a test "query"');
     expect(result).toStrictEqual({
       tokens: [
-        {type: "should", "token": "a"},
-        {type: "should", "token": "test"},
-        {type: "must", "token": "query"},
+        { type: "should", token: "a" },
+        { type: "should", token: "test" },
+        { type: "must", token: "query" },
       ],
       isAdvanced: true,
     });
@@ -38,9 +38,9 @@ describe("elastic - parseQuery", () => {
     const result = parseQuery("a test 'query'");
     expect(result).toStrictEqual({
       tokens: [
-        {type: "should", "token": "a"},
-        {type: "should", "token": "test"},
-        {type: "must", "token": "query"},
+        { type: "should", token: "a" },
+        { type: "should", token: "test" },
+        { type: "must", token: "query" },
       ],
       isAdvanced: true,
     });
@@ -49,9 +49,9 @@ describe("elastic - parseQuery", () => {
     const result = parseQuery("-a \"test\" 'query'");
     expect(result).toStrictEqual({
       tokens: [
-        {type: "not", "token": "a"},
-        {type: "must", "token": "test"},
-        {type: "must", "token": "query"},
+        { type: "not", token: "a" },
+        { type: "must", token: "test" },
+        { type: "must", token: "query" },
       ],
       isAdvanced: true,
     });

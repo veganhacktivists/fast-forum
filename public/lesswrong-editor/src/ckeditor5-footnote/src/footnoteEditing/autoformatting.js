@@ -15,15 +15,17 @@ import { COMMANDS, ELEMENTS } from '../constants';
  * @param {Element} rootElement
  */
 export const addFootnoteAutoformatting = (editor, rootElement) => {
-	if(editor.plugins.has('Autoformat')) {
-		const autoformatPluginInstance = editor.plugins.get('Autoformat');
-		inlineAutoformatEditing(editor, autoformatPluginInstance,
+	if (editor.plugins.has("Autoformat")) {
+		const autoformatPluginInstance = editor.plugins.get("Autoformat");
+		inlineAutoformatEditing(
+			editor,
+			autoformatPluginInstance,
 			text => regexMatchCallback(editor, text),
 			// @ts-ignore Pretty sure definitely typed is wrong
-			(_, /**@type Range[]*/ ranges) => formatCallback(ranges, editor, rootElement)
-			);
+			(_, /** @type Range[]*/ ranges) => formatCallback(ranges, editor, rootElement),
+		);
 	}
-}
+};
 
 /**
  * CKEditor's autoformatting feature (basically find and replace) has two opinionated default modes:
@@ -50,22 +52,22 @@ const regexMatchCallback = (editor, text) => {
 	// get the text node containing the cursor's position, or the one ending at `the cursor's position
 	const surroundingText = selectionStart && (selectionStart.textNode || selectionStart.getShiftedBy(-1).textNode);
 
-	if(!selectionStart || !surroundingText){
+	if (!selectionStart || !surroundingText) {
 		return {
 			remove: [],
 			format: [],
-		}
+		};
 	}
 
 	const results = text.matchAll(/\[\^([0-9]+)\]/g);
 
 	for (const result of results || []) {
-		const removeStartIndex = text.indexOf(result[0])
+		const removeStartIndex = text.indexOf(result[0]);
 		const removeEndIndex = removeStartIndex + result[0].length;
 		const textNodeOffset = selectionStart.parent.getChildStartOffset(surroundingText);
 
 		// if the cursor isn't at the end of the range to be replaced, do nothing
-		if(textNodeOffset === null || selectionStart.offset !== textNodeOffset + removeEndIndex) {
+		if (textNodeOffset === null || selectionStart.offset !== textNodeOffset + removeEndIndex) {
 			continue;
 		}
 		const formatStartIndex = removeStartIndex + 2;
@@ -73,13 +75,13 @@ const regexMatchCallback = (editor, text) => {
 		return {
 			remove: [[removeStartIndex, removeEndIndex]],
 			format: [[formatStartIndex, formatEndIndex]],
-		}
+		};
 	}
 	return {
 		remove: [],
 		format: [],
-	}
-}
+	};
+};
 
 /**
  * This callback takes in a range of text passed on by regexMatchCallback,
@@ -95,34 +97,37 @@ const regexMatchCallback = (editor, text) => {
  */
 const formatCallback = (ranges, editor, rootElement) => {
 	const command = editor.commands.get(COMMANDS.insertFootnote);
-	if(!command || !command.isEnabled) {
+	if (!command || !command.isEnabled) {
 		return;
 	}
 	const text = [...ranges[0].getItems()][0];
-	if(!(text instanceof TextProxy || text instanceof Text)) {
+	if (!(text instanceof TextProxy || text instanceof Text)) {
 		return false;
 	}
 	const match = text.data.match(/[0-9]+/);
-	if(!match) {
+	if (!match) {
 		return false;
 	}
 	const footnoteIndex = parseInt(match[0]);
-	const footnoteSection = modelQueryElement(editor, rootElement, element => element.is('element', ELEMENTS.footnoteSection));
-	if(!footnoteSection) {
-		if(footnoteIndex !== 1) {
+	const footnoteSection = modelQueryElement(editor, rootElement, element =>
+		element.is( "element", ELEMENTS.footnoteSection ),
+	);
+	if (!footnoteSection) {
+		if (footnoteIndex !== 1) {
 			return false;
 		}
 		editor.execute(COMMANDS.insertFootnote);
 		return;
 	}
-	const footnoteCount = modelQueryElementsAll(editor, footnoteSection, element =>  element.is('element', ELEMENTS.footnoteItem)).length;
-	if(footnoteIndex === footnoteCount + 1) {
+	const footnoteCount = modelQueryElementsAll(editor, footnoteSection, element =>
+		element.is( "element", ELEMENTS.footnoteItem ),
+	).length;
+	if (footnoteIndex === footnoteCount + 1) {
 		editor.execute(COMMANDS.insertFootnote);
 		return;
-	}
-	else if(footnoteIndex >= 1 && footnoteIndex <= footnoteCount) {
-		editor.execute(COMMANDS.insertFootnote, { footnoteIndex })
+	} else if (footnoteIndex >= 1 && footnoteIndex <= footnoteCount) {
+		editor.execute(COMMANDS.insertFootnote, { footnoteIndex });
 		return;
 	}
 	return false;
-}
+};

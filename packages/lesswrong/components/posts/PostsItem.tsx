@@ -7,6 +7,6 @@ const PostsItemComponent = registerComponent("PostsItem", PostsItem);
 
 declare global {
   interface ComponentTypes {
-    PostsItem: typeof PostsItemComponent
+    PostsItem: typeof PostsItemComponent;
   }
 }

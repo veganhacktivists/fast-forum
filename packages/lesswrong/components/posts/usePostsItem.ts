@@ -11,72 +11,70 @@ import {
   postGetPrimaryTag,
 } from "../../lib/collections/posts/helpers";
 import qs from "qs";
-import type { PopperPlacementType } from "@material-ui/core/Popper"
+import type { PopperPlacementType } from "@material-ui/core/Popper";
 
 const isSticky = (post: PostsList, terms: PostsViewTerms) =>
-  (post && terms && terms.forum)
-    ? post.sticky || (terms.af && post.afSticky) || (terms.meta && post.metaSticky)
-    : false;
+  post && terms && terms.forum ? post.sticky || (terms.af && post.afSticky) || (terms.meta && post.metaSticky) : false;
 
 export type PostsItemConfig = {
   /** post: The post displayed.*/
-  post: PostsListWithVotes,
+  post: PostsListWithVotes;
   /** tagRel: (Optional) The relationship between this post and a tag. If
   /* provided, UI will be shown with the score and voting on this post's
   /* relevance to that tag.*/
-  tagRel?: WithVoteTagRel|null,
+  tagRel?: WithVoteTagRel | null;
   /** defaultToShowComments: (bool) If set, comments will be expanded by default.*/
-  defaultToShowComments?: boolean,
+  defaultToShowComments?: boolean;
   /** sequenceId, chapter: If set, these will be used for making a nicer URL.*/
-  sequenceId?: string,
-  chapter?: any,
+  sequenceId?: string;
+  chapter?: any;
   /** index: If this is part of a list of PostsItems, its index (starting from
   /* zero) into that list. Used for special casing some styling at start of
   /* the list.*/
-  index?: number,
+  index?: number;
   /**
    * terms: If this is part of a list generated from a query, the terms of that
    * query. Used for figuring out which sticky icons to apply, if any.
    */
-  terms?: any,
+  terms?: any;
   /** resumeReading: If this is a Resume Reading suggestion, the corresponding
   /* partiallyReadSequenceItem (see schema in users/schema). Used for
   /* the sequence-image background.*/
-  resumeReading?: any,
+  resumeReading?: any;
   /** dismissRecommendation: If this is a Resume Reading suggestion, a callback to dismiss it.*/
-  dismissRecommendation?: any,
+  dismissRecommendation?: any;
   /** if this a draft, a callback to archive/unarchive it */
-  toggleDeleteDraft?: (post: PostsList) => void,
-  showBottomBorder?: boolean,
-  showDraftTag?: boolean,
-  showPersonalIcon?: boolean
-  showIcons?: boolean,
-  showPostedAt?: boolean,
-  defaultToShowUnreadComments?: boolean,
+  toggleDeleteDraft?: (post: PostsList) => void;
+  showBottomBorder?: boolean;
+  showDraftTag?: boolean;
+  showPersonalIcon?: boolean;
+  showIcons?: boolean;
+  showPostedAt?: boolean;
+  defaultToShowUnreadComments?: boolean;
   /** dense: (bool) Slightly reduce margins to make this denser. Used on the AllPosts page.*/
-  dense?: boolean,
+  dense?: boolean;
   /** bookmark: (bool) Whether this is a bookmark. Adds a clickable bookmark icon.*/
-  bookmark?: boolean,
+  bookmark?: boolean;
   /** showNominationCount: (bool) whether this should display it's number of Review nominations*/
-  showNominationCount?: boolean,
-  showReviewCount?: boolean,
+  showNominationCount?: boolean;
+  showReviewCount?: boolean;
   /** hideAuthor: hide the post author. Used on user-profile pages
    * where there's a list of posts all by the same author, to avoid the redundancy. */
-  hideAuthor?: boolean,
-  hideTag?: boolean,
-  hideTrailingButtons?: boolean,
-  tooltipPlacement?: PopperPlacementType,
-  curatedIconLeft?: boolean,
-  strikethroughTitle?: boolean,
-  translucentBackground?: boolean,
-  forceSticky?: boolean,
-  showReadCheckbox?: boolean,
-  showKarma?: boolean,
-  showMostValuableCheckbox?: boolean,
+  hideAuthor?: boolean;
+  hideTag?: boolean;
+  hideTrailingButtons?: boolean;
+  tooltipPlacement?: PopperPlacementType;
+  curatedIconLeft?: boolean;
+  strikethroughTitle?: boolean;
+  translucentBackground?: boolean;
+  forceSticky?: boolean;
+  showReadCheckbox?: boolean;
+  showKarma?: boolean;
+  showMostValuableCheckbox?: boolean;
   /** Whether or not to show interactive voting arrows */
-  isVoteable?: boolean,
-  className?: string,
-}
+  isVoteable?: boolean;
+  className?: string;
+};
 
 export type UsePostsItem = ReturnType<typeof usePostsItem>;
 
@@ -117,45 +115,37 @@ export const usePostsItem = ({
   const [showComments, setShowComments] = useState(defaultToShowComments);
   const [readComments, setReadComments] = useState(false);
   const [showDialogueMessages, setShowDialogueMessages] = useState(false);
-  const {isRead, recordPostView} = useRecordPostView(post);
-  const {isPostRepeated, addPost} = useHideRepeatedPosts();
+  const { isRead, recordPostView } = useRecordPostView(post);
+  const { isPostRepeated, addPost } = useHideRepeatedPosts();
 
   const currentUser = useCurrentUser();
 
-  const toggleComments = useCallback(
-    () => {
-      recordPostView({post, extraEventProperties: {type: "toggleComments"}})
-      setShowComments(!showComments);
-      setReadComments(true);
-    },
-    [post, recordPostView, setShowComments, showComments, setReadComments],
-  );
+  const toggleComments = useCallback(() => {
+    recordPostView({ post, extraEventProperties: { type: "toggleComments" } });
+    setShowComments(!showComments);
+    setReadComments(true);
+  }, [post, recordPostView, setShowComments, showComments, setReadComments]);
 
-  const toggleDialogueMessages = useCallback(
-    () => {
-      recordPostView({post, extraEventProperties: {type: "toggleDialogueMessages"}})
-      setShowDialogueMessages(!showDialogueMessages);
-    },
-    [post, recordPostView, setShowDialogueMessages, showDialogueMessages],
-  );
+  const toggleDialogueMessages = useCallback(() => {
+    recordPostView({ post, extraEventProperties: { type: "toggleDialogueMessages" } });
+    setShowDialogueMessages(!showDialogueMessages);
+  }, [post, recordPostView, setShowDialogueMessages, showDialogueMessages]);
 
-  const compareVisitedAndCommentedAt = (
-    lastVisitedAt: Date,
-    lastCommentedAt: Date | null,
-  ) => {
+  const compareVisitedAndCommentedAt = (lastVisitedAt: Date, lastCommentedAt: Date | null) => {
     const newComments = lastCommentedAt ? lastVisitedAt < lastCommentedAt : false;
-    return (isRead && newComments && !readComments);
-  }
+    return isRead && newComments && !readComments;
+  };
 
   const lastCommentedAt = postGetLastCommentedAt(post);
   const lastCommentPromotedAt = postGetLastCommentPromotedAt(post);
-  const hasUnreadComments =  compareVisitedAndCommentedAt(post.lastVisitedAt, lastCommentedAt);
-  const hadUnreadComments =  compareVisitedAndCommentedAt(post.lastVisitedAt, lastCommentedAt);
-  const hasNewPromotedComments =  compareVisitedAndCommentedAt(post.lastVisitedAt, lastCommentPromotedAt);
+  const hasUnreadComments = compareVisitedAndCommentedAt(post.lastVisitedAt, lastCommentedAt);
+  const hadUnreadComments = compareVisitedAndCommentedAt(post.lastVisitedAt, lastCommentedAt);
+  const hasNewPromotedComments = compareVisitedAndCommentedAt(post.lastVisitedAt, lastCommentPromotedAt);
 
-  const postLink = post.draft && !post.debate
-    ? `/editPost?${qs.stringify({postId: post._id, eventForm: post.isEvent})}`
-    : postGetPageUrl(post, false, sequenceId || chapter?.sequenceId);
+  const postLink =
+    post.draft && !post.debate
+      ? `/editPost?${qs.stringify({ postId: post._id, eventForm: post.isEvent })}`
+      : postGetPageUrl(post, false, sequenceId || chapter?.sequenceId);
 
   const showDismissButton = Boolean(currentUser && resumeReading);
   const onArchive = toggleDeleteDraft && (() => toggleDeleteDraft(post));
@@ -163,10 +153,10 @@ export const usePostsItem = ({
 
   const commentTerms: CommentsViewTerms = {
     view: "postsItemComments",
-    limit:7,
+    limit: 7,
     postId: post._id,
-    after: (defaultToShowUnreadComments && !showComments) ? post.lastVisitedAt : null
-  }
+    after: defaultToShowUnreadComments && !showComments ? post.lastVisitedAt : null,
+  };
 
   const isRepeated = isPostRepeated(post._id);
   if (!isRepeated) {
@@ -224,4 +214,4 @@ export const usePostsItem = ({
     isVoteable,
     className,
   };
-}
+};

@@ -1,6 +1,5 @@
-import { Comments } from '../../lib/collections/comments'
-import { registerMigration, migrateDocuments } from './migrationUtils';
-
+import { Comments } from "../../lib/collections/comments";
+import { registerMigration, migrateDocuments } from "./migrationUtils";
 
 registerMigration({
   name: "testCommentMigration",
@@ -12,36 +11,32 @@ registerMigration({
       collection: Comments,
       batchSize: 1000,
       unmigratedDocumentQuery: {
-        schemaVersion: {$lt: 1}
-      }, 
+        schemaVersion: { $lt: 1 },
+      },
       migrate: async (documents) => {
-        const updates = documents.map(comment => {
+        const updates = documents.map((comment) => {
           return {
             updateOne: {
-              filter: {_id: comment._id},
+              filter: { _id: comment._id },
               update: {
                 $set: {
                   testContents: {
-                      originalContents: {
-                          data: "htmlReference"
-                      },
-                      html: "htmlReference", 
-                      version: "1.0.0", 
-                      userId: "userIdReference", 
-                      editedAt: "postedAtReference" 
+                    originalContents: {
+                      data: "htmlReference",
+                    },
+                    html: "htmlReference",
+                    version: "1.0.0",
+                    userId: "userIdReference",
+                    editedAt: "postedAtReference",
                   },
-                  schemaVersion: 1
+                  schemaVersion: 1,
                 },
-                
-              }
-            }
-          }
-        })
-        await Comments.rawCollection().bulkWrite(
-          updates,
-          { ordered: false }
-        );
-      }
-    })
+              },
+            },
+          };
+        });
+        await Comments.rawCollection().bulkWrite(updates, { ordered: false });
+      },
+    });
   },
 });

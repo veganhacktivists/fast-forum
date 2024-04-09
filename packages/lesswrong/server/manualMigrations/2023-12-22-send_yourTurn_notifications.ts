@@ -7,9 +7,9 @@ interface DialogueCheckWithExtraData extends DbDialogueCheck {
   targetUserMatchPreferenceId: string;
 }
 
-const getMatchFormYourTurn = async ():Promise<DialogueCheckWithExtraData[]> => {
+const getMatchFormYourTurn = async (): Promise<DialogueCheckWithExtraData[]> => {
   const db = getSqlClientOrThrow();
-  const sql =`
+  const sql = `
     SELECT 
       dc.*,
       dmp_reciprocal._id AS "targetUserMatchPreferenceId"
@@ -26,10 +26,10 @@ const getMatchFormYourTurn = async ():Promise<DialogueCheckWithExtraData[]> => {
         AND dmp_reciprocal.deleted IS NOT TRUE 
         AND (n._id IS NULL OR n.type != 'yourTurnMatchForm')
     GROUP BY dc._id, dmp_reciprocal._id
-  `
+  `;
   const result = await db.any(sql);
-  return result
-}
+  return result;
+};
 
 registerMigration({
   name: "sendYourTurnNotifications",
@@ -37,16 +37,16 @@ registerMigration({
   idempotent: true,
   action: async () => {
     const context = createAdminContext();
-    const checksYourTurn = await getMatchFormYourTurn()
-    checksYourTurn.forEach(check => {
+    const checksYourTurn = await getMatchFormYourTurn();
+    checksYourTurn.forEach((check) => {
       void createNotification({
         userId: check.userId,
-        notificationType: 'yourTurnMatchForm',
-        documentType: 'dialogueMatchPreference',
+        notificationType: "yourTurnMatchForm",
+        documentType: "dialogueMatchPreference",
         documentId: check.targetUserMatchPreferenceId,
         context,
-        extraData: {checkId: check._id}
+        extraData: { checkId: check._id },
       });
-    })
-  }
-})
+    });
+  },
+});

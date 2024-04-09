@@ -4,11 +4,14 @@ import { userHasAutosummarize } from "../../../lib/betas";
 import { useCurrentUser } from "../../common/withUser";
 import { useDialog } from "../../common/withDialog";
 
-const SummarizeDropdownItem = ({post, closeMenu}: {
-  post: PostsList|SunshinePostsList,
-  closeMenu?: () => void,
+const SummarizeDropdownItem = ({
+  post,
+  closeMenu,
+}: {
+  post: PostsList | SunshinePostsList;
+  closeMenu?: () => void;
 }) => {
-  const {openDialog} = useDialog();
+  const { openDialog } = useDialog();
   const currentUser = useCurrentUser();
   if (!userHasAutosummarize(currentUser)) {
     return null;
@@ -18,26 +21,18 @@ const SummarizeDropdownItem = ({post, closeMenu}: {
     closeMenu?.();
     openDialog({
       componentName: "PostSummaryDialog",
-      componentProps: {post},
+      componentProps: { post },
     });
-  }
+  };
 
-  const {DropdownItem} = Components;
-  return (
-    <DropdownItem
-      title="Summarize"
-      onClick={showPostSummary}
-    />
-  );
-}
+  const { DropdownItem } = Components;
+  return <DropdownItem title="Summarize" onClick={showPostSummary} />;
+};
 
-const SummarizeDropdownItemComponent = registerComponent(
-  "SummarizeDropdownItem",
-  SummarizeDropdownItem,
-);
+const SummarizeDropdownItemComponent = registerComponent("SummarizeDropdownItem", SummarizeDropdownItem);
 
 declare global {
   interface ComponentTypes {
-    SummarizeDropdownItem: typeof SummarizeDropdownItemComponent
+    SummarizeDropdownItem: typeof SummarizeDropdownItemComponent;
   }
 }

@@ -1,4 +1,4 @@
-import { registerFragment } from '../../vulcan-lib/fragments';
+import { registerFragment } from "../../vulcan-lib/fragments";
 
 registerFragment(`
   fragment UsersMinimumInfo on User {
@@ -308,7 +308,7 @@ registerFragment(`
     bannedUserIds
     bannedPersonalUserIds
   }
-`)
+`);
 
 registerFragment(`
   fragment SunshineUsersList on User {
@@ -382,7 +382,7 @@ registerFragment(`
     taggingDashboardCollapsed
     usernameUnset
   }
-`)
+`);
 
 registerFragment(`
   fragment UsersMapEntry on User {
@@ -399,7 +399,6 @@ registerFragment(`
     mongoLocation
   }
 `);
-
 
 registerFragment(`
   fragment UsersEdit on User {
@@ -507,7 +506,7 @@ registerFragment(`
 
     deleted
   }
-`)
+`);
 
 registerFragment(`
   fragment UsersAdmin on User {
@@ -530,7 +529,7 @@ registerFragment(`
     reviewVoteCount
     email
   }
-`)
+`);
 
 registerFragment(`
   fragment UsersProfileEdit on User {
@@ -562,7 +561,7 @@ registerFragment(`
     twitterProfileURL
     githubProfileURL
   }
-`)
+`);
 
 registerFragment(`
   fragment UsersCrosspostInfo on User {
@@ -571,7 +570,7 @@ registerFragment(`
     slug
     fmCrosspostUserId
   }
-`)
+`);
 
 registerFragment(`
   fragment UsersOptedInToDialogueFacilitation on User {

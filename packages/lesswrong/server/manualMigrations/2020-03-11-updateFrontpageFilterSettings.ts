@@ -1,6 +1,6 @@
-import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
-import { getDefaultFilterSettings } from '../../lib/filterSettings';
-import Users from '../../lib/collections/users/collection';
+import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
+import { getDefaultFilterSettings } from "../../lib/filterSettings";
+import Users from "../../lib/collections/users/collection";
 
 registerMigration({
   name: "updateUserDefaultTagFilterSettings",
@@ -14,7 +14,7 @@ registerMigration({
         // eslint-disable-next-line no-console
         console.log("Migrating user batch");
         let changes: Array<any> = [];
-        
+
         for (let user of users) {
           changes.push({
             updateOne: {
@@ -23,16 +23,16 @@ registerMigration({
                 $set: {
                   frontpageFilterSettings: {
                     ...getDefaultFilterSettings(),
-                    personalBlog: (user.currentFrontpageFilter === "frontpage") ? "Hidden" : "Default"
-                  }
-                }
-              }
-            }
+                    personalBlog: user.currentFrontpageFilter === "frontpage" ? "Hidden" : "Default",
+                  },
+                },
+              },
+            },
           });
         }
-        
+
         await Users.rawCollection().bulkWrite(changes, { ordered: false });
-      }
+      },
     });
-  }
+  },
 });

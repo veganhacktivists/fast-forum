@@ -1,31 +1,33 @@
-import { addCallback, getCollection } from '../vulcan-lib';
-import { restrictViewableFieldsSingle, restrictViewableFieldsMultiple } from '../vulcan-users/permissions';
-import SimpleSchema from 'simpl-schema'
+import { addCallback, getCollection } from "../vulcan-lib";
+import { restrictViewableFieldsSingle, restrictViewableFieldsMultiple } from "../vulcan-users/permissions";
+import SimpleSchema from "simpl-schema";
 import { loadByIds, getWithLoader } from "../loaders";
-import { isServer } from '../executionEnvironment';
-import { asyncFilter } from './asyncUtils';
-import type { GraphQLScalarType } from 'graphql';
-import DataLoader from 'dataloader';
-import * as _ from 'underscore';
-import { loggerConstructor } from './logging';
-import { DeferredForumSelect } from '../forumTypeUtils';
+import { isServer } from "../executionEnvironment";
+import { asyncFilter } from "./asyncUtils";
+import type { GraphQLScalarType } from "graphql";
+import DataLoader from "dataloader";
+import * as _ from "underscore";
+import { loggerConstructor } from "./logging";
+import { DeferredForumSelect } from "../forumTypeUtils";
 
 export const generateIdResolverSingle = <CollectionName extends CollectionNameString>({
-  collectionName, fieldName, nullable
+  collectionName,
+  fieldName,
+  nullable,
 }: {
-  collectionName: CollectionName,
-  fieldName: string,
-  nullable: boolean,
+  collectionName: CollectionName;
+  fieldName: string;
+  nullable: boolean;
 }) => {
   type DataType = ObjectsByCollectionName[CollectionName];
-  return async (doc: any, args: void, context: ResolverContext): Promise<Partial<DataType>|null> => {
-    if (!doc[fieldName]) return null
+  return async (doc: any, args: void, context: ResolverContext): Promise<Partial<DataType> | null> => {
+    if (!doc[fieldName]) return null;
 
-    const { currentUser } = context
+    const { currentUser } = context;
     const collection = getCollection(collectionName);
 
-    const loader = context.loaders[collectionName] as DataLoader<string,DataType>;
-    const resolvedDoc: DataType|null = await loader.load(doc[fieldName])
+    const loader = context.loaders[collectionName] as DataLoader<string, DataType>;
+    const resolvedDoc: DataType | null = await loader.load(doc[fieldName]);
     if (!resolvedDoc) {
       if (!nullable) {
         // eslint-disable-next-line no-console
@@ -35,47 +37,48 @@ export const generateIdResolverSingle = <CollectionName extends CollectionNameSt
     }
 
     return await accessFilterSingle(currentUser, collection, resolvedDoc, context);
-  }
-}
+  };
+};
 
 const generateIdResolverMulti = <CollectionName extends CollectionNameString>({
-  collectionName, fieldName,
-  getKey = ((a:any)=>a)
+  collectionName,
+  fieldName,
+  getKey = (a: any) => a,
 }: {
-  collectionName: CollectionName,
-  fieldName: string,
-  getKey?: (key: string) => string,
+  collectionName: CollectionName;
+  fieldName: string;
+  getKey?: (key: string) => string;
 }) => {
   type DbType = ObjectsByCollectionName[CollectionName];
-  
-  return async (doc: any, args: void, context: ResolverContext): Promise<Partial<DbType>[]> => {
-    if (!doc[fieldName]) return []
-    const keys = doc[fieldName].map(getKey)
 
-    const { currentUser } = context
+  return async (doc: any, args: void, context: ResolverContext): Promise<Partial<DbType>[]> => {
+    if (!doc[fieldName]) return [];
+    const keys = doc[fieldName].map(getKey);
+
+    const { currentUser } = context;
     const collection = getCollection(collectionName);
 
-    const resolvedDocs: Array<DbType|null> = await loadByIds(context, collectionName, keys)
+    const resolvedDocs: Array<DbType | null> = await loadByIds(context, collectionName, keys);
     return await accessFilterMultiple(currentUser, collection, resolvedDocs, context);
-  }
-}
+  };
+};
 
 // Apply both document-level and field-level permission checks to a single document.
 // If the user can't access the document, returns null. If the user can access the
 // document, return a copy of the document in which any fields the user can't access
 // have been removed. If document is null, returns null.
 export const accessFilterSingle = async <N extends CollectionNameString>(
-  currentUser: DbUser|null,
+  currentUser: DbUser | null,
   collection: CollectionBase<N>,
-  document: ObjectsByCollectionName[N]|null,
-  context: ResolverContext|null,
-): Promise<Partial<ObjectsByCollectionName[N]>|null> => {
-  const { checkAccess } = collection
+  document: ObjectsByCollectionName[N] | null,
+  context: ResolverContext | null,
+): Promise<Partial<ObjectsByCollectionName[N]> | null> => {
+  const { checkAccess } = collection;
   if (!document) return null;
-  if (checkAccess && !(await checkAccess(currentUser, document, context))) return null
-  const restrictedDoc = restrictViewableFieldsSingle(currentUser, collection, document)
+  if (checkAccess && !(await checkAccess(currentUser, document, context))) return null;
+  const restrictedDoc = restrictViewableFieldsSingle(currentUser, collection, document);
   return restrictedDoc;
-}
+};
 
 // Apply both document-level and field-level permission checks to a list of documents.
 // Returns a list where documents which the user can't access are removed from the
@@ -83,45 +86,50 @@ export const accessFilterSingle = async <N extends CollectionNameString>(
 // the list. If currentUser is null, applies permission checks for the logged-out
 // view.
 export const accessFilterMultiple = async <N extends CollectionNameString>(
-  currentUser: DbUser|null,
+  currentUser: DbUser | null,
   collection: CollectionBase<N>,
-  unfilteredDocs: Array<ObjectsByCollectionName[N]|null>,
-  context: ResolverContext|null,
+  unfilteredDocs: Array<ObjectsByCollectionName[N] | null>,
+  context: ResolverContext | null,
 ): Promise<Partial<ObjectsByCollectionName[N]>[]> => {
-  const { checkAccess } = collection
-  
+  const { checkAccess } = collection;
+
   // Filter out nulls (docs that were referenced but didn't exist)
   // Explicit cast because the type-system doesn't detect that this is removing
   // nulls.
-  const existingDocs = _.filter(unfilteredDocs, d=>!!d) as ObjectsByCollectionName[N][];
+  const existingDocs = _.filter(unfilteredDocs, (d) => !!d) as ObjectsByCollectionName[N][];
   // Apply the collection's checkAccess function, if it has one, to filter out documents
   const filteredDocs = checkAccess
     ? await asyncFilter(existingDocs, async (d) => await checkAccess(currentUser, d, context))
-    : existingDocs
+    : existingDocs;
   // Apply field-level permissions
-  const restrictedDocs = restrictViewableFieldsMultiple(currentUser, collection, filteredDocs)
-  
+  const restrictedDocs = restrictViewableFieldsMultiple(currentUser, collection, filteredDocs);
+
   return restrictedDocs;
-}
+};
 
 /**
  * This field is stored in the database as a string, but resolved as the
  * referenced document
- * 
+ *
  * @param {Object=} params
  * @param {boolean} params.nullable
  * whether the resolver field is nullable, not the original database field
  */
-export const foreignKeyField = <CollectionName extends CollectionNameString>({idFieldName, resolverName, collectionName, type, nullable=true}: {
-  idFieldName: string,
-  resolverName: string,
-  collectionName: CollectionName,
-  type: string,
-  nullable?: boolean,
+export const foreignKeyField = <CollectionName extends CollectionNameString>({
+  idFieldName,
+  resolverName,
+  collectionName,
+  type,
+  nullable = true,
+}: {
+  idFieldName: string;
+  resolverName: string;
+  collectionName: CollectionName;
+  type: string;
+  nullable?: boolean;
 }) => {
-  if (!idFieldName || !resolverName || !collectionName || !type)
-    throw new Error("Missing argument to foreignKeyField");
-  
+  if (!idFieldName || !resolverName || !collectionName || !type) throw new Error("Missing argument to foreignKeyField");
+
   return {
     type: String,
     foreignKey: collectionName,
@@ -135,27 +143,29 @@ export const foreignKeyField = <CollectionName extends CollectionNameString>({id
       }),
       addOriginalField: true,
     },
-  }
-}
+  };
+};
 
-export function arrayOfForeignKeysField<CollectionName extends keyof CollectionsByName>({idFieldName, resolverName, collectionName, type, getKey}: {
-  idFieldName: string,
-  resolverName: string,
-  collectionName: CollectionName,
-  type: string,
-  getKey?: (key: any)=>string,
+export function arrayOfForeignKeysField<CollectionName extends keyof CollectionsByName>({
+  idFieldName,
+  resolverName,
+  collectionName,
+  type,
+  getKey,
+}: {
+  idFieldName: string;
+  resolverName: string;
+  collectionName: CollectionName;
+  type: string;
+  getKey?: (key: any) => string;
 }) {
-  if (!idFieldName || !resolverName || !collectionName || !type)
-    throw new Error("Missing argument to foreignKeyField");
-  
+  if (!idFieldName || !resolverName || !collectionName || !type) throw new Error("Missing argument to foreignKeyField");
+
   return {
     type: Array,
 
     defaultValue: [],
-    onCreate: ({newDocument, fieldName}: {
-      newDocument: DbObject,
-      fieldName: string,
-    }) => {
+    onCreate: ({ newDocument, fieldName }: { newDocument: DbObject; fieldName: string }) => {
       if (newDocument[fieldName as keyof DbObject] === undefined) {
         return [];
       }
@@ -168,25 +178,25 @@ export function arrayOfForeignKeysField<CollectionName extends keyof Collections
       resolver: generateIdResolverMulti({
         collectionName,
         fieldName: idFieldName,
-        getKey
+        getKey,
       }),
-      addOriginalField: true
+      addOriginalField: true,
     },
-  }
+  };
 }
 
-export const simplSchemaToGraphQLtype = (type: any): string|null => {
+export const simplSchemaToGraphQLtype = (type: any): string | null => {
   if (type === String) return "String";
   else if (type === Number) return "Int";
   else if (type === Date) return "Date";
   else if (type === Boolean) return "Boolean";
   else return null;
-}
+};
 
 interface ResolverOnlyFieldArgs<N extends CollectionNameString> extends CollectionFieldSpecification<N> {
-  resolver: (doc: ObjectsByCollectionName[N], args: any, context: ResolverContext) => any,
-  graphQLtype?: string|GraphQLScalarType|null,
-  graphqlArguments?: string|null,
+  resolver: (doc: ObjectsByCollectionName[N], args: any, context: ResolverContext) => any;
+  graphQLtype?: string | GraphQLScalarType | null;
+  graphqlArguments?: string | null;
 }
 
 /**
@@ -195,14 +205,13 @@ interface ResolverOnlyFieldArgs<N extends CollectionNameString> extends Collecti
  */
 export const resolverOnlyField = <N extends CollectionNameString>({
   type,
-  graphQLtype=null,
+  graphQLtype = null,
   resolver,
-  graphqlArguments=null,
+  graphqlArguments = null,
   ...rest
 }: ResolverOnlyFieldArgs<N>): CollectionFieldSpecification<N> => {
   const resolverType = graphQLtype || simplSchemaToGraphQLtype(type);
-  if (!type || !resolverType)
-    throw new Error("Could not determine resolver graphQL type");
+  if (!type || !resolverType) throw new Error("Could not determine resolver graphQL type");
   return {
     type: type,
     optional: true,
@@ -211,9 +220,9 @@ export const resolverOnlyField = <N extends CollectionNameString>({
       arguments: graphqlArguments,
       resolver: resolver,
     },
-    ...rest
-  }
-}
+    ...rest,
+  };
+};
 
 // Given a collection and a fieldName=>fieldSchema dictionary, add fields to
 // the collection schema. If any of the fields mentioned are already present,
@@ -226,12 +235,12 @@ export const addFieldsDict = <N extends CollectionNameString>(
 
   for (let key in fieldsDict) {
     if (key in collection._schemaFields) {
-      throw new Error("Field already exists: "+key);
+      throw new Error("Field already exists: " + key);
     } else {
       collection._schemaFields[key] = fieldsDict[key];
     }
   }
-}
+};
 
 // Given a collection and a fieldName=>fieldSchema dictionary, add properties
 // to existing fields on the collection schema, by shallow merging them. If any
@@ -246,63 +255,65 @@ export const augmentFieldsDict = <N extends CollectionNameString>(
 
   for (let key in fieldsDict) {
     if (key in collection._schemaFields) {
-      collection._schemaFields[key] = {...collection._schemaFields[key], ...fieldsDict[key]};
+      collection._schemaFields[key] = { ...collection._schemaFields[key], ...fieldsDict[key] };
     } else {
-      throw new Error("Field does not exist: "+key);
+      throw new Error("Field does not exist: " + key);
     }
   }
-}
+};
 
 // For auto-generated database type definitions, provides a (string) definition
 // of this field's type. Useful for fields that would otherwise be black-box types.
-SimpleSchema.extendOptions(['typescriptType'])
+SimpleSchema.extendOptions(["typescriptType"]);
 
 // For denormalized fields, needsUpdate is an optional attribute that
 // determines whether the denormalization function should be rerun given
 // the new document after an update or an insert
-SimpleSchema.extendOptions(['needsUpdate'])
+SimpleSchema.extendOptions(["needsUpdate"]);
 
 // For denormalized fields, getValue returns the new denormalized value of
 // the field, given the new document after an update or an insert
-SimpleSchema.extendOptions(['getValue'])
+SimpleSchema.extendOptions(["getValue"]);
 
 // For denormalized fields, marks a field so that we can automatically
 // get the automatically recompute the new denormalized value via
 // `Vulcan.recomputeDenormalizedValues` in the Meteor shell
-SimpleSchema.extendOptions(['canAutoDenormalize'])
+SimpleSchema.extendOptions(["canAutoDenormalize"]);
 
 // Whether to log changes to this field to the LWEvents collection. If undefined
 // (neither true nor false), will be logged if the logChanges option is set on
 // the collection and the denormalized option is false.
-SimpleSchema.extendOptions(['logChanges'])
-
+SimpleSchema.extendOptions(["logChanges"]);
 
 // Helper function to add all the correct callbacks and metadata for a field
 // which is denormalized, where its denormalized value is a function only of
 // the other fields on the document. (Doesn't work if it depends on the contents
 // of other collections, because it doesn't set up callbacks for changes in
 // those collections)
-export function denormalizedField<N extends CollectionNameString>({ needsUpdate, getValue }: {
-  needsUpdate?: (doc: Partial<ObjectsByCollectionName[N]>) => boolean,
-  getValue: (doc: ObjectsByCollectionName[N], context: ResolverContext) => any,
+export function denormalizedField<N extends CollectionNameString>({
+  needsUpdate,
+  getValue,
+}: {
+  needsUpdate?: (doc: Partial<ObjectsByCollectionName[N]>) => boolean;
+  getValue: (doc: ObjectsByCollectionName[N], context: ResolverContext) => any;
 }): CollectionFieldSpecification<N> {
   return {
-    onUpdate: async ({data, document, context}) => {
+    onUpdate: async ({ data, document, context }) => {
       if (!needsUpdate || needsUpdate(data)) {
-        return await getValue(document, context)
+        return await getValue(document, context);
       }
     },
-    onCreate: async ({newDocument, context}) => {
+    onCreate: async ({ newDocument, context }) => {
       if (!needsUpdate || needsUpdate(newDocument)) {
-        return await getValue(newDocument, context)
+        return await getValue(newDocument, context);
       }
     },
     denormalized: true,
     canAutoDenormalize: true,
     optional: true,
     needsUpdate,
-    getValue
-  }
+    getValue,
+  };
 }
 
 // Create a denormalized field which counts the number of objects in some other
@@ -311,106 +322,116 @@ export function denormalizedField<N extends CollectionNameString>({ needsUpdate,
 // when objects are created/deleted/updated.
 export function denormalizedCountOfReferences<
   SourceCollectionName extends CollectionNameString,
-  TargetCollectionName extends CollectionNameString
->({ collectionName, fieldName, foreignCollectionName, foreignTypeName, foreignFieldName, filterFn }: {
-  collectionName: SourceCollectionName,
-  fieldName: string & keyof ObjectsByCollectionName[SourceCollectionName],
-  foreignCollectionName: TargetCollectionName,
-  foreignTypeName: string,
-  foreignFieldName: string & keyof ObjectsByCollectionName[TargetCollectionName],
-  filterFn?: (doc: ObjectsByCollectionName[TargetCollectionName])=>boolean,
+  TargetCollectionName extends CollectionNameString,
+>({
+  collectionName,
+  fieldName,
+  foreignCollectionName,
+  foreignTypeName,
+  foreignFieldName,
+  filterFn,
+}: {
+  collectionName: SourceCollectionName;
+  fieldName: string & keyof ObjectsByCollectionName[SourceCollectionName];
+  foreignCollectionName: TargetCollectionName;
+  foreignTypeName: string;
+  foreignFieldName: string & keyof ObjectsByCollectionName[TargetCollectionName];
+  filterFn?: (doc: ObjectsByCollectionName[TargetCollectionName]) => boolean;
 }): CollectionFieldSpecification<SourceCollectionName> {
-  const denormalizedLogger = loggerConstructor(`callbacks-${collectionName.toLowerCase()}-denormalized-${fieldName}`)
+  const denormalizedLogger = loggerConstructor(`callbacks-${collectionName.toLowerCase()}-denormalized-${fieldName}`);
 
   const foreignCollectionCallbackPrefix = foreignTypeName.toLowerCase();
   const filter = filterFn || ((doc: ObjectsByCollectionName[TargetCollectionName]) => true);
-  
-  if (isServer)
-  {
+
+  if (isServer) {
     // When inserting a new document which potentially needs to be counted, follow
     // its reference and update with $inc.
-    const createCallback = async (newDoc: AnyBecauseTodo, {currentUser, collection, context}: AnyBecauseTodo) => {
-      denormalizedLogger(`about to test new ${foreignTypeName}`, newDoc)
+    const createCallback = async (newDoc: AnyBecauseTodo, { currentUser, collection, context }: AnyBecauseTodo) => {
+      denormalizedLogger(`about to test new ${foreignTypeName}`, newDoc);
       if (newDoc[foreignFieldName] && filter(newDoc)) {
-        denormalizedLogger(`new ${foreignTypeName} should increment ${newDoc[foreignFieldName]}`)
+        denormalizedLogger(`new ${foreignTypeName} should increment ${newDoc[foreignFieldName]}`);
         const collection = getCollection(collectionName);
         await collection.rawUpdateOne(newDoc[foreignFieldName], {
-          $inc: { [fieldName]: 1 }
+          $inc: { [fieldName]: 1 },
         });
       }
-      
+
       return newDoc;
-    }
+    };
     addCallback(`${foreignCollectionCallbackPrefix}.create.after`, createCallback);
-    
+
     // When updating a document, we may need to decrement a count, we may
     // need to increment a count, we may need to do both with them cancelling
     // out, or we may need to both but on different documents.
-    addCallback(`${foreignCollectionCallbackPrefix}.update.after`,
-      async (newDoc: AnyBecauseTodo, {oldDocument, currentUser, collection}: AnyBecauseTodo) => {
-        denormalizedLogger(`about to test updating ${foreignTypeName}`, newDoc, oldDocument)
+    addCallback(
+      `${foreignCollectionCallbackPrefix}.update.after`,
+      async (newDoc: AnyBecauseTodo, { oldDocument, currentUser, collection }: AnyBecauseTodo) => {
+        denormalizedLogger(`about to test updating ${foreignTypeName}`, newDoc, oldDocument);
         const countingCollection = getCollection(collectionName);
         if (filter(newDoc) && !filter(oldDocument)) {
           // The old doc didn't count, but the new doc does. Increment on the new doc.
           if (newDoc[foreignFieldName]) {
-            denormalizedLogger(`updated ${foreignTypeName} should increment ${newDoc[foreignFieldName]}`)
+            denormalizedLogger(`updated ${foreignTypeName} should increment ${newDoc[foreignFieldName]}`);
             await countingCollection.rawUpdateOne(newDoc[foreignFieldName], {
-              $inc: { [fieldName]: 1 }
+              $inc: { [fieldName]: 1 },
             });
           }
         } else if (!filter(newDoc) && filter(oldDocument)) {
           // The old doc counted, but the new doc doesn't. Decrement on the old doc.
           if (oldDocument[foreignFieldName]) {
-            denormalizedLogger(`updated ${foreignTypeName} should decrement ${newDoc[foreignFieldName]}`)
+            denormalizedLogger(`updated ${foreignTypeName} should decrement ${newDoc[foreignFieldName]}`);
             await countingCollection.rawUpdateOne(oldDocument[foreignFieldName], {
-              $inc: { [fieldName]: -1 }
+              $inc: { [fieldName]: -1 },
             });
           }
         } else if (filter(newDoc) && oldDocument[foreignFieldName] !== newDoc[foreignFieldName]) {
-          denormalizedLogger(`${foreignFieldName} of ${foreignTypeName} has changed from ${oldDocument[foreignFieldName]} to ${newDoc[foreignFieldName]}`)
+          denormalizedLogger(
+            `${foreignFieldName} of ${foreignTypeName} has changed from ${oldDocument[foreignFieldName]} to ${newDoc[foreignFieldName]}`,
+          );
           // The old and new doc both count, but the reference target has changed.
           // Decrement on one doc and increment on the other.
           if (oldDocument[foreignFieldName]) {
-            denormalizedLogger(`changing ${foreignFieldName} leads to decrement of ${oldDocument[foreignFieldName]}`)
+            denormalizedLogger(`changing ${foreignFieldName} leads to decrement of ${oldDocument[foreignFieldName]}`);
             await countingCollection.rawUpdateOne(oldDocument[foreignFieldName], {
-              $inc: { [fieldName]: -1 }
+              $inc: { [fieldName]: -1 },
             });
           }
           if (newDoc[foreignFieldName]) {
-            denormalizedLogger(`changing ${foreignFieldName} leads to increment of ${newDoc[foreignFieldName]}`)
+            denormalizedLogger(`changing ${foreignFieldName} leads to increment of ${newDoc[foreignFieldName]}`);
             await countingCollection.rawUpdateOne(newDoc[foreignFieldName], {
-              $inc: { [fieldName]: 1 }
+              $inc: { [fieldName]: 1 },
             });
           }
         }
         return newDoc;
-      }
+      },
     );
-    addCallback(`${foreignCollectionCallbackPrefix}.delete.async`,
-      async ({document, currentUser, collection}: AnyBecauseTodo) => {
-        denormalizedLogger(`about to test deleting ${foreignTypeName}`, document)
+    addCallback(
+      `${foreignCollectionCallbackPrefix}.delete.async`,
+      async ({ document, currentUser, collection }: AnyBecauseTodo) => {
+        denormalizedLogger(`about to test deleting ${foreignTypeName}`, document);
         if (document[foreignFieldName] && filter(document)) {
-          denormalizedLogger(`deleting ${foreignTypeName} should decrement ${document[foreignFieldName]}`)
+          denormalizedLogger(`deleting ${foreignTypeName} should decrement ${document[foreignFieldName]}`);
           const countingCollection = getCollection(collectionName);
           await countingCollection.rawUpdateOne(document[foreignFieldName], {
-            $inc: { [fieldName]: -1 }
+            $inc: { [fieldName]: -1 },
           });
         }
-      }
+      },
     );
   }
-  
+
   return {
     type: Number,
     optional: true,
     nullable: false,
     defaultValue: 0,
-    onCreate: ()=>0,
+    onCreate: () => 0,
     canAutofillDefault: true,
-    
+
     denormalized: true,
     canAutoDenormalize: true,
-    
+
     getValue: async (
       document: ObjectsByCollectionName[SourceCollectionName],
       context: ResolverContext,
@@ -422,26 +443,29 @@ export function denormalizedCountOfReferences<
         `denormalizedCount_${collectionName}.${fieldName}`,
         {},
         foreignFieldName,
-        document._id
+        document._id,
       );
-      
-      const docsThatCount = _.filter(docsThatMayCount, d=>filter(d));
+
+      const docsThatCount = _.filter(docsThatMayCount, (d) => filter(d));
       return docsThatCount.length;
-    }
-  }
+    },
+  };
 }
 
 export function googleLocationToMongoLocation(gmaps: AnyBecauseTodo) {
   return {
     type: "Point",
-    coordinates: [gmaps.geometry.location.lng, gmaps.geometry.location.lat]
-  }
+    coordinates: [gmaps.geometry.location.lng, gmaps.geometry.location.lat],
+  };
 }
 export function schemaDefaultValue<N extends CollectionNameString>(
   defaultValue: any,
 ): Partial<CollectionFieldSpecification<N>> {
   // Used for both onCreate and onUpdate
-  const fillIfMissing = ({ newDocument, fieldName }: {
+  const fillIfMissing = ({
+    newDocument,
+    fieldName,
+  }: {
     newDocument: ObjectsByCollectionName[N];
     fieldName: string;
   }) => {
@@ -451,7 +475,11 @@ export function schemaDefaultValue<N extends CollectionNameString>(
       return undefined;
     }
   };
-  const throwIfSetToNull = ({ oldDocument, document, fieldName }: {
+  const throwIfSetToNull = ({
+    oldDocument,
+    document,
+    fieldName,
+  }: {
     oldDocument: ObjectsByCollectionName[N];
     document: ObjectsByCollectionName[N];
     fieldName: string;
@@ -469,6 +497,6 @@ export function schemaDefaultValue<N extends CollectionNameString>(
     onCreate: fillIfMissing,
     onUpdate: throwIfSetToNull,
     canAutofillDefault: true,
-    nullable: false
+    nullable: false,
   };
 }

@@ -1,24 +1,24 @@
-import type {
-  MappingProperty,
-  QueryDslQueryContainer,
-} from "@elastic/elasticsearch/lib/api/types";
+import type { MappingProperty, QueryDslQueryContainer } from "@elastic/elasticsearch/lib/api/types";
 import { SearchIndexCollectionName } from "../../../lib/search/searchUtil";
 import { postStatuses } from "../../../lib/collections/posts/constants";
 
 export type Ranking = {
-  field: string,
-  order: "asc" | "desc",
-  weight?: number,
-  scoring: {
-    type: "numeric",
-    pivot: number,
-    min?: number,
-  } | {
-    type: "date",
-  } | {
-    type: "bool",
-  },
-}
+  field: string;
+  order: "asc" | "desc";
+  weight?: number;
+  scoring:
+    | {
+        type: "numeric";
+        pivot: number;
+        min?: number;
+      }
+    | {
+        type: "date";
+      }
+    | {
+        type: "bool";
+      };
+};
 
 export type Mappings = Record<string, MappingProperty>;
 
@@ -31,32 +31,32 @@ export type IndexConfig = {
    * will make matches on that field 3 times more relevant than matches on other fields.
    * You never need to include objectID here as that is always checked separately.
    */
-  fields: string[],
+  fields: string[];
   /**
    * The name of the field to create a match snippet from.
    */
-  snippet: string,
+  snippet: string;
   /**
    * The name of the field to create a match highlight from.
    */
-  highlight?: string,
+  highlight?: string;
   /**
    * An array of ranking specifications to manually tune the relevancy of results.
    * Ordering does not matter.
    */
-  ranking?: Ranking[],
+  ranking?: Ranking[];
   /**
    * The name of the field to use as a tie-breaker in the event that multiple results
    * have exactly the same ranking (normally a date and ideally guaranteed to be
    * unique). Note that relevancy is calculated as a floating point number so the
    * probability of two results actually having the same relevancy is extremely low.
    */
-  tiebreaker: string,
+  tiebreaker: string;
   /**
    * Filters to completely remove entries from the result set, irregardless of their
    * relevancy to the query. This is often used to remove deleted data.
    */
-  filters?: QueryDslQueryContainer[],
+  filters?: QueryDslQueryContainer[];
   /**
    * Mappings define the schema of the table. In general, elasticsearch infers the
    * type of data when it is inserted so we do not need to keep a complete schema
@@ -70,23 +70,23 @@ export type IndexConfig = {
    * Note that making a change here requires reindexing the data with
    * `Globals.elasticConfigureIndex`.
    */
-  mappings?: Mappings,
+  mappings?: Mappings;
   /**
    * An array of field names that should not be sent to the client. This may be
    * because the data is private, or just because it isn't needed and we want to
    * save on network traffic.
    */
-  privateFields: string[],
+  privateFields: string[];
   /**
    * The name of the field to sort on when sorting by karma. Defaults to
    * `baseScore` if not defined.
    */
-  karmaField?: string,
+  karmaField?: string;
   /**
    * Field used for location based geo-sorting
    */
-  locationField?: string,
-}
+  locationField?: string;
+};
 
 /**
  * Fields that use full-text search (ie; generally all of the fields that are
@@ -136,10 +136,7 @@ const keywordMapping: MappingProperty = {
 
 const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
   Comments: {
-    fields: [
-      "body",
-      "authorDisplayName",
-    ],
+    fields: ["body", "authorDisplayName"],
     snippet: "body",
     highlight: "authorDisplayName",
     ranking: [
@@ -147,16 +144,16 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
         field: "baseScore",
         order: "desc",
         weight: 0.5,
-        scoring: {type: "numeric", pivot: 20},
+        scoring: { type: "numeric", pivot: 20 },
       },
     ],
     tiebreaker: "publicDateMs",
     filters: [
-      {term: {deleted: false}},
-      {term: {rejected: false}},
-      {term: {authorIsUnreviewed: false}},
-      {term: {retracted: false}},
-      {term: {spam: false}},
+      { term: { deleted: false } },
+      { term: { rejected: false } },
+      { term: { authorIsUnreviewed: false } },
+      { term: { retracted: false } },
+      { term: { spam: false } },
     ],
     mappings: {
       body: fullTextMapping,
@@ -172,21 +169,10 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
       tagSlug: keywordMapping,
       tagCommentType: keywordMapping,
     },
-    privateFields: [
-      "authorIsUnreviewed",
-      "deleted",
-      "legacy",
-      "rejected",
-      "retracted",
-      "spam",
-    ],
+    privateFields: ["authorIsUnreviewed", "deleted", "legacy", "rejected", "retracted", "spam"],
   },
   Posts: {
-    fields: [
-      "title^3",
-      "authorDisplayName^4",
-      "body",
-    ],
+    fields: ["title^3", "authorDisplayName^4", "body"],
     snippet: "body",
     highlight: "title",
     ranking: [
@@ -194,17 +180,17 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
         field: "baseScore",
         order: "desc",
         weight: 8,
-        scoring: {type: "numeric", pivot: 20},
+        scoring: { type: "numeric", pivot: 20 },
       },
     ],
     tiebreaker: "publicDateMs",
     filters: [
-      {term: {isFuture: false}},
-      {term: {draft: false}},
-      {term: {rejected: false}},
-      {term: {authorIsUnreviewed: false}},
-      {term: {status: postStatuses.STATUS_APPROVED}},
-      {range: {baseScore: {gte: 0}}},
+      { term: { isFuture: false } },
+      { term: { draft: false } },
+      { term: { rejected: false } },
+      { term: { authorIsUnreviewed: false } },
+      { term: { status: postStatuses.STATUS_APPROVED } },
+      { range: { baseScore: { gte: 0 } } },
     ],
     mappings: {
       title: fullTextMapping,
@@ -218,15 +204,7 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
       url: keywordMapping,
       userId: keywordMapping,
     },
-    privateFields: [
-      "authorIsUnreviewed",
-      "draft",
-      "isFuture",
-      "legacy",
-      "rejected",
-      "status",
-      "viewCount",
-    ],
+    privateFields: ["authorIsUnreviewed", "draft", "isFuture", "legacy", "rejected", "status", "viewCount"],
   },
   Users: {
     fields: [
@@ -244,33 +222,29 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
         field: "karma",
         order: "desc",
         weight: 2,
-        scoring: {type: "numeric", pivot: 5000, min: 1000},
+        scoring: { type: "numeric", pivot: 5000, min: 1000 },
       },
       {
         field: "karma",
         order: "desc",
         weight: 1.5,
-        scoring: {type: "numeric", pivot: 1000, min: 1000},
+        scoring: { type: "numeric", pivot: 1000, min: 1000 },
       },
       {
         field: "karma",
         order: "desc",
         weight: 1,
-        scoring: {type: "numeric", pivot: 100, min: 10},
+        scoring: { type: "numeric", pivot: 100, min: 10 },
       },
       {
         field: "createdAt",
         order: "desc",
         weight: 0.5,
-        scoring: {type: "date"},
+        scoring: { type: "date" },
       },
     ],
     tiebreaker: "karma",
-    filters: [
-      {range: {karma: {gte: 0}}},
-      {term: {deleted: false}},
-      {term: {deleteContent: false}},
-    ],
+    filters: [{ range: { karma: { gte: 0 } } }, { term: { deleted: false } }, { term: { deleteContent: false } }],
     mappings: {
       displayName: shingleTextMapping,
       bio: fullTextMapping,
@@ -287,27 +261,15 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
       tags: keywordMapping,
       _geoloc: geopointMapping,
     },
-    privateFields: [
-      "deleteContent",
-      "deleted",
-      "isAdmin",
-    ],
+    privateFields: ["deleteContent", "deleted", "isAdmin"],
     karmaField: "karma",
     locationField: "_geoloc",
   },
   Sequences: {
-    fields: [
-      "title^3",
-      "plaintextDescription",
-      "authorDisplayName",
-    ],
+    fields: ["title^3", "plaintextDescription", "authorDisplayName"],
     snippet: "plaintextDescription",
     tiebreaker: "publicDateMs",
-    filters: [
-      {term: {isDeleted: false}},
-      {term: {draft: false}},
-      {term: {hidden: false}},
-    ],
+    filters: [{ term: { isDeleted: false } }, { term: { draft: false } }, { term: { hidden: false } }],
     mappings: {
       body: fullTextMapping,
       plaintextDescription: fullTextMapping,
@@ -316,37 +278,27 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
       authorSlug: shingleTextMapping,
       bannerImageId: keywordMapping,
     },
-    privateFields: [
-      "draft",
-      "hidden",
-      "isDeleted",
-    ],
+    privateFields: ["draft", "hidden", "isDeleted"],
   },
   Tags: {
-    fields: [
-      "name^3",
-      "description",
-    ],
+    fields: ["name^3", "description"],
     snippet: "description",
     ranking: [
       {
         field: "core",
         order: "desc",
         weight: 0.5,
-        scoring: {type: "bool"},
+        scoring: { type: "bool" },
       },
       {
         field: "postCount",
         order: "desc",
         weight: 0.25,
-        scoring: {type: "numeric", pivot: 10},
+        scoring: { type: "numeric", pivot: 10 },
       },
     ],
     tiebreaker: "postCount",
-    filters: [
-      {term: {deleted: false}},
-      {term: {adminOnly: false}},
-    ],
+    filters: [{ term: { deleted: false } }, { term: { adminOnly: false } }],
     mappings: {
       name: fullTextMapping,
       description: fullTextMapping,
@@ -354,9 +306,7 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
       parentTagId: keywordMapping,
       slug: keywordMapping,
     },
-    privateFields: [
-      "deleted",
-    ],
+    privateFields: ["deleted"],
   },
 };
 
@@ -372,19 +322,17 @@ const indexToCollectionName = (index: string): SearchIndexCollectionName => {
     throw new Error("Invalid index name: " + index);
   }
   return data[index];
-}
+};
 
-export const collectionNameToConfig = (
-  collectionName: SearchIndexCollectionName,
-): IndexConfig => {
+export const collectionNameToConfig = (collectionName: SearchIndexCollectionName): IndexConfig => {
   const config = elasticSearchConfig[collectionName];
   if (!config) {
     throw new Error("Config not found for collection: " + collectionName);
   }
   return config;
-}
+};
 
 export const indexNameToConfig = (indexName: string): IndexConfig => {
   const collectionName = indexToCollectionName(indexName);
   return collectionNameToConfig(collectionName);
-}
+};

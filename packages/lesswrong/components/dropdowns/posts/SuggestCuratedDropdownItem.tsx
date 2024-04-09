@@ -1,48 +1,45 @@
-import { registerComponent, Components } from '../../../lib/vulcan-lib';
-import { useUpdate } from '../../../lib/crud/withUpdate';
-import React from 'react';
-import { userCanDo, userIsMemberOf } from '../../../lib/vulcan-users/permissions';
-import { useCurrentUser } from '../../common/withUser';
-import { clone, without } from 'underscore';
-import { isAF } from '../../../lib/instanceSettings';
-import { preferredHeadingCase } from '../../../themes/forumTheme';
+import { registerComponent, Components } from "../../../lib/vulcan-lib";
+import { useUpdate } from "../../../lib/crud/withUpdate";
+import React from "react";
+import { userCanDo, userIsMemberOf } from "../../../lib/vulcan-users/permissions";
+import { useCurrentUser } from "../../common/withUser";
+import { clone, without } from "underscore";
+import { isAF } from "../../../lib/instanceSettings";
+import { preferredHeadingCase } from "../../../themes/forumTheme";
 
-
-const SuggestCuratedDropdownItem = ({post}: {post: PostsBase}) => {
+const SuggestCuratedDropdownItem = ({ post }: { post: PostsBase }) => {
   const currentUser = useCurrentUser();
-  const {DropdownItem} = Components;
-  const {mutate: updatePost} = useUpdate({
+  const { DropdownItem } = Components;
+  const { mutate: updatePost } = useUpdate({
     collectionName: "Posts",
-    fragmentName: 'PostsList',
+    fragmentName: "PostsList",
   });
-  
-  if (!currentUser)
-    return null;
-  
+
+  if (!currentUser) return null;
+
   const handleSuggestCurated = () => {
-    let suggestUserIds = clone(post.suggestForCuratedUserIds) || []
+    let suggestUserIds = clone(post.suggestForCuratedUserIds) || [];
     if (!suggestUserIds.includes(currentUser._id)) {
-      suggestUserIds.push(currentUser._id)
+      suggestUserIds.push(currentUser._id);
     }
     void updatePost({
       selector: { _id: post._id },
-      data: {suggestForCuratedUserIds:suggestUserIds}
-    })
-  }
+      data: { suggestForCuratedUserIds: suggestUserIds },
+    });
+  };
 
   const handleUnsuggestCurated = () => {
-    let suggestUserIds = clone(post.suggestForCuratedUserIds) || []
+    let suggestUserIds = clone(post.suggestForCuratedUserIds) || [];
     if (suggestUserIds.includes(currentUser._id)) {
       suggestUserIds = without(suggestUserIds, currentUser._id);
     }
     void updatePost({
       selector: { _id: post._id },
-      data: {suggestForCuratedUserIds:suggestUserIds}
-    })
-  }
+      data: { suggestForCuratedUserIds: suggestUserIds },
+    });
+  };
 
-  if (!userCanDo(currentUser, "posts.moderate.all")
-    && !userIsMemberOf(currentUser, 'canSuggestCuration')) {
+  if (!userCanDo(currentUser, "posts.moderate.all") && !userIsMemberOf(currentUser, "canSuggestCuration")) {
     return null;
   }
   if (isAF) {
@@ -50,13 +47,7 @@ const SuggestCuratedDropdownItem = ({post}: {post: PostsBase}) => {
   }
 
   if (!post?.frontpageDate) {
-    return (
-      <DropdownItem
-        title={preferredHeadingCase("Suggest Curation")}
-        sideMessage="Must be frontpage"
-        disabled
-      />
-    );
+    return <DropdownItem title={preferredHeadingCase("Suggest Curation")} sideMessage="Must be frontpage" disabled />;
   }
 
   if (post.curatedDate && post.reviewForCuratedUserId) {
@@ -66,21 +57,13 @@ const SuggestCuratedDropdownItem = ({post}: {post: PostsBase}) => {
   const isSuggested = post.suggestForCuratedUserIds?.includes(currentUser._id);
   const title = isSuggested ? "Unsuggest Curation" : "Suggest Curation";
   const onClick = isSuggested ? handleUnsuggestCurated : handleSuggestCurated;
-  return (
-    <DropdownItem
-      title={preferredHeadingCase(title)}
-      onClick={onClick}
-    />
-  );
-}
+  return <DropdownItem title={preferredHeadingCase(title)} onClick={onClick} />;
+};
 
-const SuggestCuratedDropdownItemComponent = registerComponent(
-  'SuggestCuratedDropdownItem',
-  SuggestCuratedDropdownItem,
-);
+const SuggestCuratedDropdownItemComponent = registerComponent("SuggestCuratedDropdownItem", SuggestCuratedDropdownItem);
 
 declare global {
   interface ComponentTypes {
-    SuggestCuratedDropdownItem: typeof SuggestCuratedDropdownItemComponent
+    SuggestCuratedDropdownItem: typeof SuggestCuratedDropdownItemComponent;
   }
 }

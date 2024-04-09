@@ -6,7 +6,7 @@ import { userIsSharedOn } from "../../../lib/collections/users/helpers";
 import { useCurrentUser } from "../../common/withUser";
 import qs from "qs";
 
-const EditPostDropdownItem = ({post}: {post: PostsBase}) => {
+const EditPostDropdownItem = ({ post }: { post: PostsBase }) => {
   const currentUser = useCurrentUser();
   const isEditor = canUserEditPostMetadata(currentUser, post);
   const isPodcaster = userIsPodcaster(currentUser);
@@ -15,33 +15,25 @@ const EditPostDropdownItem = ({post}: {post: PostsBase}) => {
     return null;
   }
 
-  const link = (isEditor || isPodcaster)
-    ? {
-      pathname:'/editPost',
-      search:`?${qs.stringify({postId: post._id, eventForm: post.isEvent})}`,
-    }
-    : {
-      pathname:'/collaborateOnPost',
-      search:`?${qs.stringify({postId: post._id})}`,
-    };
+  const link =
+    isEditor || isPodcaster
+      ? {
+          pathname: "/editPost",
+          search: `?${qs.stringify({ postId: post._id, eventForm: post.isEvent })}`,
+        }
+      : {
+          pathname: "/collaborateOnPost",
+          search: `?${qs.stringify({ postId: post._id })}`,
+        };
 
-  const {DropdownItem} = Components;
-  return (
-    <DropdownItem
-      title="Edit"
-      to={link}
-      icon="Edit"
-    />
-  );
-}
+  const { DropdownItem } = Components;
+  return <DropdownItem title="Edit" to={link} icon="Edit" />;
+};
 
-const EditPostDropdownItemComponent = registerComponent(
-  "EditPostDropdownItem",
-  EditPostDropdownItem,
-);
+const EditPostDropdownItemComponent = registerComponent("EditPostDropdownItem", EditPostDropdownItem);
 
 declare global {
   interface ComponentTypes {
-    EditPostDropdownItem: typeof EditPostDropdownItemComponent
+    EditPostDropdownItem: typeof EditPostDropdownItemComponent;
   }
 }

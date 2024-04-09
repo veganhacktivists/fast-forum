@@ -1,9 +1,7 @@
-import React from 'react';
-import { Helmet } from 'react-helmet';
+import React from "react";
+import { Helmet } from "react-helmet";
 
-const Head = ({userAgent}: {
-  userAgent?: string
-}) => {
+const Head = ({ userAgent }: { userAgent?: string }) => {
   // Helmet.rewind() is deprecated in favour of renderStatic() for better readability
   //@see https://github.com/nfl/react-helmet/releases/tag/5.0.0
   const helmet = Helmet.renderStatic();
@@ -15,7 +13,7 @@ const Head = ({userAgent}: {
       {helmet.meta.toComponent()}
       {helmet.link.toComponent()}
       {helmet.script.toComponent()}
-      
+
       {/* Twitter link-card
        * Note 2023-10-05: Twitter's "summary_large_image" card currently shows only
        * an image with no title/description/etc, so we only ever use "summary". Before
@@ -37,9 +35,11 @@ const Head = ({userAgent}: {
        * to clean up all of the software technical debt. Worried that it might
        * finish soon.
        */}
-      {(userAgent && userAgent.startsWith("Slackbot-LinkExpanding"))
-        ? <meta name="twitter:card" content="summary_large_image"/>
-        : <meta name="twitter:card" content="summary"/>}
+      {userAgent && userAgent.startsWith("Slackbot-LinkExpanding") ? (
+        <meta name="twitter:card" content="summary_large_image" />
+      ) : (
+        <meta name="twitter:card" content="summary" />
+      )}
     </>
   );
 };

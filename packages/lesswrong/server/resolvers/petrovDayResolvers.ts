@@ -1,21 +1,25 @@
-import { PetrovDayLaunchs } from '../../lib/collections/petrovDayLaunchs/collection';
-import { addGraphQLSchema, addGraphQLResolvers, addGraphQLMutation, addGraphQLQuery } from "../../lib/vulcan-lib/graphql";
+import { PetrovDayLaunchs } from "../../lib/collections/petrovDayLaunchs/collection";
+import {
+  addGraphQLSchema,
+  addGraphQLResolvers,
+  addGraphQLMutation,
+  addGraphQLQuery,
+} from "../../lib/vulcan-lib/graphql";
 import { createMutator, updateMutator } from "../vulcan-lib/mutators";
-const crypto = require('crypto');
+const crypto = require("crypto");
 import { petrovDayLaunchCode } from "../../components/seasonal/PetrovDayButton";
 import { userCanLaunchPetrovMissile } from "../../lib/petrovHelpers";
-
 
 const PetrovDayCheckIfIncoming = `type PetrovDayCheckIfIncomingData {
   launched: Boolean
   createdAt: Date
-}`
+}`;
 
 const hashPetrovCode = (code: string): string => {
   // @ts-ignore
-  var hash = crypto.createHash('sha256');
+  var hash = crypto.createHash("sha256");
   hash.update(code);
-  return hash.digest('base64');
+  return hash.digest("base64");
 };
 
 addGraphQLSchema(PetrovDayCheckIfIncoming);
@@ -23,26 +27,26 @@ addGraphQLSchema(PetrovDayCheckIfIncoming);
 const PetrovDayLaunchMissile = `type PetrovDayLaunchMissileData {
   launchCode: String
   createdAt: Date
-}`
+}`;
 
 addGraphQLSchema(PetrovDayLaunchMissile);
 
 const petrovDayLaunchResolvers = {
   Query: {
     async PetrovDayCheckIfIncoming(root: void, context: ResolverContext) {
-      const launches = await PetrovDayLaunchs.find().fetch()
+      const launches = await PetrovDayLaunchs.find().fetch();
 
       for (const launch of launches) {
         if (launch.launchCode === petrovDayLaunchCode) {
-          return { launched: true, createdAt: launch.createdAt }
+          return { launched: true, createdAt: launch.createdAt };
         }
       }
-      return { launched: false }
-    }
+      return { launched: false };
+    },
   },
   Mutation: {
-    async PetrovDayLaunchMissile(root: void, {launchCode}: {launchCode: string}, context: ResolverContext) {
-      const { currentUser } = context
+    async PetrovDayLaunchMissile(root: void, { launchCode }: { launchCode: string }, context: ResolverContext) {
+      const { currentUser } = context;
       if (userCanLaunchPetrovMissile(currentUser)) {
         const newLaunch = await createMutator({
           collection: PetrovDayLaunchs,
@@ -61,15 +65,15 @@ const petrovDayLaunchResolvers = {
         //   },
         //   validate: false
         // })
-        return newLaunch.data
+        return newLaunch.data;
       } else {
-        throw new Error("User not authorized to launch")
+        throw new Error("User not authorized to launch");
       }
-    } 
-  }
+    },
+  },
 };
 
 addGraphQLResolvers(petrovDayLaunchResolvers);
 
-addGraphQLQuery('PetrovDayCheckIfIncoming: PetrovDayCheckIfIncomingData');
-addGraphQLMutation('PetrovDayLaunchMissile(launchCode: String): PetrovDayLaunchMissileData');
+addGraphQLQuery("PetrovDayCheckIfIncoming: PetrovDayCheckIfIncomingData");
+addGraphQLMutation("PetrovDayLaunchMissile(launchCode: String): PetrovDayLaunchMissileData");

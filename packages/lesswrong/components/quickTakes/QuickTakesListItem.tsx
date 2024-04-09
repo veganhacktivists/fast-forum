@@ -10,50 +10,41 @@ const styles = (_theme: ThemeType) => ({
   },
 });
 
-const QuickTakesListItem = ({quickTake, classes}: {
-  quickTake: ShortformComments,
-  classes: ClassesType,
-}) => {
-  const {captureEvent} = useTracking();
+const QuickTakesListItem = ({ quickTake, classes }: { quickTake: ShortformComments; classes: ClassesType }) => {
+  const { captureEvent } = useTracking();
   const [expanded, setExpanded] = useState(false);
-  const wrappedSetExpanded = useCallback((value: boolean) => {
-    setExpanded(value);
-    captureEvent(value ? "shortformItemExpanded" : "shortformItemCollapsed");
-  }, [captureEvent, setExpanded]);
+  const wrappedSetExpanded = useCallback(
+    (value: boolean) => {
+      setExpanded(value);
+      captureEvent(value ? "shortformItemExpanded" : "shortformItemCollapsed");
+    },
+    [captureEvent, setExpanded],
+  );
 
-  const {CommentsNode, QuickTakesCollapsedListItem} = Components;
-  return expanded
-    ? (
-      <div className={classes.expandedRoot}>
-        <CommentsNode
-          treeOptions={{
-            post: quickTake.post ?? undefined,
-            showCollapseButtons: true,
-            onToggleCollapsed: () => wrappedSetExpanded(!expanded),
-          }}
-          comment={quickTake}
-          loadChildrenSeparately
-          forceUnTruncated
-          forceUnCollapsed
-        />
-      </div>
-    )
-    : (
-      <QuickTakesCollapsedListItem
-        quickTake={quickTake}
-        setExpanded={wrappedSetExpanded}
+  const { CommentsNode, QuickTakesCollapsedListItem } = Components;
+  return expanded ? (
+    <div className={classes.expandedRoot}>
+      <CommentsNode
+        treeOptions={{
+          post: quickTake.post ?? undefined,
+          showCollapseButtons: true,
+          onToggleCollapsed: () => wrappedSetExpanded(!expanded),
+        }}
+        comment={quickTake}
+        loadChildrenSeparately
+        forceUnTruncated
+        forceUnCollapsed
       />
-    );
-}
+    </div>
+  ) : (
+    <QuickTakesCollapsedListItem quickTake={quickTake} setExpanded={wrappedSetExpanded} />
+  );
+};
 
-const QuickTakesListItemComponent = registerComponent(
-  "QuickTakesListItem",
-  QuickTakesListItem,
-  {styles},
-);
+const QuickTakesListItemComponent = registerComponent("QuickTakesListItem", QuickTakesListItem, { styles });
 
 declare global {
   interface ComponentTypes {
-    QuickTakesListItem: typeof QuickTakesListItemComponent
+    QuickTakesListItem: typeof QuickTakesListItemComponent;
   }
 }

@@ -1,30 +1,30 @@
 /*
  * Schema converter/getters
  */
-import { userCanCreateField, userCanUpdateField } from '../vulcan-users/permissions';
-import _keys from 'lodash/keys';
-import _filter from 'lodash/filter';
-import * as _ from 'underscore';
+import { userCanCreateField, userCanUpdateField } from "../vulcan-users/permissions";
+import _keys from "lodash/keys";
+import _filter from "lodash/filter";
+import * as _ from "underscore";
 
 /* getters */
 // filter out fields with "." or "$"
 export const getValidFields = <N extends CollectionNameString>(schema: SchemaType<N>) => {
-  return Object.keys(schema).filter(fieldName => !fieldName.includes('$') && !fieldName.includes('.'));
+  return Object.keys(schema).filter((fieldName) => !fieldName.includes("$") && !fieldName.includes("."));
 };
 
 export const getReadableFields = <N extends CollectionNameString>(schema: SchemaType<N>) => {
   // OpenCRUD backwards compatibility
-  return getValidFields(schema).filter(fieldName => schema[fieldName].canRead);
+  return getValidFields(schema).filter((fieldName) => schema[fieldName].canRead);
 };
 
 export const getCreateableFields = <N extends CollectionNameString>(schema: SchemaType<N>) => {
   // OpenCRUD backwards compatibility
-  return getValidFields(schema).filter(fieldName => schema[fieldName].canCreate);
+  return getValidFields(schema).filter((fieldName) => schema[fieldName].canCreate);
 };
 
 export const getUpdateableFields = <N extends CollectionNameString>(schema: SchemaType<N>) => {
   // OpenCRUD backwards compatibility
-  return getValidFields(schema).filter(fieldName => schema[fieldName].canUpdate);
+  return getValidFields(schema).filter((fieldName) => schema[fieldName].canUpdate);
 };
 
 /* permissions */
@@ -34,8 +34,11 @@ export const getUpdateableFields = <N extends CollectionNameString>(schema: Sche
  * Get an array of all fields editable by a specific user for a given collection
  * @param {Object} user – the user for which to check field permissions
  */
-export const getInsertableFields = function<N extends CollectionNameString>(schema: SchemaType<N>, user: UsersCurrent|null): Array<string> {
-  const fields: Array<string> = _filter(_keys(schema), function(fieldName: string): boolean {
+export const getInsertableFields = function <N extends CollectionNameString>(
+  schema: SchemaType<N>,
+  user: UsersCurrent | null,
+): Array<string> {
+  const fields: Array<string> = _filter(_keys(schema), function (fieldName: string): boolean {
     var field = schema[fieldName];
     return userCanCreateField(user, field);
   });
@@ -47,12 +50,12 @@ export const getInsertableFields = function<N extends CollectionNameString>(sche
  * Get an array of all fields editable by a specific user for a given collection (and optionally document)
  * @param {Object} user – the user for which to check field permissions
  */
-export const getEditableFields = function<N extends CollectionNameString>(
+export const getEditableFields = function <N extends CollectionNameString>(
   schema: SchemaType<N>,
-  user: UsersCurrent|null,
+  user: UsersCurrent | null,
   document: ObjectsByCollectionName[N],
 ): Array<string> {
-  const fields = _.filter(_.keys(schema), function(fieldName: string): boolean {
+  const fields = _.filter(_.keys(schema), function (fieldName: string): boolean {
     var field = schema[fieldName];
     return userCanUpdateField(user, field, document);
   });
@@ -67,9 +70,9 @@ export const convertSchema = <N extends CollectionNameString>(schema: SimpleSche
   if (schema._schema) {
     let jsonSchema: AnyBecauseTodo = {};
 
-    Object.keys(schema._schema).forEach(fieldName => {
+    Object.keys(schema._schema).forEach((fieldName) => {
       // exclude array fields
-      if (fieldName.includes('$')) {
+      if (fieldName.includes("$")) {
         return;
       }
 
@@ -110,7 +113,7 @@ Get a JSON object representing a field's schema
 */
 export const getFieldSchema = <N extends CollectionNameString>(fieldName: string, schema: SimpleSchemaType<N>) => {
   let fieldSchema: AnyBecauseTodo = {};
-  schemaProperties.forEach(property => {
+  schemaProperties.forEach((property) => {
     const propertyValue = schema.get(fieldName, property);
     if (propertyValue) {
       fieldSchema[property] = propertyValue;
@@ -128,7 +131,7 @@ const getArrayNestedSchema = <N extends CollectionNameString>(
   schema: SimpleSchemaType<N>,
 ) => {
   const arrayItemSchema = schema._schema[`${fieldName}.$`];
-  
+
   const nestedSchema = arrayItemSchema && getSchemaType(arrayItemSchema);
   return nestedSchema;
 };
@@ -163,62 +166,62 @@ export const getNestedFieldSchemaOrType = (fieldName: AnyBecauseTodo, schema: An
 };
 
 export const schemaProperties = [
-  'type',
-  'label',
-  'optional',
-  'min',
-  'max',
-  'minCount',
-  'maxCount',
-  'allowedValues',
-  'regEx',
-  'blackbox',
-  'defaultValue',
-  'hidden', // hidden: true means the field is never shown in a form no matter what
-  'form', // form placeholder
-  'control', // SmartForm control (String or React component)
-  'input', // SmartForm control (String or React component)
-  'autoform', // legacy form placeholder; backward compatibility (not used anymore)
-  'order', // position in the form
-  'group', // form fieldset group
-  'onCreate', // field insert callback
-  'onUpdate', // field edit callback
-  'onDelete', // field remove callback
-  'onInsert', // OpenCRUD backwards compatibility
-  'onEdit', // OpenCRUD backwards compatibility
-  'canRead',
-  'canCreate',
-  'canUpdate',
-  'resolveAs',
-  'description',
-  'beforeComponent',
-  'afterComponent',
-  'placeholder',
-  'options',
-  'tooltip'
+  "type",
+  "label",
+  "optional",
+  "min",
+  "max",
+  "minCount",
+  "maxCount",
+  "allowedValues",
+  "regEx",
+  "blackbox",
+  "defaultValue",
+  "hidden", // hidden: true means the field is never shown in a form no matter what
+  "form", // form placeholder
+  "control", // SmartForm control (String or React component)
+  "input", // SmartForm control (String or React component)
+  "autoform", // legacy form placeholder; backward compatibility (not used anymore)
+  "order", // position in the form
+  "group", // form fieldset group
+  "onCreate", // field insert callback
+  "onUpdate", // field edit callback
+  "onDelete", // field remove callback
+  "onInsert", // OpenCRUD backwards compatibility
+  "onEdit", // OpenCRUD backwards compatibility
+  "canRead",
+  "canCreate",
+  "canUpdate",
+  "resolveAs",
+  "description",
+  "beforeComponent",
+  "afterComponent",
+  "placeholder",
+  "options",
+  "tooltip",
 ] as const;
 
 /** Fields that, if they appear on a field schema, will be passed through to the
  * form component for that field. */
 export const formProperties = [
-  'optional',
-  'min',
-  'max',
-  'minCount',
-  'maxCount',
-  'allowedValues',
-  'regEx',
-  'blackbox',
-  'defaultValue',
-  'form', // form placeholder
-  'control', // SmartForm control (String or React component)
-  'input', // SmartForm control (String or React component)
-  'order', // position in the form
-  'group', // form fieldset group
-  'description',
-  'beforeComponent',
-  'afterComponent',
-  'placeholder',
-  'options',
-  'tooltip'
+  "optional",
+  "min",
+  "max",
+  "minCount",
+  "maxCount",
+  "allowedValues",
+  "regEx",
+  "blackbox",
+  "defaultValue",
+  "form", // form placeholder
+  "control", // SmartForm control (String or React component)
+  "input", // SmartForm control (String or React component)
+  "order", // position in the form
+  "group", // form fieldset group
+  "description",
+  "beforeComponent",
+  "afterComponent",
+  "placeholder",
+  "options",
+  "tooltip",
 ] as const;

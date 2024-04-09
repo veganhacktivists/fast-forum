@@ -1,6 +1,6 @@
-import { registerMigration, fillDefaultValues } from './migrationUtils';
+import { registerMigration, fillDefaultValues } from "./migrationUtils";
 
-import { Notifications } from '../../lib/collections/notifications/collection';
+import { Notifications } from "../../lib/collections/notifications/collection";
 
 registerMigration({
   name: "setDefaultNotificationValues",

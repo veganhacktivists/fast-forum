@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Components, fragmentTextForQuery, registerComponent } from '../../lib/vulcan-lib';
-import { userIsAdminOrMod } from '../../lib/vulcan-users/permissions';
-import { useCurrentUser } from '../common/withUser';
-import { gql, useLazyQuery } from '@apollo/client';
-import Button from '@material-ui/core/Button';
+import React, { useEffect, useState } from "react";
+import { Components, fragmentTextForQuery, registerComponent } from "../../lib/vulcan-lib";
+import { userIsAdminOrMod } from "../../lib/vulcan-users/permissions";
+import { useCurrentUser } from "../common/withUser";
+import { gql, useLazyQuery } from "@apollo/client";
+import Button from "@material-ui/core/Button";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -23,33 +23,34 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const RandomUserPage = ({classes}: {
-  classes: ClassesType,
-}) => {
+const RandomUserPage = ({ classes }: { classes: ClassesType }) => {
   const currentUser = useCurrentUser();
   const [newTabKeyHeld, setNewTabKeyHeld] = useState(false);
   const [recievedNewResults, setRecievedNewResults] = useState(false);
-  const [getRandomUser, {loading, data}] = useLazyQuery(gql`
-    query randomUser($userIsAuthor: String!) {
-      GetRandomUser(userIsAuthor: $userIsAuthor) {
-        ...UsersMinimumInfo
+  const [getRandomUser, { loading, data }] = useLazyQuery(
+    gql`
+      query randomUser($userIsAuthor: String!) {
+        GetRandomUser(userIsAuthor: $userIsAuthor) {
+          ...UsersMinimumInfo
+        }
       }
-    }
-    ${fragmentTextForQuery('UsersMinimumInfo')}
-  `, {
-    onCompleted: (data) => {
-      if (!data.GetRandomUser) return;
-      // You might imagine we could redirect here, but we don't have the status
-      // of the new tab key, so we use the useEffect below
-      setRecievedNewResults(true);
+      ${fragmentTextForQuery("UsersMinimumInfo")}
+    `,
+    {
+      onCompleted: (data) => {
+        if (!data.GetRandomUser) return;
+        // You might imagine we could redirect here, but we don't have the status
+        // of the new tab key, so we use the useEffect below
+        setRecievedNewResults(true);
+      },
+      fetchPolicy: "no-cache",
     },
-    fetchPolicy: "no-cache",
-  });
+  );
   // Redirect to the user page
   // useEffect combined with recievedNewResults ensures that we only redirect once
   useEffect(() => {
     if (recievedNewResults) {
-      const user: UsersMinimumInfo|undefined = data?.GetRandomUser;
+      const user: UsersMinimumInfo | undefined = data?.GetRandomUser;
       if (!user) {
         // eslint-disable-next-line no-console
         console.error("No user found");
@@ -66,46 +67,46 @@ const RandomUserPage = ({classes}: {
       setNewTabKeyHeld(false);
     }
   }, [recievedNewResults, data, newTabKeyHeld]);
-  
+
   const { SingleColumnSection, SectionTitle, Typography, Error404, Loading } = Components;
-  
+
   if (!userIsAdminOrMod(currentUser)) {
-    return <Error404 />
+    return <Error404 />;
   }
 
-  return <SingleColumnSection className={classes.root}>
-    <SectionTitle title="Random active user" noTopMargin />
-    <Typography variant="body1" className={classes.body}>
-      Active is defined as reading or writing something in the past month, respectively.
-    </Typography>
-    <Button
-      onClick={(e: React.MouseEvent) => {
-        if (e.ctrlKey || e.metaKey) setNewTabKeyHeld(true);
-        getRandomUser({variables: {userIsAuthor: 'optional'}})
-      }}
-      className={classes.button}
-    >
-      Get a random active user
-    </Button>
-    <Button
-      onClick={(e: React.MouseEvent) => {
-        if (e.ctrlKey || e.metaKey) setNewTabKeyHeld(true);
-        getRandomUser({variables: {userIsAuthor: 'required'}})
-      }}
-      className={classes.button}
-    >
-      Get a random active writer
-    </Button>
-    {loading && <Loading />}
-  </SingleColumnSection>
-}
+  return (
+    <SingleColumnSection className={classes.root}>
+      <SectionTitle title="Random active user" noTopMargin />
+      <Typography variant="body1" className={classes.body}>
+        Active is defined as reading or writing something in the past month, respectively.
+      </Typography>
+      <Button
+        onClick={(e: React.MouseEvent) => {
+          if (e.ctrlKey || e.metaKey) setNewTabKeyHeld(true);
+          getRandomUser({ variables: { userIsAuthor: "optional" } });
+        }}
+        className={classes.button}
+      >
+        Get a random active user
+      </Button>
+      <Button
+        onClick={(e: React.MouseEvent) => {
+          if (e.ctrlKey || e.metaKey) setNewTabKeyHeld(true);
+          getRandomUser({ variables: { userIsAuthor: "required" } });
+        }}
+        className={classes.button}
+      >
+        Get a random active writer
+      </Button>
+      {loading && <Loading />}
+    </SingleColumnSection>
+  );
+};
 
-const RandomUserPageComponent = registerComponent(
-  "RandomUserPage", RandomUserPage, {styles}
-);
+const RandomUserPageComponent = registerComponent("RandomUserPage", RandomUserPage, { styles });
 
 declare global {
   interface ComponentTypes {
-    RandomUserPage: typeof RandomUserPageComponent
+    RandomUserPage: typeof RandomUserPageComponent;
   }
 }

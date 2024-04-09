@@ -5,6 +5,6 @@ export const up = async (_: MigrationContext) => {
    * No change is needed here - we changed the field type, but the table
    * will be created by the `migrateCollections` script
    */
-}
+};
 
-export const down = async (_: MigrationContext) => {}
+export const down = async (_: MigrationContext) => {};

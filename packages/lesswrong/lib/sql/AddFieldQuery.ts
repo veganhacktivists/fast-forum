@@ -14,11 +14,7 @@ class AddFieldQuery<T extends DbObject> extends Query<T> {
     if (!skipValidation && !fieldType) {
       throw new Error(`Field "${fieldName}" does not exist in the schema`);
     }
-    super(table, [
-      "ALTER TABLE",
-      table,
-      `ADD COLUMN IF NOT EXISTS "${fieldName}" ${fieldType.toString()}`,
-    ]);
+    super(table, ["ALTER TABLE", table, `ADD COLUMN IF NOT EXISTS "${fieldName}" ${fieldType.toString()}`]);
   }
 }
 

@@ -1,6 +1,5 @@
-
-import { registerMigration, fillDefaultValues } from './migrationUtils';
-import { Posts } from '../../lib/collections/posts/collection';
+import { registerMigration, fillDefaultValues } from "./migrationUtils";
+import { Posts } from "../../lib/collections/posts/collection";
 
 registerMigration({
   name: "onlineEvents",
@@ -11,5 +10,5 @@ registerMigration({
       collection: Posts,
       fieldName: "onlineEvent",
     });
-  }
-})
+  },
+});

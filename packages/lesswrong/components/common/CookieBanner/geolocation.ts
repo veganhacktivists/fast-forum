@@ -2,7 +2,7 @@ import { isServer } from "../../../lib/executionEnvironment";
 import { DatabasePublicSetting, hasCookieConsentSetting } from "../../../lib/publicSettings";
 import { getBrowserLocalStorage } from "../../editor/localStorageHandlers";
 
-const ipApiKeySetting = new DatabasePublicSetting<string | null>('ipapi.apiKey', null);
+const ipApiKeySetting = new DatabasePublicSetting<string | null>("ipapi.apiKey", null);
 
 const GDPR_COUNTRY_CODES: string[] = [
   "AT", // Austria
@@ -38,8 +38,8 @@ const GDPR_COUNTRY_CODES: string[] = [
 function getCountryCodeFromLocalStorage(): string | null {
   const ls = getBrowserLocalStorage();
 
-  const cachedCountryCode = ls.getItem('countryCode');
-  const cachedTimestamp = ls.getItem('countryCodeTimestamp');
+  const cachedCountryCode = ls.getItem("countryCode");
+  const cachedTimestamp = ls.getItem("countryCodeTimestamp");
 
   if (!cachedCountryCode || !cachedTimestamp) {
     return null;
@@ -51,8 +51,8 @@ function getCountryCodeFromLocalStorage(): string | null {
   // 48 hours
   const cacheTTL = 48 * 60 * 60 * 1000;
   if (timeDifference > cacheTTL) {
-    localStorage.removeItem('countryCode');
-    localStorage.removeItem('countryCodeTimestamp');
+    localStorage.removeItem("countryCode");
+    localStorage.removeItem("countryCodeTimestamp");
     return null;
   }
 
@@ -63,8 +63,8 @@ function setCountryCodeToLocalStorage(countryCode: string) {
   const ls = getBrowserLocalStorage();
 
   const timestamp = new Date().getTime();
-  ls.setItem('countryCode', countryCode);
-  ls.setItem('countryCodeTimestamp', timestamp.toString());
+  ls.setItem("countryCode", countryCode);
+  ls.setItem("countryCodeTimestamp", timestamp.toString());
 }
 
 function getCachedUserCountryCode() {
@@ -94,7 +94,7 @@ async function getUserCountryCode({ signal }: { signal?: AbortSignal } = {}): Pr
   }
 
   const apiKey = ipApiKeySetting.get();
-  const ipapiUrl = apiKey ? `https://ipapi.co/json/?key=${apiKey}` : 'https://ipapi.co/json/';
+  const ipapiUrl = apiKey ? `https://ipapi.co/json/?key=${apiKey}` : "https://ipapi.co/json/";
 
   inFlightRequest = (async () => {
     try {

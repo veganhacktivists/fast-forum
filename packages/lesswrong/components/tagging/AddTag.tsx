@@ -1,27 +1,27 @@
-import React from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { InstantSearch, SearchBox, Hits, Configure } from 'react-instantsearch-dom';
-import { getSearchIndexName, getSearchClient, isSearchEnabled } from '../../lib/search/searchUtil';
-import { useCurrentUser } from '../common/withUser';
-import { userCanCreateTags } from '../../lib/betas';
-import { Link } from '../../lib/reactRouterWrapper';
-import { taggingNameCapitalSetting, taggingNamePluralCapitalSetting } from '../../lib/instanceSettings';
-import { tagCreateUrl, tagUserHasSufficientKarma } from '../../lib/collections/tags/helpers';
-import { getAllTagsPath } from '../../lib/routes';
+import React from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { InstantSearch, SearchBox, Hits, Configure } from "react-instantsearch-dom";
+import { getSearchIndexName, getSearchClient, isSearchEnabled } from "../../lib/search/searchUtil";
+import { useCurrentUser } from "../common/withUser";
+import { userCanCreateTags } from "../../lib/betas";
+import { Link } from "../../lib/reactRouterWrapper";
+import { taggingNameCapitalSetting, taggingNamePluralCapitalSetting } from "../../lib/instanceSettings";
+import { tagCreateUrl, tagUserHasSufficientKarma } from "../../lib/collections/tags/helpers";
+import { getAllTagsPath } from "../../lib/routes";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     "& .ais-SearchBox": {
       padding: 8,
     },
-    '& .ais-SearchBox-input': {
+    "& .ais-SearchBox-input": {
       background: "transparent",
     },
-    '& .ais-SearchBox-submit': {
+    "& .ais-SearchBox-submit": {
       position: "absolute",
-      right: 11
+      right: 11,
     },
-    '& .ais-SearchBox-submitIcon path': {
+    "& .ais-SearchBox-submitIcon path": {
       fill: theme.palette.grey[900],
     },
   },
@@ -30,17 +30,21 @@ const styles = (theme: ThemeType): JssStyles => ({
     padding: 8,
     cursor: "pointer",
     color: theme.palette.grey[600],
-    ...theme.typography.commentStyle
+    ...theme.typography.commentStyle,
   },
 });
 
-const AddTag = ({onTagSelected, isVotingContext, classes}: {
-  onTagSelected: (props: {tagId: string, tagName: string})=>void,
-  isVotingContext?: boolean,
-  classes: ClassesType,
+const AddTag = ({
+  onTagSelected,
+  isVotingContext,
+  classes,
+}: {
+  onTagSelected: (props: { tagId: string; tagName: string }) => void;
+  isVotingContext?: boolean;
+  classes: ClassesType;
 }) => {
-  const {TagSearchHit, DropdownDivider} = Components
-  const currentUser = useCurrentUser()
+  const { TagSearchHit, DropdownDivider } = Components;
+  const currentUser = useCurrentUser();
   const [searchOpen, setSearchOpen] = React.useState(false);
   const searchStateChanged = React.useCallback((searchState) => {
     setSearchOpen(searchState.query?.length > 0);
@@ -72,60 +76,65 @@ const AddTag = ({onTagSelected, isVotingContext, classes}: {
   }, []);
 
   if (!isSearchEnabled()) {
-    return <div className={classes.root} ref={containerRef}>
-      <input placeholder="Tag ID" type="text" onKeyPress={ev => {
-        if (ev.charCode===13) {
-          const id = (ev.target as any).value;
-          onTagSelected({tagId: id, tagName: "Tag"});
-          ev.preventDefault();
-        }
-      }}/>
-    </div>
+    return (
+      <div className={classes.root} ref={containerRef}>
+        <input
+          placeholder="Tag ID"
+          type="text"
+          onKeyPress={(ev) => {
+            if (ev.charCode === 13) {
+              const id = (ev.target as any).value;
+              onTagSelected({ tagId: id, tagName: "Tag" });
+              ev.preventDefault();
+            }
+          }}
+        />
+      </div>
+    );
   }
 
-  return <div className={classes.root} ref={containerRef}>
-    <InstantSearch
-      indexName={getSearchIndexName("Tags")}
-      searchClient={getSearchClient()}
-      onSearchStateChange={searchStateChanged}
-    >
-      {/* Ignored because SearchBox is incorrectly annotated as not taking null for its reset prop, when
+  return (
+    <div className={classes.root} ref={containerRef}>
+      <InstantSearch
+        indexName={getSearchIndexName("Tags")}
+        searchClient={getSearchClient()}
+        onSearchStateChange={searchStateChanged}
+      >
+        {/* Ignored because SearchBox is incorrectly annotated as not taking null for its reset prop, when
         * null is the only option that actually suppresses the extra X button.
        // @ts-ignore */}
-      <SearchBox reset={null} focusShortcuts={[]}/>
-      <Configure
-        filters="wikiOnly:false"
-        hitsPerPage={searchOpen ? 12 : 6}
-      />
-      <Hits hitComponent={({hit}) =>
-        <TagSearchHit
-          hit={hit}
-          onClick={ev => {
-            onTagSelected({tagId: hit._id, tagName: hit.name});
-            ev.stopPropagation();
-          }}
-          isVotingContext={isVotingContext}
+        <SearchBox reset={null} focusShortcuts={[]} />
+        <Configure filters="wikiOnly:false" hitsPerPage={searchOpen ? 12 : 6} />
+        <Hits
+          hitComponent={({ hit }) => (
+            <TagSearchHit
+              hit={hit}
+              onClick={(ev) => {
+                onTagSelected({ tagId: hit._id, tagName: hit.name });
+                ev.stopPropagation();
+              }}
+              isVotingContext={isVotingContext}
+            />
+          )}
         />
-      }/>
-    </InstantSearch>
-    <DropdownDivider />
-    <Link target="_blank" to={getAllTagsPath()} className={classes.newTag}>
-      All {taggingNamePluralCapitalSetting.get()}
-    </Link>
-    {userCanCreateTags(currentUser) && tagUserHasSufficientKarma(currentUser, "new") && <Link
-      target="_blank"
-      to={tagCreateUrl}
-      className={classes.newTag}
-    >
-      Create {taggingNameCapitalSetting.get()}
-    </Link>}
-  </div>
-}
+      </InstantSearch>
+      <DropdownDivider />
+      <Link target="_blank" to={getAllTagsPath()} className={classes.newTag}>
+        All {taggingNamePluralCapitalSetting.get()}
+      </Link>
+      {userCanCreateTags(currentUser) && tagUserHasSufficientKarma(currentUser, "new") && (
+        <Link target="_blank" to={tagCreateUrl} className={classes.newTag}>
+          Create {taggingNameCapitalSetting.get()}
+        </Link>
+      )}
+    </div>
+  );
+};
 
-const AddTagComponent = registerComponent("AddTag", AddTag, {styles});
+const AddTagComponent = registerComponent("AddTag", AddTag, { styles });
 
 declare global {
   interface ComponentTypes {
-    AddTag: typeof AddTagComponent
+    AddTag: typeof AddTagComponent;
   }
 }

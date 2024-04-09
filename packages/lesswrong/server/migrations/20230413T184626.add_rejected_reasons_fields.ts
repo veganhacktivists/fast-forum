@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-04-12T18:58:46.000Z by 20230412T185846.add_modGPTAnalysis.ts
  * +-- Overall schema hash: 1058503cdf3522b15f94b3499566433a
- *  
+ *
  * @@ -108,3 +106,3 @@ CREATE TABLE "CommentModeratorActions" (
- *  
+ *
  * --- Schema for "Comments", hash: aff61766f86b6129215dc4cd710aa12a
  * +-- Schema for "Comments", hash: 1a34920ecad5fd219e1d13d6025f4839
  *  CREATE TABLE "Comments" (
@@ -23,7 +23,7 @@
  * +    "rejectedReason" text,
  *      "rejectedByUserId" varchar(27),
  * @@ -463,3 +462,3 @@ CREATE TABLE "PostRelations" (
- *  
+ *
  * --- Schema for "Posts", hash: 3af0a7c4d804abbea3f2a8396a737aeb
  * +-- Schema for "Posts", hash: f4ca610b780ee8fc503c04e05fd7a646
  *  CREATE TABLE "Posts" (
@@ -31,7 +31,7 @@
  *      "rejected" bool DEFAULT false,
  * +    "rejectedReason" text,
  *      "rejectedByUserId" varchar(27),
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -46,12 +46,12 @@ import Comments from "../../lib/collections/comments/collection";
 import Posts from "../../lib/collections/posts/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Posts, 'rejectedReason');
-  await addField(db, Comments, 'rejectedReason');
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Posts, "rejectedReason");
+  await addField(db, Comments, "rejectedReason");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Posts, 'rejectedReason');
-  await dropField(db, Comments, 'rejectedReason');
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Posts, "rejectedReason");
+  await dropField(db, Comments, "rejectedReason");
+};

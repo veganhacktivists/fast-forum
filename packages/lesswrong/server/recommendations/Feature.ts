@@ -20,8 +20,8 @@ abstract class Feature {
 }
 
 type ConstructableFeature = {
-  new(): Feature;
-}
+  new (): Feature;
+};
 
 class KarmaFeature extends Feature {
   private readonly pivot = 100;
@@ -70,9 +70,7 @@ class CollabFilterFeature extends Feature {
 }
 
 class TextSimilarityFeature extends Feature {
-  constructor(
-    private model = DEFAULT_EMBEDDINGS_MODEL,
-  ) {
+  constructor(private model = DEFAULT_EMBEDDINGS_MODEL) {
     super();
   }
 
@@ -98,10 +96,7 @@ class TextSimilarityFeature extends Feature {
   }
 }
 
-export const featureRegistry: Record<
-  RecommendationFeatureName,
-  ConstructableFeature
-> = {
+export const featureRegistry: Record<RecommendationFeatureName, ConstructableFeature> = {
   karma: KarmaFeature,
   curated: CuratedFeature,
   tagSimilarity: TagSimilarityFeature,

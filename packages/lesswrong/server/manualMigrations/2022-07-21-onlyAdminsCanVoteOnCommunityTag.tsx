@@ -1,5 +1,5 @@
-import { registerMigration } from './migrationUtils';
-import { Tags } from '../../lib/collections/tags/collection';
+import { registerMigration } from "./migrationUtils";
+import { Tags } from "../../lib/collections/tags/collection";
 
 registerMigration({
   name: "onlyAdminsCanVoteOnCommunityTopic",

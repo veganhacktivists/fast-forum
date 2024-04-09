@@ -1,40 +1,40 @@
-import { createMutator, updateMutator } from '../../vulcan-lib';
+import { createMutator, updateMutator } from "../../vulcan-lib";
 import Users from "../../../lib/collections/users/collection";
-import Messages from '../../../lib/collections/messages/collection';
-import Conversations from '../../../lib/collections/conversations/collection';
-import { Posts } from '../../../lib/collections/posts/collection';
-import { getCollectionHooks } from '../../mutationCallbacks';
+import Messages from "../../../lib/collections/messages/collection";
+import Conversations from "../../../lib/collections/conversations/collection";
+import { Posts } from "../../../lib/collections/posts/collection";
+import { getCollectionHooks } from "../../mutationCallbacks";
 
 const getAlignmentForumAccount = async () => {
-  let account = await Users.findOne({username: "AI Alignment Forum"});
+  let account = await Users.findOne({ username: "AI Alignment Forum" });
   if (!account) {
     const userData = {
       username: "AI Alignment Forum",
       displayName: "AI Alignment Forum",
       email: "aialignmentforum@lesswrong.com",
-    }
+    };
     const response = await createMutator({
       collection: Users,
       document: userData,
       validate: false,
-    })
-    account = response.data
+    });
+    account = response.data;
   }
   return account;
+};
+
+function isAlignmentForumMember(user: DbUser | null) {
+  return user?.groups?.includes("alignmentForum");
 }
 
-function isAlignmentForumMember(user: DbUser|null) {
-  return user?.groups?.includes('alignmentForum')
-}
-
-getCollectionHooks("Users").editAsync.add(async function NewAlignmentUserSendPMAsync (newUser: DbUser, oldUser: DbUser) {
+getCollectionHooks("Users").editAsync.add(async function NewAlignmentUserSendPMAsync(newUser: DbUser, oldUser: DbUser) {
   if (isAlignmentForumMember(newUser) && !isAlignmentForumMember(oldUser)) {
     const lwAccount = await getAlignmentForumAccount();
-    if (!lwAccount) throw Error("Unable to find the lwAccount to send the new alignment user message")
+    if (!lwAccount) throw Error("Unable to find the lwAccount to send the new alignment user message");
     const conversationData = {
       participantIds: [newUser._id, lwAccount._id],
-      title: `Welcome to the AI Alignment Forum!`
-    }
+      title: `Welcome to the AI Alignment Forum!`,
+    };
     const conversation = await createMutator({
       collection: Conversations,
       document: conversationData,
@@ -42,8 +42,7 @@ getCollectionHooks("Users").editAsync.add(async function NewAlignmentUserSendPMA
       validate: false,
     });
 
-    let firstMessageContent =
-        `<div>
+    let firstMessageContent = `<div>
             <p>You've been approved for posting on https://alignment-forum.com.</p>
             <p>You can now:</p>
             <ul>
@@ -51,40 +50,43 @@ getCollectionHooks("Users").editAsync.add(async function NewAlignmentUserSendPMA
               <li> Suggest other posts for the Alignment Forum</li>
               <li> Move comments to the AI Alignment Forum</li>
             </ul>
-        </div>`
+        </div>`;
 
     const firstMessageData = {
       userId: lwAccount._id,
       contents: {
         originalContents: {
           type: "html",
-          data: firstMessageContent
-        }
+          data: firstMessageContent,
+        },
       },
-      conversationId: conversation.data._id
-    }
+      conversationId: conversation.data._id,
+    };
     void createMutator({
       collection: Messages,
       document: firstMessageData,
       currentUser: lwAccount,
       validate: false,
-    })
+    });
   }
 });
 
-getCollectionHooks("Users").editAsync.add(async function NewAlignmentUserMoveShortform(newUser: DbUser, oldUser: DbUser, context) {
+getCollectionHooks("Users").editAsync.add(async function NewAlignmentUserMoveShortform(
+  newUser: DbUser,
+  oldUser: DbUser,
+  context,
+) {
   if (isAlignmentForumMember(newUser) && !isAlignmentForumMember(oldUser)) {
     if (newUser.shortformFeedId) {
       await updateMutator({
-        collection:Posts,
+        collection: Posts,
         documentId: newUser.shortformFeedId,
         set: {
-          af: true
+          af: true,
         },
         unset: {},
         validate: false,
-      })
+      });
     }
   }
 });
-

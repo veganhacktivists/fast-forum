@@ -2,86 +2,83 @@ export default function (
   lastKnownScrollY = 0,
   currentScrollY = 0,
   props: AnyBecauseTodo = {},
-  state: AnyBecauseTodo = {}
+  state: AnyBecauseTodo = {},
 ) {
-  const scrollDirection = currentScrollY >= lastKnownScrollY ? 'down' : 'up'
-  const distanceScrolled = Math.abs(currentScrollY - lastKnownScrollY)
+  const scrollDirection = currentScrollY >= lastKnownScrollY ? "down" : "up";
+  const distanceScrolled = Math.abs(currentScrollY - lastKnownScrollY);
 
   // We're disabled
   if (props.disable) {
     return {
-      action: 'none',
+      action: "none",
       scrollDirection,
       distanceScrolled,
-    }
+    };
     // We're at the top and not fixed yet.
-  } else if (currentScrollY <= props.pinStart && state.state !== 'unfixed') {
+  } else if (currentScrollY <= props.pinStart && state.state !== "unfixed") {
     return {
-      action: 'unfix',
+      action: "unfix",
       scrollDirection,
       distanceScrolled,
-    }
-  // We're unfixed and headed down. Carry on.
+    };
+    // We're unfixed and headed down. Carry on.
+  } else if (currentScrollY <= state.height && scrollDirection === "down" && state.state === "unfixed") {
+    return {
+      action: "none",
+      scrollDirection,
+      distanceScrolled,
+    };
   } else if (
-    currentScrollY <= state.height &&
-    scrollDirection === 'down' &&
-    state.state === 'unfixed'
+    currentScrollY > state.height + props.pinStart &&
+    scrollDirection === "down" &&
+    state.state === "unfixed"
   ) {
     return {
-      action: 'none',
+      action: "unpin-snap",
       scrollDirection,
       distanceScrolled,
-    }
+    };
+    // We're past the header and scrolling down.
+    // We transition to "unpinned" if necessary.
   } else if (
-    currentScrollY > (state.height + props.pinStart) &&
-    scrollDirection === 'down' &&
-    state.state === 'unfixed'
+    scrollDirection === "down" &&
+    ["pinned", "unfixed"].indexOf(state.state) >= 0 &&
+    currentScrollY > state.height + props.pinStart &&
+    distanceScrolled > props.downTolerance
   ) {
     return {
-      action: 'unpin-snap',
+      action: "unpin",
       scrollDirection,
       distanceScrolled,
-    }
-  // We're past the header and scrolling down.
-  // We transition to "unpinned" if necessary.
+    };
+    // We're scrolling up, we transition to "pinned"
   } else if (
-    scrollDirection === 'down' &&
-    ['pinned', 'unfixed'].indexOf(state.state) >= 0 &&
-    currentScrollY > (state.height + props.pinStart) && distanceScrolled > props.downTolerance
-  ) {
-    return {
-      action: 'unpin',
-      scrollDirection,
-      distanceScrolled,
-    }
-  // We're scrolling up, we transition to "pinned"
-  } else if (
-    scrollDirection === 'up' &&
+    scrollDirection === "up" &&
     distanceScrolled > props.upTolerance &&
-    ['pinned', 'unfixed'].indexOf(state.state) < 0
+    ["pinned", "unfixed"].indexOf(state.state) < 0
   ) {
     return {
-      action: 'pin',
+      action: "pin",
       scrollDirection,
       distanceScrolled,
-    }
-  // We're scrolling up, and inside the header.
-  // We transition to pin regardless of upTolerance
+    };
+    // We're scrolling up, and inside the header.
+    // We transition to pin regardless of upTolerance
   } else if (
-    scrollDirection === 'up' &&
+    scrollDirection === "up" &&
     currentScrollY <= state.height &&
-    ['pinned', 'unfixed'].indexOf(state.state) < 0
+    ["pinned", "unfixed"].indexOf(state.state) < 0
   ) {
     return {
-      action: 'pin',
+      action: "pin",
       scrollDirection,
       distanceScrolled,
-    }
+    };
   } else {
     return {
-      action: 'none',
+      action: "none",
       scrollDirection,
       distanceScrolled,
-    }
+    };
   }
 }

@@ -13,14 +13,13 @@
  */
 export const acceptsSchemaHash = "546cd13c6ee60ca019f7eb5df4502471";
 
-import { ModerationTemplates } from "../../lib/collections/moderationTemplates"
-import { updateDefaultValue } from "./meta/utils"
+import { ModerationTemplates } from "../../lib/collections/moderationTemplates";
+import { updateDefaultValue } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await updateDefaultValue(db, ModerationTemplates, "order")
-}
+export const up = async ({ db }: MigrationContext) => {
+  await updateDefaultValue(db, ModerationTemplates, "order");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await updateDefaultValue(db, ModerationTemplates, "order")
-}
-
+export const down = async ({ db }: MigrationContext) => {
+  await updateDefaultValue(db, ModerationTemplates, "order");
+};

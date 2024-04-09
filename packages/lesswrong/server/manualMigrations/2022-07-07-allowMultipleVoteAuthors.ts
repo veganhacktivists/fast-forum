@@ -1,5 +1,5 @@
-import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
-import Votes from '../../lib/collections/votes/collection';
+import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
+import Votes from "../../lib/collections/votes/collection";
 
 registerMigration({
   name: "allowMultipleVoteAuthors",
@@ -19,11 +19,11 @@ registerMigration({
         const changes = votes.map(({ _id, authorId }) => ({
           updateOne: {
             filter: { _id },
-            update: { $set: {authorIds: authorId ? [authorId] : [] } },
-          }
+            update: { $set: { authorIds: authorId ? [authorId] : [] } },
+          },
         }));
         await Votes.rawCollection().bulkWrite(changes, { ordered: false });
-      }
+      },
     });
   },
 });

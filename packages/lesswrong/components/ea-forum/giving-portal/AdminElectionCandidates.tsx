@@ -17,37 +17,30 @@ const styles = (theme: ThemeType) => ({
     color: theme.palette.primary.main,
     fontFamily: theme.typography.fontFamily,
     fontSize: 16,
-    lineHeight: '22px',
+    lineHeight: "22px",
   },
 });
 
-const AdminElectionCandidates = ({classes}: {
-  classes: ClassesType,
-}) => {
+const AdminElectionCandidates = ({ classes }: { classes: ClassesType }) => {
   const currentUser = useCurrentUser();
-  const {results, loading} = useElectionCandidates("name", {
+  const { results, loading } = useElectionCandidates("name", {
     fetchPolicy: "network-only",
   });
 
   if (!userIsAdmin(currentUser)) {
-    const {Error404} = Components;
-    return (
-      <Error404 />
-    );
+    const { Error404 } = Components;
+    return <Error404 />;
   }
 
-  const {SectionTitle, Loading, EAButton, ForumIcon} = Components;
+  const { SectionTitle, Loading, EAButton, ForumIcon } = Components;
   return (
     <div className={classes.root}>
       <SectionTitle title="Election Candidates" centered />
       {loading && <Loading />}
       <div>
-        {results?.map(({_id, name}) => (
+        {results?.map(({ _id, name }) => (
           <div key={_id}>
-            <Link
-              to={`/admin/election-candidates/${_id}`}
-              className={classes.link}
-            >
+            <Link to={`/admin/election-candidates/${_id}`} className={classes.link}>
               {name}
             </Link>
           </div>
@@ -58,13 +51,11 @@ const AdminElectionCandidates = ({classes}: {
       </EAButton>
     </div>
   );
-}
+};
 
-const AdminElectionCandidatesComponent = registerComponent(
-  "AdminElectionCandidates",
-  AdminElectionCandidates,
-  {styles},
-);
+const AdminElectionCandidatesComponent = registerComponent("AdminElectionCandidates", AdminElectionCandidates, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {

@@ -1,5 +1,3 @@
-const testGroup = require('./testGroup');
+const testGroup = require("./testGroup");
 
-module.exports = [
-  testGroup,
-];
+module.exports = [testGroup];

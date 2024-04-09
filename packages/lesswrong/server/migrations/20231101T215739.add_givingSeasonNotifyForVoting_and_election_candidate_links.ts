@@ -12,13 +12,13 @@
  * -
  * --- Accepted on 2023-10-28T01:20:12.000Z by 20231028T012012.add_notificationAddedAsCoauthor.ts
  * +-- Overall schema hash: 0cc5ac04b5c4340a894f1bef511f22a9
- *  
+ *
  * @@ -1063,3 +1061,3 @@ CREATE TABLE "UserTagRels" (
- *  
+ *
  * --- Schema for "Users", hash: b27730e9f93ef74e21bbea8d6f188b80
  * +-- Schema for "Users", hash: 50f4feeb1374733e404020c3513d1892
  *  CREATE TABLE "Users" (
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -31,16 +31,16 @@ export const acceptsSchemaHash = "0cc5ac04b5c4340a894f1bef511f22a9";
 
 import ElectionCandidates from "../../lib/collections/electionCandidates/collection";
 import Users from "../../lib/collections/users/collection";
-import { addField, dropField } from "./meta/utils"
+import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Users, "givingSeasonNotifyForVoting");
   await addField(db, ElectionCandidates, "fundraiserLink");
   await addField(db, ElectionCandidates, "gwwcLink");
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropField(db, Users, "givingSeasonNotifyForVoting");
   await dropField(db, ElectionCandidates, "fundraiserLink");
   await dropField(db, ElectionCandidates, "gwwcLink");
-}
+};

@@ -1,8 +1,8 @@
-import React from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import Paper from "@material-ui/core/Card"
-import CloseIcon from '@material-ui/icons/Close';
-import type { CommentsNewFormProps } from './CommentsNewForm';
+import React from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import Paper from "@material-ui/core/Card";
+import CloseIcon from "@material-ui/icons/Close";
+import type { CommentsNewFormProps } from "./CommentsNewForm";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -12,11 +12,11 @@ const styles = (theme: ThemeType): JssStyles => ({
     right: theme.spacing.unit,
     bottom: theme.spacing.unit,
     zIndex: theme.zIndexes.commentBoxPopup,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       width: "100%",
       right: 0,
       bottom: 0,
-    }
+    },
   },
   title: {
     ...theme.typography.commentStyle,
@@ -31,9 +31,9 @@ const styles = (theme: ThemeType): JssStyles => ({
     cursor: "pointer",
     color: theme.palette.grey[400],
     height: 20,
-    '&:hover': {
+    "&:hover": {
       color: theme.palette.grey[600],
-    }
+    },
   },
   header: {
     backgroundColor: theme.palette.grey[100],
@@ -41,7 +41,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     paddingRight: 20,
     paddingTop: 14,
     paddingBottom: 8,
-    position: "relative"
+    position: "relative",
   },
   editor: {
     padding: 20,
@@ -62,42 +62,48 @@ const styles = (theme: ThemeType): JssStyles => ({
  *   specifying what post the comment is on, and prefilling props.
  * onClose: Called when the window is closed.
  */
-const PopupCommentEditor = ({title, guidelines, commentFormProps, onClose, classes}: {
-  title: React.ReactNode,
-  guidelines?: React.ReactNode,
-  commentFormProps: Partial<CommentsNewFormProps>,
-  onClose: ()=>void,
-  classes: ClassesType
+const PopupCommentEditor = ({
+  title,
+  guidelines,
+  commentFormProps,
+  onClose,
+  classes,
+}: {
+  title: React.ReactNode;
+  guidelines?: React.ReactNode;
+  commentFormProps: Partial<CommentsNewFormProps>;
+  onClose: () => void;
+  classes: ClassesType;
 }) => {
   const { CommentsNewForm } = Components;
 
-  return <Paper className={classes.root}>
-    <div className={classes.header}>
-      <div className={classes.title}>
-        {title}
+  return (
+    <Paper className={classes.root}>
+      <div className={classes.header}>
+        <div className={classes.title}>{title}</div>
+        <CloseIcon className={classes.close} onClick={onClose} />
+        {guidelines}
       </div>
-      <CloseIcon className={classes.close} onClick={onClose}/>
-      {guidelines}
-    </div>
-    <div className={classes.editor}>
-      <CommentsNewForm
-        enableGuidelines={false}
-        padding={false}
-        successCallback={onClose}
-        type="comment"
-        formProps={{
-          maxHeight: true
-        }}
-        {...commentFormProps}
-      />
-    </div>
-  </Paper>
-}
+      <div className={classes.editor}>
+        <CommentsNewForm
+          enableGuidelines={false}
+          padding={false}
+          successCallback={onClose}
+          type="comment"
+          formProps={{
+            maxHeight: true,
+          }}
+          {...commentFormProps}
+        />
+      </div>
+    </Paper>
+  );
+};
 
-const PopupCommentEditorComponent = registerComponent('PopupCommentEditor', PopupCommentEditor, {styles});
+const PopupCommentEditorComponent = registerComponent("PopupCommentEditor", PopupCommentEditor, { styles });
 
 declare global {
   interface ComponentTypes {
-    PopupCommentEditor: typeof PopupCommentEditorComponent
+    PopupCommentEditor: typeof PopupCommentEditorComponent;
   }
 }

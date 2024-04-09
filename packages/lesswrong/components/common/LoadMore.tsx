@@ -1,12 +1,12 @@
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import React from 'react';
-import classNames from 'classnames';
-import { queryIsUpdating } from './queryStatusUtils'
-import {useTracking} from "../../lib/analyticsEvents";
-import { LoadMoreCallback } from '../../lib/crud/withMulti';
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import React from "react";
+import classNames from "classnames";
+import { queryIsUpdating } from "./queryStatusUtils";
+import { useTracking } from "../../lib/analyticsEvents";
+import { LoadMoreCallback } from "../../lib/crud/withMulti";
 import { useIsFirstRender } from "../hooks/useFirstRender";
 
-import { isFriendlyUI, preferredHeadingCase } from '../../themes/forumTheme';
+import { isFriendlyUI, preferredHeadingCase } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -17,10 +17,10 @@ const styles = (theme: ThemeType): JssStyles => ({
     minHeight: 20,
     ...(isFriendlyUI
       ? {
-        fontSize: 14,
-        fontWeight: 600,
-        lineHeight: "24px",
-      }
+          fontSize: 14,
+          fontWeight: 600,
+          lineHeight: "24px",
+        }
       : {}),
   },
   afterPostsListMarginTop: {
@@ -31,24 +31,23 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   disabled: {
     color: theme.palette.grey[400],
-    cursor: 'default',
-    '&:hover': {
-      opacity: 1
-    }
+    cursor: "default",
+    "&:hover": {
+      opacity: 1,
+    },
   },
   sectionFooterStyles: {
     // This is an artifact of how SectionFooter is currently implemented, which should probably change.
     flexGrow: 1,
     textAlign: "left !important",
     marginLeft: "0 !important", // for loading spinner
-    '&:after': {
+    "&:after": {
       content: "'' !important",
       marginLeft: "0 !important",
       marginRight: "0 !important",
-    }
-  }
-})
-
+    },
+  },
+});
 
 /**
  * Load More button. The simplest way to use this is to take `loadMoreProps`
@@ -59,39 +58,39 @@ const LoadMore = ({
   loadMore,
   count,
   totalCount,
-  className=null,
+  className = null,
   loadingClassName,
-  disabled=false,
+  disabled = false,
   networkStatus,
-  loading=false,
-  hideLoading=false,
-  hidden=false,
+  loading = false,
+  hideLoading = false,
+  hidden = false,
   classes,
   sectionFooterStyles,
   afterPostsListMarginTop,
-  message=preferredHeadingCase("Load More"),
+  message = preferredHeadingCase("Load More"),
 }: {
   // loadMore: Callback when clicked.
-  loadMore: LoadMoreCallback,
+  loadMore: LoadMoreCallback;
   // count/totalCount: If provided, looks like "Load More (10/25)"
-  count?: number,
-  totalCount?: number,
+  count?: number;
+  totalCount?: number;
   // className: If provided, replaces the root style (default typography).
-  className?: string|null|undefined,
-  loadingClassName?: string,
+  className?: string | null | undefined;
+  loadingClassName?: string;
   // disabled: If true, this is grayed out (eg because everything's already loaded).
-  disabled?: boolean,
-  networkStatus?: any,
-  loading?: boolean,
+  disabled?: boolean;
+  networkStatus?: any;
+  loading?: boolean;
   // hideLoading: Reserve space for the load spinner as normal, but don't show it
-  hideLoading?: boolean,
-  hidden?: boolean,
-  classes: ClassesType,
-  sectionFooterStyles?: boolean,
-  afterPostsListMarginTop?: boolean,
-  message?: string,
+  hideLoading?: boolean;
+  hidden?: boolean;
+  classes: ClassesType;
+  sectionFooterStyles?: boolean;
+  afterPostsListMarginTop?: boolean;
+  message?: string;
 }) => {
-  const { captureEvent } = useTracking()
+  const { captureEvent } = useTracking();
 
   /**
    * To avoid hydration errors, set loading to false if this is the initial render and we have
@@ -100,15 +99,21 @@ const LoadMore = ({
   const isFirstRender = useIsFirstRender();
   loading = loading && !(isFirstRender && (count ?? 0) > 0);
 
-  const { Loading } = Components
+  const { Loading } = Components;
   const handleClickLoadMore = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     void loadMore();
-    captureEvent("loadMoreClicked")
-  }
+    captureEvent("loadMoreClicked");
+  };
 
   if (!hideLoading && (loading || (networkStatus && queryIsUpdating(networkStatus)))) {
-    return <Loading className={classNames(classes.loading, loadingClassName, {[classes.sectionFooterStyles]: sectionFooterStyles})} />
+    return (
+      <Loading
+        className={classNames(classes.loading, loadingClassName, {
+          [classes.sectionFooterStyles]: sectionFooterStyles,
+        })}
+      />
+    );
   }
 
   if (hidden) return null;
@@ -125,13 +130,13 @@ const LoadMore = ({
     >
       {totalCount ? `${message} (${count}/${totalCount})` : `${message}`}
     </a>
-  )
-}
+  );
+};
 
-const LoadMoreComponent = registerComponent('LoadMore', LoadMore, {styles, stylePriority: -1});
+const LoadMoreComponent = registerComponent("LoadMore", LoadMore, { styles, stylePriority: -1 });
 
 declare global {
   interface ComponentTypes {
-    LoadMore: typeof LoadMoreComponent
+    LoadMore: typeof LoadMoreComponent;
   }
 }

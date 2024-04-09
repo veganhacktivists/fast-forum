@@ -1,54 +1,59 @@
-import { registerComponent, Components } from '../../../lib/vulcan-lib';
-import React from 'react';
-import Divider from '@material-ui/core/Divider';
+import { registerComponent, Components } from "../../../lib/vulcan-lib";
+import React from "react";
+import Divider from "@material-ui/core/Divider";
 
 // -- See here for all the tab content --
-import menuTabs from './menuTabs'
-import { forumSelect } from '../../../lib/forumTypeUtils';
+import menuTabs from "./menuTabs";
+import { forumSelect } from "../../../lib/forumTypeUtils";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     display: "flex",
     flexDirection: "column",
-    width:55,
+    width: 55,
     backgroundColor: theme.palette.grey[100],
     borderRight: theme.palette.border.faint,
-    height:"100%",
+    height: "100%",
     color: theme.palette.grey[600],
   },
   divider: {
-    marginTop:theme.spacing.unit,
-    marginBottom:theme.spacing.unit
-  }
-})
+    marginTop: theme.spacing.unit,
+    marginBottom: theme.spacing.unit,
+  },
+});
 
-const TabNavigationMenuCompressed = ({onClickSection, classes}: {
-  onClickSection: (e?: React.BaseSyntheticEvent) => void,
-  classes: ClassesType
+const TabNavigationMenuCompressed = ({
+  onClickSection,
+  classes,
+}: {
+  onClickSection: (e?: React.BaseSyntheticEvent) => void;
+  classes: ClassesType;
 }) => {
-  const { TabNavigationCompressedItem } = Components
+  const { TabNavigationCompressedItem } = Components;
 
   return (
     <div className={classes.root}>
-      {forumSelect(menuTabs).map(tab => {
-        if (!('showOnCompressed' in tab) || !tab.showOnCompressed) {
-          return
+      {forumSelect(menuTabs).map((tab) => {
+        if (!("showOnCompressed" in tab) || !tab.showOnCompressed) {
+          return;
         }
-        if ('divider' in tab) {
-          return <Divider key={tab.id} className={classes.divider} />
+        if ("divider" in tab) {
+          return <Divider key={tab.id} className={classes.divider} />;
         }
-        return <TabNavigationCompressedItem key={tab.id} tab={tab} onClick={onClickSection} />
+        return <TabNavigationCompressedItem key={tab.id} tab={tab} onClick={onClickSection} />;
       })}
     </div>
-  )
+  );
 };
 
 const TabNavigationMenuCompressedComponent = registerComponent(
-  'TabNavigationMenuCompressed', TabNavigationMenuCompressed, {styles}
+  "TabNavigationMenuCompressed",
+  TabNavigationMenuCompressed,
+  { styles },
 );
 
 declare global {
   interface ComponentTypes {
-    TabNavigationMenuCompressed: typeof TabNavigationMenuCompressedComponent
+    TabNavigationMenuCompressed: typeof TabNavigationMenuCompressedComponent;
   }
 }

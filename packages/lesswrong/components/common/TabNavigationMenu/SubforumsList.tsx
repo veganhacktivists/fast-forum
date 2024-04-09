@@ -5,17 +5,17 @@ import { useMulti } from "../../../lib/crud/withMulti";
 import { tagGetSubforumUrl, tagGetUrl } from "../../../lib/collections/tags/helpers";
 import { isEAForum } from "../../../lib/instanceSettings";
 
-const styles = ((theme: ThemeType): JssStyles => ({
+const styles = (theme: ThemeType): JssStyles => ({
   menuItem: {
     paddingTop: 0,
     paddingBottom: 0,
     paddingLeft: 0,
     paddingRight: 0,
-    '&:hover': {
-      backgroundColor: 'transparent' // Prevent MUI default behavior of rendering solid background on hover
+    "&:hover": {
+      backgroundColor: "transparent", // Prevent MUI default behavior of rendering solid background on hover
     },
-    whiteSpace: 'break-spaces',
-    height: 'unset',
+    whiteSpace: "break-spaces",
+    height: "unset",
     minHeight: 24,
   },
   title: {
@@ -25,43 +25,43 @@ const styles = ((theme: ThemeType): JssStyles => ({
     color: theme.palette.grey[isEAForum ? 600 : 800],
   },
   subItem: {
-    textTransform: 'capitalize',
-    whiteSpace: 'break-spaces !important',
+    textTransform: "capitalize",
+    whiteSpace: "break-spaces !important",
   },
   showMoreLess: {
     color: `${theme.palette.grey[500]} !important`,
-  }
-}))
+  },
+});
 
-const INITIAL_LIMIT = 3
+const INITIAL_LIMIT = 3;
 
-const SubforumsList = ({ onClick, classes }: {
-  onClick: ()=>void
-  classes: ClassesType
-}) => {
+const SubforumsList = ({ onClick, classes }: { onClick: () => void; classes: ClassesType }) => {
   const { results } = useMulti({
-    terms: {view: 'coreTags', limit: 100},
+    terms: { view: "coreTags", limit: 100 },
     collectionName: "Tags",
-    fragmentName: 'TagSubforumSidebarFragment',
+    fragmentName: "TagSubforumSidebarFragment",
     enableTotal: false,
-    fetchPolicy: 'cache-and-network',
-    skip: !isEAForum
-  })
-  const [showAll, setShowAll] = useState(false)
+    fetchPolicy: "cache-and-network",
+    skip: !isEAForum,
+  });
+  const [showAll, setShowAll] = useState(false);
 
-  const onClickShowMoreOrLess = useCallback((e) => {
-    e.preventDefault() // Prevent ripple
-    setShowAll(!showAll)
-  }, [showAll])
-  
-  if (!results || !results.length) return <></>
-  
-  const initialResults = results.slice(0, INITIAL_LIMIT)
-  const maybeHiddenResults = results.slice(INITIAL_LIMIT)
-  const displayShowMoreOrLess = results.length > INITIAL_LIMIT
+  const onClickShowMoreOrLess = useCallback(
+    (e) => {
+      e.preventDefault(); // Prevent ripple
+      setShowAll(!showAll);
+    },
+    [showAll],
+  );
 
-  const { TabNavigationSubItem, MenuItem, MenuItemLink } = Components
-  
+  if (!results || !results.length) return <></>;
+
+  const initialResults = results.slice(0, INITIAL_LIMIT);
+  const maybeHiddenResults = results.slice(INITIAL_LIMIT);
+  const displayShowMoreOrLess = results.length > INITIAL_LIMIT;
+
+  const { TabNavigationSubItem, MenuItem, MenuItemLink } = Components;
+
   const getListItem = (tag: TagSubforumSidebarFragment) => (
     <MenuItemLink
       key={tag._id}
@@ -90,9 +90,9 @@ const SubforumsList = ({ onClick, classes }: {
       </AnalyticsContext>
     </span>
   );
-}
+};
 
-const SubforumsListComponent = registerComponent("SubforumsList", SubforumsList, {styles})
+const SubforumsListComponent = registerComponent("SubforumsList", SubforumsList, { styles });
 
 declare global {
   interface ComponentTypes {

@@ -25,40 +25,40 @@ const styles = (_theme: ThemeType) => ({
 
 const getItemProps = (
   post: PostsRecentDiscussion,
-  {item}: CommentTreeNode<CommentsListWithTopLevelComment>,
+  { item }: CommentTreeNode<CommentsListWithTopLevelComment>,
 ): EARecentDiscussionItemProps => {
   return item.parentCommentId
     ? {
-      // We have comments on a quick take
-      icon: "CommentFilled",
-      iconVariant: "primary",
-      user: item.user,
-      action: "commented on",
-      postTitleOverride: `${post.user?.displayName}'s quick take`,
-      postUrlOverride: commentGetPageUrlFromIds({
-        commentId: item.topLevelCommentId ?? item._id,
-        postId: post._id,
-        postSlug: post.slug,
-      }),
-      post,
-      timestamp: item.postedAt,
-    }
+        // We have comments on a quick take
+        icon: "CommentFilled",
+        iconVariant: "primary",
+        user: item.user,
+        action: "commented on",
+        postTitleOverride: `${post.user?.displayName}'s quick take`,
+        postUrlOverride: commentGetPageUrlFromIds({
+          commentId: item.topLevelCommentId ?? item._id,
+          postId: post._id,
+          postSlug: post.slug,
+        }),
+        post,
+        timestamp: item.postedAt,
+      }
     : {
-      // We have a new quick take without comments yet
-      icon: "CommentFilled",
-      iconVariant: "grey",
-      user: post.user,
-      action: "posted a",
-      postTitleOverride: "Quick Take",
-      postUrlOverride: commentGetPageUrlFromIds({
-        commentId: item._id,
-        postId: post._id,
-        postSlug: post.slug,
-      }),
-      post,
-      timestamp: item.postedAt,
-    };
-}
+        // We have a new quick take without comments yet
+        icon: "CommentFilled",
+        iconVariant: "grey",
+        user: post.user,
+        action: "posted a",
+        postTitleOverride: "Quick Take",
+        postUrlOverride: commentGetPageUrlFromIds({
+          commentId: item._id,
+          postId: post._id,
+          postSlug: post.slug,
+        }),
+        post,
+        timestamp: item.postedAt,
+      };
+};
 
 type NestedComments = CommentTreeNode<CommentsListWithTopLevelComment>;
 
@@ -72,7 +72,7 @@ const splitByTopLevelComment = (nodes: NestedComments[]): NestedComments[][] => 
     }
   }
   return Object.values(result);
-}
+};
 
 const EARecentDiscussionQuickTake = ({
   post,
@@ -81,18 +81,13 @@ const EARecentDiscussionQuickTake = ({
   expandAllThreads: initialExpandAllThreads,
   classes,
 }: {
-  post: ShortformRecentDiscussion,
-  comments?: CommentsListWithTopLevelComment[],
-  refetch: () => void,
-  expandAllThreads?: boolean,
-  classes: ClassesType,
+  post: ShortformRecentDiscussion;
+  comments?: CommentsListWithTopLevelComment[];
+  refetch: () => void;
+  expandAllThreads?: boolean;
+  classes: ClassesType;
 }) => {
-  const {
-    isSkippable,
-    expandAllThreads,
-    nestedComments,
-    treeOptions,
-  } = useRecentDiscussionThread({
+  const { isSkippable, expandAllThreads, nestedComments, treeOptions } = useRecentDiscussionThread({
     post,
     comments,
     refetch,
@@ -105,7 +100,7 @@ const EARecentDiscussionQuickTake = ({
 
   const splitComments = splitByTopLevelComment(nestedComments);
 
-  const {EARecentDiscussionItem, CommentsItem, CommentsNode} = Components;
+  const { EARecentDiscussionItem, CommentsItem, CommentsNode } = Components;
   return (
     <>
       {splitComments.map((comments) => {
@@ -113,17 +108,12 @@ const EARecentDiscussionQuickTake = ({
           return null;
         }
         const hasComments = !!comments[0].item.parentCommentId;
-        const quickTake = hasComments
-          ? comments[0].item.topLevelComment
-          : comments[0].item;
+        const quickTake = hasComments ? comments[0].item.topLevelComment : comments[0].item;
         if (!quickTake) {
           return null;
         }
         return (
-          <EARecentDiscussionItem
-            key={quickTake._id}
-            {...getItemProps(post, comments[0])}
-          >
+          <EARecentDiscussionItem key={quickTake._id} {...getItemProps(post, comments[0])}>
             <CommentsItem
               treeOptions={treeOptions}
               comment={quickTake}
@@ -134,36 +124,37 @@ const EARecentDiscussionQuickTake = ({
                 [classes.noBottomPadding]: !hasComments,
               })}
             />
-            {hasComments && comments.map((comment) => (
-              <CommentsNode
-                key={comment.item._id}
-                treeOptions={{
-                  ...treeOptions,
-                  hideParentCommentToggleForTopLevel: true,
-                }}
-                truncated={false}
-                expandAllThreads={expandAllThreads}
-                expandNewComments={false}
-                nestingLevel={1}
-                comment={comment.item}
-                childComments={comment.children}
-              />
-            ))}
+            {hasComments &&
+              comments.map((comment) => (
+                <CommentsNode
+                  key={comment.item._id}
+                  treeOptions={{
+                    ...treeOptions,
+                    hideParentCommentToggleForTopLevel: true,
+                  }}
+                  truncated={false}
+                  expandAllThreads={expandAllThreads}
+                  expandNewComments={false}
+                  nestingLevel={1}
+                  comment={comment.item}
+                  childComments={comment.children}
+                />
+              ))}
           </EARecentDiscussionItem>
         );
       })}
     </>
   );
-}
+};
 
 const EARecentDiscussionQuickTakeComponent = registerComponent(
   "EARecentDiscussionQuickTake",
   EARecentDiscussionQuickTake,
-  {styles},
+  { styles },
 );
 
 declare global {
   interface ComponentTypes {
-    EARecentDiscussionQuickTake: typeof EARecentDiscussionQuickTakeComponent,
+    EARecentDiscussionQuickTake: typeof EARecentDiscussionQuickTakeComponent;
   }
 }

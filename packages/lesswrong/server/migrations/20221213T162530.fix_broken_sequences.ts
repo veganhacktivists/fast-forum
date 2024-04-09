@@ -3,17 +3,17 @@ import Sequences from "../../lib/collections/sequences/collection";
 import { randomId } from "../../lib/random";
 import InsertQuery from "../../lib/sql/InsertQuery";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   const [sequences, chapters] = await Promise.all([
-    Sequences.find({}, {projection: {_id: 1}}).fetch(),
-    Chapters.find({}, {projection: {_id: 1, sequenceId: 1}}).fetch(),
+    Sequences.find({}, { projection: { _id: 1 } }).fetch(),
+    Chapters.find({}, { projection: { _id: 1, sequenceId: 1 } }).fetch(),
   ]);
 
   const newChapters: Partial<DbChapter>[] = [];
 
   for (const sequence of sequences) {
-    const {_id} = sequence;
-    const chapter = chapters.find(({sequenceId}) => sequenceId === _id);
+    const { _id } = sequence;
+    const chapter = chapters.find(({ sequenceId }) => sequenceId === _id);
     if (!chapter) {
       newChapters.push({
         _id: randomId(),
@@ -26,7 +26,7 @@ export const up = async ({db}: MigrationContext) => {
 
   if (newChapters.length) {
     const query = new InsertQuery(Chapters.getTable(), newChapters as DbChapter[]);
-    const {sql, args} = query.compile();
+    const { sql, args } = query.compile();
     await db.none(sql, args);
   }
-}
+};

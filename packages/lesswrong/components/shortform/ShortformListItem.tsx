@@ -65,7 +65,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     marginLeft: 10,
     [theme.breakpoints.down("xs")]: {
       display: "none",
-    }
+    },
   },
   preview: {
     marginLeft: 6,
@@ -79,20 +79,27 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const ShortformListItem = ({comment, hideTag, classes}: {
-  comment: ShortformComments,
-  hideTag?: boolean,
-  classes: ClassesType,
+const ShortformListItem = ({
+  comment,
+  hideTag,
+  classes,
+}: {
+  comment: ShortformComments;
+  hideTag?: boolean;
+  classes: ClassesType;
 }) => {
   const { captureEvent } = useTracking();
 
-  const [expanded, setExpanded] = useState(false)
-  const wrappedSetExpanded = useCallback((value: boolean) => {
-    setExpanded(value);
-    captureEvent(value ? "shortformItemExpanded" : "shortformItemCollapsed");
-  }, [captureEvent, setExpanded]);
+  const [expanded, setExpanded] = useState(false);
+  const wrappedSetExpanded = useCallback(
+    (value: boolean) => {
+      setExpanded(value);
+      captureEvent(value ? "shortformItemExpanded" : "shortformItemCollapsed");
+    },
+    [captureEvent, setExpanded],
+  );
 
-  const {eventHandlers, hover, anchorEl} = useHover({
+  const { eventHandlers, hover, anchorEl } = useHover({
     pageElementContext: "shortformItemTooltip",
     commentId: comment._id,
   });
@@ -103,18 +110,12 @@ const ShortformListItem = ({comment, hideTag, classes}: {
     onToggleCollapsed: () => wrappedSetExpanded(!expanded),
   };
 
-  const {
-    LWPopper, LWTooltip, ForumIcon, UsersName, FooterTag, CommentsNode
-  } = Components;
+  const { LWPopper, LWTooltip, ForumIcon, UsersName, FooterTag, CommentsNode } = Components;
 
   if (expanded) {
     return (
       <div className={classes.expandedRoot}>
-        <CommentsNode
-          treeOptions={treeOptions}
-          comment={comment}
-          loadChildrenSeparately
-        />
+        <CommentsNode treeOptions={treeOptions} comment={comment} loadChildrenSeparately />
       </div>
     );
   }
@@ -122,21 +123,19 @@ const ShortformListItem = ({comment, hideTag, classes}: {
   const karma = comment.baseScore ?? 0;
   const commentCount = comment.descendentCount ?? 0;
   const primaryTag = comment.relevantTags?.[0];
-  const displayHoverOver = hover && (comment.baseScore > -5) && !isMobile();
+  const displayHoverOver = hover && comment.baseScore > -5 && !isMobile();
 
   return (
-    <div
-      className={classes.root}
-      onClick={() => wrappedSetExpanded(true)}
-      {...eventHandlers}
-    >
+    <div className={classes.root} onClick={() => wrappedSetExpanded(true)} {...eventHandlers}>
       <div className={classes.karma}>
-        <LWTooltip title={
-          <div>
-            <div>{karma} karma</div>
-            <div>({comment.voteCount} votes)</div>
-          </div>
-        }>
+        <LWTooltip
+          title={
+            <div>
+              <div>{karma} karma</div>
+              <div>({comment.voteCount} votes)</div>
+            </div>
+          }
+        >
           {karma}
         </LWTooltip>
         <SoftUpArrowIcon />
@@ -145,31 +144,19 @@ const ShortformListItem = ({comment, hideTag, classes}: {
         <UsersName user={comment.user} />
       </div>
       <div className={classes.date}>
-        <LWTooltip
-          placement="right"
-          title={<ExpandedDate date={comment.postedAt} />}
-        >
+        <LWTooltip placement="right" title={<ExpandedDate date={comment.postedAt} />}>
           {moment(new Date(comment.postedAt)).fromNow()}
         </LWTooltip>
       </div>
-      {commentCount > 0 &&
+      {commentCount > 0 && (
         <div className={classes.comments}>
-            <ForumIcon icon="Comment" />
-            {commentCount}
+          <ForumIcon icon="Comment" />
+          {commentCount}
         </div>
-      }
-      <div className={classes.tag}>
-        {!hideTag && primaryTag && <FooterTag tag={primaryTag} smallText />}
-      </div>
-      <div className={classes.preview}>
-        {comment.contents?.plaintextMainText}
-      </div>
-      <LWPopper
-        open={displayHoverOver}
-        anchorEl={anchorEl}
-        placement="bottom-end"
-        clickable={false}
-      >
+      )}
+      <div className={classes.tag}>{!hideTag && primaryTag && <FooterTag tag={primaryTag} smallText />}</div>
+      <div className={classes.preview}>{comment.contents?.plaintextMainText}</div>
+      <LWPopper open={displayHoverOver} anchorEl={anchorEl} placement="bottom-end" clickable={false}>
         <div className={classes.hoverOver}>
           <CommentsNode
             truncated
@@ -187,21 +174,18 @@ const ShortformListItem = ({comment, hideTag, classes}: {
       </LWPopper>
     </div>
   );
-}
+};
 
-const ShortformListItemComponent = registerComponent(
-  "ShortformListItem",
-  ShortformListItem, {
-    styles,
-    hocs: [withErrorBoundary],
-    areEqual: {
-      treeOptions: "shallow",
-    },
+const ShortformListItemComponent = registerComponent("ShortformListItem", ShortformListItem, {
+  styles,
+  hocs: [withErrorBoundary],
+  areEqual: {
+    treeOptions: "shallow",
   },
-);
+});
 
 declare global {
   interface ComponentTypes {
-    ShortformListItem: typeof ShortformListItemComponent,
+    ShortformListItem: typeof ShortformListItemComponent;
   }
 }

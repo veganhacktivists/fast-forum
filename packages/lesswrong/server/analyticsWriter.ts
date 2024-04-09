@@ -1,55 +1,59 @@
-import { isDevelopment, onStartup } from '../lib/executionEnvironment';
-import { randomId } from '../lib/random';
-import { AnalyticsUtil } from '../lib/analyticsEvents';
-import { PublicInstanceSetting } from '../lib/instanceSettings';
-import { addStaticRoute } from './vulcan-lib/staticRoutes';
-import { addGraphQLMutation, addGraphQLResolvers } from '../lib/vulcan-lib/graphql';
-import { pgPromiseLib, getAnalyticsConnection, AnalyticsConnectionPool } from './analytics/postgresConnection'
-import chunk from 'lodash/chunk';
-import Table from '../lib/sql/Table';
-import { NotNullType, StringType, IntType } from '../lib/sql/Type';
-import InsertQuery from '../lib/sql/InsertQuery';
-import { filterNonnull } from '../lib/utils/typeGuardUtils';
-import SelectQuery from '../lib/sql/SelectQuery';
-import uniq from 'lodash/uniq';
-import md5 from 'md5';
-import { performanceMetricLoggingBatchSize } from '../lib/publicSettings';
-import LRU from 'lru-cache';
+import { isDevelopment, onStartup } from "../lib/executionEnvironment";
+import { randomId } from "../lib/random";
+import { AnalyticsUtil } from "../lib/analyticsEvents";
+import { PublicInstanceSetting } from "../lib/instanceSettings";
+import { addStaticRoute } from "./vulcan-lib/staticRoutes";
+import { addGraphQLMutation, addGraphQLResolvers } from "../lib/vulcan-lib/graphql";
+import { pgPromiseLib, getAnalyticsConnection, AnalyticsConnectionPool } from "./analytics/postgresConnection";
+import chunk from "lodash/chunk";
+import Table from "../lib/sql/Table";
+import { NotNullType, StringType, IntType } from "../lib/sql/Type";
+import InsertQuery from "../lib/sql/InsertQuery";
+import { filterNonnull } from "../lib/utils/typeGuardUtils";
+import SelectQuery from "../lib/sql/SelectQuery";
+import uniq from "lodash/uniq";
+import md5 from "md5";
+import { performanceMetricLoggingBatchSize } from "../lib/publicSettings";
+import LRU from "lru-cache";
 
 // Since different environments are connected to the same DB, this setting cannot be moved to the database
-export const environmentDescriptionSetting = new PublicInstanceSetting<string>("analytics.environment", "misconfigured", "warning")
+export const environmentDescriptionSetting = new PublicInstanceSetting<string>(
+  "analytics.environment",
+  "misconfigured",
+  "warning",
+);
 
 const serverId = randomId();
 
-const isValidEventAge = (age: number) => age>=0 && age<=60*60*1000;
+const isValidEventAge = (age: number) => age >= 0 && age <= 60 * 60 * 1000;
 
 addGraphQLResolvers({
   Mutation: {
     analyticsEvent(root: void, { events, now: clientTime }: AnyBecauseTodo, context: ResolverContext) {
       void handleAnalyticsEventWriteRequest(events, clientTime);
     },
-  }
+  },
 });
-addGraphQLMutation('analyticsEvent(events: [JSON!], now: Date): Boolean');
+addGraphQLMutation("analyticsEvent(events: [JSON!], now: Date): Boolean");
 
-addStaticRoute('/analyticsEvent', ({query}, req, res, next) => {
+addStaticRoute("/analyticsEvent", ({ query }, req, res, next) => {
   if (req.method !== "POST") {
     res.statusCode = 405; // Method not allowed
     res.end("analyticsEvent endpoint should receive POST");
     return;
   }
-  
+
   const body = (req as any).body; //Type system doesn't know body-parser middleware has filled this in
-  
+
   if (!body?.events || !body?.now) {
     res.statusCode = 405; // Method not allowed
     res.end('analyticsEvent endpoint should be JSON with fields "events" and "now"');
     return;
   }
-  
+
   void handleAnalyticsEventWriteRequest(body.events, body.now);
   res.writeHead(200, {
-    "Content-Type": "text/plain;charset=UTF-8"
+    "Content-Type": "text/plain;charset=UTF-8",
   });
   res.end("ok");
 });
@@ -66,53 +70,54 @@ async function handleAnalyticsEventWriteRequest(events: AnyBecauseTodo, clientTi
   // events were being captured); in that case, use the time it reached the
   // server instead.
   const serverTime = new Date();
-  
+
   let augmentedEvents = events.map((event: AnyBecauseTodo) => {
     const eventTime = new Date(event.timestamp);
     const age = clientTime.valueOf() - eventTime.valueOf();
-    const adjustedTimestamp = isValidEventAge(age) ? new Date(serverTime.valueOf()-age.valueOf()) : serverTime;
-    
-    return {...event, timestamp: adjustedTimestamp};
+    const adjustedTimestamp = isValidEventAge(age) ? new Date(serverTime.valueOf() - age.valueOf()) : serverTime;
+
+    return { ...event, timestamp: adjustedTimestamp };
   });
   await writeEventsToAnalyticsDB(augmentedEvents);
   return true;
 }
 
-let inFlightRequestCounter = {inFlightRequests: 0};
+let inFlightRequestCounter = { inFlightRequests: 0 };
 // See: https://stackoverflow.com/questions/37300997/multi-row-insert-with-pg-promise
-const analyticsColumnSet = new pgPromiseLib.helpers.ColumnSet(['environment', 'event_type', 'timestamp', 'event'], {table: 'raw'});
+const analyticsColumnSet = new pgPromiseLib.helpers.ColumnSet(["environment", "event_type", "timestamp", "event"], {
+  table: "raw",
+});
 
 // If you want to capture an event, this is not the function you're looking for;
 // use captureEvent.
 // Writes an event to the analytics database.
-async function writeEventsToAnalyticsDB(events: {type: string, timestamp: Date, props: AnyBecauseTodo}[]) {
-  const connection = getAnalyticsConnection()
-  
+async function writeEventsToAnalyticsDB(events: { type: string; timestamp: Date; props: AnyBecauseTodo }[]) {
+  const connection = getAnalyticsConnection();
+
   if (connection) {
     try {
-      const environmentDescription = isDevelopment ? "development" : environmentDescriptionSetting.get()
-      const valuesToInsert = events.map(ev => ({
+      const environmentDescription = isDevelopment ? "development" : environmentDescriptionSetting.get();
+      const valuesToInsert = events.map((ev) => ({
         environment: environmentDescription,
         event_type: ev.type,
         timestamp: ev.timestamp,
         event: ev.props,
       }));
       const query = pgPromiseLib.helpers.insert(valuesToInsert, analyticsColumnSet);
-    
+
       if (inFlightRequestCounter.inFlightRequests > 500) {
         // eslint-disable-next-line no-console
         console.error(`Warning: ${inFlightRequestCounter.inFlightRequests} in-flight postgres queries. Dropping.`);
         return;
       }
-      
-      
+
       inFlightRequestCounter.inFlightRequests++;
       try {
         await connection?.none(query);
       } finally {
         inFlightRequestCounter.inFlightRequests--;
       }
-    } catch (err){
+    } catch (err) {
       //eslint-disable-next-line no-console
       console.error("Error sending events to analytics DB:");
       //eslint-disable-next-line no-console
@@ -121,7 +126,26 @@ async function writeEventsToAnalyticsDB(events: {type: string, timestamp: Date, 
   }
 }
 
-const perfMetricsColumnSet = new pgPromiseLib.helpers.ColumnSet(['trace_id', 'op_type', 'op_name', 'started_at', 'ended_at', 'parent_trace_id', 'client_path', 'extra_data', 'gql_string_id', 'ip', 'user_agent', 'user_id', 'render_started_at', 'queue_priority', 'environment'], {table: 'perf_metrics'});
+const perfMetricsColumnSet = new pgPromiseLib.helpers.ColumnSet(
+  [
+    "trace_id",
+    "op_type",
+    "op_name",
+    "started_at",
+    "ended_at",
+    "parent_trace_id",
+    "client_path",
+    "extra_data",
+    "gql_string_id",
+    "ip",
+    "user_agent",
+    "user_id",
+    "render_started_at",
+    "queue_priority",
+    "environment",
+  ],
+  { table: "perf_metrics" },
+);
 
 interface PerfMetricGqlString {
   id: number;
@@ -129,11 +153,11 @@ interface PerfMetricGqlString {
   gql_string: string;
 }
 
-const perfMetricsGqlStringsTable = new Table('perf_metrics_gql_strings');
-perfMetricsGqlStringsTable.addField('gql_hash', new NotNullType(new StringType()));
-perfMetricsGqlStringsTable.addField('gql_string', new NotNullType(new StringType()));
+const perfMetricsGqlStringsTable = new Table("perf_metrics_gql_strings");
+perfMetricsGqlStringsTable.addField("gql_hash", new NotNullType(new StringType()));
+perfMetricsGqlStringsTable.addField("gql_string", new NotNullType(new StringType()));
 
-const GQL_STRING_ID_CACHE = new LRU<string, number>({max: 10000});
+const GQL_STRING_ID_CACHE = new LRU<string, number>({ max: 10000 });
 
 function cacheQueryStringRecords(queryStringRecords: PerfMetricGqlString[]) {
   queryStringRecords.forEach(({ id, gql_string }) => {
@@ -149,7 +173,7 @@ function getGqlStringIdFromCache(gqlString?: string): { gql_string_id: number | 
 }
 
 async function insertAndCacheGqlStringRecords(gqlStrings: string[], connection: AnalyticsConnectionPool) {
-  const gqlRecords = gqlStrings.map((gql_string) => ({gql_hash: md5(gql_string), gql_string}));
+  const gqlRecords = gqlStrings.map((gql_string) => ({ gql_hash: md5(gql_string), gql_string }));
   const previouslyCachedGqlStrings = gqlRecords.filter(({ gql_hash }) => GQL_STRING_ID_CACHE.has(gql_hash));
   const newGqlRecords = gqlRecords.filter(({ gql_hash }) => !GQL_STRING_ID_CACHE.has(gql_hash));
 
@@ -158,17 +182,22 @@ async function insertAndCacheGqlStringRecords(gqlStrings: string[], connection: 
   }
 
   // Insert and cache all the new query strings we don't already have cached
-  const { sql, args } = new InsertQuery(perfMetricsGqlStringsTable, newGqlRecords as AnyBecauseHard, undefined, { conflictStrategy: 'ignore', returnInserted: true }).compile();
+  const { sql, args } = new InsertQuery(perfMetricsGqlStringsTable, newGqlRecords as AnyBecauseHard, undefined, {
+    conflictStrategy: "ignore",
+    returnInserted: true,
+  }).compile();
   const insertedQueryStringRecords = await connection.any<PerfMetricGqlString>(sql, args);
   cacheQueryStringRecords(insertedQueryStringRecords);
 
   // The insert query has a RETURNING * but that doesn't return anything for the ON CONFLICT DO NOTHING cases, so we need to fetch those separately
-  const insertedQueryStrings = insertedQueryStringRecords.map(record => record.gql_string);
+  const insertedQueryStrings = insertedQueryStringRecords.map((record) => record.gql_string);
   const cachedQueryStrings = new Set([...previouslyCachedGqlStrings, ...insertedQueryStrings]);
-  const missingQueryStrings = gqlStrings.filter(queryString => !cachedQueryStrings.has(queryString));
+  const missingQueryStrings = gqlStrings.filter((queryString) => !cachedQueryStrings.has(queryString));
 
   if (missingQueryStrings.length > 0) {
-    const { sql, args } = new SelectQuery(perfMetricsGqlStringsTable, { gql_string: { $in: missingQueryStrings } }).compile();
+    const { sql, args } = new SelectQuery(perfMetricsGqlStringsTable, {
+      gql_string: { $in: missingQueryStrings },
+    }).compile();
     const remainingQueryStringRecords = await connection.any(sql, args);
     cacheQueryStringRecords(remainingQueryStringRecords);
   }
@@ -182,24 +211,24 @@ export function queuePerfMetric(perfMetric: PerfMetric) {
 }
 
 async function flushPerfMetrics() {
-  const batchSize = performanceMetricLoggingBatchSize.get()
+  const batchSize = performanceMetricLoggingBatchSize.get();
 
   if (queuedPerfMetrics.length < batchSize) return;
 
   const connection = getAnalyticsConnection();
   if (!connection) return;
-   
+
   const metricsToWrite = queuedPerfMetrics.splice(0);
   for (const batch of chunk(metricsToWrite, batchSize)) {
     try {
       const environmentDescription = isDevelopment ? "development" : environmentDescriptionSetting.get();
 
-      const queryStringsInBatch = uniq(filterNonnull(batch.map(metric => metric.gql_string)));
+      const queryStringsInBatch = uniq(filterNonnull(batch.map((metric) => metric.gql_string)));
       if (queryStringsInBatch.length > 0) {
         await insertAndCacheGqlStringRecords(queryStringsInBatch, connection);
       }
 
-      const valuesToInsert = batch.map(perfMetric => {
+      const valuesToInsert = batch.map((perfMetric) => {
         const { gql_string, ...rest } = perfMetric;
         const gqlStringId = getGqlStringIdFromCache(gql_string);
 
@@ -214,18 +243,18 @@ async function flushPerfMetrics() {
           user_id: perfMetric.user_id ?? null,
           render_started_at: perfMetric.render_started_at ?? null,
           queue_priority: perfMetric.queue_priority ?? null,
-          ...gqlStringId
-        }
+          ...gqlStringId,
+        };
       });
       const query = pgPromiseLib.helpers.insert(valuesToInsert, perfMetricsColumnSet);
-      
+
       inFlightRequestCounter.inFlightRequests++;
       try {
         await connection?.none(query);
       } finally {
         inFlightRequestCounter.inFlightRequests--;
       }
-    } catch (err){
+    } catch (err) {
       //eslint-disable-next-line no-console
       console.error("Error sending events to analytics DB:");
       //eslint-disable-next-line no-console
@@ -238,7 +267,7 @@ export async function pruneOldPerfMetrics() {
   const connection = getAnalyticsConnection();
   if (!connection) {
     // eslint-disable-next-line no-console
-    console.error('Missing connection to analytics DB when trying to prune old perf metrics');
+    console.error("Missing connection to analytics DB when trying to prune old perf metrics");
     return;
   }
 
@@ -280,23 +309,26 @@ export async function pruneOldPerfMetrics() {
     `);
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error('Error when pruning old perf metrics', { err });
+    console.error("Error when pruning old perf metrics", { err });
   }
 }
 
-function serverWriteEvent({type, timestamp, props}: AnyBecauseTodo) {
-  void writeEventsToAnalyticsDB([{
-    type, timestamp,
-    props: {
-      ...props,
-      serverId: serverId,
-    }
-  }]);
+function serverWriteEvent({ type, timestamp, props }: AnyBecauseTodo) {
+  void writeEventsToAnalyticsDB([
+    {
+      type,
+      timestamp,
+      props: {
+        ...props,
+        serverId: serverId,
+      },
+    },
+  ]);
 }
 
 onStartup(() => {
   AnalyticsUtil.serverWriteEvent = serverWriteEvent;
-  
+
   const deferredEvents = AnalyticsUtil.serverPendingEvents;
   AnalyticsUtil.serverPendingEvents = [];
   for (let event of deferredEvents) {

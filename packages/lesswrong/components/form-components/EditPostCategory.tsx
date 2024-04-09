@@ -61,7 +61,7 @@ const EditPostCategory = ({
         });
       }
     },
-    [path, document.question, document.url, updateCurrentValues]
+    [path, document.question, document.url, updateCurrentValues],
   );
 
   return (

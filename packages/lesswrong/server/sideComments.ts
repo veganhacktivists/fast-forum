@@ -1,24 +1,23 @@
-import cheerio from 'cheerio';
-import { cheerioParse, cheerioParseAndMarkOffsets, tokenizeHtml } from './utils/htmlUtil';
-import { Comments } from '../lib/collections/comments/collection';
-import type { SideCommentsResolverResult } from '../lib/collections/posts/schema';
-import { getDefaultViewSelector } from '../lib/utils/viewUtils';
-import groupBy from 'lodash/groupBy';
-import some from 'lodash/some';
+import cheerio from "cheerio";
+import { cheerioParse, cheerioParseAndMarkOffsets, tokenizeHtml } from "./utils/htmlUtil";
+import { Comments } from "../lib/collections/comments/collection";
+import type { SideCommentsResolverResult } from "../lib/collections/posts/schema";
+import { getDefaultViewSelector } from "../lib/utils/viewUtils";
+import groupBy from "lodash/groupBy";
+import some from "lodash/some";
 
 export interface QuoteShardSettings {
-  minLength: number
+  minLength: number;
 }
 export interface QuoteShard {
-  text: string,
-  blockquoteIndex: number,
+  text: string;
+  blockquoteIndex: number;
 }
 const defaultQuoteShardSettings: QuoteShardSettings = {
   minLength: 20,
 };
 
-const matchableBlockElementSelector = 'p,li,blockquote';
-
+const matchableBlockElementSelector = "p,li,blockquote";
 
 /**
  * Given HTML (probably for a post), make it so every top-level block element
@@ -39,10 +38,10 @@ const matchableBlockElementSelector = 'p,li,blockquote';
 export function addBlockIDsToHTML(html: string): string {
   const parsedPost = cheerioParse(html);
   let markedElements = parsedPost(matchableBlockElementSelector);
-  for (let i=0; i<markedElements.length; i++) {
+  for (let i = 0; i < markedElements.length; i++) {
     let markedElement = markedElements[i];
     if (!cheerio(markedElement).attr("id")) {
-      cheerio(markedElement).attr("id", `block${i}`)
+      cheerio(markedElement).attr("id", `block${i}`);
     }
   }
   return parsedPost.html();
@@ -55,29 +54,28 @@ export function addBlockIDsToHTML(html: string): string {
  */
 export function annotateMatchableBlockquotes(html: string, documentId: string): string {
   const parsedDocument = cheerioParse(html);
-  let blockquotes = parsedDocument('blockquote');
-  for (let i=0; i<blockquotes.length; i++) {
+  let blockquotes = parsedDocument("blockquote");
+  for (let i = 0; i < blockquotes.length; i++) {
     const blockquote = blockquotes[i];
-    const markerClass = `blockquote_${documentId}_${i+1}`;
+    const markerClass = `blockquote_${documentId}_${i + 1}`;
     const existingClasses = cheerio(blockquote).attr("class");
     if (existingClasses) {
-      if (existingClasses.split(' ').indexOf(markerClass) >= 0) {
+      if (existingClasses.split(" ").indexOf(markerClass) >= 0) {
         // Annotation already present
       } else {
-        cheerio(blockquote).attr('class', `${existingClasses} ${markerClass}`);
+        cheerio(blockquote).attr("class", `${existingClasses} ${markerClass}`);
       }
     } else {
-      cheerio(blockquote).attr('class', markerClass);
+      cheerio(blockquote).attr("class", markerClass);
     }
   }
   return parsedDocument.html();
 }
 
-
 interface MarkedInterval {
-  start: number
-  end: number
-  spanClass: string
+  start: number;
+  end: number;
+  spanClass: string;
 }
 
 /**
@@ -102,17 +100,17 @@ interface MarkedInterval {
  *   <p>Lorem <span ...>ipsum <em>dolor</em> sit</span> amet adipiscing
  */
 export function annotateMatchedSpans(html: string, intervals: MarkedInterval[]): string {
-  let intervalsByStart = groupBy(intervals, interval=>interval.start);
-  let intervalsByEnd = groupBy(intervals, interval=>interval.end);
+  let intervalsByStart = groupBy(intervals, (interval) => interval.start);
+  let intervalsByEnd = groupBy(intervals, (interval) => interval.end);
   let sb: string[] = [];
   let pos = 0;
-  
-  let activeSpan: string|null = null;
+
+  let activeSpan: string | null = null;
   let activeClasses = new Set<string>();
   let activeIntervals: MarkedInterval[] = [];
   let isInTag = false;
-  
-  function setActiveSpan(classes: string|null) {
+
+  function setActiveSpan(classes: string | null) {
     if (classes) {
       if (activeSpan) {
         if (activeSpan !== classes) {
@@ -123,82 +121,81 @@ export function annotateMatchedSpans(html: string, intervals: MarkedInterval[]):
       }
     } else {
       if (activeSpan) {
-        sb.push('</span>');
+        sb.push("</span>");
       }
     }
     activeSpan = classes;
   }
-  
-  for (let [tokenType,tokenStr] of tokenizeHtml(html)) {
-    switch(tokenType) {
-      case 'startTagStart':
-      case 'endTagStart':
+
+  for (let [tokenType, tokenStr] of tokenizeHtml(html)) {
+    switch (tokenType) {
+      case "startTagStart":
+      case "endTagStart":
         setActiveSpan(null);
         sb.push(tokenStr);
         pos += tokenStr.length;
         isInTag = true;
         break;
-      case 'space':
+      case "space":
         if (isInTag) {
           sb.push(tokenStr);
           pos += tokenStr.length;
           break;
         }
-        // FALLTHROUGH
-      case 'data':
+      // FALLTHROUGH
+      case "data":
         let lastSplit = 0;
-        
-        for (let i=0; i<tokenStr.length; i++) {
+
+        for (let i = 0; i < tokenStr.length; i++) {
           //if (intervalsByStart[i+pos] || intervalsByEnd[i+pos]) {
           //if (intervalsByStart[i+pos] || some(activeIntervals, interval => interval.end > i+pos)) {
           {
-            if (i>lastSplit) {
-              const activeClassStrs = activeIntervals.map(interval => interval.spanClass);
+            if (i > lastSplit) {
+              const activeClassStrs = activeIntervals.map((interval) => interval.spanClass);
               setActiveSpan(activeClassStrs.join(" "));
-              
-              sb.push(tokenStr.substr(lastSplit, i-lastSplit));
+
+              sb.push(tokenStr.substr(lastSplit, i - lastSplit));
               lastSplit = i;
             }
-            
+
             // FIXME: Don't rely on exact end offsets; close anything that's overshot.
-            let closedHere = intervalsByEnd[i+pos]
+            let closedHere = intervalsByEnd[i + pos];
             if (closedHere) {
               for (let interval of closedHere) {
                 activeClasses.delete(interval.spanClass);
               }
             }
-            let startedHere = intervalsByStart[i+pos]
-            if (intervalsByStart[i+pos]) {
+            let startedHere = intervalsByStart[i + pos];
+            if (intervalsByStart[i + pos]) {
               for (let interval of startedHere) {
                 activeClasses.add(interval.spanClass);
                 activeIntervals.push(interval);
               }
             }
-            
-            activeIntervals = activeIntervals.filter(interval => interval.end > i+pos);
+
+            activeIntervals = activeIntervals.filter((interval) => interval.end > i + pos);
           }
         }
-        
-        const activeClassStrs = activeIntervals.map(interval => interval.spanClass);
+
+        const activeClassStrs = activeIntervals.map((interval) => interval.spanClass);
         setActiveSpan(activeClassStrs.join(" "));
-        
-        sb.push(tokenStr.substr(lastSplit, tokenStr.length-lastSplit));
+
+        sb.push(tokenStr.substr(lastSplit, tokenStr.length - lastSplit));
         pos += tokenStr.length;
         break;
-      case 'tagEnd':
-      case 'tagEndAutoclose':
+      case "tagEnd":
+      case "tagEndAutoclose":
         isInTag = false;
-        // FALLTHROUGH
+      // FALLTHROUGH
       default:
         sb.push(tokenStr);
         pos += tokenStr.length;
         break;
     }
   }
-  
-  return sb.join('');
-}
 
+  return sb.join("");
+}
 
 /**
  * Given the HTML of a post body which has IDs on every block (from
@@ -206,12 +203,16 @@ export function annotateMatchedSpans(html: string, intervals: MarkedInterval[]):
  * blockquotes taken from it, return the ID of the first block which the comment
  * quotes from.
  */
-export function getCommentQuotedBlockID(postHTML: string, commentHTML: string, options: QuoteShardSettings): string|null {
+export function getCommentQuotedBlockID(
+  postHTML: string,
+  commentHTML: string,
+  options: QuoteShardSettings,
+): string | null {
   const quoteShards = commentToQuoteShards(commentHTML, options);
   if (!quoteShards?.length) return null;
-  
+
   const parsedPost = cheerioParse(postHTML);
-  
+
   const match = findQuoteInPost(parsedPost, quoteShards);
   return match?.firstMatchingBlockID ?? null;
 }
@@ -232,22 +233,26 @@ export function getCommentQuotedBlockID(postHTML: string, commentHTML: string, o
  *  * Discard shards shorter than 20 characters.
  */
 export function commentToQuoteShards(commentHTML: string, options?: QuoteShardSettings): QuoteShard[] {
-  options = options||defaultQuoteShardSettings;
+  options = options || defaultQuoteShardSettings;
   const result: QuoteShard[] = [];
-  
+
   // Parse the HTML into cheerio
   const parsedComment = cheerioParse(commentHTML);
-  
+
   // Find blockquote elements
-  const blockquotes = parsedComment('blockquote');
-  for (let i=0; i<blockquotes.length; i++) {
+  const blockquotes = parsedComment("blockquote");
+  for (let i = 0; i < blockquotes.length; i++) {
     addQuoteShardsFromElement(result, cheerio(blockquotes[i]), options);
   }
-  
+
   return result;
 }
 
-function addQuoteShardsFromElement(outQuoteShards: QuoteShard[], blockquoteElement: any, options: QuoteShardSettings): void {
+function addQuoteShardsFromElement(
+  outQuoteShards: QuoteShard[],
+  blockquoteElement: any,
+  options: QuoteShardSettings,
+): void {
   // HACK: Rather than do this in full generality, we first assume that a
   // blockquote element either contains only other block types or no block
   // types.
@@ -255,7 +260,7 @@ function addQuoteShardsFromElement(outQuoteShards: QuoteShard[], blockquoteEleme
   let pos = blockquoteElement[0].firstChild;
   let hasBlockChildren = false;
   while (pos) {
-    if (pos.type==='tag' && ['p','li','blockquote'].includes(pos.name)) {
+    if (pos.type === "tag" && ["p", "li", "blockquote"].includes(pos.name)) {
       addQuoteShardsFromElement(outQuoteShards, cheerio(pos), options);
       hasBlockChildren = true;
     }
@@ -264,7 +269,7 @@ function addQuoteShardsFromElement(outQuoteShards: QuoteShard[], blockquoteEleme
   if (hasBlockChildren) {
     return;
   }
-  
+
   // Split on ellipses
   // HACK: Rather than handle this in full generality, we just ignore the case
   // where ellipses may be inside child elements (eg an italicized section or
@@ -272,7 +277,7 @@ function addQuoteShardsFromElement(outQuoteShards: QuoteShard[], blockquoteEleme
   // produces mismatched tags. This is okay because quote shards are never
   // rendered anywhere, only string-matched to produce a boolean result.
   const quoteHtml = cheerio(blockquoteElement).html() || "";
-  
+
   const ellipsizedSections = quoteHtml.split(/(\[\.\.\.\])|(\[\u2026\])|(\.\.\.)|(\u2026)/);
   for (let section of ellipsizedSections) {
     if (section) {
@@ -288,8 +293,8 @@ function addQuoteShardsFromElement(outQuoteShards: QuoteShard[], blockquoteEleme
 }
 
 interface QuoteInPost {
-  firstMatchingBlockID: string
-  matchingSpans: {start: number, end: number}[]
+  firstMatchingBlockID: string;
+  matchingSpans: { start: number; end: number }[];
 }
 
 /**
@@ -297,17 +302,17 @@ interface QuoteInPost {
  * quote shards, return the ID of the first block which matches a quote shard
  * (or null if no match is found).
  */
-function findQuoteInPost(parsedPost: AnyBecauseTodo, quoteShards: QuoteShard[]): QuoteInPost|null {
+function findQuoteInPost(parsedPost: AnyBecauseTodo, quoteShards: QuoteShard[]): QuoteInPost | null {
   let markedElements = parsedPost(matchableBlockElementSelector);
-  let firstMatchingBlockID: string|null = null;
-  let matchingSpans: {start: number, end: number}[] = [];
-  
-  for (let i=0; i<markedElements.length; i++) {
+  let firstMatchingBlockID: string | null = null;
+  let matchingSpans: { start: number; end: number }[] = [];
+
+  for (let i = 0; i < markedElements.length; i++) {
     const blockID = cheerio(markedElements[i]).attr("id");
     if (blockID) {
       const blockStartOffset = markedElements[i].offset;
-      const markedHtml = parsedPost.html(cheerio(markedElements[i]))||"";
-      
+      const markedHtml = parsedPost.html(cheerio(markedElements[i])) || "";
+
       for (let quoteShard of quoteShards) {
         const quoteShardOffset = markedHtml.indexOf(quoteShard.text);
         if (quoteShardOffset >= 0) {
@@ -323,7 +328,7 @@ function findQuoteInPost(parsedPost: AnyBecauseTodo, quoteShards: QuoteShard[]):
       }
     }
   }
-  
+
   if (firstMatchingBlockID) {
     return { firstMatchingBlockID, matchingSpans };
   } else {
@@ -334,8 +339,8 @@ function findQuoteInPost(parsedPost: AnyBecauseTodo, quoteShards: QuoteShard[]):
 // A comment, reduced to only the fields that affect side-comment placement.
 // Used to split getSideComments from matchSideComments, for unit testability.
 interface CommentForSideComment {
-  _id: string
-  html: string
+  _id: string;
+  html: string;
 }
 
 /**
@@ -346,38 +351,43 @@ interface CommentForSideComment {
  * This function is potentially quite slow, if there are a lot of comments and/or
  * the post is very long. FIXME: Build caching for this.
  */
-export async function getSideComments(context: ResolverContext, postId: string, html: string): Promise<SideCommentsResolverResult> {
+export async function getSideComments(
+  context: ResolverContext,
+  postId: string,
+  html: string,
+): Promise<SideCommentsResolverResult> {
   //const startTimeMs = new Date().getTime();
-  
+
   const comments = await Comments.find({
     ...getDefaultViewSelector("Comments"),
     postId,
   }).fetch();
-  
-  const {html: annotatedHtml, sideCommentsByBlock} = matchSideComments({
-    postId, html,
-    comments: comments.map(comment => ({
+
+  const { html: annotatedHtml, sideCommentsByBlock } = matchSideComments({
+    postId,
+    html,
+    comments: comments.map((comment) => ({
       _id: comment._id,
       html: comment.contents?.html,
-    }))
+    })),
   });
-  
+
   const minKarma = 10;
-  const highKarmaComments: DbComment[] = comments.filter(comment => comment.baseScore >= minKarma)
-  const highKarmaCommentIds: Set<string> = new Set(highKarmaComments.map(c => c._id));
-  
-  let highKarmaCommentsByBlock: Record<string,string[]> = {};
+  const highKarmaComments: DbComment[] = comments.filter((comment) => comment.baseScore >= minKarma);
+  const highKarmaCommentIds: Set<string> = new Set(highKarmaComments.map((c) => c._id));
+
+  let highKarmaCommentsByBlock: Record<string, string[]> = {};
   for (let blockID of Object.keys(sideCommentsByBlock)) {
     const commentsIdsHere = sideCommentsByBlock[blockID];
-    const highKarmaCommentIdsHere = commentsIdsHere.filter(commentId => highKarmaCommentIds.has(commentId));
+    const highKarmaCommentIdsHere = commentsIdsHere.filter((commentId) => highKarmaCommentIds.has(commentId));
     if (highKarmaCommentIdsHere.length > 0) {
       highKarmaCommentsByBlock[blockID] = highKarmaCommentIdsHere;
     }
   }
-  
+
   //const endTimeMs = new Date().getTime();
   //console.log(`Matched ${comments.length} comments in ${endTimeMs-startTimeMs}ms`);
-  
+
   return {
     html: annotatedHtml,
     commentsByBlock: sideCommentsByBlock,
@@ -385,45 +395,46 @@ export async function getSideComments(context: ResolverContext, postId: string, 
   };
 }
 
-export function matchSideComments({postId, html, comments, quoteShardSettings}: {
-  postId: string,
-  html: string,
-  comments: CommentForSideComment[]
-  quoteShardSettings?: QuoteShardSettings,
+export function matchSideComments({
+  postId,
+  html,
+  comments,
+  quoteShardSettings,
+}: {
+  postId: string;
+  html: string;
+  comments: CommentForSideComment[];
+  quoteShardSettings?: QuoteShardSettings;
 }): {
-  html: string,
-  sideCommentsByBlock: Record<string,string[]>,
+  html: string;
+  sideCommentsByBlock: Record<string, string[]>;
 } {
   const htmlWithBlockIDs = addBlockIDsToHTML(html);
   const parsedPost = cheerioParseAndMarkOffsets(htmlWithBlockIDs);
-  
-  let sideCommentsByBlock: Record<string,string[]> = {};
+
+  let sideCommentsByBlock: Record<string, string[]> = {};
   let markedSpans: MarkedInterval[] = [];
-  
+
   for (let comment of comments) {
     const quoteShards = commentToQuoteShards(comment.html, quoteShardSettings);
     const match = findQuoteInPost(parsedPost, quoteShards);
-    
+
     if (match) {
       const blockID = match?.firstMatchingBlockID ?? null;
       // TODO: this isn't distinguishing between blockquotes within the comment
       const spanClass = `blockquote_${comment._id}_1`;
-      
-      markedSpans = [
-        ...markedSpans,
-        ...match.matchingSpans.map(({start,end}) => ({start, end, spanClass}))
-      ];
-      
+
+      markedSpans = [...markedSpans, ...match.matchingSpans.map(({ start, end }) => ({ start, end, spanClass }))];
+
       if (blockID in sideCommentsByBlock) sideCommentsByBlock[blockID].push(comment._id);
       else sideCommentsByBlock[blockID] = [comment._id];
     }
   }
-  
+
   const htmlWithSpanAnnotations = annotateMatchedSpans(htmlWithBlockIDs, markedSpans);
-  
+
   return {
     html: htmlWithSpanAnnotations,
-    sideCommentsByBlock
+    sideCommentsByBlock,
   };
 }
-

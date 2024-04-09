@@ -1,11 +1,11 @@
-import { getString } from '../vulcan-lib/intl';
-import { camelToSpaces } from '../vulcan-lib/utils';
+import { getString } from "../vulcan-lib/intl";
+import { camelToSpaces } from "../vulcan-lib/utils";
 
-const locale = 'en-US';
+const locale = "en-US";
 
 export const formatMessage = (
-  { id, defaultMessage }: { id: string, defaultMessage?: string },
-  values?: AnyBecauseTodo
+  { id, defaultMessage }: { id: string; defaultMessage?: string },
+  values?: AnyBecauseTodo,
 ) => {
   return getString({ id, defaultMessage, values, locale: locale });
 };
@@ -20,22 +20,16 @@ export const formatMessage = (
  * @param  {object} values                    The values to pass to format the i18n string
  * @return {string}                           The translated label
  */
-export const formatLabel = (
-  { fieldName, collectionName, schema }: AnyBecauseTodo,
-  values?: AnyBecauseTodo
-) => {
+export const formatLabel = ({ fieldName, collectionName, schema }: AnyBecauseTodo, values?: AnyBecauseTodo) => {
   if (!fieldName) {
-    throw new Error('fieldName option passed to formatLabel cannot be empty or undefined');
+    throw new Error("fieldName option passed to formatLabel cannot be empty or undefined");
   }
-  const defaultMessage = '|*|*|';
+  const defaultMessage = "|*|*|";
   // Get the intl label
   let intlLabel = defaultMessage;
   // try collectionName.fieldName as intl id
   if (collectionName) {
-    intlLabel = formatMessage(
-      { id: `${collectionName.toLowerCase()}.${fieldName}`, defaultMessage },
-      values
-    );
+    intlLabel = formatMessage({ id: `${collectionName.toLowerCase()}.${fieldName}`, defaultMessage }, values);
   }
   // try global.fieldName then just fieldName as intl id
   if (intlLabel === defaultMessage) {

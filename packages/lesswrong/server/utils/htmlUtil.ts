@@ -1,13 +1,12 @@
-import cheerio from 'cheerio';
-import HtmlLexer from 'html-lexer';
-
+import cheerio from "cheerio";
+import HtmlLexer from "html-lexer";
 
 /**
  * Parse an HTML string with cheerio. Server-side only. Provides some cheerio
  * config options, and works around a Typescript annotation problem (which
  * should go away when we version-upgrade Cheerio at some point).
  */
-export function cheerioParse(html: string|null) {
+export function cheerioParse(html: string | null) {
   //@ts-ignore (cheerio type annotations sadly don't quite match the actual imported library)
   return cheerio.load(html ?? "", null, false);
 }
@@ -16,12 +15,12 @@ export function cheerioParse(html: string|null) {
  * Tokenize HTML. Wraps around the html-lexer library to give it a conventional
  * API taking a string, rather than an awkward streaming thing.
  */
-export function tokenizeHtml(html: string): [string,string][] {
-  const result: [string,string][] = [];
+export function tokenizeHtml(html: string): [string, string][] {
+  const result: [string, string][] = [];
   const lexer = new HtmlLexer({
-    write: (token: [string,string]) => result.push(token),
-    end: () => null
-  })
+    write: (token: [string, string]) => result.push(token),
+    end: () => null,
+  });
   lexer.write(html);
   return result;
 }
@@ -41,24 +40,24 @@ export function cheerioParseAndMarkOffsets(html: string) {
   let preprocessedHtmlSb: string[] = [];
   let offset = 0;
   let isInTag = false;
-  
-  for (let [tokenType,tokenStr] of tokens) {
-    switch(tokenType) {
-      case 'startTagStart':
-      case 'endTagStart':
+
+  for (let [tokenType, tokenStr] of tokens) {
+    switch (tokenType) {
+      case "startTagStart":
+      case "endTagStart":
         if (offset > 0) {
           preprocessedHtmlSb.push(`<span class="__offset_marker" offset="${offset}"></span>`);
         }
         isInTag = true;
         break;
-      case 'tagEnd':
-      case 'tagEndAutoclose':
+      case "tagEnd":
+      case "tagEndAutoclose":
         isInTag = false;
         break;
-      case 'space':
+      case "space":
         if (isInTag) break;
-        // FALLTHROUGH
-      case 'data':
+      // FALLTHROUGH
+      case "data":
         if (tokenStr.length > 0) {
           preprocessedHtmlSb.push(`<span class="__offset_marker" offset="${offset}"></span>`);
         }
@@ -66,15 +65,15 @@ export function cheerioParseAndMarkOffsets(html: string) {
       default:
         break;
     }
-    
+
     preprocessedHtmlSb.push(tokenStr);
     offset += tokenStr.length;
   }
-  
-  const preprocessedHtml = preprocessedHtmlSb.join('');
+
+  const preprocessedHtml = preprocessedHtmlSb.join("");
   const parsed = cheerioParse(preprocessedHtml);
-  let offsetMarkers = parsed('.__offset_marker');
-  for (let i=0; i<offsetMarkers.length; i++) {
+  let offsetMarkers = parsed(".__offset_marker");
+  for (let i = 0; i < offsetMarkers.length; i++) {
     let offsetMarker = offsetMarkers[i];
     let offset = parseInt((offsetMarker as cheerio.TagElement).attribs.offset);
     if (offsetMarker.next) {
@@ -82,7 +81,6 @@ export function cheerioParseAndMarkOffsets(html: string) {
     }
   }
   offsetMarkers.remove();
-  
+
   return parsed;
 }
-

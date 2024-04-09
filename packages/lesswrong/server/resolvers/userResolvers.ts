@@ -1,34 +1,46 @@
-import { markdownToHtml, dataToMarkdown } from '../editor/conversionUtils';
-import Users from '../../lib/collections/users/collection';
-import { accessFilterMultiple, augmentFieldsDict, denormalizedField } from '../../lib/utils/schemaUtils'
-import { addGraphQLMutation, addGraphQLQuery, addGraphQLResolvers, addGraphQLSchema, slugify, updateMutator, Utils } from '../vulcan-lib';
-import pick from 'lodash/pick';
-import SimpleSchema from 'simpl-schema';
-import {getUserEmail, userCanEditUser, userGetDisplayName} from "../../lib/collections/users/helpers";
-import {userFindOneByEmail} from "../commonQueries";
-import { isEAForum } from '../../lib/instanceSettings';
-import ReadStatuses from '../../lib/collections/readStatus/collection';
-import moment from 'moment';
-import Posts from '../../lib/collections/posts/collection';
-import countBy from 'lodash/countBy';
-import entries from 'lodash/fp/entries';
-import sortBy from 'lodash/sortBy';
-import last from 'lodash/fp/last';
-import range from 'lodash/range';
-import Tags, { EA_FORUM_COMMUNITY_TOPIC_ID } from '../../lib/collections/tags/collection';
-import Comments from '../../lib/collections/comments/collection';
-import sumBy from 'lodash/sumBy';
+import { markdownToHtml, dataToMarkdown } from "../editor/conversionUtils";
+import Users from "../../lib/collections/users/collection";
+import { accessFilterMultiple, augmentFieldsDict, denormalizedField } from "../../lib/utils/schemaUtils";
+import {
+  addGraphQLMutation,
+  addGraphQLQuery,
+  addGraphQLResolvers,
+  addGraphQLSchema,
+  slugify,
+  updateMutator,
+  Utils,
+} from "../vulcan-lib";
+import pick from "lodash/pick";
+import SimpleSchema from "simpl-schema";
+import { getUserEmail, userCanEditUser, userGetDisplayName } from "../../lib/collections/users/helpers";
+import { userFindOneByEmail } from "../commonQueries";
+import { isEAForum } from "../../lib/instanceSettings";
+import ReadStatuses from "../../lib/collections/readStatus/collection";
+import moment from "moment";
+import Posts from "../../lib/collections/posts/collection";
+import countBy from "lodash/countBy";
+import entries from "lodash/fp/entries";
+import sortBy from "lodash/sortBy";
+import last from "lodash/fp/last";
+import range from "lodash/range";
+import Tags, { EA_FORUM_COMMUNITY_TOPIC_ID } from "../../lib/collections/tags/collection";
+import Comments from "../../lib/collections/comments/collection";
+import sumBy from "lodash/sumBy";
 import { getAnalyticsConnection } from "../analytics/postgresConnection";
-import GraphQLJSON from 'graphql-type-json';
-import { getRecentKarmaInfo, rateLimitDateWhenUserNextAbleToComment, rateLimitDateWhenUserNextAbleToPost } from '../rateLimitUtils';
-import { RateLimitInfo, RecentKarmaInfo } from '../../lib/rateLimits/types';
-import { userIsAdminOrMod } from '../../lib/vulcan-users/permissions';
-import { UsersRepo } from '../repos';
-import { defineQuery } from '../utils/serverGraphqlUtil';
+import GraphQLJSON from "graphql-type-json";
+import {
+  getRecentKarmaInfo,
+  rateLimitDateWhenUserNextAbleToComment,
+  rateLimitDateWhenUserNextAbleToPost,
+} from "../rateLimitUtils";
+import { RateLimitInfo, RecentKarmaInfo } from "../../lib/rateLimits/types";
+import { userIsAdminOrMod } from "../../lib/vulcan-users/permissions";
+import { UsersRepo } from "../repos";
+import { defineQuery } from "../utils/serverGraphqlUtil";
 import { UserDialogueUsefulData } from "../../components/users/DialogueMatchingPage";
-import { eaEmojiPalette } from '../../lib/voting/eaEmojiPalette';
-import { postStatuses } from '../../lib/collections/posts/constants';
-import { getConfirmedCoauthorIds, userIsPostCoauthor } from '../../lib/collections/posts/helpers';
+import { eaEmojiPalette } from "../../lib/voting/eaEmojiPalette";
+import { postStatuses } from "../../lib/collections/posts/constants";
+import { getConfirmedCoauthorIds, userIsPostCoauthor } from "../../lib/collections/posts/helpers";
 
 addGraphQLSchema(`
   type CommentCountTag {
@@ -58,17 +70,17 @@ addGraphQLSchema(`
     topUsers: [UpvotedUser]
     activeDialogueMatchSeekers: [User]
   }
-`)
+`);
 
 augmentFieldsDict(Users, {
   htmlMapMarkerText: {
     ...denormalizedField({
-      needsUpdate: (data: Partial<DbUser>) => ('mapMarkerText' in data),
+      needsUpdate: (data: Partial<DbUser>) => "mapMarkerText" in data,
       getValue: async (user: DbUser) => {
         if (!user.mapMarkerText) return "";
         return await markdownToHtml(user.mapMarkerText);
-      }
-    })
+      },
+    }),
   },
   bio: {
     resolveAs: {
@@ -77,8 +89,8 @@ augmentFieldsDict(Users, {
         const bio = user.biography?.originalContents;
         if (!bio) return "";
         return dataToMarkdown(bio.data, bio.type);
-      }
-    }
+      },
+    },
   },
   htmlBio: {
     resolveAs: {
@@ -86,46 +98,54 @@ augmentFieldsDict(Users, {
       resolver: (user: DbUser, args: void, { Users }: ResolverContext) => {
         const bio = user.biography;
         return bio?.html || "";
-      }
-    }
+      },
+    },
   },
   rateLimitNextAbleToComment: {
     nullable: true,
     resolveAs: {
       type: GraphQLJSON,
-      arguments: 'postId: String',
-      resolver: async (user: DbUser, args: {postId: string | null}, context: ResolverContext): Promise<RateLimitInfo|null> => {
+      arguments: "postId: String",
+      resolver: async (
+        user: DbUser,
+        args: { postId: string | null },
+        context: ResolverContext,
+      ): Promise<RateLimitInfo | null> => {
         return rateLimitDateWhenUserNextAbleToComment(user, args.postId, context);
-      }
+      },
     },
   },
   rateLimitNextAbleToPost: {
     nullable: true,
     resolveAs: {
       type: GraphQLJSON,
-      arguments: 'eventForm: Boolean',
-      resolver: async (user: DbUser, args: { eventForm?: boolean }, context: ResolverContext): Promise<RateLimitInfo|null> => {
-        const { eventForm } = args
-        if (eventForm) return null
+      arguments: "eventForm: Boolean",
+      resolver: async (
+        user: DbUser,
+        args: { eventForm?: boolean },
+        context: ResolverContext,
+      ): Promise<RateLimitInfo | null> => {
+        const { eventForm } = args;
+        if (eventForm) return null;
 
         const rateLimit = await rateLimitDateWhenUserNextAbleToPost(user);
         if (rateLimit) {
-          return rateLimit
+          return rateLimit;
         } else {
-          return null
+          return null;
         }
-      }
-    }
+      },
+    },
   },
   recentKarmaInfo: {
     nullable: true,
     resolveAs: {
       type: GraphQLJSON,
       resolver: async (user: DbUser, args, context: ResolverContext): Promise<RecentKarmaInfo> => {
-        return getRecentKarmaInfo(user._id)
-      }
-    }
-  }
+        return getRecentKarmaInfo(user._id);
+      },
+    },
+  },
 });
 
 addGraphQLSchema(`
@@ -136,14 +156,14 @@ addGraphQLSchema(`
     subscribedToDigest: Boolean,
     usernameUnset: Boolean
   }
-`)
+`);
 
 type NewUserUpdates = {
-  username: string
-  email?: string
-  subscribeToDigest: boolean
-  acceptedTos: boolean
-}
+  username: string;
+  email?: string;
+  subscribeToDigest: boolean;
+  acceptedTos: boolean;
+};
 
 addGraphQLSchema(`
   type MostReadAuthor {
@@ -172,7 +192,7 @@ addGraphQLSchema(`
     topShortform: Comment,
     karmaChange: Int
   }
-`)
+`);
 
 // TODO remove all the V2s when done
 addGraphQLSchema(`
@@ -238,10 +258,14 @@ addGraphQLSchema(`
 
 addGraphQLResolvers({
   Mutation: {
-    async NewUserCompleteProfile(root: void, { username, email, subscribeToDigest, acceptedTos }: NewUserUpdates, context: ResolverContext) {
-      const { currentUser } = context
+    async NewUserCompleteProfile(
+      root: void,
+      { username, email, subscribeToDigest, acceptedTos }: NewUserUpdates,
+      context: ResolverContext,
+    ) {
+      const { currentUser } = context;
       if (!currentUser) {
-        throw new Error('Cannot change username without being logged in')
+        throw new Error("Cannot change username without being logged in");
       }
       // Check they accepted the terms of use
       if (isEAForum && !acceptedTos) {
@@ -250,62 +274,66 @@ addGraphQLResolvers({
       // Only for new users. Existing users should need to contact support to
       // change their usernames
       if (!currentUser.usernameUnset) {
-        throw new Error('Only new users can set their username this way')
+        throw new Error("Only new users can set their username this way");
       }
       // Check for uniqueness
-      const existingUser = await Users.findOne({username})
+      const existingUser = await Users.findOne({ username });
       if (existingUser && existingUser._id !== currentUser._id) {
-        throw new Error('Username already exists')
+        throw new Error("Username already exists");
       }
       // Check for someone setting an email when they already have one
       if (email && getUserEmail(currentUser)) {
-        throw new Error('You already have an email address')
+        throw new Error("You already have an email address");
       }
       // Check for email uniqueness
-      if (email && await userFindOneByEmail(email)) {
-        throw new Error('Email already taken')
+      if (email && (await userFindOneByEmail(email))) {
+        throw new Error("Email already taken");
       }
       // Check for valid email
       if (email && !SimpleSchema.RegEx.Email.test(email)) {
-        throw new Error('Invalid email')
+        throw new Error("Invalid email");
       }
-      const updatedUser = (await updateMutator({
-        collection: Users,
-        documentId: currentUser._id,
-        set: {
-          usernameUnset: false,
-          username,
-          displayName: username,
-          slug: await Utils.getUnusedSlugByCollectionName("Users", slugify(username)),
-          ...(email ? {email} : {}),
-          subscribedToDigest: subscribeToDigest,
-          acceptedTos,
-        },
-        // We've already done necessary gating
-        validate: false
-      })).data
+      const updatedUser = (
+        await updateMutator({
+          collection: Users,
+          documentId: currentUser._id,
+          set: {
+            usernameUnset: false,
+            username,
+            displayName: username,
+            slug: await Utils.getUnusedSlugByCollectionName("Users", slugify(username)),
+            ...(email ? { email } : {}),
+            subscribedToDigest: subscribeToDigest,
+            acceptedTos,
+          },
+          // We've already done necessary gating
+          validate: false,
+        })
+      ).data;
       // Don't want to return the whole object without more permission checking
-      return pick(updatedUser, 'username', 'slug', 'displayName', 'subscribedToCurated', 'usernameUnset')
+      return pick(updatedUser, "username", "slug", "displayName", "subscribedToCurated", "usernameUnset");
     },
     // TODO: Deprecated
-    async UserAcceptTos(_root: void, _args: {}, {currentUser}: ResolverContext) {
+    async UserAcceptTos(_root: void, _args: {}, { currentUser }: ResolverContext) {
       if (!currentUser) {
-        throw new Error('Cannot accept terms of use while not logged in');
+        throw new Error("Cannot accept terms of use while not logged in");
       }
-      const updatedUser = (await updateMutator({
-        collection: Users,
-        documentId: currentUser._id,
-        set: {
-          acceptedTos: true,
-        },
-        validate: false,
-      })).data;
+      const updatedUser = (
+        await updateMutator({
+          collection: Users,
+          documentId: currentUser._id,
+          set: {
+            acceptedTos: true,
+          },
+          validate: false,
+        })
+      ).data;
       return updatedUser.acceptedTos;
     },
     async UserExpandFrontpageSection(
       _root: void,
-      {section, expanded}: {section: string, expanded: boolean},
-      {currentUser, repos}: ResolverContext,
+      { section, expanded }: { section: string; expanded: boolean },
+      { currentUser, repos }: ResolverContext,
     ) {
       if (!currentUser) {
         throw new Error("You must login to do this");
@@ -314,27 +342,38 @@ addGraphQLResolvers({
       await repos.users.setExpandFrontpageSection(currentUser._id, section, expanded);
       return expanded;
     },
-    async UserUpdateSubforumMembership(root: void, { tagId, member }: {tagId: string, member: boolean}, context: ResolverContext) {
-      const { currentUser } = context
+    async UserUpdateSubforumMembership(
+      root: void,
+      { tagId, member }: { tagId: string; member: boolean },
+      context: ResolverContext,
+    ) {
+      const { currentUser } = context;
       if (!currentUser) {
-        throw new Error('Cannot join subforum without being logged in')
+        throw new Error("Cannot join subforum without being logged in");
       }
 
-      if ((member && currentUser.profileTagIds?.includes(tagId)) || (!member && !currentUser.profileTagIds?.includes(tagId))) {
-        throw new Error(member ? 'User is aleady a member of this subforum' : 'User is not a member of this subforum so cannot leave')
+      if (
+        (member && currentUser.profileTagIds?.includes(tagId)) ||
+        (!member && !currentUser.profileTagIds?.includes(tagId))
+      ) {
+        throw new Error(
+          member ? "User is aleady a member of this subforum" : "User is not a member of this subforum so cannot leave",
+        );
       }
 
-      const newProfileTagIds = member ? [...(currentUser.profileTagIds || []), tagId] : currentUser.profileTagIds?.filter(id => id !== tagId) || []
+      const newProfileTagIds = member
+        ? [...(currentUser.profileTagIds || []), tagId]
+        : currentUser.profileTagIds?.filter((id) => id !== tagId) || [];
       const updatedUser = await updateMutator({
         collection: Users,
         documentId: currentUser._id,
         set: {
-          profileTagIds: newProfileTagIds
+          profileTagIds: newProfileTagIds,
         },
-        validate: false
-      })
-      
-      return updatedUser
+        validate: false,
+      });
+
+      return updatedUser;
     },
   },
 
@@ -361,52 +400,65 @@ addGraphQLResolvers({
     // - Your overall karma change this year was X (Y from comments, Z from posts)
     // - Others gave you X [most received react] reacts
     // - And X reacts in total (X insightful, Y helpful, Z changed my mind)
-    async UserWrappedDataByYearV2(root: void, {userId, year}: {userId: string, year: number}, context: ResolverContext) {
-      const { currentUser } = context
-      const user = await Users.findOne({_id: userId})
+    async UserWrappedDataByYearV2(
+      root: void,
+      { userId, year }: { userId: string; year: number },
+      context: ResolverContext,
+    ) {
+      const { currentUser } = context;
+      const user = await Users.findOne({ _id: userId });
 
       // Must be logged in and have permission to view this user's data
       if (!userId || !currentUser || !user || !userCanEditUser(currentUser, user)) {
-        throw new Error('Not authorized')
+        throw new Error("Not authorized");
       }
 
       // Get all the user's posts read for the given year
-      const start = new Date(year, 0)
-      const end = new Date(year + 1, 0)
+      const start = new Date(year, 0);
+      const end = new Date(year + 1, 0);
       const readStatuses = await ReadStatuses.find({
         userId: user._id,
         isRead: true,
-        lastUpdated: {$gte: start, $lte: end},
-        postId: {$ne: null}
-      }).fetch()
+        lastUpdated: { $gte: start, $lte: end },
+        postId: { $ne: null },
+      }).fetch();
 
       // Filter out the posts that the user themselves authored or co-authored,
       // plus events and shortform posts
-      const posts = (await Posts.find({
-        _id: {$in: readStatuses.map(rs => rs.postId)},
-        userId: {$ne: user._id},
-        isEvent: false,
-        shortform: false,
-      }, {projection: {userId: 1, coauthorStatuses: 1, hasCoauthorPermission: 1, tagRelevance: 1}}).fetch()).filter(p => {
+      const posts = (
+        await Posts.find(
+          {
+            _id: { $in: readStatuses.map((rs) => rs.postId) },
+            userId: { $ne: user._id },
+            isEvent: false,
+            shortform: false,
+          },
+          { projection: { userId: 1, coauthorStatuses: 1, hasCoauthorPermission: 1, tagRelevance: 1 } },
+        ).fetch()
+      ).filter((p) => {
         return !userIsPostCoauthor(user, p);
-      })
+      });
 
       // Get the top 5 authors that the user has read
-      const userIds = posts.map(p => getConfirmedCoauthorIds(p).concat([p.userId])).flat()
-      const authorCounts = countBy(userIds)
-      const topAuthors = sortBy(entries(authorCounts), last).slice(-5).map(a => a![0]) as string[]
+      const userIds = posts.map((p) => getConfirmedCoauthorIds(p).concat([p.userId])).flat();
+      const authorCounts = countBy(userIds);
+      const topAuthors = sortBy(entries(authorCounts), last)
+        .slice(-5)
+        .map((a) => a![0]) as string[];
 
       const readAuthorStatsPromise = Promise.all(
         topAuthors.map(async (id) => ({
           authorUserId: id,
           ...(await context.repos.posts.getReadAuthorStats({ userId: user._id, authorUserId: id, year })),
-        }))
+        })),
       );
 
       // Get the top 4 topics that the user has read (filtering out the Community topic)
-      const tagIds = posts.map(p => Object.keys(p.tagRelevance ?? {}) ?? []).flat()
-      const tagCounts = countBy(tagIds)
-      const topTags = sortBy(entries(tagCounts), last).slice(-4).map(t => t![0])
+      const tagIds = posts.map((p) => Object.keys(p.tagRelevance ?? {}) ?? []).flat();
+      const tagCounts = countBy(tagIds);
+      const topTags = sortBy(entries(tagCounts), last)
+        .slice(-4)
+        .map((t) => t![0]);
 
       // Get the number of posts, comments, and shortforms that the user posted this year,
       // including which were the most popular
@@ -426,19 +478,19 @@ addGraphQLResolvers({
           {
             _id: { $in: topAuthors },
           },
-          { projection: { displayName: 1, slug: 1, profileImageId: 1 } }
+          { projection: { displayName: 1, slug: 1, profileImageId: 1 } },
         ).fetch(),
         Tags.find(
           {
             _id: { $in: topTags },
           },
-          { projection: { name: 1, shortName: 1, slug: 1 } }
+          { projection: { name: 1, shortName: 1, slug: 1 } },
         ).fetch(),
         Posts.find(
           {
             $or: [{ userId: user._id }, { "coauthorStatuses.userId": user._id }],
             postedAt: { $gte: start, $lte: end },
-            status: {$eq: postStatuses.STATUS_APPROVED},
+            status: { $eq: postStatuses.STATUS_APPROVED },
             draft: false,
             deletedDraft: false,
             isEvent: false,
@@ -446,7 +498,7 @@ addGraphQLResolvers({
             unlisted: false,
             shortform: false,
           },
-          { projection: { title: 1, slug: 1, baseScore: 1 }, sort: { baseScore: -1 } }
+          { projection: { title: 1, slug: 1, baseScore: 1 }, sort: { baseScore: -1 } },
         ).fetch(),
         Comments.find(
           {
@@ -460,7 +512,10 @@ addGraphQLResolvers({
             postId: { $exists: true },
             $or: [{ shortform: false }, { topLevelCommentId: { $exists: true } }],
           },
-          { projection: { postId: 1, postedAt: 1, baseScore: 1, extendedScore: 1, contents: 1 }, sort: { baseScore: -1 } }
+          {
+            projection: { postId: 1, postedAt: 1, baseScore: 1, extendedScore: 1, contents: 1 },
+            sort: { baseScore: -1 },
+          },
         ).fetch(),
         Comments.find(
           {
@@ -474,7 +529,10 @@ addGraphQLResolvers({
             shortform: true,
             topLevelCommentId: { $exists: false },
           },
-          { projection: { postId: 1, postedAt: 1, baseScore: 1, extendedScore: 1, contents: 1 }, sort: { baseScore: -1 } }
+          {
+            projection: { postId: 1, postedAt: 1, baseScore: 1, extendedScore: 1, contents: 1 },
+            sort: { baseScore: -1 },
+          },
         ).fetch(),
         context.repos.posts.getAuthorshipStats({ userId: user._id, year }),
         context.repos.comments.getAuthorshipStats({ userId: user._id, year, shortform: false }),
@@ -484,76 +542,87 @@ addGraphQLResolvers({
       ]);
 
       const [postKarmaChanges, commentKarmaChanges] = await Promise.all([
-        context.repos.votes.getDocumentKarmaChangePerDay({ documentIds: userPosts.map(({ _id }) => _id), startDate: start, endDate: end }),
-        context.repos.votes.getDocumentKarmaChangePerDay({ documentIds: [...userComments.map(({ _id }) => _id), ...userShortforms.map(({ _id }) => _id)], startDate: start, endDate: end }),
+        context.repos.votes.getDocumentKarmaChangePerDay({
+          documentIds: userPosts.map(({ _id }) => _id),
+          startDate: start,
+          endDate: end,
+        }),
+        context.repos.votes.getDocumentKarmaChangePerDay({
+          documentIds: [...userComments.map(({ _id }) => _id), ...userShortforms.map(({ _id }) => _id)],
+          startDate: start,
+          endDate: end,
+        }),
       ]);
-      
+
       // Format the data changes in a way that can be easily passed in to recharts
       // to display it as a stacked area chart that goes up and to the right.
-      let postKarma = 0
-      let commentKarma = 0
-      const combinedKarmaVals = range(1, 366).map(i => {
-        const day = moment('2023', 'YYYY').dayOfYear(i)
-        if (postKarmaChanges?.length && moment(postKarmaChanges[0].window_start_key).isSame(day, 'date')) {
+      let postKarma = 0;
+      let commentKarma = 0;
+      const combinedKarmaVals = range(1, 366).map((i) => {
+        const day = moment("2023", "YYYY").dayOfYear(i);
+        if (postKarmaChanges?.length && moment(postKarmaChanges[0].window_start_key).isSame(day, "date")) {
           try {
-            const postKarmaChange = postKarmaChanges.shift()
+            const postKarmaChange = postKarmaChanges.shift();
             if (postKarmaChange) {
-              postKarma += parseInt(postKarmaChange.karma_change)
+              postKarma += parseInt(postKarmaChange.karma_change);
             }
           } catch {
             // ignore
           }
         }
-        if (commentKarmaChanges?.length && moment(commentKarmaChanges[0].window_start_key).isSame(day, 'date')) {
+        if (commentKarmaChanges?.length && moment(commentKarmaChanges[0].window_start_key).isSame(day, "date")) {
           try {
-            const commentKarmaChange = commentKarmaChanges.shift()
+            const commentKarmaChange = commentKarmaChanges.shift();
             if (commentKarmaChange) {
-              commentKarma += parseInt(commentKarmaChange.karma_change)
+              commentKarma += parseInt(commentKarmaChange.karma_change);
             }
           } catch {
             // ignore
           }
         }
-        
+
         return {
           date: day.toDate(),
           postKarma,
-          commentKarma
-        }
-      })
+          commentKarma,
+        };
+      });
 
-      let totalKarmaChange
-      let mostReceivedReacts: { name: string, count: number }[] = []
+      let totalKarmaChange;
+      let mostReceivedReacts: { name: string; count: number }[] = [];
       if (context.repos?.votes) {
         const karmaQueryArgs = {
           userId: user._id,
           startDate: start,
           endDate: end,
           af: false,
-          showNegative: true
-        }
-        const {changedComments, changedPosts, changedTagRevisions} = await context.repos.votes.getKarmaChanges(karmaQueryArgs);
+          showNegative: true,
+        };
+        const { changedComments, changedPosts, changedTagRevisions } =
+          await context.repos.votes.getKarmaChanges(karmaQueryArgs);
         totalKarmaChange =
-          sumBy(changedPosts, (doc: any)=>doc.scoreChange)
-        + sumBy(changedComments, (doc: any)=>doc.scoreChange)
-        + sumBy(changedTagRevisions, (doc: any)=>doc.scoreChange)
+          sumBy(changedPosts, (doc: any) => doc.scoreChange) +
+          sumBy(changedComments, (doc: any) => doc.scoreChange) +
+          sumBy(changedTagRevisions, (doc: any) => doc.scoreChange);
 
         const allAddedReacts = [
           ...changedComments.map(({ addedReacts }) => addedReacts).flat(),
           ...changedPosts.map(({ addedReacts }) => addedReacts).flat(),
         ].flat();
 
-        const reactCounts = countBy(allAddedReacts, 'reactionType');
+        const reactCounts = countBy(allAddedReacts, "reactionType");
         // We're ignoring agree and disagree reacts.
         delete reactCounts.agree;
         delete reactCounts.disagree;
-        mostReceivedReacts = (sortBy(entries(reactCounts), last) as [string, number][]).reverse().map(([name, count]) => ({
-          name: eaEmojiPalette.find(emoji => emoji.name === name)?.label ?? '',
-          count
-        }));
+        mostReceivedReacts = (sortBy(entries(reactCounts), last) as [string, number][])
+          .reverse()
+          .map(([name, count]) => ({
+            name: eaEmojiPalette.find((emoji) => emoji.name === name)?.label ?? "",
+            count,
+          }));
       }
 
-      const { engagementPercentile, totalSeconds, daysVisited }  = await getEngagementV2(user._id, year);
+      const { engagementPercentile, totalSeconds, daysVisited } = await getEngagementV2(user._id, year);
       const mostReadTopics = topTags
         .reverse()
         .map((id) => {
@@ -569,29 +638,32 @@ addGraphQLResolvers({
         })
         .filter((t) => !!t);
 
-      const mostReadAuthors = topAuthors.reverse().map(async id => {
-        const author = authors.find(a => a._id === id)
-        const authorStats = readAuthorStats.find(s => s.authorUserId === id)
+      const mostReadAuthors = topAuthors
+        .reverse()
+        .map(async (id) => {
+          const author = authors.find((a) => a._id === id);
+          const authorStats = readAuthorStats.find((s) => s.authorUserId === id);
 
-        return author
-          ? {
-              _id: author._id,
-              displayName: author.displayName,
-              slug: author.slug,
-              profileImageId: author.profileImageId,
-              count: authorCounts[author._id],
-              engagementPercentile: authorStats?.percentile ?? 0.0,
-            }
-          : null;
-      }).filter(a => !!a);
-      
+          return author
+            ? {
+                _id: author._id,
+                displayName: author.displayName,
+                slug: author.slug,
+                profileImageId: author.profileImageId,
+                count: authorCounts[author._id],
+                engagementPercentile: authorStats?.percentile ?? 0.0,
+              }
+            : null;
+        })
+        .filter((a) => !!a);
+
       // add the post title and slug to the top comment
-      const topComment: (DbComment & {postTitle?: string, postSlug?: string})|null = userComments.shift() ?? null;
+      const topComment: (DbComment & { postTitle?: string; postSlug?: string }) | null = userComments.shift() ?? null;
       if (topComment) {
-        const topCommentPost = await Posts.findOne({_id: topComment.postId}, {projection: {title: 1, slug: 1}})
+        const topCommentPost = await Posts.findOne({ _id: topComment.postId }, { projection: { title: 1, slug: 1 } });
         if (topCommentPost) {
-          topComment.postTitle = topCommentPost.title
-          topComment.postSlug = topCommentPost.slug
+          topComment.postTitle = topCommentPost.title;
+          topComment.postSlug = topCommentPost.slug;
         }
       }
 
@@ -601,9 +673,9 @@ addGraphQLResolvers({
         totalSeconds,
         daysVisited,
         mostReadTopics,
-        relativeMostReadCoreTopics: readCoreTagStats.filter(stat => stat.readLikelihoodRatio > 0),
+        relativeMostReadCoreTopics: readCoreTagStats.filter((stat) => stat.readLikelihoodRatio > 0),
         mostReadAuthors,
-        topPosts: userPosts.slice(0,4) ?? null,
+        topPosts: userPosts.slice(0, 4) ?? null,
         postCount: postAuthorshipStats.totalCount,
         authorPercentile: postAuthorshipStats.percentile,
         topComment,
@@ -615,178 +687,223 @@ addGraphQLResolvers({
         karmaChange: totalKarmaChange,
         combinedKarmaVals: combinedKarmaVals,
         mostReceivedReacts,
-      }
-      return results
+      };
+      return results;
     },
-    async UserWrappedDataByYear(root: void, {year}: {year: number}, context: ResolverContext) {
-      const { currentUser } = context
+    async UserWrappedDataByYear(root: void, { year }: { year: number }, context: ResolverContext) {
+      const { currentUser } = context;
       if (!currentUser) {
-        throw new Error('Must be logged in to view forum wrapped data')
+        throw new Error("Must be logged in to view forum wrapped data");
       }
 
       // Get all the user's posts read for the given year
-      const start = moment().year(year).dayOfYear(1).toDate()
-      const end = moment().year(year+1).dayOfYear(0).toDate()
+      const start = moment().year(year).dayOfYear(1).toDate();
+      const end = moment()
+        .year(year + 1)
+        .dayOfYear(0)
+        .toDate();
       const readStatuses = await ReadStatuses.find({
         userId: currentUser._id,
         isRead: true,
-        lastUpdated: {$gte: start, $lte: end},
-        postId: {$exists: true, $ne: null}
-      }).fetch()
+        lastUpdated: { $gte: start, $lte: end },
+        postId: { $exists: true, $ne: null },
+      }).fetch();
 
       // Filter out the posts that the user themselves authored or co-authored,
       // plus events and shortform posts
-      const posts = (await Posts.find({
-        _id: {$in: readStatuses.map(rs => rs.postId)},
-        userId: {$ne: currentUser._id},
-        isEvent: false,
-        shortform: false,
-      }, {projection: {userId: 1, coauthorStatuses: 1, tagRelevance: 1}}).fetch()).filter(p => {
-        return !p.coauthorStatuses?.some(cs => cs.userId === currentUser._id)
-      })
+      const posts = (
+        await Posts.find(
+          {
+            _id: { $in: readStatuses.map((rs) => rs.postId) },
+            userId: { $ne: currentUser._id },
+            isEvent: false,
+            shortform: false,
+          },
+          { projection: { userId: 1, coauthorStatuses: 1, tagRelevance: 1 } },
+        ).fetch()
+      ).filter((p) => {
+        return !p.coauthorStatuses?.some((cs) => cs.userId === currentUser._id);
+      });
 
       // Get the top 3 authors that the user has read
-      const userIds = posts.map(p => {
-        let authors = p.coauthorStatuses?.map(cs => cs.userId) ?? []
-        authors.push(p.userId)
-        return authors
-      }).flat()
-      const authorCounts = countBy(userIds)
-      const topAuthors = sortBy(entries(authorCounts), last).slice(-3).map(a => a![0])
+      const userIds = posts
+        .map((p) => {
+          let authors = p.coauthorStatuses?.map((cs) => cs.userId) ?? [];
+          authors.push(p.userId);
+          return authors;
+        })
+        .flat();
+      const authorCounts = countBy(userIds);
+      const topAuthors = sortBy(entries(authorCounts), last)
+        .slice(-3)
+        .map((a) => a![0]);
 
       // Get the top 3 topics that the user has read (filtering out the Community topic)
-      const tagIds = posts.map(p => Object.keys(p.tagRelevance ?? {}) ?? []).flat().filter(t => t !== EA_FORUM_COMMUNITY_TOPIC_ID)
-      const tagCounts = countBy(tagIds)
-      const topTags = sortBy(entries(tagCounts), last).slice(-3).map(t => t![0])
+      const tagIds = posts
+        .map((p) => Object.keys(p.tagRelevance ?? {}) ?? [])
+        .flat()
+        .filter((t) => t !== EA_FORUM_COMMUNITY_TOPIC_ID);
+      const tagCounts = countBy(tagIds);
+      const topTags = sortBy(entries(tagCounts), last)
+        .slice(-3)
+        .map((t) => t![0]);
 
       // Get the number of posts, comments, and shortforms that the user posted this year,
       // including which were the most popular
       const [authors, topics, userPosts, userComments, userShortforms] = await Promise.all([
-        Users.find({
-          _id: {$in: topAuthors}
-        }, {projection: {displayName: 1, slug: 1}}).fetch(),
-        Tags.find({
-          _id: {$in: topTags}
-        }, {projection: {name: 1, slug: 1}}).fetch(),
-        Posts.find({
-          $or: [
-            {userId: currentUser._id},
-            {"coauthorStatuses.userId": currentUser._id}
-          ],
-          postedAt: {$gte: start, $lte: end},
-          draft: false,
-          deletedDraft: false,
-          isEvent: false,
-          isFuture: false,
-          unlisted: false,
-          shortform: false,
-        }, {projection: {title: 1, slug: 1, baseScore: 1}, sort: {baseScore: -1}}).fetch(),
-        Comments.find({
-          userId: currentUser._id,
-          postedAt: {$gte: start, $lte: end},
-          deleted: false,
-          postId: {$exists: true},
-          $or: [
-            {shortform: false},
-            {topLevelCommentId: {$exists: true}}
-          ]
-        }, {projection: {postId: 1, baseScore: 1, contents: 1}, sort: {baseScore: -1}}).fetch(),
-        Comments.find({
-          userId: currentUser._id,
-          postedAt: {$gte: start, $lte: end},
-          deleted: false,
-          shortform: true,
-          topLevelCommentId: {$exists: false},
-        }, {projection: {postId: 1, baseScore: 1, contents: 1}, sort: {baseScore: -1}}).fetch()
-      ])
+        Users.find(
+          {
+            _id: { $in: topAuthors },
+          },
+          { projection: { displayName: 1, slug: 1 } },
+        ).fetch(),
+        Tags.find(
+          {
+            _id: { $in: topTags },
+          },
+          { projection: { name: 1, slug: 1 } },
+        ).fetch(),
+        Posts.find(
+          {
+            $or: [{ userId: currentUser._id }, { "coauthorStatuses.userId": currentUser._id }],
+            postedAt: { $gte: start, $lte: end },
+            draft: false,
+            deletedDraft: false,
+            isEvent: false,
+            isFuture: false,
+            unlisted: false,
+            shortform: false,
+          },
+          { projection: { title: 1, slug: 1, baseScore: 1 }, sort: { baseScore: -1 } },
+        ).fetch(),
+        Comments.find(
+          {
+            userId: currentUser._id,
+            postedAt: { $gte: start, $lte: end },
+            deleted: false,
+            postId: { $exists: true },
+            $or: [{ shortform: false }, { topLevelCommentId: { $exists: true } }],
+          },
+          { projection: { postId: 1, baseScore: 1, contents: 1 }, sort: { baseScore: -1 } },
+        ).fetch(),
+        Comments.find(
+          {
+            userId: currentUser._id,
+            postedAt: { $gte: start, $lte: end },
+            deleted: false,
+            shortform: true,
+            topLevelCommentId: { $exists: false },
+          },
+          { projection: { postId: 1, baseScore: 1, contents: 1 }, sort: { baseScore: -1 } },
+        ).fetch(),
+      ]);
 
-      let totalKarmaChange
+      let totalKarmaChange;
       if (context.repos?.votes) {
         const karmaQueryArgs = {
           userId: currentUser._id,
           startDate: start,
           endDate: end,
           af: false,
-          showNegative: true
-        }
-        const {changedComments, changedPosts, changedTagRevisions} = await context.repos.votes.getKarmaChanges(karmaQueryArgs);
+          showNegative: true,
+        };
+        const { changedComments, changedPosts, changedTagRevisions } =
+          await context.repos.votes.getKarmaChanges(karmaQueryArgs);
         totalKarmaChange =
-          sumBy(changedPosts, (doc: any)=>doc.scoreChange)
-        + sumBy(changedComments, (doc: any)=>doc.scoreChange)
-        + sumBy(changedTagRevisions, (doc: any)=>doc.scoreChange)
+          sumBy(changedPosts, (doc: any) => doc.scoreChange) +
+          sumBy(changedComments, (doc: any) => doc.scoreChange) +
+          sumBy(changedTagRevisions, (doc: any) => doc.scoreChange);
       }
 
       const results: AnyBecauseTodo = {
-        ...await getEngagement(currentUser._id),
+        ...(await getEngagement(currentUser._id)),
         postsReadCount: posts.length,
-        mostReadAuthors: topAuthors.reverse().map(id => {
-          const author = authors.find(a => a._id === id)
-          return author ? {
-            displayName: author.displayName,
-            slug: author.slug,
-            count: authorCounts[author._id]
-          } : null
-        }).filter(a => !!a),
-        mostReadTopics: topTags.reverse().map(id => {
-          const topic = topics.find(t => t._id === id)
-          return topic ? {
-            name: topic.name,
-            slug: topic.slug,
-            count: tagCounts[topic._id]
-          } : null
-        }).filter(t => !!t),
+        mostReadAuthors: topAuthors
+          .reverse()
+          .map((id) => {
+            const author = authors.find((a) => a._id === id);
+            return author
+              ? {
+                  displayName: author.displayName,
+                  slug: author.slug,
+                  count: authorCounts[author._id],
+                }
+              : null;
+          })
+          .filter((a) => !!a),
+        mostReadTopics: topTags
+          .reverse()
+          .map((id) => {
+            const topic = topics.find((t) => t._id === id);
+            return topic
+              ? {
+                  name: topic.name,
+                  slug: topic.slug,
+                  count: tagCounts[topic._id],
+                }
+              : null;
+          })
+          .filter((t) => !!t),
         postCount: userPosts.length,
         topPost: userPosts.shift() ?? null,
         commentCount: userComments.length,
         topComment: userComments.shift() ?? null,
         shortformCount: userShortforms.length,
         topShortform: userShortforms.shift() ?? null,
-        karmaChange: totalKarmaChange
-      }
-      results['alignment'] = getAlignment(results)
-      return results
+        karmaChange: totalKarmaChange,
+      };
+      results["alignment"] = getAlignment(results);
+      return results;
     },
-    async GetRandomUser(root: void, {userIsAuthor}: {userIsAuthor: 'optional'|'required'}, context: ResolverContext) {
-      const { currentUser } = context
+    async GetRandomUser(
+      root: void,
+      { userIsAuthor }: { userIsAuthor: "optional" | "required" },
+      context: ResolverContext,
+    ) {
+      const { currentUser } = context;
       if (!userIsAdminOrMod(currentUser)) {
-        throw new Error('Must be an admin/mod to get a random user')
+        throw new Error("Must be an admin/mod to get a random user");
       }
-      
-      if (userIsAuthor === 'optional') {
-        return new UsersRepo().getRandomActiveUser()
-      } else if (userIsAuthor === 'required') {
-        return new UsersRepo().getRandomActiveAuthor()
+
+      if (userIsAuthor === "optional") {
+        return new UsersRepo().getRandomActiveUser();
+      } else if (userIsAuthor === "required") {
+        return new UsersRepo().getRandomActiveAuthor();
       } else {
-        throw new Error('Invalid user type type')
+        throw new Error("Invalid user type type");
       }
     },
   },
-})
+});
 
 function getAlignment(results: AnyBecauseTodo) {
-  let goodEvil = 'neutral', lawfulChaotic = 'Neutral';
+  let goodEvil = "neutral",
+    lawfulChaotic = "Neutral";
   if (results.engagementPercentile < 0.33) {
-    goodEvil = 'evil'
-  } else if  (results.engagementPercentile > 0.66) {
-    goodEvil = 'good'
+    goodEvil = "evil";
+  } else if (results.engagementPercentile > 0.66) {
+    goodEvil = "good";
   }
   const ratio = results.commentCount / results.postCount;
   if (ratio < 3) {
-    lawfulChaotic = 'Chaotic'
-  } else if  (ratio > 6) {
-    lawfulChaotic = 'Lawful'
+    lawfulChaotic = "Chaotic";
+  } else if (ratio > 6) {
+    lawfulChaotic = "Lawful";
   }
-  if (lawfulChaotic === 'Neutral' && goodEvil  === 'neutral') {
-    return 'True neutral'
+  if (lawfulChaotic === "Neutral" && goodEvil === "neutral") {
+    return "True neutral";
   }
-  return lawfulChaotic + ' ' + goodEvil
+  return lawfulChaotic + " " + goodEvil;
 }
 
 /*
   Note: this just returns the values from a materialized view that never automatically refreshes
   So the code for the materialized view will need to be changed if we do this in future years
 */
-async function getEngagementV2(userId: string, year: number): Promise<{
+async function getEngagementV2(
+  userId: string,
+  year: number,
+): Promise<{
   totalSeconds: number;
   daysVisited: string[];
   engagementPercentile: number;
@@ -837,7 +954,7 @@ async function getEngagementV2(userId: string, year: number): Promise<{
 
   const [totalResult, daysActiveResult] = await Promise.all([
     postgres.query(totalQuery, [userId, year]),
-    postgres.query(daysActiveQuery, [userId, year])
+    postgres.query(daysActiveQuery, [userId, year]),
   ]);
 
   const totalSeconds = totalResult?.[0]?.["total_seconds"] ?? 0;
@@ -856,13 +973,13 @@ async function getEngagementV2(userId: string, year: number): Promise<{
   Note: this just returns the values from a materialized view that never automatically refreshes
   So the code for the materialized view will need to be changed if we do this in future years
 */
-async function getEngagement(userId : string): Promise<{totalSeconds: number, engagementPercentile: number}> {
+async function getEngagement(userId: string): Promise<{ totalSeconds: number; engagementPercentile: number }> {
   const postgres = getAnalyticsConnection();
   if (!postgres) {
     return {
       totalSeconds: 0,
-      engagementPercentile: 0
-    }
+      engagementPercentile: 0,
+    };
   }
 
   const query = `
@@ -879,47 +996,41 @@ async function getEngagement(userId : string): Promise<{totalSeconds: number, en
       , coalesce(engagementPercentile, 0) engagementPercentile
     from user_engagement_wrapped
     left join ranked using (user_id)
-    where user_id = $1`
+    where user_id = $1`;
 
   const pgResult = await postgres.query(query, [userId]);
-  
+
   if (!pgResult || !pgResult.length) {
     return {
       totalSeconds: 0,
-      engagementPercentile: 0
-    }
+      engagementPercentile: 0,
+    };
   }
-  
+
   return {
-    totalSeconds: pgResult[0]['total_seconds'],
-    engagementPercentile: pgResult[0]['engagementpercentile']
-  }
+    totalSeconds: pgResult[0]["total_seconds"],
+    engagementPercentile: pgResult[0]["engagementpercentile"],
+  };
 }
 
 addGraphQLMutation(
-  'NewUserCompleteProfile(username: String!, subscribeToDigest: Boolean!, email: String, acceptedTos: Boolean): NewUserCompletedProfile'
-)
+  "NewUserCompleteProfile(username: String!, subscribeToDigest: Boolean!, email: String, acceptedTos: Boolean): NewUserCompletedProfile",
+);
 // TODO: Derecated
-addGraphQLMutation(
-  'UserAcceptTos: Boolean'
-)
-addGraphQLMutation(
-  'UserExpandFrontpageSection(section: String!, expanded: Boolean!): Boolean'
-)
-addGraphQLMutation(
-  'UserUpdateSubforumMembership(tagId: String!, member: Boolean!): User'
-)
-addGraphQLQuery('UserWrappedDataByYear(year: Int!): WrappedDataByYear')
-addGraphQLQuery('UserWrappedDataByYearV2(userId: String!, year: Int!): WrappedDataByYearV2')
-addGraphQLQuery('GetRandomUser(userIsAuthor: String!): User')
+addGraphQLMutation("UserAcceptTos: Boolean");
+addGraphQLMutation("UserExpandFrontpageSection(section: String!, expanded: Boolean!): Boolean");
+addGraphQLMutation("UserUpdateSubforumMembership(tagId: String!, member: Boolean!): User");
+addGraphQLQuery("UserWrappedDataByYear(year: Int!): WrappedDataByYear");
+addGraphQLQuery("UserWrappedDataByYearV2(userId: String!, year: Int!): WrappedDataByYearV2");
+addGraphQLQuery("GetRandomUser(userIsAuthor: String!): User");
 
 defineQuery({
   name: "GetUserDialogueUsefulData",
   resultType: "UserDialogueUsefulData",
-  fn: async (root:void, _:any, context: ResolverContext) => {
-    const { currentUser } = context
+  fn: async (root: void, _: any, context: ResolverContext) => {
+    const { currentUser } = context;
     if (!currentUser) {
-      throw new Error('User must be logged in to get top upvoted users');
+      throw new Error("User must be logged in to get top upvoted users");
     }
 
     const [dialogueUsers, topUsers, activeDialogueMatchSeekers] = await Promise.all([
@@ -929,38 +1040,41 @@ defineQuery({
     ]);
 
     const results: UserDialogueUsefulData = {
-      dialogueUsers: dialogueUsers.map(user => ({ ...user, displayName: userGetDisplayName(user) })),
+      dialogueUsers: dialogueUsers.map((user) => ({ ...user, displayName: userGetDisplayName(user) })),
       topUsers: topUsers,
-      activeDialogueMatchSeekers: activeDialogueMatchSeekers.map(user => ({ ...user, displayName: userGetDisplayName(user) })),
-    }
-    return results
-  }
+      activeDialogueMatchSeekers: activeDialogueMatchSeekers.map((user) => ({
+        ...user,
+        displayName: userGetDisplayName(user),
+      })),
+    };
+    return results;
+  },
 });
 
 defineQuery({
   name: "GetDialogueMatchedUsers",
   resultType: "[User]!",
   fn: async (root, _, context) => {
-    const { currentUser } = context
+    const { currentUser } = context;
     if (!currentUser) {
-      throw new Error('User must be logged in to get matched users');
+      throw new Error("User must be logged in to get matched users");
     }
 
     const matchedUsers = await new UsersRepo().getDialogueMatchedUsers(currentUser._id);
     return accessFilterMultiple(currentUser, Users, matchedUsers, context);
-  }
+  },
 });
 
 defineQuery({
   name: "GetDialogueRecommendedUsers",
   resultType: "[User]!",
   fn: async (root, _, context) => {
-    const { currentUser } = context
+    const { currentUser } = context;
     if (!currentUser) {
-      throw new Error('User must be logged in to get recommended users');
+      throw new Error("User must be logged in to get recommended users");
     }
 
-    const upvotedUsers = await context.repos.users.getUsersTopUpvotedUsers(currentUser, 35, 30)
+    const upvotedUsers = await context.repos.users.getUsersTopUpvotedUsers(currentUser, 35, 30);
     const recommendedUsers = await context.repos.users.getDialogueRecommendedUsers(currentUser._id, upvotedUsers);
 
     // Shuffle and limit the list to 2 users
@@ -968,5 +1082,5 @@ defineQuery({
     const sampleSize = 2;
 
     return accessFilterMultiple(currentUser, Users, shuffled.slice(0, sampleSize), context);
-  }
-}); 
+  },
+});

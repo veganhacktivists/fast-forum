@@ -1,10 +1,10 @@
-import React from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { useSingle } from '../../lib/crud/withSingle';
-import { conversationGetTitle } from '../../lib/collections/conversations/helpers';
-import withErrorBoundary from '../common/withErrorBoundary';
-import { Link } from '../../lib/reactRouterWrapper';
-import { userCanDo } from '../../lib/vulcan-users';
+import React from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useSingle } from "../../lib/crud/withSingle";
+import { conversationGetTitle } from "../../lib/collections/conversations/helpers";
+import withErrorBoundary from "../common/withErrorBoundary";
+import { Link } from "../../lib/reactRouterWrapper";
+import { userCanDo } from "../../lib/vulcan-users";
 
 const styles = (theme: ThemeType): JssStyles => ({
   conversationSection: {
@@ -13,73 +13,77 @@ const styles = (theme: ThemeType): JssStyles => ({
   conversationTitle: {
     ...theme.typography.commentStyle,
     marginTop: theme.spacing.unit,
-    marginBottom: theme.spacing.unit*1.5
+    marginBottom: theme.spacing.unit * 1.5,
   },
   editor: {
-    marginTop: theme.spacing.unit*4,
-    position:"relative",
+    marginTop: theme.spacing.unit * 4,
+    position: "relative",
   },
   backButton: {
-    color: theme.palette.lwTertiary.main
+    color: theme.palette.lwTertiary.main,
   },
   row: {
     display: "flex",
-    justifyContent: "space-between"
-  }
-})
+    justifyContent: "space-between",
+  },
+});
 
 /**
  * Page for viewing a private messages conversation. Typically invoked from
  * ConversationWrapper, which takes care of the URL parsing.
  */
-const ConversationPage = ({ conversationId, currentUser, classes }: {
-  conversationId: string,
-  currentUser: UsersCurrent,
-  classes: ClassesType,
+const ConversationPage = ({
+  conversationId,
+  currentUser,
+  classes,
+}: {
+  conversationId: string;
+  currentUser: UsersCurrent;
+  classes: ClassesType;
 }) => {
   const { document: conversation, loading } = useSingle({
     documentId: conversationId,
     collectionName: "Conversations",
-    fragmentName: 'ConversationsList',
+    fragmentName: "ConversationsList",
   });
 
-  const { SingleColumnSection, ConversationContents, Error404, Loading, Typography, ConversationDetails } = Components
+  const { SingleColumnSection, ConversationContents, Error404, Loading, Typography, ConversationDetails } = Components;
 
-  if (loading) return <Loading />
-  if (!conversation) return <Error404 />
+  if (loading) return <Loading />;
+  if (!conversation) return <Error404 />;
 
-  const showModInboxLink = userCanDo(currentUser, 'conversations.view.all') && conversation.moderator
+  const showModInboxLink = userCanDo(currentUser, "conversations.view.all") && conversation.moderator;
 
   return (
     <SingleColumnSection>
       <div className={classes.conversationSection}>
         <div className={classes.row}>
-          <Typography variant="body2" className={classes.backButton}><Link to="/inbox"> Go back to Inbox </Link></Typography>
-          {showModInboxLink && <Typography variant="body2" className={classes.backButton}>
-            <Link to="/moderatorInbox"> Moderator Inbox </Link>
-          </Typography>}
+          <Typography variant="body2" className={classes.backButton}>
+            <Link to="/inbox"> Go back to Inbox </Link>
+          </Typography>
+          {showModInboxLink && (
+            <Typography variant="body2" className={classes.backButton}>
+              <Link to="/moderatorInbox"> Moderator Inbox </Link>
+            </Typography>
+          )}
         </div>
         <Typography variant="display2" className={classes.conversationTitle}>
           {conversationGetTitle(conversation, currentUser)}
         </Typography>
         <ConversationDetails conversation={conversation} />
-        <ConversationContents
-          conversation={conversation}
-          currentUser={currentUser}
-        />
+        <ConversationContents conversation={conversation} currentUser={currentUser} />
       </div>
     </SingleColumnSection>
-  )
-}
+  );
+};
 
-const ConversationPageComponent = registerComponent('ConversationPage', ConversationPage, {
+const ConversationPageComponent = registerComponent("ConversationPage", ConversationPage, {
   styles,
-  hocs: [withErrorBoundary]
+  hocs: [withErrorBoundary],
 });
 
 declare global {
   interface ComponentTypes {
-    ConversationPage: typeof ConversationPageComponent
+    ConversationPage: typeof ConversationPageComponent;
   }
 }
-

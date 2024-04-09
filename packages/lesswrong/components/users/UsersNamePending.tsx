@@ -1,11 +1,8 @@
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import React from 'react';
-import { Link } from '../../lib/reactRouterWrapper';
-import ErrorIcon from '@material-ui/icons/ErrorOutline';
-import {
-  userGetDisplayName,
-  userGetProfileUrl,
-} from '../../lib/collections/users/helpers';
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import React from "react";
+import { Link } from "../../lib/reactRouterWrapper";
+import ErrorIcon from "@material-ui/icons/ErrorOutline";
+import { userGetDisplayName, userGetProfileUrl } from "../../lib/collections/users/helpers";
 
 const styles = (theme: ThemeType): JssStyles => ({
   userName: {
@@ -20,16 +17,15 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const UsersNamePending = ({ user, classes }: {
-  user: UsersMinimumInfo,
-  classes: ClassesType,
-}) => {
+const UsersNamePending = ({ user, classes }: { user: UsersMinimumInfo; classes: ClassesType }) => {
   const { LWTooltip } = Components;
-  const name = userGetDisplayName(user)
-  const tooltip = <p>
-    <span className={classes.tooltipUserName}>{name}</span> has been requested
-    as a co-author of this post. They can accept or decline this request.
-  </p>;
+  const name = userGetDisplayName(user);
+  const tooltip = (
+    <p>
+      <span className={classes.tooltipUserName}>{name}</span> has been requested as a co-author of this post. They can
+      accept or decline this request.
+    </p>
+  );
 
   return (
     <LWTooltip title={tooltip} placement="right">
@@ -38,14 +34,12 @@ const UsersNamePending = ({ user, classes }: {
       </Link>
     </LWTooltip>
   );
-}
+};
 
-const UsersNamePendingComponent = registerComponent(
-  'UsersNamePending', UsersNamePending, {styles}
-);
+const UsersNamePendingComponent = registerComponent("UsersNamePending", UsersNamePending, { styles });
 
 declare global {
   interface ComponentTypes {
-    UsersNamePending: typeof UsersNamePendingComponent
+    UsersNamePending: typeof UsersNamePendingComponent;
   }
 }

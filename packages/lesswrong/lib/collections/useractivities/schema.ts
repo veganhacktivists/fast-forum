@@ -1,29 +1,29 @@
 const schema: SchemaType<"UserActivities"> = {
   visitorId: {
     type: String,
-    nullable: false
+    nullable: false,
   },
   type: {
     type: String,
     allowedValues: ["userId", "clientId"],
-    nullable: false
+    nullable: false,
   },
   startDate: {
     type: Date,
-    nullable: false
+    nullable: false,
   },
   endDate: {
     type: Date,
-    nullable: false
+    nullable: false,
   },
   activityArray: {
     type: Array,
-    nullable: false
+    nullable: false,
   },
-  'activityArray.$': {
+  "activityArray.$": {
     // In practice this is currently a boolean, but we could support weighting by how long exactly they were active for
     type: Number,
-    optional: false
+    optional: false,
   },
 };
 

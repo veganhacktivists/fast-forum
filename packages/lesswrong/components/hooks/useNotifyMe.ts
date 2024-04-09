@@ -5,18 +5,15 @@ import { getCollectionName } from "../../lib/vulcan-lib";
 import { useDialog } from "../common/withDialog";
 import { useMessages } from "../common/withMessages";
 import { useCurrentUser } from "../common/withUser";
-import {
-  defaultSubscriptionTypeTable,
-  isDefaultSubscriptionType,
-} from "../../lib/collections/subscriptions/mutations";
+import { defaultSubscriptionTypeTable, isDefaultSubscriptionType } from "../../lib/collections/subscriptions/mutations";
 import type { SubscriptionType } from "../../lib/collections/subscriptions/schema";
 import { useMulti } from "../../lib/crud/withMulti";
 import { max } from "underscore";
 import { userIsDefaultSubscribed } from "../../lib/subscriptionUtil";
 
 const currentUserIsSubscribed = (
-  currentUser: UsersCurrent|null,
-  results: SubscriptionState[]|undefined,
+  currentUser: UsersCurrent | null,
+  results: SubscriptionState[] | undefined,
   subscriptionType: SubscriptionType,
   collectionName: CollectionNameString,
   document: AnyBecauseTodo,
@@ -25,10 +22,7 @@ const currentUserIsSubscribed = (
   // recent subscription
   if (results && results.length > 0) {
     // Get the newest subscription entry (Mingo doesn't enforce the limit:1)
-    const currentSubscription = max(
-      results,
-      (result) => new Date(result.createdAt).getTime(),
-    );
+    const currentSubscription = max(results, (result) => new Date(result.createdAt).getTime());
 
     if (currentSubscription.state === "subscribed") {
       return true;
@@ -42,14 +36,14 @@ const currentUserIsSubscribed = (
     collectionName,
     document,
   });
-}
+};
 
 export type NotifyMeConfig = {
-  loading: boolean,
-  disabled?: boolean,
-  isSubscribed?: boolean,
-  onSubscribe?: (event: MouseEvent) => Promise<void>,
-}
+  loading: boolean;
+  disabled?: boolean;
+  isSubscribed?: boolean;
+  onSubscribe?: (event: MouseEvent) => Promise<void>;
+};
 
 export const useNotifyMe = ({
   document,
@@ -57,15 +51,15 @@ export const useNotifyMe = ({
   hideIfNotificationsDisabled,
   hideForLoggedOutUsers,
 }: {
-  document: AnyBecauseTodo,
-  overrideSubscriptionType?: SubscriptionType,
-  hideIfNotificationsDisabled?: boolean,
-  hideForLoggedOutUsers?: boolean,
+  document: AnyBecauseTodo;
+  overrideSubscriptionType?: SubscriptionType;
+  hideIfNotificationsDisabled?: boolean;
+  hideForLoggedOutUsers?: boolean;
 }): NotifyMeConfig => {
   const currentUser = useCurrentUser();
-  const {openDialog} = useDialog();
-  const {flash} = useMessages();
-  const {create: createSubscription} = useCreate({
+  const { openDialog } = useDialog();
+  const { flash } = useMessages();
+  const { create: createSubscription } = useCreate({
     collectionName: "Subscriptions",
     fragmentName: "SubscriptionState",
   });
@@ -76,15 +70,14 @@ export const useNotifyMe = ({
   }
 
   const documentType = collectionName.toLowerCase();
-  const subscriptionType = overrideSubscriptionType ??
-    defaultSubscriptionTypeTable[collectionName];
-  const {captureEvent} = useTracking({
+  const subscriptionType = overrideSubscriptionType ?? defaultSubscriptionTypeTable[collectionName];
+  const { captureEvent } = useTracking({
     eventType: "subscribeClicked",
-    eventProps: {documentId: document._id, documentType: documentType},
+    eventProps: { documentId: document._id, documentType: documentType },
   });
 
   // Get existing subscription, if there is one
-  const {results, loading, invalidateCache} = useMulti({
+  const { results, loading, invalidateCache } = useMulti({
     terms: {
       view: "subscriptionState",
       documentId: document._id,
@@ -96,19 +89,19 @@ export const useNotifyMe = ({
     collectionName: "Subscriptions",
     fragmentName: "SubscriptionState",
     enableTotal: false,
-    skip: !currentUser
+    skip: !currentUser,
   });
-  
+
   const onSubscribe = async (e: MouseEvent) => {
     if (!currentUser) {
-      openDialog({componentName: "LoginPopup"});
+      openDialog({ componentName: "LoginPopup" });
       return;
     }
 
     try {
       e.preventDefault();
       const subscriptionState = isSubscribed ? "suppressed" : "subscribed";
-      captureEvent("subscribeClicked", {state: subscriptionState});
+      captureEvent("subscribeClicked", { state: subscriptionState });
 
       const newSubscription = {
         state: subscriptionState,
@@ -117,7 +110,7 @@ export const useNotifyMe = ({
         type: subscriptionType,
       } as const;
 
-      await createSubscription({data: newSubscription});
+      await createSubscription({ data: newSubscription });
 
       // We have to manually invalidate the cache as this hook can sometimes be
       // unmounted before the create mutation has finished (eg; when used inside
@@ -126,19 +119,17 @@ export const useNotifyMe = ({
       invalidateCache();
 
       // Success message will be for example posts.subscribed
-      flash({messageString: `Successfully ${
-        isSubscribed ? "unsubscribed" : "subscribed"}`
-      });
-    } catch(error) {
-      flash({messageString: error.message});
+      flash({ messageString: `Successfully ${isSubscribed ? "unsubscribed" : "subscribed"}` });
+    } catch (error) {
+      flash({ messageString: error.message });
     }
-  }
-  
+  };
+
   // If we are hiding the notify element, don't return an onSubscribe.
   if (!currentUser && hideForLoggedOutUsers) {
     return {
-      loading: false
-    }
+      loading: false,
+    };
   }
   // By default, we allow logged out users to see the element and click on it,
   // so that we can prompt them with the login/sign up buttons.
@@ -148,25 +139,19 @@ export const useNotifyMe = ({
       disabled: false,
       isSubscribed: false,
       onSubscribe,
-    }
+    };
   }
 
   if (loading) {
     return {
       loading: true,
     };
-  };
+  }
 
-  const isSubscribed = currentUserIsSubscribed(
-    currentUser,
-    results,
-    subscriptionType,
-    collectionName,
-    document,
-  );
+  const isSubscribed = currentUserIsSubscribed(currentUser, results, subscriptionType, collectionName, document);
 
   // Can't subscribe to yourself
-  if (collectionName === 'Users' && document._id === currentUser?._id) {
+  if (collectionName === "Users" && document._id === currentUser?._id) {
     return {
       disabled: true,
       loading: false,
@@ -186,4 +171,4 @@ export const useNotifyMe = ({
     isSubscribed,
     onSubscribe,
   };
-}
+};

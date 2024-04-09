@@ -1,34 +1,28 @@
-import { registerComponent } from '../../lib/vulcan-lib';
-import React from 'react';
+import { registerComponent } from "../../lib/vulcan-lib";
+import React from "react";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
     position: "absolute",
-    top:0,
-    right:0,
+    top: 0,
+    right: 0,
     height: "100%",
-    display:"flex",
+    display: "flex",
     alignItems: "center",
     backgroundColor: theme.palette.grey[50],
-    paddingLeft: theme.spacing.unit*2,
+    paddingLeft: theme.spacing.unit * 2,
     zIndex: theme.zIndexes.sidebarActionMenu,
   },
-})
+});
 
-const SidebarActionMenu = ({children, classes}: {
-  children: React.ReactNode,
-  classes: ClassesType,
-}) => {
-  return <div className={classes.root}>
-    {children}
-  </div>
+const SidebarActionMenu = ({ children, classes }: { children: React.ReactNode; classes: ClassesType }) => {
+  return <div className={classes.root}>{children}</div>;
 };
 
-const SidebarActionMenuComponent = registerComponent('SidebarActionMenu', SidebarActionMenu, {styles});
+const SidebarActionMenuComponent = registerComponent("SidebarActionMenu", SidebarActionMenu, { styles });
 
 declare global {
   interface ComponentTypes {
-    SidebarActionMenu: typeof SidebarActionMenuComponent
+    SidebarActionMenu: typeof SidebarActionMenuComponent;
   }
 }
-

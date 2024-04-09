@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-09-14T09:41:48.000Z by 20230914T094148.add_forceAllowType3Audio.ts
  * +-- Overall schema hash: c7d6d21198c4725672bcea289b5c32ff
- *  
+ *
  * @@ -968,2 +966,13 @@ CREATE TABLE "Tags" (
- *  
+ *
  * +-- Schema for "TypingIndicators", hash: b1ca958f9f88cd30add34274d4f97cb1
  * +CREATE TABLE "TypingIndicators" (
  * +    _id varchar(27) PRIMARY KEY,
@@ -27,7 +27,7 @@
  * +);
  * +
  *  -- Schema for "UserActivities", hash: 0ab5700d352f6273e9a280dca6d864d5
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -41,10 +41,10 @@ export const acceptsSchemaHash = "c7d6d21198c4725672bcea289b5c32ff";
 import TypingIndicator from "../../lib/collections/typingIndicators/collection";
 import { createTable, dropTable } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await createTable(db, TypingIndicator);
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropTable(db, TypingIndicator);
-}
+};

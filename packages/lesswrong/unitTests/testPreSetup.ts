@@ -1,4 +1,4 @@
-import 'regenerator-runtime/runtime';
-import { filterConsoleLogSpam } from '../lib/consoleFilters';
+import "regenerator-runtime/runtime";
+import { filterConsoleLogSpam } from "../lib/consoleFilters";
 
 filterConsoleLogSpam();

@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useRef } from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { useCurrentUser } from '../common/withUser';
-import { useGlobalKeydown } from '../common/withGlobalKeydown';
-import { forumSelect } from '../../lib/forumTypeUtils';
-import { AnalyticsContext } from '../../lib/analyticsEvents';
-import AddBoxIcon from '@material-ui/icons/AddBox'
-import { isLWorAF } from '../../lib/instanceSettings';
+import React, { useState, useCallback, useRef } from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useCurrentUser } from "../common/withUser";
+import { useGlobalKeydown } from "../common/withGlobalKeydown";
+import { forumSelect } from "../../lib/forumTypeUtils";
+import { AnalyticsContext } from "../../lib/analyticsEvents";
+import AddBoxIcon from "@material-ui/icons/AddBox";
+import { isLWorAF } from "../../lib/instanceSettings";
 
 const recentDisucssionFeedComponents = forumSelect({
   LWAF: {
@@ -29,34 +29,34 @@ const recentDisucssionFeedComponents = forumSelect({
 });
 
 const RecentDiscussionFeed = ({
-  commentsLimit, maxAgeHours, af,
-  title="Recent Discussion", shortformButton=true
+  commentsLimit,
+  maxAgeHours,
+  af,
+  title = "Recent Discussion",
+  shortformButton = true,
 }: {
-  commentsLimit?: number,
-  maxAgeHours?: number,
-  af?: boolean,
-  title?: string,
-  shortformButton?: boolean,
+  commentsLimit?: number;
+  maxAgeHours?: number;
+  af?: boolean;
+  title?: string;
+  shortformButton?: boolean;
 }) => {
   const [expandAllThreads, setExpandAllThreads] = useState(false);
   const [showShortformFeed, setShowShortformFeed] = useState(false);
-  const refetchRef = useRef<null|(()=>void)>(null);
+  const refetchRef = useRef<null | (() => void)>(null);
   const currentUser = useCurrentUser();
-  const expandAll = currentUser?.noCollapseCommentsFrontpage || expandAllThreads
+  const expandAll = currentUser?.noCollapseCommentsFrontpage || expandAllThreads;
 
-  useGlobalKeydown(event => {
-    const F_Key = 70
+  useGlobalKeydown((event) => {
+    const F_Key = 70;
     if ((event.metaKey || event.ctrlKey) && event.keyCode === F_Key) {
       setExpandAllThreads(true);
     }
   });
 
-  const toggleShortformFeed = useCallback(
-    () => {
-      setShowShortformFeed(!showShortformFeed);
-    },
-    [setShowShortformFeed, showShortformFeed]
-  );
+  const toggleShortformFeed = useCallback(() => {
+    setShowShortformFeed(!showShortformFeed);
+  }, [setShowShortformFeed, showShortformFeed]);
 
   const {
     SingleColumnSection,
@@ -68,8 +68,7 @@ const RecentDiscussionFeed = ({
   } = Components;
 
   const refetch = useCallback(() => {
-    if (refetchRef.current)
-      refetchRef.current();
+    if (refetchRef.current) refetchRef.current();
   }, [refetchRef]);
 
   const {
@@ -82,35 +81,39 @@ const RecentDiscussionFeed = ({
     MeetupsPokeComponent,
   } = recentDisucssionFeedComponents;
 
-  const showShortformButton = isLWorAF && currentUser?.isReviewed && shortformButton && !currentUser.allCommentingDisabled
+  const showShortformButton =
+    isLWorAF && currentUser?.isReviewed && shortformButton && !currentUser.allCommentingDisabled;
   return (
     <AnalyticsContext pageSectionContext="recentDiscussion">
-      <AnalyticsInViewTracker eventProps={{inViewType: "recentDiscussion"}}>
+      <AnalyticsInViewTracker eventProps={{ inViewType: "recentDiscussion" }}>
         <SingleColumnSection>
-          <SectionTitle title={title} >
-            {showShortformButton && <div onClick={toggleShortformFeed}>
-              <SectionButton>
-                <AddBoxIcon />
-                New Shortform Post
-              </SectionButton>
-            </div>}
+          <SectionTitle title={title}>
+            {showShortformButton && (
+              <div onClick={toggleShortformFeed}>
+                <SectionButton>
+                  <AddBoxIcon />
+                  New Shortform Post
+                </SectionButton>
+              </div>
+            )}
           </SectionTitle>
-          {showShortformFeed && <ShortformSubmitForm successCallback={refetch}/>}
+          {showShortformFeed && <ShortformSubmitForm successCallback={refetch} />}
           <MixedTypeFeed
             firstPageSize={10}
             pageSize={20}
             refetchRef={refetchRef}
             resolverName="RecentDiscussionFeed"
             sortKeyType="Date"
-            resolverArgs={{ af: 'Boolean' }}
+            resolverArgs={{ af: "Boolean" }}
             resolverArgsValues={{ af }}
             fragmentArgs={{
-              commentsLimit: 'Int',
-              maxAgeHours: 'Int',
-              tagCommentsLimit: 'Int',
+              commentsLimit: "Int",
+              maxAgeHours: "Int",
+              tagCommentsLimit: "Int",
             }}
             fragmentArgsValues={{
-              commentsLimit, maxAgeHours,
+              commentsLimit,
+              maxAgeHours,
               tagCommentsLimit: commentsLimit,
             }}
             renderers={{
@@ -123,7 +126,7 @@ const RecentDiscussionFeed = ({
                     comments={post.recentComments}
                     expandAllThreads={expandAll}
                   />
-                )
+                ),
               },
               shortformCommented: {
                 fragmentName: "ShortformRecentDiscussion",
@@ -134,7 +137,7 @@ const RecentDiscussionFeed = ({
                     comments={post.recentComments}
                     expandAllThreads={expandAll}
                   />
-                )
+                ),
               },
               tagDiscussed: {
                 fragmentName: "TagRecentDiscussion",
@@ -145,18 +148,22 @@ const RecentDiscussionFeed = ({
                     comments={tag.recentComments}
                     expandAllThreads={expandAll}
                   />
-                )
+                ),
               },
               tagRevised: {
                 fragmentName: "RecentDiscussionRevisionTagFragment",
-                render: (revision: RecentDiscussionRevisionTagFragment) => <div>
-                  {revision.tag && <TagRevisionComponent
-                    tag={revision.tag}
-                    revision={revision}
-                    headingStyle="full"
-                    documentId={revision.documentId}
-                  />}
-                </div>,
+                render: (revision: RecentDiscussionRevisionTagFragment) => (
+                  <div>
+                    {revision.tag && (
+                      <TagRevisionComponent
+                        tag={revision.tag}
+                        revision={revision}
+                        headingStyle="full"
+                        documentId={revision.documentId}
+                      />
+                    )}
+                  </div>
+                ),
               },
               electionVoted: {
                 fragmentName: "ElectionVoteRecentDiscussion",
@@ -166,26 +173,26 @@ const RecentDiscussionFeed = ({
               },
               subscribeReminder: {
                 fragmentName: null,
-                render: () => <SubscribeReminderComponent />
+                render: () => <SubscribeReminderComponent />,
               },
               meetupsPoke: {
                 fragmentName: null,
-                render: () => <MeetupsPokeComponent />
+                render: () => <MeetupsPokeComponent />,
               },
             }}
           />
         </SingleColumnSection>
       </AnalyticsInViewTracker>
     </AnalyticsContext>
-  )
-}
+  );
+};
 
-const RecentDiscussionFeedComponent = registerComponent('RecentDiscussionFeed', RecentDiscussionFeed, {
+const RecentDiscussionFeedComponent = registerComponent("RecentDiscussionFeed", RecentDiscussionFeed, {
   areEqual: "auto",
 });
 
 declare global {
   interface ComponentTypes {
-    RecentDiscussionFeed: typeof RecentDiscussionFeedComponent,
+    RecentDiscussionFeed: typeof RecentDiscussionFeedComponent;
   }
 }

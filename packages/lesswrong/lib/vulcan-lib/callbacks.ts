@@ -1,42 +1,57 @@
-import { isServer } from '../executionEnvironment';
-import * as _ from 'underscore';
+import { isServer } from "../executionEnvironment";
+import * as _ from "underscore";
 
-import { isPromise } from './utils';
-import { isAnyQueryPending as isAnyPostgresQueryPending } from '../sql/PgCollection';
-import { loggerConstructor } from '../utils/logging'
+import { isPromise } from "./utils";
+import { isAnyQueryPending as isAnyPostgresQueryPending } from "../sql/PgCollection";
+import { loggerConstructor } from "../utils/logging";
 
 export interface CallbackPropertiesBase<N extends CollectionNameString> {
   // TODO: Many of these are empirically optional, but setting them to optional
   // causes a bajillion type errors, so we will not be fixing today
-  currentUser: DbUser|null
-  collection: CollectionBase<N>
-  context: ResolverContext
-  schema: SchemaType<N>
+  currentUser: DbUser | null;
+  collection: CollectionBase<N>;
+  context: ResolverContext;
+  schema: SchemaType<N>;
 }
 
-export class CallbackChainHook<IteratorType,ArgumentsType extends any[]> {
-  name: string
-  
+export class CallbackChainHook<IteratorType, ArgumentsType extends any[]> {
+  name: string;
+
   constructor(name: string) {
     this.name = name;
   }
-  
-  add = (fn: (doc: IteratorType, ...args: ArgumentsType)=>
-    (Promise<IteratorType|Partial<IteratorType>> | IteratorType | undefined | void)
+
+  add = (
+    fn: (
+      doc: IteratorType,
+      ...args: ArgumentsType
+    ) => Promise<IteratorType | Partial<IteratorType>> | IteratorType | undefined | void,
   ) => {
     addCallback(this.name, fn);
-  }
-  
-  remove = (fn: (doc: IteratorType, ...args: ArgumentsType)=>IteratorType|Promise<IteratorType>|undefined|void) => {
+  };
+
+  remove = (
+    fn: (doc: IteratorType, ...args: ArgumentsType) => IteratorType | Promise<IteratorType> | undefined | void,
+  ) => {
     removeCallback(this.name, fn);
-  }
-  
-  runCallbacks = async ({iterator, properties, ignoreExceptions}: {iterator: IteratorType, properties: ArgumentsType, ignoreExceptions?: boolean}): Promise<IteratorType> => {
+  };
+
+  runCallbacks = async ({
+    iterator,
+    properties,
+    ignoreExceptions,
+  }: {
+    iterator: IteratorType;
+    properties: ArgumentsType;
+    ignoreExceptions?: boolean;
+  }): Promise<IteratorType> => {
     const start = Date.now();
 
     const result = await runCallbacks({
       name: this.name,
-      iterator, properties, ignoreExceptions
+      iterator,
+      properties,
+      ignoreExceptions,
     });
 
     const timeElapsed = Date.now() - start;
@@ -48,48 +63,48 @@ export class CallbackChainHook<IteratorType,ArgumentsType extends any[]> {
     // }, true);
 
     return result;
-  }
+  };
 }
 
 export class CallbackHook<ArgumentsType extends any[]> {
-  name: string
-  
+  name: string;
+
   constructor(name: string) {
     this.name = name;
   }
-  
-  add = (fn: (...args: ArgumentsType)=>void|Promise<void>) => {
+
+  add = (fn: (...args: ArgumentsType) => void | Promise<void>) => {
     addCallback(this.name, fn);
-  }
-  
+  };
+
   runCallbacksAsync = async (properties: ArgumentsType): Promise<void> => {
     const start = Date.now();
 
     await runCallbacksAsync({
       name: this.name,
-      properties
+      properties,
     });
 
     const timeElapsed = Date.now() - start;
     // Need to use this from Globals to avoid import cycles
-    // Temporarily disabled to investigate performance issues 
+    // Temporarily disabled to investigate performance issues
     // Globals.captureEvent('callbacksCompleted', {
     //   callbackHookName: this.name,
     //   timeElapsed
     // }, true);
-  }
+  };
 }
 
 /**
  * @summary Format callback hook names
  */
-const formatHookName = (hook: string|null|undefined): string => hook?.toLowerCase() || "";
+const formatHookName = (hook: string | null | undefined): string => hook?.toLowerCase() || "";
 
 /**
  * @summary Callback hooks provide an easy way to add extra steps to common operations.
  * @namespace Callbacks
  */
-const Callbacks: Record<string,any> = {};
+const Callbacks: Record<string, any> = {};
 
 /**
  * @summary Add a callback function to a hook
@@ -97,21 +112,20 @@ const Callbacks: Record<string,any> = {};
  * @param {Function} callback - The callback function
  */
 export const addCallback = function (hook: string, callback: AnyBecauseTodo) {
-
   const formattedHook = formatHookName(hook);
 
   // if callback array doesn't exist yet, initialize it
-  if (typeof Callbacks[formattedHook] === 'undefined') {
+  if (typeof Callbacks[formattedHook] === "undefined") {
     Callbacks[formattedHook] = [];
   }
 
   Callbacks[formattedHook].push(callback);
-  
+
   if (Callbacks[formattedHook].length > 20) {
     // eslint-disable-next-line no-console
     console.log(`Warning: Excessively many callbacks (${Callbacks[formattedHook].length}) on hook ${formattedHook}.`);
   }
-  
+
   return callback;
 };
 
@@ -123,9 +137,7 @@ export const addCallback = function (hook: string, callback: AnyBecauseTodo) {
  */
 const removeCallback = function (hookName: string, callback: AnyBecauseTodo) {
   const formattedHook = formatHookName(hookName);
-  Callbacks[formattedHook] = _.reject(Callbacks[formattedHook],
-    c => c === callback
-  );
+  Callbacks[formattedHook] = _.reject(Callbacks[formattedHook], (c) => c === callback);
 };
 
 /**
@@ -139,45 +151,46 @@ const removeCallback = function (hookName: string, callback: AnyBecauseTodo) {
  *   will be rethrown.
  * @returns {Object} Returns the item after it's been through all the callbacks for this hook
  */
-export const runCallbacks = function <N extends CollectionNameString> (this: any, options: {
-  name: string,
-  iterator?: any,
-  // A bit of a mess. If you stick to non-deprecated hooks, you'll get the typed version
-  properties: [CallbackPropertiesBase<N>]|any[],
-  ignoreExceptions?: boolean,
-}) {
-  const logger = loggerConstructor(`callbacks-${options.properties[0]?.collection?.collectionName.toLowerCase()}`)
+export const runCallbacks = function <N extends CollectionNameString>(
+  this: any,
+  options: {
+    name: string;
+    iterator?: any;
+    // A bit of a mess. If you stick to non-deprecated hooks, you'll get the typed version
+    properties: [CallbackPropertiesBase<N>] | any[];
+    ignoreExceptions?: boolean;
+  },
+) {
+  const logger = loggerConstructor(`callbacks-${options.properties[0]?.collection?.collectionName.toLowerCase()}`);
   const hook = options.name;
   const formattedHook = formatHookName(hook);
   const item = options.iterator;
   const args = options.properties;
   let ignoreExceptions: boolean;
-  if ("ignoreExceptions" in options)
-    ignoreExceptions = !!options.ignoreExceptions;
-  else
-    ignoreExceptions = true;
+  if ("ignoreExceptions" in options) ignoreExceptions = !!options.ignoreExceptions;
+  else ignoreExceptions = true;
   const callbacks = Callbacks[formattedHook];
 
   // flag used to detect the callback that initiated the async context
   let asyncContext = false;
-  
+
   let inProgressCallbackKey = markCallbackStarted(hook);
-  
-  if (typeof callbacks !== 'undefined' && !!callbacks.length) { // if the hook exists, and contains callbacks to run
+
+  if (typeof callbacks !== "undefined" && !!callbacks.length) {
+    // if the hook exists, and contains callbacks to run
 
     const runCallback = (accumulator: AnyBecauseTodo, callback: AnyBecauseTodo) => {
-      logger(`\x1b[32m[${formattedHook}] [${callback.name || 'noname callback'}]\x1b[0m`);
+      logger(`\x1b[32m[${formattedHook}] [${callback.name || "noname callback"}]\x1b[0m`);
       try {
         const result = callback.apply(this, [accumulator].concat(args));
 
-        if (typeof result === 'undefined') {
+        if (typeof result === "undefined") {
           // if result of current iteration is undefined, don't pass it on
           // logger(`// Warning: Sync callback [${callback.name}] in hook [${hook}] didn't return a result!`)
           return accumulator;
         } else {
           return result;
         }
-
       } catch (error) {
         // eslint-disable-next-line no-console
         console.log(`\x1b[31m// error at callback [${callback.name}] in hook [${formattedHook}]\x1b[0m`);
@@ -191,18 +204,26 @@ export const runCallbacks = function <N extends CollectionNameString> (this: any
       }
     };
 
-    const result = callbacks.reduce(function (accumulator: AnyBecauseTodo, callback: AnyBecauseTodo, index: AnyBecauseTodo) {
+    const result = callbacks.reduce(function (
+      accumulator: AnyBecauseTodo,
+      callback: AnyBecauseTodo,
+      index: AnyBecauseTodo,
+    ) {
       if (isPromise(accumulator)) {
         if (!asyncContext) {
-          logger(`\x1b[32m[${formattedHook}] Started async context for [${callbacks[index-1] && callbacks[index-1].name}]\x1b[0m`);
+          logger(
+            `\x1b[32m[${formattedHook}] Started async context for [${callbacks[index - 1] && callbacks[index - 1].name}]\x1b[0m`,
+          );
           asyncContext = true;
         }
         return new Promise((resolve, reject) => {
           accumulator
-            .then(result => {
+            .then((result) => {
               if (result === undefined) {
                 // eslint-disable-next-line no-console
-                console.error('Async before callbacks should not return undefined. Please return the document/data instead')
+                console.error(
+                  "Async before callbacks should not return undefined. Please return the document/data instead",
+                );
               }
               try {
                 // run this callback once we have the previous value
@@ -218,10 +239,11 @@ export const runCallbacks = function <N extends CollectionNameString> (this: any
         return runCallback(accumulator, callback);
       }
     }, item);
-    
+
     markCallbackFinished(inProgressCallbackKey, hook);
     return result;
-  } else { // else, just return the item unchanged
+  } else {
+    // else, just return the item unchanged
     markCallbackFinished(inProgressCallbackKey, hook);
     return item;
   }
@@ -232,12 +254,15 @@ export const runCallbacks = function <N extends CollectionNameString> (this: any
 // hook). This is used only by vulcan-forms, which previously was using
 // runCallbacks, but is new separated out in order to make runCallbacks more
 // refactor-able.
-export const runCallbacksList = function (this: any, options: {
-  iterator?: any,
-  properties?: any, // Properties here, from Forms, seems to be a mess
-  callbacks: any,
-}) {
-  const logger = loggerConstructor(`callbacks-form`)
+export const runCallbacksList = function (
+  this: any,
+  options: {
+    iterator?: any;
+    properties?: any; // Properties here, from Forms, seems to be a mess
+    callbacks: any;
+  },
+) {
+  const logger = loggerConstructor(`callbacks-form`);
   const item = options.iterator;
   const args = options.properties;
   const ignoreExceptions = true;
@@ -245,21 +270,19 @@ export const runCallbacksList = function (this: any, options: {
 
   // flag used to detect the callback that initiated the async context
   let asyncContext = false;
-  
-  if (typeof callbacks !== 'undefined' && !!callbacks.length) {
 
+  if (typeof callbacks !== "undefined" && !!callbacks.length) {
     const runCallback = (accumulator: AnyBecauseTodo, callback: AnyBecauseTodo) => {
-      logger(`running callback ${callback.name}`)
+      logger(`running callback ${callback.name}`);
       try {
         const result = callback.apply(this, [accumulator].concat(args));
 
-        if (typeof result === 'undefined') {
+        if (typeof result === "undefined") {
           // if result of current iteration is undefined, don't pass it on
           return accumulator;
         } else {
           return result;
         }
-
       } catch (error) {
         // eslint-disable-next-line no-console
         console.log(`error at callback [${callback.name}] in callbacks list`);
@@ -273,7 +296,7 @@ export const runCallbacksList = function (this: any, options: {
       }
     };
 
-    logger("Running callbacks list")
+    logger("Running callbacks list");
     return callbacks.reduce(function (accumulator: AnyBecauseTodo, callback: AnyBecauseTodo, index: AnyBecauseTodo) {
       if (isPromise(accumulator)) {
         if (!asyncContext) {
@@ -281,7 +304,7 @@ export const runCallbacksList = function (this: any, options: {
         }
         return new Promise((resolve, reject) => {
           accumulator
-            .then(result => {
+            .then((result) => {
               try {
                 // run this callback once we have the previous value
                 resolve(runCallback(result, callback));
@@ -296,53 +319,52 @@ export const runCallbacksList = function (this: any, options: {
         return runCallback(accumulator, callback);
       }
     }, item);
-
-  } else { // else, just return the item unchanged
+  } else {
+    // else, just return the item unchanged
     return item;
   }
-}
+};
 
 /**
  * @summary Successively run all of a hook's callbacks on an item, in async mode (only works on server)
  * @param {String} hook - First argument: the name of the hook
  * @param {Any} args - Other arguments will be passed to each successive iteration
  */
-export const runCallbacksAsync = function <N extends CollectionNameString> (options: {
-  name: string,
+export const runCallbacksAsync = function <N extends CollectionNameString>(options: {
+  name: string;
   // A bit of a mess. If you stick to non-deprecated hooks, you'll get the typed version
-  properties: [CallbackPropertiesBase<N>]|any[]
+  properties: [CallbackPropertiesBase<N>] | any[];
 }) {
-  const logger = loggerConstructor(`callbacks-${options.properties[0]?.collection?.collectionName.toLowerCase()}`)
+  const logger = loggerConstructor(`callbacks-${options.properties[0]?.collection?.collectionName.toLowerCase()}`);
   const hook = formatHookName(options.name);
   const args = options.properties;
 
   const callbacks = Array.isArray(hook) ? hook : Callbacks[hook];
 
-  if (isServer && typeof callbacks !== 'undefined' && !!callbacks.length) {
+  if (isServer && typeof callbacks !== "undefined" && !!callbacks.length) {
     let pendingDeferredCallbackStart = markCallbackStarted(hook);
 
     // use defer to avoid holding up client
     setTimeout(function () {
       // run all post submit server callbacks on post object successively
       callbacks.forEach(function (this: any, callback: AnyBecauseTodo) {
-        logger(`\x1b[32m[${hook}]: [${callback.name || 'noname callback'}]\x1b[0m`);
-        
+        logger(`\x1b[32m[${hook}]: [${callback.name || "noname callback"}]\x1b[0m`);
+
         let pendingAsyncCallback = markCallbackStarted(hook);
         try {
           let callbackResult = callback.apply(this, args);
           if (isPromise(callbackResult)) {
-            callbackResult
-              .then(
-                result => markCallbackFinished(pendingAsyncCallback, hook),
-                exception => {
-                  markCallbackFinished(pendingAsyncCallback, hook)
-                  // eslint-disable-next-line no-console
-                  console.log(`Error running async callback [${callback.name}] on hook [${hook}]`);
-                  // eslint-disable-next-line no-console
-                  console.log(exception);
-                  throw exception;
-                }
-              )
+            callbackResult.then(
+              (result) => markCallbackFinished(pendingAsyncCallback, hook),
+              (exception) => {
+                markCallbackFinished(pendingAsyncCallback, hook);
+                // eslint-disable-next-line no-console
+                console.log(`Error running async callback [${callback.name}] on hook [${hook}]`);
+                // eslint-disable-next-line no-console
+                console.log(exception);
+                throw exception;
+              },
+            );
           } else {
             markCallbackFinished(pendingAsyncCallback, hook);
           }
@@ -350,10 +372,9 @@ export const runCallbacksAsync = function <N extends CollectionNameString> (opti
           markCallbackFinished(pendingAsyncCallback, hook);
         }
       });
-      
+
       markCallbackFinished(pendingDeferredCallbackStart, hook);
     }, 0);
-
   }
 };
 
@@ -379,7 +400,7 @@ export const runCallbacksAsync = function <N extends CollectionNameString> (opti
  * thread which isn't tracked.
  */
 export const waitUntilCallbacksFinished = () => {
-  return new Promise<void>(resolve => {
+  return new Promise<void>((resolve) => {
     function finishOrWait() {
       if (callbacksArePending() || isAnyPostgresQueryPending()) {
         setTimeout(finishOrWait, 20);
@@ -387,16 +408,16 @@ export const waitUntilCallbacksFinished = () => {
         resolve();
       }
     }
-    
+
     finishOrWait();
   });
 };
 
 // Dictionary of all outstanding callbacks (key is an ID, value is `true`). If
 // there are no outstanding callbacks, this should be an empty dictionary.
-let pendingCallbackKeys: Partial<Record<string,true>> = {};
+let pendingCallbackKeys: Partial<Record<string, true>> = {};
 
-let pendingCallbackDescriptions: Record<string,number> = {};
+let pendingCallbackDescriptions: Record<string, number> = {};
 
 // ID for a pending callback. Incremements with each call to
 // `markCallbackStarted`.
@@ -408,36 +429,34 @@ let numCallbacksPending = 0;
 
 // When starting an async callback, assign it an ID, record the fact that it's
 // running, and return the ID.
-function markCallbackStarted(description: string): number
-{
+function markCallbackStarted(description: string): number {
   if (numCallbacksPending > 1000) {
     // eslint-disable-next-line no-console
-    console.log(`Warning: Excessively many background callbacks running (numCallbacksPending=${numCallbacksPending}) while trying to add callback ${description}`);
+    console.log(
+      `Warning: Excessively many background callbacks running (numCallbacksPending=${numCallbacksPending}) while trying to add callback ${description}`,
+    );
   }
   numCallbacksPending++;
-  
-  if (pendingCallbackKey >= Number.MAX_SAFE_INTEGER)
-    pendingCallbackKey = 0;
-  else
-    pendingCallbackKey++;
+
+  if (pendingCallbackKey >= Number.MAX_SAFE_INTEGER) pendingCallbackKey = 0;
+  else pendingCallbackKey++;
   pendingCallbackKeys[pendingCallbackKey] = true;
-  
+
   if (description in pendingCallbackDescriptions) {
     pendingCallbackDescriptions[description]++;
   } else {
     pendingCallbackDescriptions[description] = 1;
   }
-  
+
   return pendingCallbackKey;
 }
 
 // Record the fact that an async callback with the given ID has finished.
-function markCallbackFinished(id: number, description: string)
-{
+function markCallbackFinished(id: number, description: string) {
   numCallbacksPending--;
   delete pendingCallbackKeys[id];
-  
-  if (!pendingCallbackDescriptions[description] || pendingCallbackDescriptions[description]===1) {
+
+  if (!pendingCallbackDescriptions[description] || pendingCallbackDescriptions[description] === 1) {
     delete pendingCallbackDescriptions[description];
   } else {
     pendingCallbackDescriptions[description]--;
@@ -445,9 +464,8 @@ function markCallbackFinished(id: number, description: string)
 }
 
 // Return whether there is at least one async callback running.
-function callbacksArePending(): boolean
-{
-  for(let id in pendingCallbackKeys) {
+function callbacksArePending(): boolean {
+  for (let id in pendingCallbackKeys) {
     return true;
   }
   return false;
@@ -456,7 +474,9 @@ function callbacksArePending(): boolean
 export function printInProgressCallbacks() {
   const callbacksInProgress = Object.keys(pendingCallbackDescriptions);
   // eslint-disable-next-line no-console
-  console.log(`Callbacks in progress: ${callbacksInProgress.map(c => pendingCallbackDescriptions[c]!==1 ? `${c}(${pendingCallbackDescriptions[c]})` : c).join(", ")}`);
+  console.log(
+    `Callbacks in progress: ${callbacksInProgress.map((c) => (pendingCallbackDescriptions[c] !== 1 ? `${c}(${pendingCallbackDescriptions[c]})` : c)).join(", ")}`,
+  );
 }
 
-export const userChangedCallback = new CallbackChainHook<UsersCurrent|DbUser|null,[]>("events.identify");
+export const userChangedCallback = new CallbackChainHook<UsersCurrent | DbUser | null, []>("events.identify");

@@ -5,21 +5,18 @@ import { useDialog } from "../../common/withDialog";
 import { taggingNamePluralCapitalSetting } from "../../../lib/instanceSettings";
 import { preferredHeadingCase } from "../../../themes/forumTheme";
 
-const EditTagsDropdownItem = ({post, closeMenu}: {
-  post: PostsList | SunshinePostsList,
-  closeMenu?: () => void,
-}) => {
-  const {openDialog} = useDialog();
+const EditTagsDropdownItem = ({ post, closeMenu }: { post: PostsList | SunshinePostsList; closeMenu?: () => void }) => {
+  const { openDialog } = useDialog();
 
   const handleOpenTagDialog = async () => {
     closeMenu?.();
     openDialog({
       componentName: "EditTagsDialog",
-      componentProps: {post},
+      componentProps: { post },
     });
-  }
+  };
 
-  const {DropdownItem} = Components;
+  const { DropdownItem } = Components;
   return (
     <DropdownItem
       title={preferredHeadingCase(`Edit ${taggingNamePluralCapitalSetting.get()}`)}
@@ -27,15 +24,12 @@ const EditTagsDropdownItem = ({post, closeMenu}: {
       icon="Tag"
     />
   );
-}
+};
 
-const EditTagsDropdownItemComponent = registerComponent(
-  "EditTagsDropdownItem",
-  EditTagsDropdownItem,
-);
+const EditTagsDropdownItemComponent = registerComponent("EditTagsDropdownItem", EditTagsDropdownItem);
 
 declare global {
   interface ComponentTypes {
-    EditTagsDropdownItem: typeof EditTagsDropdownItemComponent
+    EditTagsDropdownItem: typeof EditTagsDropdownItemComponent;
   }
 }

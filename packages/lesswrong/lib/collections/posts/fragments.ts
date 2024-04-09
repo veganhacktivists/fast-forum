@@ -1,6 +1,4 @@
-import { registerFragment } from '../../vulcan-lib';
-
-
+import { registerFragment } from "../../vulcan-lib";
 
 registerFragment(`
   fragment PostsMinimumInfo on Post {
@@ -152,7 +150,7 @@ registerFragment(`
     currentUserVote
     currentUserExtendedVote
   }
-`)
+`);
 
 registerFragment(`
   fragment PostsListWithVotesAndSequence on Post {
@@ -161,7 +159,7 @@ registerFragment(`
       ...SequencesPageFragment
     }
   }
-`)
+`);
 
 registerFragment(`
   fragment PostsReviewVotingList on Post {
@@ -173,8 +171,7 @@ registerFragment(`
     reviewVoteScoreAF
     reviewVotesAF
   }
-`)
-
+`);
 
 registerFragment(`
   fragment PostsAuthors on Post {
@@ -255,7 +252,7 @@ registerFragment(`
       ...WithVoteTagRel
     }
   }
-`)
+`);
 
 registerFragment(`
   fragment PostsListTagWithVotes on Post {
@@ -264,7 +261,7 @@ registerFragment(`
       ...WithVoteTagRel
     }
   }
-`)
+`);
 
 registerFragment(`
   fragment PostsDetails on Post {
@@ -394,7 +391,7 @@ registerFragment(`
       ...RevisionMetadata
     }
   }
-`)
+`);
 
 registerFragment(`
   fragment PostsRevisionEdit on Post {
@@ -409,7 +406,7 @@ registerFragment(`
       ...RevisionMetadata
     }
   }
-`)
+`);
 
 registerFragment(`
   fragment PostsWithNavigationAndRevision on Post {
@@ -421,7 +418,7 @@ registerFragment(`
     
     tableOfContentsRevision(version: $version)
   }
-`)
+`);
 
 registerFragment(`
   fragment PostsWithNavigation on Post {
@@ -430,7 +427,7 @@ registerFragment(`
     
     tableOfContents
   }
-`)
+`);
 
 // This is a union of the fields needed by PostsTopNavigation and BottomNavigation.
 registerFragment(`
@@ -462,7 +459,7 @@ registerFragment(`
       }
     }
   }
-`)
+`);
 
 registerFragment(`
   fragment PostsPage on Post {
@@ -477,7 +474,7 @@ registerFragment(`
     myEditorAccess
     linkSharingKey
   }
-`)
+`);
 
 registerFragment(`
   fragment PostsEdit on Post {
@@ -542,7 +539,7 @@ registerFragment(`
       ...RevisionMetadata
     }
   }
-`)
+`);
 
 registerFragment(`
   fragment PostsRecentDiscussion on Post {
@@ -572,7 +569,7 @@ registerFragment(`
     _id
     bannedUserIds
   }
-`)
+`);
 
 registerFragment(`
   fragment SunshinePostsList on Post {
@@ -614,7 +611,7 @@ registerFragment(`
       }
     }
   }
-`)
+`);
 
 registerFragment(`
   fragment WithVotePost on Post {

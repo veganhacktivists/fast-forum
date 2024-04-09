@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-11-16T02:23:04.000Z by 20231116T022304.add_DialogueMatchPreferences_table.ts
  * +-- Overall schema hash: 4a83029d46e8b6afd17ced17bfeb6cf7
- *  
+ *
  * @@ -263,3 +261,3 @@ CREATE TABLE "DialogueChecks" (
- *  
+ *
  * --- Schema for "DialogueMatchPreferences", hash: 00ecc0712e874db689d7edf630fe33de
  * +-- Schema for "DialogueMatchPreferences", hash: 8094e1a80428d3d3a5e6afcfd47e40ee
  *  CREATE TABLE "DialogueMatchPreferences" (
@@ -23,7 +23,7 @@
  * -    "topicPreferences" jsonb[] NOT NULL,
  * +    "topicPreferences" jsonb[] NOT NULL DEFAULT '{}',
  *      "topicNotes" text NOT NULL DEFAULT '',
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -34,13 +34,13 @@
  */
 export const acceptsSchemaHash = "4a83029d46e8b6afd17ced17bfeb6cf7";
 
-import DialogueMatchPreferences from "../../lib/collections/dialogueMatchPreferences/collection"
-import { createTable, dropTable } from "./meta/utils"
+import DialogueMatchPreferences from "../../lib/collections/dialogueMatchPreferences/collection";
+import { createTable, dropTable } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await createTable(db, DialogueMatchPreferences);
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropTable(db, DialogueMatchPreferences);
-}
+};

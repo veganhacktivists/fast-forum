@@ -1,49 +1,61 @@
-import crypto from 'crypto';
-import fs from 'fs';
-import difference from 'lodash/difference';
-import moment from 'moment';
-import _ from 'underscore';
-import Posts from '../../lib/collections/posts/collection';
-import Revisions from '../../lib/collections/revisions/collection';
-import Users from '../../lib/collections/users/collection';
-import { userGetDisplayName } from '../../lib/collections/users/helpers';
-import { filterNonnull } from '../../lib/utils/typeGuardUtils';
-import { ckEditorBundleVersion } from '../../lib/wrapCkEditor';
-import { buildRevision, getLatestRev, getNextVersion, getPrecedingRev, htmlToChangeMetrics } from '../editor/make_editable_callbacks';
-import { createAdminContext, createMutator, Globals, updateMutator } from '../vulcan-lib';
-import { CkEditorUser, CreateDocumentPayload, DocumentResponse, DocumentResponseSchema, UserSchema } from './ckEditorApiValidators';
-import { getCkEditorApiPrefix, getCkEditorApiSecretKey } from './ckEditorServerConfig';
-import { getPostEditorConfig } from './postEditorConfig';
-import CkEditorUserSessions from '../../lib/collections/ckEditorUserSessions/collection';
+import crypto from "crypto";
+import fs from "fs";
+import difference from "lodash/difference";
+import moment from "moment";
+import _ from "underscore";
+import Posts from "../../lib/collections/posts/collection";
+import Revisions from "../../lib/collections/revisions/collection";
+import Users from "../../lib/collections/users/collection";
+import { userGetDisplayName } from "../../lib/collections/users/helpers";
+import { filterNonnull } from "../../lib/utils/typeGuardUtils";
+import { ckEditorBundleVersion } from "../../lib/wrapCkEditor";
+import {
+  buildRevision,
+  getLatestRev,
+  getNextVersion,
+  getPrecedingRev,
+  htmlToChangeMetrics,
+} from "../editor/make_editable_callbacks";
+import { createAdminContext, createMutator, Globals, updateMutator } from "../vulcan-lib";
+import {
+  CkEditorUser,
+  CreateDocumentPayload,
+  DocumentResponse,
+  DocumentResponseSchema,
+  UserSchema,
+} from "./ckEditorApiValidators";
+import { getCkEditorApiPrefix, getCkEditorApiSecretKey } from "./ckEditorServerConfig";
+import { getPostEditorConfig } from "./postEditorConfig";
+import CkEditorUserSessions from "../../lib/collections/ckEditorUserSessions/collection";
 
 // TODO: actually implement these in Zod
 interface CkEditorComment {
-  id: string,
-  document_id: string,
-  thread_id: string,
-  content: string,
-  user: {id: string},
-  created_at: string,
-  updated_at: string,
-  attributes: any,
+  id: string;
+  document_id: string;
+  thread_id: string;
+  content: string;
+  user: { id: string };
+  created_at: string;
+  updated_at: string;
+  attributes: any;
 }
 
 interface CkEditorGetCommentsResponse {
-cursor_next: string,
-cursor_prev: string,
-data: CkEditorComment[],
+  cursor_next: string;
+  cursor_prev: string;
+  data: CkEditorComment[];
 }
 
 // Time interval such that, when autosaving, we will update an existing
 // rev instead of create a new rev if it's within this amount of time ago. In
 // milliseconds.
-const autosaveMaxInterval = 10*60*1000;
+const autosaveMaxInterval = 10 * 60 * 1000;
 
 const cloudEditorAutosaveCommitMessage = "Cloud editor autosave";
 
 function combineURIs(prefix: string, path: string): string {
   if (prefix.endsWith("/")) {
-    return prefix.substr(0, prefix.length-1) + path;
+    return prefix.substr(0, prefix.length - 1) + path;
   } else {
     return prefix + path;
   }
@@ -54,14 +66,14 @@ function generateSignature(apiKey: string, method: string, uri: string, timestam
   const url = new URL(uri);
   const path = url.pathname + url.search;
 
-  const hmac = crypto.createHmac('SHA256', apiKey);
+  const hmac = crypto.createHmac("SHA256", apiKey);
   hmac.update(`${method.toUpperCase()}${path}${timestamp}`);
 
   if (body) {
     hmac.update(Buffer.from(JSON.stringify(body)));
   }
 
-  return hmac.digest('hex');
+  return hmac.digest("hex");
 }
 
 async function fetchCkEditorRestAPI(method: string, uri: string, body?: any): Promise<string> {
@@ -79,12 +91,13 @@ async function fetchCkEditorRestAPI(method: string, uri: string, body?: any): Pr
     },
   });
   if (!response.ok) {
-
     let explanation;
     try {
       const responseBody = await response.json();
       explanation = responseBody.data?.reasons?.[0]?.explanation;
-    } catch (err) { /* empty */ }
+    } catch (err) {
+      /* empty */
+    }
 
     if (explanation)
       throw new Error(`CkEditor REST API call FAILED (${response.status}): ${method} ${fullURI}\n${explanation}`);
@@ -94,7 +107,6 @@ async function fetchCkEditorRestAPI(method: string, uri: string, body?: any): Pr
   return responseBody;
 }
 
-
 const documentHelpers = {
   postIdToCkEditorDocumentId(postId: string) {
     return `${postId}-edit`;
@@ -102,31 +114,31 @@ const documentHelpers = {
 
   ckEditorDocumentIdToPostId(ckEditorId: string) {
     if (ckEditorId.endsWith("-edit")) {
-      return ckEditorId.substr(0, ckEditorId.length-"-edit".length);
+      return ckEditorId.substr(0, ckEditorId.length - "-edit".length);
     } else {
       return ckEditorId;
     }
   },
-  
+
   async saveDocumentRevision(userId: string, documentId: string, html: string) {
     const fieldName = "contents";
     const user = await Users.findOne(userId);
     const previousRev = await getLatestRev(documentId, fieldName);
-    
+
     const newOriginalContents = {
       data: html,
       type: "ckEditorMarkup",
-    }
-    
+    };
+
     if (!user) {
-      throw Error("no user found for userId in saveDocumentRevision")
+      throw Error("no user found for userId in saveDocumentRevision");
     }
     if (!previousRev || !_.isEqual(newOriginalContents, previousRev.originalContents)) {
       const newRevision: Partial<DbRevision> = {
-        ...await buildRevision({
+        ...(await buildRevision({
           originalContents: newOriginalContents,
           currentUser: user,
-        }),
+        })),
         documentId,
         fieldName,
         collectionName: "Posts",
@@ -147,34 +159,39 @@ const documentHelpers = {
   async saveOrUpdateDocumentRevision(postId: string, html: string) {
     const fieldName = "contents";
     const previousRev = await getLatestRev(postId, fieldName);
-    
+
     // Time relative to which to compute the max autosave interval, in ms since
     // epoch.
     const lastEditedAt = previousRev
-      ? moment(previousRev.autosaveTimeoutStart || previousRev.editedAt).toDate().getTime()
+      ? moment(previousRev.autosaveTimeoutStart || previousRev.editedAt)
+          .toDate()
+          .getTime()
       : 0;
     const timeSinceLastEdit = new Date().getTime() - lastEditedAt; //In ms
-    
-    if (previousRev
-      && previousRev.draft
-      && timeSinceLastEdit < autosaveMaxInterval
-      && previousRev.commitMessage===cloudEditorAutosaveCommitMessage
+
+    if (
+      previousRev &&
+      previousRev.draft &&
+      timeSinceLastEdit < autosaveMaxInterval &&
+      previousRev.commitMessage === cloudEditorAutosaveCommitMessage
     ) {
       // Get the revision prior to the one being replaced, for computing change metrics
       const precedingRev = await getPrecedingRev(previousRev);
-      
+
       // eslint-disable-next-line no-console
-      console.log("Updating rev "+previousRev._id);
+      console.log("Updating rev " + previousRev._id);
       // Update the existing rev
       await Revisions.rawUpdateOne(
-        {_id: previousRev._id},
-        {$set: {
-          editedAt: new Date(),
-          autosaveTimeoutStart: previousRev.autosaveTimeoutStart || previousRev.editedAt,
-          originalContents: { data: html, type: "ckEditorMarkup" },
-          changeMetrics: htmlToChangeMetrics(precedingRev?.html || "", html),
-        }}
-      )
+        { _id: previousRev._id },
+        {
+          $set: {
+            editedAt: new Date(),
+            autosaveTimeoutStart: previousRev.autosaveTimeoutStart || previousRev.editedAt,
+            originalContents: { data: html, type: "ckEditorMarkup" },
+            changeMetrics: htmlToChangeMetrics(precedingRev?.html || "", html),
+          },
+        },
+      );
     } else {
       const post = await Posts.findOne(postId);
       const userId = post!.userId;
@@ -185,7 +202,7 @@ const documentHelpers = {
 
   async endCkEditorUserSession(documentId: string, endedBy: string, endedAt: Date = new Date()) {
     const adminContext = createAdminContext();
-  
+
     return updateMutator({
       collection: CkEditorUserSessions,
       documentId,
@@ -193,7 +210,7 @@ const documentHelpers = {
       context: adminContext,
       currentUser: adminContext.currentUser,
     });
-  }
+  },
 };
 
 // See https://docs.cke-cs.com/api/v5/docs for documentation on ckEditor's api.
@@ -204,14 +221,18 @@ const ckEditorApi = {
     try {
       parsedResult = JSON.parse(rawResult);
     } catch (err) {
-      throw new Error(`Failure to parse response from ckEditor when fetching document from storage. Returned data: ${rawResult}`);
+      throw new Error(
+        `Failure to parse response from ckEditor when fetching document from storage. Returned data: ${rawResult}`,
+      );
     }
-  
+
     const validatedResult = DocumentResponseSchema.safeParse(parsedResult);
     if (!validatedResult.success) {
-      throw new Error(`Failure to validate response from ckEditor when fetching document from storage. Validation error: ${validatedResult.error}.  Parsed data: ${parsedResult}`);
+      throw new Error(
+        `Failure to validate response from ckEditor when fetching document from storage. Validation error: ${validatedResult.error}.  Parsed data: ${parsedResult}`,
+      );
     }
-  
+
     return validatedResult.data;
   },
 
@@ -224,7 +245,7 @@ const ckEditorApi = {
   },
 
   async getAllDocuments() {
-    return await fetchCkEditorRestAPI("GET", "/documents"); 
+    return await fetchCkEditorRestAPI("GET", "/documents");
   },
 
   async fetchCkEditorCommentThread(threadId: string): Promise<CkEditorComment[]> {
@@ -237,7 +258,7 @@ const ckEditorApi = {
     // a CkEditor thread somehow has more comments than that, then new commenters
     // won't subscribed after the 1000th comment, which is not a big problem.
     const limit = 1000;
-    
+
     const response = await fetchCkEditorRestAPI("GET", `/comments?thread_id=${threadId}&limit=${limit}`);
     const parsedResponse: CkEditorGetCommentsResponse = JSON.parse(response);
     return parsedResponse.data;
@@ -250,14 +271,16 @@ const ckEditorApi = {
       parsedUser = JSON.parse(rawUser);
     } catch (err) {
       // eslint-disable-next-line no-console
-      console.log(`Failed to fetch or parse ckEditor user with id ${userId}. Error: ${err}`)
+      console.log(`Failed to fetch or parse ckEditor user with id ${userId}. Error: ${err}`);
       return undefined;
     }
 
     const validatedUser = UserSchema.safeParse(parsedUser);
     if (!validatedUser.success) {
       // eslint-disable-next-line no-console
-      console.log(`Failed to validate ckEditor user response with error ${validatedUser.error.toString()}.  Parsed data: ${parsedUser}`);
+      console.log(
+        `Failed to validate ckEditor user response with error ${validatedUser.error.toString()}.  Parsed data: ${parsedUser}`,
+      );
       return undefined;
     }
 
@@ -274,7 +297,7 @@ const ckEditorApi = {
   async deleteCkEditorCloudStorageDocument(ckEditorId: string) {
     return await fetchCkEditorRestAPI("DELETE", `/storage/${ckEditorId}`);
   },
-  
+
   /**
    * This deletes the *entire* document, including any associated collaborative session, comments, suggestions, users, etc.
    */
@@ -282,7 +305,7 @@ const ckEditorApi = {
     return await fetchCkEditorRestAPI("DELETE", `/documents/${ckEditorId}?force=true&wait=true`);
   },
 
-  async createCkEditorUser(user: { id: string; name: string; }): Promise<string> {
+  async createCkEditorUser(user: { id: string; name: string }): Promise<string> {
     return await fetchCkEditorRestAPI("POST", `/users`, user);
   },
 
@@ -300,15 +323,14 @@ const ckEditorApi = {
   },
 
   async uploadEditorBundle(bundleVersion: string): Promise<void> {
-    if (!bundleVersion)
-      throw new Error("Missing argument: bundleVersion");
-    
-    const editorBundle = fs.readFileSync("public/lesswrong-editor/build/ckeditor-cloud.js", 'utf8');
-    const editorBundleHash = crypto.createHash('sha256').update(editorBundle, 'utf8').digest('hex');
-    
+    if (!bundleVersion) throw new Error("Missing argument: bundleVersion");
+
+    const editorBundle = fs.readFileSync("public/lesswrong-editor/build/ckeditor-cloud.js", "utf8");
+    const editorBundleHash = crypto.createHash("sha256").update(editorBundle, "utf8").digest("hex");
+
     // eslint-disable-next-line no-console
     console.log(`Uploading editor with SHA256sum ${editorBundleHash}`);
-    
+
     const result = await fetchCkEditorRestAPI("POST", "/editors", {
       bundle: editorBundle,
       config: {
@@ -322,9 +344,8 @@ const ckEditorApi = {
   },
 
   async checkEditorBundle(bundleVersion: string): Promise<void> {
-    if (!bundleVersion)
-      throw new Error("Missing argument: bundleVersion");
-    
+    if (!bundleVersion) throw new Error("Missing argument: bundleVersion");
+
     const result = await fetchCkEditorRestAPI("GET", `/editors/${bundleVersion}/exists`);
     // eslint-disable-next-line no-console
     console.log(result);
@@ -332,8 +353,8 @@ const ckEditorApi = {
 
   async flushAllCkEditorCollaborations() {
     await fetchCkEditorRestAPI("DELETE", `/collaborations?force=true`);
-  }
-}
+  },
+};
 
 const ckEditorApiHelpers = {
   async fetchCkEditorCloudStorageDocumentHtml(ckEditorId: string): Promise<string> {
@@ -344,7 +365,7 @@ const ckEditorApiHelpers = {
     // the latter will fail if there's a bundle version mismatch.
     try {
       return await fetchCkEditorRestAPI("GET", `/collaborations/${ckEditorId}`);
-    } catch(e) {
+    } catch (e) {
       // eslint-disable-next-line no-console
       console.log("Downloading document via /collaborations failed. Trying via /documents.");
       const document = await ckEditorApi.fetchCkEditorDocumentFromStorage(ckEditorId);
@@ -353,20 +374,30 @@ const ckEditorApiHelpers = {
   },
 
   async createMissingUsersForDocument(document: CreateDocumentPayload) {
-    const commentUsers = document.comments.map(comment => comment.user.id);
-    const suggestionUsers = document.suggestions.map(suggestion => suggestion.author_id);
+    const commentUsers = document.comments.map((comment) => comment.user.id);
+    const suggestionUsers = document.suggestions.map((suggestion) => suggestion.author_id);
     const documentUserIds = Array.from(new Set([...commentUsers, ...suggestionUsers]));
-  
-    const ckEditorUsers = filterNonnull(await Promise.all(documentUserIds.map(userId => ckEditorApi.fetchCkEditorUser(userId))));
-  
-    const missingUserIds = difference(documentUserIds, ckEditorUsers.map(user => user.id));
-    const missingUserNames = await Users.find({ _id: { $in: missingUserIds } }, undefined, { _id: 1, displayName: 1, username: 1, fullName: 1 }).fetch();
-    const missingUserPayloads = missingUserNames.map(user => ({
+
+    const ckEditorUsers = filterNonnull(
+      await Promise.all(documentUserIds.map((userId) => ckEditorApi.fetchCkEditorUser(userId))),
+    );
+
+    const missingUserIds = difference(
+      documentUserIds,
+      ckEditorUsers.map((user) => user.id),
+    );
+    const missingUserNames = await Users.find({ _id: { $in: missingUserIds } }, undefined, {
+      _id: 1,
+      displayName: 1,
+      username: 1,
+      fullName: 1,
+    }).fetch();
+    const missingUserPayloads = missingUserNames.map((user) => ({
       id: user._id,
       name: userGetDisplayName(user),
     }));
-  
-    await Promise.all(missingUserPayloads.map(user => ckEditorApi.createCkEditorUser(user)));
+
+    await Promise.all(missingUserPayloads.map((user) => ckEditorApi.createCkEditorUser(user)));
   },
 
   async createRemoteStorageDocument(document: CreateDocumentPayload) {
@@ -382,11 +413,11 @@ const ckEditorApiHelpers = {
     // eslint-disable-next-line no-console
     console.log(`Pushing to CkEditor cloud: postId=${postId}, html=${html}`);
     const ckEditorId = documentHelpers.postIdToCkEditorDocumentId(postId);
-    
+
     // Check for unsaved changes and save them first
     const latestHtml = await ckEditorApiHelpers.fetchCkEditorCloudStorageDocumentHtml(ckEditorId);
     await documentHelpers.saveOrUpdateDocumentRevision(postId, latestHtml);
-    
+
     // End the collaboration session so that we can restart with new contents
     // To do this we have to delete *both* the document and the collaboration.
     // (jimrandomh: This seems like suspiciously bad API design in CkEditor's REST API, but
@@ -408,7 +439,7 @@ const ckEditorApiHelpers = {
     } catch (err) {
       // Swallow any errors - we won't always get one, but if we do it's almost certainly because the first attempt succeeded.
     }
-    
+
     // Push the selected revision
     await ckEditorApi.createCollaborativeSession(ckEditorId, html);
   },
@@ -416,36 +447,38 @@ const ckEditorApiHelpers = {
   async debugGetCkEditorCloudInfo() {
     const allCollaborations = await ckEditorApi.getAllCollaborations();
     const allDocuments = await ckEditorApi.getAllDocuments();
-    
+
     // eslint-disable-next-line no-console
     console.log(`Collaborations: ${allCollaborations}`);
     // eslint-disable-next-line no-console
     console.log(`Documents: ${allDocuments}`);
-  }
+  },
 };
 
 Globals.cke = {
   ...ckEditorApi,
   ...ckEditorApiHelpers,
-  ...documentHelpers
+  ...documentHelpers,
 };
 
 // Also generate serverShellCommands that log the output of every function here, rather than just running them.
 // In general this is only useful for GET calls, since ckEditor doesn't often return anything for POST/DELETE/etc operations.
 // This isn't guaranteed to produce sane results in every single case, but seems fine for the things I've tested.
-Globals.cke.log = Object.fromEntries(Object.entries(Globals.cke).map(([key, val]) => {
-  if (typeof val !== 'function') {
-    return [key, val];
-  }
+Globals.cke.log = Object.fromEntries(
+  Object.entries(Globals.cke).map(([key, val]) => {
+    if (typeof val !== "function") {
+      return [key, val];
+    }
 
-  const withLoggedOutput = async (...args: any[]) => {
-    const result = await val(...args);
-    // eslint-disable-next-line no-console
-    console.log({ result });
-    return result;
-  };
+    const withLoggedOutput = async (...args: any[]) => {
+      const result = await val(...args);
+      // eslint-disable-next-line no-console
+      console.log({ result });
+      return result;
+    };
 
-  return [key, withLoggedOutput];
-}));
+    return [key, withLoggedOutput];
+  }),
+);
 
 export { ckEditorApi, ckEditorApiHelpers, documentHelpers };

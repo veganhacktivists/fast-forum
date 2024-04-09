@@ -1,13 +1,10 @@
-import React from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { ForumOptions, forumSelect } from '../../lib/forumTypeUtils';
-import classNames from 'classnames';
-import { useCurrentUser } from '../common/withUser';
-import type {
-  CommentCancelCallback,
-  CommentSuccessCallback,
-} from '../comments/CommentsNewForm';
-import { isFriendlyUI } from '../../themes/forumTheme';
+import React from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { ForumOptions, forumSelect } from "../../lib/forumTypeUtils";
+import classNames from "classnames";
+import { useCurrentUser } from "../common/withUser";
+import type { CommentCancelCallback, CommentSuccessCallback } from "../comments/CommentsNewForm";
+import { isFriendlyUI } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -52,11 +49,15 @@ const styles = (theme: ThemeType): JssStyles => ({
 });
 
 const forumHintText: ForumOptions<string> = {
-  LessWrong: "Write your thoughts here! What have you been thinking about?\nExploratory, draft-stage, rough, and rambly thoughts are all welcome on Shortform.",
-  AlignmentForum: "Write your thoughts here! What have you been thinking about?\nExploratory, draft-stage, rough, and rambly thoughts are all welcome on Shortform.",
-  EAForum: "Write your brief or quickly written post here.\nExploratory, draft-stage, rough, and off-the-cuff thoughts are all welcome in quick takes.",
-  default: "Write your brief or quickly written post here.\nExploratory, draft-stage, rough, and off-the-cuff thoughts are all welcome on Shortform."
-}
+  LessWrong:
+    "Write your thoughts here! What have you been thinking about?\nExploratory, draft-stage, rough, and rambly thoughts are all welcome on Shortform.",
+  AlignmentForum:
+    "Write your thoughts here! What have you been thinking about?\nExploratory, draft-stage, rough, and rambly thoughts are all welcome on Shortform.",
+  EAForum:
+    "Write your brief or quickly written post here.\nExploratory, draft-stage, rough, and off-the-cuff thoughts are all welcome in quick takes.",
+  default:
+    "Write your brief or quickly written post here.\nExploratory, draft-stage, rough, and off-the-cuff thoughts are all welcome on Shortform.",
+};
 
 const ShortformSubmitForm = ({
   successCallback,
@@ -66,15 +67,15 @@ const ShortformSubmitForm = ({
   className,
   classes,
 }: {
-  successCallback?: CommentSuccessCallback,
-  cancelCallback?: CommentCancelCallback,
-  prefilledProps?: any,
-  noDefaultStyles?: boolean,
-  className?: string,
-  classes: ClassesType,
+  successCallback?: CommentSuccessCallback;
+  cancelCallback?: CommentCancelCallback;
+  prefilledProps?: any;
+  noDefaultStyles?: boolean;
+  className?: string;
+  classes: ClassesType;
 }) => {
   const currentUser = useCurrentUser();
-  const {CommentsNewForm, QuickTakesEntry, ForumIcon} = Components;
+  const { CommentsNewForm, QuickTakesEntry, ForumIcon } = Components;
 
   if (isFriendlyUI) {
     return (
@@ -100,7 +101,7 @@ const ShortformSubmitForm = ({
   }
 
   return (
-    <div className={classNames(className, {[classes.root]: !noDefaultStyles})}>
+    <div className={classNames(className, { [classes.root]: !noDefaultStyles })}>
       <CommentsNewForm
         prefilledProps={{
           ...prefilledProps,
@@ -111,17 +112,17 @@ const ShortformSubmitForm = ({
         // Put in "reply" to make the cancel button appear
         type={cancelCallback ? "reply" : "comment"}
         formProps={{
-          editorHintText: forumSelect(forumHintText)
+          editorHintText: forumSelect(forumHintText),
         }}
       />
     </div>
   );
-}
+};
 
-const ShortformSubmitFormComponent = registerComponent('ShortformSubmitForm', ShortformSubmitForm, {styles});
+const ShortformSubmitFormComponent = registerComponent("ShortformSubmitForm", ShortformSubmitForm, { styles });
 
 declare global {
   interface ComponentTypes {
-    ShortformSubmitForm: typeof ShortformSubmitFormComponent
+    ShortformSubmitForm: typeof ShortformSubmitFormComponent;
   }
 }

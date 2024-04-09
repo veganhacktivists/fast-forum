@@ -1,19 +1,19 @@
-import React, { useMemo, useRef, useState } from 'react';
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import { useMessages } from '../common/withMessages';
-import { useCurrentUser } from '../common/withUser';
-import { useDialog } from '../common/withDialog';
-import Button from '@material-ui/core/Button';
-import classNames from 'classnames';
+import React, { useMemo, useRef, useState } from "react";
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import { useMessages } from "../common/withMessages";
+import { useCurrentUser } from "../common/withUser";
+import { useDialog } from "../common/withDialog";
+import Button from "@material-ui/core/Button";
+import classNames from "classnames";
 import { AnalyticsContext, useTracking } from "../../lib/analyticsEvents";
-import { FilterMode, useSubscribeUserToTag } from '../../lib/filterSettings';
-import { taggingNameIsSet, taggingNameSetting } from '../../lib/instanceSettings';
-import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
-import { Link } from '../../lib/reactRouterWrapper';
-import { useMulti } from '../../lib/crud/withMulti';
-import { useCreate } from '../../lib/crud/withCreate';
-import { userIsDefaultSubscribed } from '../../lib/subscriptionUtil';
+import { FilterMode, useSubscribeUserToTag } from "../../lib/filterSettings";
+import { taggingNameIsSet, taggingNameSetting } from "../../lib/instanceSettings";
+import Paper from "@material-ui/core/Paper";
+import Checkbox from "@material-ui/core/Checkbox";
+import { Link } from "../../lib/reactRouterWrapper";
+import { useMulti } from "../../lib/crud/withMulti";
+import { useCreate } from "../../lib/crud/withCreate";
+import { userIsDefaultSubscribed } from "../../lib/subscriptionUtil";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -21,16 +21,16 @@ const styles = (theme: ThemeType): JssStyles => ({
     alignItems: "center",
   },
   button: {
-    textTransform: 'none',
-    boxShadow: 'none',
+    textTransform: "none",
+    boxShadow: "none",
     padding: 0,
-    fontSize: '14px',
-    alignItems: 'unset', // required for vertical bar
+    fontSize: "14px",
+    alignItems: "unset", // required for vertical bar
     minHeight: 32,
   },
   buttonSection: {
-    display: 'flex',
-    alignItems: 'center'
+    display: "flex",
+    alignItems: "center",
   },
   dropdownArrowContainer: {
     borderLeft: "solid 1px",
@@ -38,7 +38,7 @@ const styles = (theme: ThemeType): JssStyles => ({
     padding: "0px 8px 0px 8px",
   },
   buttonLabelContainer: {
-    padding: '0px 9px 0px 8px',
+    padding: "0px 9px 0px 8px",
   },
   notificationBell: {
     width: 17,
@@ -52,12 +52,12 @@ const styles = (theme: ThemeType): JssStyles => ({
   popout: {
     padding: "4px 0px 4px 0px",
     maxWidth: 260,
-    '& .form-input': {
+    "& .form-input": {
       marginTop: 0,
     },
-    '& .form-input:last-child': {
+    "& .form-input:last-child": {
       marginBottom: 4,
-    }
+    },
   },
   checkbox: {
     display: "flex",
@@ -76,11 +76,13 @@ const styles = (theme: ThemeType): JssStyles => ({
     margin: "4px 4px 0px 4px",
     padding: "4px 4px 0px 4px",
     fontSize: 13,
-    color: theme.palette.primary.main
+    color: theme.palette.primary.main,
   },
-})
+});
 
-export const taggedPostWording = taggingNameIsSet.get() ? `posts on this ${taggingNameSetting.get()}` : "posts with this tag"
+export const taggedPostWording = taggingNameIsSet.get()
+  ? `posts on this ${taggingNameSetting.get()}`
+  : "posts with this tag";
 
 const SubscribeButton = ({
   tag,
@@ -91,37 +93,37 @@ const SubscribeButton = ({
   className,
   classes,
 }: {
-  tag: TagBasicInfo,
-  subscriptionType?: string,
-  subscribeMessage?: string,
-  unsubscribeMessage?: string,
-  isSubscribedOverride?: boolean,
-  subscribeUserToTagOverride?: (tag: TagBasicInfo, filterMode: FilterMode) => void,
-  className?: string,
-  classes: ClassesType,
+  tag: TagBasicInfo;
+  subscriptionType?: string;
+  subscribeMessage?: string;
+  unsubscribeMessage?: string;
+  isSubscribedOverride?: boolean;
+  subscribeUserToTagOverride?: (tag: TagBasicInfo, filterMode: FilterMode) => void;
+  className?: string;
+  classes: ClassesType;
 }) => {
   // useSubscribeUserToTag ultimately uses a useState to store the filter settings internally,
   // this means that updates here do not affect the isSubscribed of other places this hook is used.
   // This is currently only a problem in TagSubforumPage2, so I have added a way to override the
   // isSubscribed and subscribeUserToTag functions here as a workaround. If this causes problems
   // elsewhere we should probably fix the useSubscribeUserToTag hook to use a ref instead of a state.
-  const subscribeHook = useSubscribeUserToTag(tag)
+  const subscribeHook = useSubscribeUserToTag(tag);
   const { isSubscribed, subscribeUserToTag } = {
     isSubscribed: isSubscribedOverride ?? subscribeHook.isSubscribed,
     subscribeUserToTag: subscribeUserToTagOverride ?? subscribeHook.subscribeUserToTag,
-  }
+  };
 
   const currentUser = useCurrentUser();
   const { openDialog } = useDialog();
   const { flash } = useMessages();
-  const { captureEvent } = useTracking()
+  const { captureEvent } = useTracking();
   const [open, setOpen] = useState(false);
   const anchorEl = useRef(null);
 
   const { LWClickAwayListener, LWPopper, Typography, LWTooltip, ForumIcon } = Components;
-  
+
   // Get existing NOTIFICATIONS subscription, if there is one
-  const subscriptionType = "newTagPosts"
+  const subscriptionType = "newTagPosts";
   const { results: notifSubscriptions } = useMulti({
     terms: {
       view: "subscriptionState",
@@ -129,22 +131,25 @@ const SubscribeButton = ({
       userId: currentUser?._id,
       type: subscriptionType,
       collectionName: "Tags",
-      limit: 1
+      limit: 1,
     },
     collectionName: "Subscriptions",
-    fragmentName: 'SubscriptionState',
+    fragmentName: "SubscriptionState",
     enableTotal: false,
   });
   const { create: createSubscription } = useCreate({
-    collectionName: 'Subscriptions',
-    fragmentName: 'SubscriptionState',
+    collectionName: "Subscriptions",
+    fragmentName: "SubscriptionState",
   });
 
   const isSubscribedToPostNotifs = useMemo(() => {
-    if (notifSubscriptions?.length !== 1) { // due to `limit: 1` above, this should only happen if there is no subscription
+    if (notifSubscriptions?.length !== 1) {
+      // due to `limit: 1` above, this should only happen if there is no subscription
       return userIsDefaultSubscribed({
         user: currentUser,
-        subscriptionType, collectionName: "Tags", document: tag
+        subscriptionType,
+        collectionName: "Tags",
+        document: tag,
       });
     }
 
@@ -154,8 +159,8 @@ const SubscribeButton = ({
   const togglePostNotifsSubscribed = async (e: AnyBecauseTodo) => {
     try {
       e.preventDefault();
-      const subscriptionState = isSubscribedToPostNotifs ? 'suppressed' : 'subscribed'
-      captureEvent("subscribeClicked", {state: subscriptionState})
+      const subscriptionState = isSubscribedToPostNotifs ? "suppressed" : "subscribed";
+      captureEvent("subscribeClicked", { state: subscriptionState });
 
       const newSubscription = {
         state: subscriptionState,
@@ -164,32 +169,32 @@ const SubscribeButton = ({
         type: subscriptionType,
       } as const;
 
-      await createSubscription({data: newSubscription})
-    } catch(error) {
-      flash({messageString: error.message});
+      await createSubscription({ data: newSubscription });
+    } catch (error) {
+      flash({ messageString: error.message });
     }
-  }
+  };
 
   const onSubscribe = async (e: React.MouseEvent<HTMLButtonElement>) => {
     try {
       e.preventDefault();
 
       const newMode = isSubscribed ? "Default" : "Subscribed";
-      captureEvent('newSubscribeClicked', {tagId: tag._id, newMode});
+      captureEvent("newSubscribeClicked", { tagId: tag._id, newMode });
 
       if (currentUser) {
         subscribeUserToTag(tag, newMode);
-        flash({messageString: isSubscribed ? "Unsubscribed" : "Subscribed"});
+        flash({ messageString: isSubscribed ? "Unsubscribed" : "Subscribed" });
       } else {
         openDialog({
           componentName: "LoginPopup",
-          componentProps: {}
+          componentProps: {},
         });
       }
-    } catch(error) {
-      flash({messageString: error.message});
+    } catch (error) {
+      flash({ messageString: error.message });
     }
-  }
+  };
 
   return (
     <div className={classNames(className, classes.root)}>
@@ -216,7 +221,7 @@ const SubscribeButton = ({
             className={classNames(classes.buttonSection, classes.dropdownArrowContainer)}
             onClick={(e) => {
               e.stopPropagation();
-              captureEvent('notificationsMenuOpened', {tagId: tag._id, newState: open ? "closed" : "open"});
+              captureEvent("notificationsMenuOpened", { tagId: tag._id, newState: open ? "closed" : "open" });
               setOpen((prev) => !prev);
             }}
           >
@@ -241,12 +246,12 @@ const SubscribeButton = ({
       </LWPopper>
     </div>
   );
-}
+};
 
-const SubscribeButtonComponent = registerComponent('SubscribeButton', SubscribeButton, {styles});
+const SubscribeButtonComponent = registerComponent("SubscribeButton", SubscribeButton, { styles });
 
 declare global {
   interface ComponentTypes {
-    SubscribeButton: typeof SubscribeButtonComponent
+    SubscribeButton: typeof SubscribeButtonComponent;
   }
 }

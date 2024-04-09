@@ -1,39 +1,39 @@
-import classNames from 'classnames';
-import React, { useCallback, useEffect, useState } from 'react';
+import classNames from "classnames";
+import React, { useCallback, useEffect, useState } from "react";
 import { AnalyticsContext } from "../../../lib/analyticsEvents";
-import { tagGetUrl } from '../../../lib/collections/tags/helpers';
-import { useMulti } from '../../../lib/crud/withMulti';
-import { Link, useNavigate } from '../../../lib/reactRouterWrapper';
-import { useLocation } from '../../../lib/routeUtil';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
-import { useCurrentUser } from '../../common/withUser';
-import { MAX_COLUMN_WIDTH } from '../../posts/PostsPage/PostsPage';
-import { useTagBySlug } from '../useTag';
+import { tagGetUrl } from "../../../lib/collections/tags/helpers";
+import { useMulti } from "../../../lib/crud/withMulti";
+import { Link, useNavigate } from "../../../lib/reactRouterWrapper";
+import { useLocation } from "../../../lib/routeUtil";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
+import { useCurrentUser } from "../../common/withUser";
+import { MAX_COLUMN_WIDTH } from "../../posts/PostsPage/PostsPage";
+import { useTagBySlug } from "../useTag";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import qs from "qs";
-import { subscriptionTypes } from '../../../lib/collections/subscriptions/schema';
-import { useSubscribeUserToTag } from '../../../lib/filterSettings';
-import { defaultPostsLayout, isPostsLayout } from '../../../lib/collections/posts/dropdownOptions';
-import { getTagStructuredData } from '../TagPageRouter';
+import { subscriptionTypes } from "../../../lib/collections/subscriptions/schema";
+import { useSubscribeUserToTag } from "../../../lib/filterSettings";
+import { defaultPostsLayout, isPostsLayout } from "../../../lib/collections/posts/dropdownOptions";
+import { getTagStructuredData } from "../TagPageRouter";
 
 export const styles = (theme: ThemeType): JssStyles => ({
   tabRow: {
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
   },
   tabs: {
-    marginRight: 'auto',
-    '& .MuiTab-root': {
+    marginRight: "auto",
+    "& .MuiTab-root": {
       minWidth: 80,
-      [theme.breakpoints.down('xs')]: {
-        minWidth: 50
-      }
+      [theme.breakpoints.down("xs")]: {
+        minWidth: 50,
+      },
     },
-    '& .MuiTab-labelContainer': {
-      fontSize: '1rem',
-      padding: '28px 12px'
-    }
+    "& .MuiTab-labelContainer": {
+      fontSize: "1rem",
+      padding: "28px 12px",
+    },
   },
   centralColumn: {
     marginLeft: "auto",
@@ -44,19 +44,19 @@ export const styles = (theme: ThemeType): JssStyles => ({
     background: theme.palette.panelBackground.default,
     borderRadius: theme.borderRadius.default,
     width: "100%",
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       paddingLeft: 32,
       paddingRight: 32,
-    }
+    },
   },
   titleComponent: {
     paddingTop: 150,
     paddingBottom: 24,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       paddingTop: 100,
       paddingLeft: 24,
       paddingRight: 24,
-    }
+    },
   },
   title: {
     ...theme.typography.headline,
@@ -65,20 +65,20 @@ export const styles = (theme: ThemeType): JssStyles => ({
     marginTop: 0,
     fontSize: 40,
     fontWeight: 600,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       fontSize: "2.4rem",
-    }
+    },
   },
   titleDesktop: {
-    [theme.breakpoints.down('sm')]: {
-      display: 'none'
-    }
+    [theme.breakpoints.down("sm")]: {
+      display: "none",
+    },
   },
   titleMobile: {
-    display: 'none',
-    [theme.breakpoints.down('sm')]: {
-      display: 'block'
-    }
+    display: "none",
+    [theme.breakpoints.down("sm")]: {
+      display: "block",
+    },
   },
   subtitle: {
     ...theme.typography.commentStyle,
@@ -87,12 +87,12 @@ export const styles = (theme: ThemeType): JssStyles => ({
   },
   writeNewButton: {
     marginRight: 8,
-    [theme.breakpoints.down('xs')]: {
-      display: 'none !important'
+    [theme.breakpoints.down("xs")]: {
+      display: "none !important",
     },
   },
   nextLink: {
-    ...theme.typography.commentStyle
+    ...theme.typography.commentStyle,
   },
   sidebarBoxWrapper: {
     backgroundColor: theme.palette.panelBackground.default,
@@ -105,13 +105,11 @@ export const styles = (theme: ThemeType): JssStyles => ({
   },
 });
 
-const subforumTabs = ["posts", "wiki"] as const
-type SubforumTab = typeof subforumTabs[number]
-const defaultTab: SubforumTab = "posts"
+const subforumTabs = ["posts", "wiki"] as const;
+type SubforumTab = (typeof subforumTabs)[number];
+const defaultTab: SubforumTab = "posts";
 
-const TagSubforumPage2 = ({classes}: {
-  classes: ClassesType
-}) => {
+const TagSubforumPage2 = ({ classes }: { classes: ClassesType }) => {
   const {
     Loading,
     Error404,
@@ -128,61 +126,77 @@ const TagSubforumPage2 = ({classes}: {
   } = Components;
 
   const currentUser = useCurrentUser();
-  const { query, params: { slug } } = useLocation();
+  const {
+    query,
+    params: { slug },
+  } = useLocation();
   const navigate = useNavigate();
 
-  const isTab = (tab: string): tab is SubforumTab => (subforumTabs as readonly string[]).includes(tab)
-  const tab = isTab(query.tab) ? query.tab : defaultTab
-  
-  const handleChangeTab = useCallback((_, value: SubforumTab) => {
-    const newQuery = {...query, tab: value}
-    navigate({...location, search: `?${qs.stringify(newQuery)}`})
-  }, [navigate, query])
+  const isTab = (tab: string): tab is SubforumTab => (subforumTabs as readonly string[]).includes(tab);
+  const tab = isTab(query.tab) ? query.tab : defaultTab;
+
+  const handleChangeTab = useCallback(
+    (_, value: SubforumTab) => {
+      const newQuery = { ...query, tab: value };
+      navigate({ ...location, search: `?${qs.stringify(newQuery)}` });
+    },
+    [navigate, query],
+  );
 
   // "subforum" tab is now called "posts", so redirect to the new tab name
   useEffect(() => {
     if (query.tab === "subforum") {
-      handleChangeTab(null, "posts")
+      handleChangeTab(null, "posts");
     }
-  }, [handleChangeTab, query.tab, tab])
-  
+  }, [handleChangeTab, query.tab, tab]);
+
   // Support URLs with ?version=1.2.3 or with ?revision=1.2.3 (we were previously inconsistent, ?version is now preferred)
   const { version: queryVersion, revision: queryRevision } = query;
   const revision = queryVersion ?? queryRevision ?? undefined;
-  
+
   const contributorsLimit = 7;
-  const { tag, loading: loadingTag } = useTagBySlug(slug, revision ? "TagPageWithRevisionFragment" : "TagPageFragment", {
-    extraVariables: revision ? {
-      version: 'String',
-      contributorsLimit: 'Int',
-    } : {
-      contributorsLimit: 'Int',
+  const { tag, loading: loadingTag } = useTagBySlug(
+    slug,
+    revision ? "TagPageWithRevisionFragment" : "TagPageFragment",
+    {
+      extraVariables: revision
+        ? {
+            version: "String",
+            contributorsLimit: "Int",
+          }
+        : {
+            contributorsLimit: "Int",
+          },
+      extraVariablesValues: revision
+        ? {
+            version: revision,
+            contributorsLimit,
+          }
+        : {
+            contributorsLimit,
+          },
     },
-    extraVariablesValues: revision ? {
-      version: revision,
-      contributorsLimit,
-    } : {
-      contributorsLimit,
-    },
-  });
-  
-  const [truncated, setTruncated] = useState(true) // Used in SubforumWikiTab, defined here because it can be controlled from the sidebar
-  const [hoveredContributorId, setHoveredContributorId] = useState<string|null>(null);
-  const [newShortformOpen, setNewShortformOpen] = useState(false)
+  );
+
+  const [truncated, setTruncated] = useState(true); // Used in SubforumWikiTab, defined here because it can be controlled from the sidebar
+  const [hoveredContributorId, setHoveredContributorId] = useState<string | null>(null);
+  const [newShortformOpen, setNewShortformOpen] = useState(false);
 
   const multiTerms: AnyBecauseTodo = {
-    allPages: {view: "allPagesByNewest"},
-    myPages: {view: "userTags", userId: currentUser?._id},
+    allPages: { view: "allPagesByNewest" },
+    myPages: { view: "userTags", userId: currentUser?._id },
     //tagFlagId handled as default case below
-  }
+  };
 
   const { results: otherTagsWithNavigation } = useMulti({
-    terms: ["allPages", "myPages"].includes(query.focus) ? multiTerms[query.focus] : {view: "tagsByTagFlag", tagFlagId: query.focus},
+    terms: ["allPages", "myPages"].includes(query.focus)
+      ? multiTerms[query.focus]
+      : { view: "tagsByTagFlag", tagFlagId: query.focus },
     collectionName: "Tags",
-    fragmentName: 'TagWithFlagsFragment',
+    fragmentName: "TagWithFlagsFragment",
     limit: 1500,
-    skip: !query.flagId
-  })
+    skip: !query.flagId,
+  });
 
   const { results: userTagRelResults } = useMulti({
     terms: { view: "single", tagId: tag?._id, userId: currentUser?._id },
@@ -192,17 +206,19 @@ const TagSubforumPage2 = ({classes}: {
     // in principle redundant because of `skip`, but it would be bad to create a UserTagRel with
     // a null tagId or userId so be extra careful.
     createIfMissing: tag?._id && currentUser?._id ? { tagId: tag?._id, userId: currentUser?._id } : undefined,
-    skip: !tag || !currentUser
+    skip: !tag || !currentUser,
   });
   const userTagRel = userTagRelResults?.[0];
 
   // "feed" -> "card" for backwards compatibility, TODO remove after a month or so
   if (query.layout === "feed") {
-    query.layout = "card"
+    query.layout = "card";
   }
-  const layout = isPostsLayout(query.layout) ? query.layout : currentUser?.subforumPreferredLayout ?? defaultPostsLayout
+  const layout = isPostsLayout(query.layout)
+    ? query.layout
+    : currentUser?.subforumPreferredLayout ?? defaultPostsLayout;
 
-  const tagPositionInList = otherTagsWithNavigation?.findIndex(tagInList => tag?._id === tagInList._id);
+  const tagPositionInList = otherTagsWithNavigation?.findIndex((tagInList) => tag?._id === tagInList._id);
   // We have to handle updates to the listPosition explicitly, since we have to deal with three cases
   // 1. Initially the listPosition is -1 because we don't have a list at all yet
   // 2. Then we have the real position
@@ -211,43 +227,46 @@ const TagSubforumPage2 = ({classes}: {
   useEffect(() => {
     // Initial list position setting
     if (tagPositionInList && tagPositionInList >= 0) {
-      setNextTagPosition(tagPositionInList + 1)
+      setNextTagPosition(tagPositionInList + 1);
     }
     if (nextTagPosition !== null && tagPositionInList && tagPositionInList < 0) {
       // Here we want to decrement the list positions by one, because we removed the original tag and so
       // all the indices are moved to the next
-      setNextTagPosition(nextTagPosition => (nextTagPosition || 1) - 1)
+      setNextTagPosition((nextTagPosition) => (nextTagPosition || 1) - 1);
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tagPositionInList])
-  const nextTag = otherTagsWithNavigation && (nextTagPosition !== null && nextTagPosition >= 0) && otherTagsWithNavigation[nextTagPosition]
-  
+  }, [tagPositionInList]);
+  const nextTag =
+    otherTagsWithNavigation &&
+    nextTagPosition !== null &&
+    nextTagPosition >= 0 &&
+    otherTagsWithNavigation[nextTagPosition];
+
   const expandAll = useCallback(() => {
-    setTruncated(false)
+    setTruncated(false);
   }, []);
 
   const onHoverContributor = useCallback((userId: string) => {
     setHoveredContributorId(userId);
   }, []);
-  
-  const { isSubscribed, subscribeUserToTag } = useSubscribeUserToTag(tag ?? undefined)
-  
-  if (loadingTag)
-    return <Loading/>
-  if (!tag)
-    return <Error404/>
+
+  const { isSubscribed, subscribeUserToTag } = useSubscribeUserToTag(tag ?? undefined);
+
+  if (loadingTag) return <Loading />;
+  if (!tag) return <Error404 />;
   // If the slug in our URL is not the same as the slug on the tag, redirect to the canonical slug page
-  if (tag.oldSlugs?.filter(slug => slug !== tag.slug)?.includes(slug)) {
-    return <PermanentRedirect url={tagGetUrl(tag)} />
+  if (tag.oldSlugs?.filter((slug) => slug !== tag.slug)?.includes(slug)) {
+    return <PermanentRedirect url={tagGetUrl(tag)} />;
   }
 
-  const headTagDescription = tag.description?.plaintextDescription || `All posts related to ${tag.name}, sorted by relevance`
-  
+  const headTagDescription =
+    tag.description?.plaintextDescription || `All posts related to ${tag.name}, sorted by relevance`;
+
   const tagFlagItemType: AnyBecauseTodo = {
     allPages: "allPages",
-    myPages: "userPages"
-  }
-  
+    myPages: "userPages",
+  };
+
   const headerComponent = (
     <div className={classNames(classes.header, classes.centralColumn)}>
       {query.flagId && (
@@ -299,16 +318,16 @@ const TagSubforumPage2 = ({classes}: {
     </div>
   );
 
-  const titleComponent = <div className={classNames(classes.titleComponent, classes.centralColumn)}>
-    <div className={classNames(classes.title, classes.titleDesktop)}>{tag.name}</div>
-    <div className={classNames(classes.title, classes.titleMobile)}>{tag.shortName || tag.name}</div>
-    <div className={classes.subtitle}>{tag.subtitle}</div>
-  </div>
+  const titleComponent = (
+    <div className={classNames(classes.titleComponent, classes.centralColumn)}>
+      <div className={classNames(classes.title, classes.titleDesktop)}>{tag.name}</div>
+      <div className={classNames(classes.title, classes.titleMobile)}>{tag.shortName || tag.name}</div>
+      <div className={classes.subtitle}>{tag.subtitle}</div>
+    </div>
+  );
 
   const rightSidebarComponents: Record<SubforumTab, JSX.Element[]> = {
-    posts: [
-      <SidebarSubtagsBox tag={tag} className={classes.sidebarBoxWrapper} key={`subtags_box`} />,
-    ],
+    posts: [<SidebarSubtagsBox tag={tag} className={classes.sidebarBoxWrapper} key={`subtags_box`} />],
     wiki: [
       <div key={`toc_${tag._id}`} className={classes.tableOfContentsWrapper}>
         <TagTableOfContents
@@ -320,7 +339,7 @@ const TagSubforumPage2 = ({classes}: {
       </div>,
     ],
   };
-  
+
   const tabComponents: Record<SubforumTab, JSX.Element> = {
     posts: (
       <SubforumSubforumTab
@@ -353,12 +372,12 @@ const TagSubforumPage2 = ({classes}: {
       </SubforumLayout>
     </AnalyticsContext>
   );
-}
+};
 
-const TagSubforumPage2Component = registerComponent("TagSubforumPage2", TagSubforumPage2, {styles});
+const TagSubforumPage2Component = registerComponent("TagSubforumPage2", TagSubforumPage2, { styles });
 
 declare global {
   interface ComponentTypes {
-    TagSubforumPage2: typeof TagSubforumPage2Component
+    TagSubforumPage2: typeof TagSubforumPage2Component;
   }
 }

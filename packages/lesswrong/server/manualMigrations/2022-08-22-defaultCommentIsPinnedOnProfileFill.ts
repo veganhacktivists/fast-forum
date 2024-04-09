@@ -1,6 +1,5 @@
-import { registerMigration, fillDefaultValues } from './migrationUtils';
-import Comments from '../../lib/collections/comments/collection';
-
+import { registerMigration, fillDefaultValues } from "./migrationUtils";
+import Comments from "../../lib/collections/comments/collection";
 
 registerMigration({
   name: "defaultCommentIsPinnedOnProfileFill",

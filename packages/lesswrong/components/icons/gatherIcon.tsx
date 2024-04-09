@@ -1,3 +1,3 @@
-import React from 'react';
+import React from "react";
 
-export const gatherIcon = <img style={{width:50}} src={"../gatherTownIconMuted.png"}/>
+export const gatherIcon = <img style={{ width: 50 }} src={"../gatherTownIconMuted.png"} />;

@@ -1,36 +1,35 @@
-import React from 'react';
-import { registerComponent, Components } from '../../../lib/vulcan-lib';
-import { useUpdate } from '../../../lib/crud/withUpdate';
-import { useCurrentUser } from '../../common/withUser';
-import { preferredHeadingCase } from '../../../themes/forumTheme';
+import React from "react";
+import { registerComponent, Components } from "../../../lib/vulcan-lib";
+import { useUpdate } from "../../../lib/crud/withUpdate";
+import { useCurrentUser } from "../../common/withUser";
+import { preferredHeadingCase } from "../../../themes/forumTheme";
 
-
-const RetractCommentDropdownItem = ({comment}: {comment: CommentsList}) => {
+const RetractCommentDropdownItem = ({ comment }: { comment: CommentsList }) => {
   const currentUser = useCurrentUser();
-  const {mutate: updateComment} = useUpdate({
+  const { mutate: updateComment } = useUpdate({
     collectionName: "Comments",
-    fragmentName: 'CommentsList',
+    fragmentName: "CommentsList",
   });
 
   const handleRetract = () => {
     void updateComment({
-      selector: {_id: comment._id},
-      data: {retracted: true},
+      selector: { _id: comment._id },
+      data: { retracted: true },
     });
-  }
+  };
 
   const handleUnretract = () => {
     void updateComment({
-      selector: {_id: comment._id},
-      data: {retracted: false},
+      selector: { _id: comment._id },
+      data: { retracted: false },
     });
-  }
+  };
 
   if (!currentUser || comment.userId !== currentUser._id) {
     return null;
   }
 
-  const {DropdownItem} = Components;
+  const { DropdownItem } = Components;
   if (comment.retracted) {
     return (
       <DropdownItem
@@ -48,14 +47,12 @@ const RetractCommentDropdownItem = ({comment}: {comment: CommentsList}) => {
       tooltip="Comment will become crossed out, indicating you no longer endorse it."
     />
   );
-}
+};
 
-const RetractCommentDropdownItemComponent = registerComponent(
-  'RetractCommentDropdownItem', RetractCommentDropdownItem,
-);
+const RetractCommentDropdownItemComponent = registerComponent("RetractCommentDropdownItem", RetractCommentDropdownItem);
 
 declare global {
   interface ComponentTypes {
-    RetractCommentDropdownItem: typeof RetractCommentDropdownItemComponent
+    RetractCommentDropdownItem: typeof RetractCommentDropdownItemComponent;
   }
 }

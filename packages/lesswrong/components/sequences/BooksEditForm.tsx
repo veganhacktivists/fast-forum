@@ -1,12 +1,17 @@
-import { Components, registerComponent, getFragment } from '../../lib/vulcan-lib';
-import React from 'react';
-import Books from '../../lib/collections/books/collection';
+import { Components, registerComponent, getFragment } from "../../lib/vulcan-lib";
+import React from "react";
+import Books from "../../lib/collections/books/collection";
 
-const BooksEditForm = ({documentId, successCallback, cancelCallback, prefilledProps}: {
-  documentId: string,
-  successCallback?: ()=>void,
-  cancelCallback?: ()=>void,
-  prefilledProps?: Record<string,any>,
+const BooksEditForm = ({
+  documentId,
+  successCallback,
+  cancelCallback,
+  prefilledProps,
+}: {
+  documentId: string;
+  successCallback?: () => void;
+  cancelCallback?: () => void;
+  prefilledProps?: Record<string, any>;
 }) => {
   return (
     <div className="books-edit-form">
@@ -17,18 +22,17 @@ const BooksEditForm = ({documentId, successCallback, cancelCallback, prefilledPr
         cancelCallback={cancelCallback}
         prefilledProps={prefilledProps}
         showRemove={true}
-        queryFragment={getFragment('BookEdit')}
-        mutationFragment={getFragment('BookPageFragment')}
+        queryFragment={getFragment("BookEdit")}
+        mutationFragment={getFragment("BookPageFragment")}
       />
     </div>
-  )
-}
+  );
+};
 
-const BooksEditFormComponent = registerComponent('BooksEditForm', BooksEditForm);
+const BooksEditFormComponent = registerComponent("BooksEditForm", BooksEditForm);
 
 declare global {
   interface ComponentTypes {
-    BooksEditForm: typeof BooksEditFormComponent
+    BooksEditForm: typeof BooksEditFormComponent;
   }
 }
-

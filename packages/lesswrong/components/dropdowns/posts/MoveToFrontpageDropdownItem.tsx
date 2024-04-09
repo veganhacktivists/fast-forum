@@ -6,11 +6,11 @@ import { userCanDo } from "../../../lib/vulcan-users";
 import { useCurrentUser } from "../../common/withUser";
 import { preferredHeadingCase } from "../../../themes/forumTheme";
 
-const MoveToFrontpageDropdownItem = ({post}: {post: PostsBase}) => {
+const MoveToFrontpageDropdownItem = ({ post }: { post: PostsBase }) => {
   const currentUser = useCurrentUser();
-  const {mutate: updatePost} = useUpdate({
+  const { mutate: updatePost } = useUpdate({
     collectionName: "Posts",
-    fragmentName: 'PostsList',
+    fragmentName: "PostsList",
   });
 
   if (!userCanDo(currentUser, "posts.edit.all")) {
@@ -19,10 +19,10 @@ const MoveToFrontpageDropdownItem = ({post}: {post: PostsBase}) => {
 
   const handleMoveToFrontpage = () => {
     if (!currentUser) {
-      throw new Error("Cannot move to frontpage anonymously")
+      throw new Error("Cannot move to frontpage anonymously");
     }
     void updatePost({
-      selector: {_id: post._id},
+      selector: { _id: post._id },
       data: {
         frontpageDate: new Date(),
         meta: false,
@@ -30,14 +30,14 @@ const MoveToFrontpageDropdownItem = ({post}: {post: PostsBase}) => {
         reviewedByUserId: currentUser._id,
       },
     });
-  }
+  };
 
   const handleMoveToPersonalBlog = () => {
     if (!currentUser) {
-      throw new Error("Cannot move to personal blog anonymously")
+      throw new Error("Cannot move to personal blog anonymously");
     }
     void updatePost({
-      selector: {_id: post._id},
+      selector: { _id: post._id },
       data: {
         draft: false,
         meta: false,
@@ -45,9 +45,9 @@ const MoveToFrontpageDropdownItem = ({post}: {post: PostsBase}) => {
         reviewedByUserId: currentUser._id,
       },
     });
-  }
+  };
 
-  const {DropdownItem} = Components;
+  const { DropdownItem } = Components;
 
   if (!post.frontpageDate) {
     return (
@@ -60,16 +60,11 @@ const MoveToFrontpageDropdownItem = ({post}: {post: PostsBase}) => {
   }
 
   if (post.frontpageDate || post.meta || post.curatedDate) {
-    return (
-      <DropdownItem
-        title={preferredHeadingCase("Move to Personal Blog")}
-        onClick={handleMoveToPersonalBlog}
-      />
-    );
+    return <DropdownItem title={preferredHeadingCase("Move to Personal Blog")} onClick={handleMoveToPersonalBlog} />;
   }
 
   return null;
-}
+};
 
 const MoveToFrontpageDropdownItemComponent = registerComponent(
   "MoveToFrontpageDropdownItem",
@@ -78,6 +73,6 @@ const MoveToFrontpageDropdownItemComponent = registerComponent(
 
 declare global {
   interface ComponentTypes {
-    MoveToFrontpageDropdownItem: typeof MoveToFrontpageDropdownItemComponent
+    MoveToFrontpageDropdownItem: typeof MoveToFrontpageDropdownItemComponent;
   }
 }

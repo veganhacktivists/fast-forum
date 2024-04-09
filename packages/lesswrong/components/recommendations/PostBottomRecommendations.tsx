@@ -37,15 +37,16 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const PostBottomRecommendations = ({post, hasTableOfContents, classes}: {
-  post: PostsWithNavigation | PostsWithNavigationAndRevision,
-  hasTableOfContents?: boolean,
-  classes: ClassesType,
+const PostBottomRecommendations = ({
+  post,
+  hasTableOfContents,
+  classes,
+}: {
+  post: PostsWithNavigation | PostsWithNavigationAndRevision;
+  hasTableOfContents?: boolean;
+  classes: ClassesType;
 }) => {
-  const {
-    recommendationsLoading: moreFromAuthorLoading,
-    recommendations: moreFromAuthorPosts,
-  } = useRecommendations({
+  const { recommendationsLoading: moreFromAuthorLoading, recommendations: moreFromAuthorPosts } = useRecommendations({
     strategy: {
       name: "moreFromAuthor",
       postId: post._id,
@@ -55,39 +56,27 @@ const PostBottomRecommendations = ({post, hasTableOfContents, classes}: {
     disableFallbacks: true,
   });
 
-  const {
-    results: curatedAndPopularPosts,
-    loading: curatedAndPopularLoading,
-  } = usePaginatedResolver({
+  const { results: curatedAndPopularPosts, loading: curatedAndPopularLoading } = usePaginatedResolver({
     fragmentName: "PostsPage",
     resolverName: "CuratedAndPopularThisWeek",
     limit: 6,
   });
 
-  const {
-    results: opportunityPosts,
-    loading: opportunitiesLoading,
-  } = useRecentOpportunities({
+  const { results: opportunityPosts, loading: opportunitiesLoading } = useRecentOpportunities({
     fragmentName: "PostsListWithVotes",
   });
 
   const profileUrl = userGetProfileUrl(post.user);
 
-  const hasUserPosts = post.user &&
-    (moreFromAuthorLoading || !!moreFromAuthorPosts?.length);
+  const hasUserPosts = post.user && (moreFromAuthorLoading || !!moreFromAuthorPosts?.length);
 
-  const {
-    PostsLoading, ToCColumn, EAPostsItem, EALargePostsItem, UserTooltip,
-  } = Components;
+  const { PostsLoading, ToCColumn, EAPostsItem, EALargePostsItem, UserTooltip } = Components;
   return (
     <AnalyticsContext pageSectionContext="postPageFooterRecommendations">
       <div className={classes.root}>
-        <ToCColumn
-          tableOfContents={hasTableOfContents ? <div /> : null}
-          notHideable
-        >
+        <ToCColumn tableOfContents={hasTableOfContents ? <div /> : null} notHideable>
           <div>
-            {hasUserPosts &&
+            {hasUserPosts && (
               <div className={classes.section}>
                 <div className={classes.sectionHeading}>
                   More from{" "}
@@ -95,54 +84,31 @@ const PostBottomRecommendations = ({post, hasTableOfContents, classes}: {
                     <Link to={profileUrl}>{post.user.displayName}</Link>
                   </UserTooltip>
                 </div>
-                {moreFromAuthorLoading && !moreFromAuthorPosts?.length &&
-                  <PostsLoading />
-                }
+                {moreFromAuthorLoading && !moreFromAuthorPosts?.length && <PostsLoading />}
                 <AnalyticsContext pageSubSectionContext="moreFromAuthor">
-                  {moreFromAuthorPosts?.map((post) => (
-                    <EAPostsItem key={post._id} post={post} />
-                  ))}
+                  {moreFromAuthorPosts?.map((post) => <EAPostsItem key={post._id} post={post} />)}
                   <div className={classes.viewMore}>
-                    <Link to={profileUrl}>
-                      View more
-                    </Link>
+                    <Link to={profileUrl}>View more</Link>
                   </div>
                 </AnalyticsContext>
               </div>
-            }
+            )}
             <div className={classes.section}>
-              <div className={classes.sectionHeading}>
-                Curated and popular this week
-              </div>
-              {curatedAndPopularLoading && !curatedAndPopularPosts?.length &&
-                <PostsLoading />
-              }
+              <div className={classes.sectionHeading}>Curated and popular this week</div>
+              {curatedAndPopularLoading && !curatedAndPopularPosts?.length && <PostsLoading />}
               <AnalyticsContext pageSubSectionContext="curatedAndPopular">
                 {curatedAndPopularPosts?.map((post) => (
-                  <EALargePostsItem
-                    key={post._id}
-                    post={post}
-                    className={classes.largePostItem}
-                    noImagePlaceholder
-                  />
+                  <EALargePostsItem key={post._id} post={post} className={classes.largePostItem} noImagePlaceholder />
                 ))}
               </AnalyticsContext>
             </div>
             <div className={classes.section}>
-              <div className={classes.sectionHeading}>
-                Recent opportunities
-              </div>
-              {opportunitiesLoading && !opportunityPosts?.length &&
-                <PostsLoading />
-              }
+              <div className={classes.sectionHeading}>Recent opportunities</div>
+              {opportunitiesLoading && !opportunityPosts?.length && <PostsLoading />}
               <AnalyticsContext pageSubSectionContext="recentOpportunities">
-                {opportunityPosts?.map((post) => (
-                  <EAPostsItem key={post._id} post={post} />
-                ))}
+                {opportunityPosts?.map((post) => <EAPostsItem key={post._id} post={post} />)}
                 <div className={classes.viewMore}>
-                  <Link to="/topics/careers-and-volunteering">
-                    View more
-                  </Link>
+                  <Link to="/topics/careers-and-volunteering">View more</Link>
                 </div>
               </AnalyticsContext>
             </div>
@@ -151,16 +117,14 @@ const PostBottomRecommendations = ({post, hasTableOfContents, classes}: {
       </div>
     </AnalyticsContext>
   );
-}
+};
 
-const PostBottomRecommendationsComponent = registerComponent(
-  "PostBottomRecommendations",
-  PostBottomRecommendations,
-  {styles},
-);
+const PostBottomRecommendationsComponent = registerComponent("PostBottomRecommendations", PostBottomRecommendations, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    PostBottomRecommendations: typeof PostBottomRecommendationsComponent
+    PostBottomRecommendations: typeof PostBottomRecommendationsComponent;
   }
 }

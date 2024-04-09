@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-12-08T02:17:26.000Z by 20231208T021726.add_soft_delete_to_forms.ts
  * +-- Overall schema hash: e30b5ca4f4989161f627585b747ee83e
- *  
+ *
  * @@ -81,2 +79,13 @@ CREATE TABLE "Chapters" (
- *  
+ *
  * +-- Schema for "CkEditorUserSessions", hash: b9eaf9c72e9640972611847068931528
  * +CREATE TABLE "CkEditorUserSessions" (
  * +    _id varchar(27) PRIMARY KEY,
@@ -27,7 +27,7 @@
  * +);
  * +
  *  -- Schema for "ClientIds", hash: dfb103acdd47efe3095b6b37647334f8
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -41,10 +41,10 @@ export const acceptsSchemaHash = "e30b5ca4f4989161f627585b747ee83e";
 import { createTable, dropTable } from "./meta/utils";
 import CkEditorUserSession from "../../lib/collections/ckEditorUserSessions/collection";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await createTable(db, CkEditorUserSession);
-}
+};
 
-export const down = async ({db}: MigrationContext) => {
+export const down = async ({ db }: MigrationContext) => {
   await dropTable(db, CkEditorUserSession);
-}
+};

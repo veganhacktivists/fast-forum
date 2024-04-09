@@ -1,30 +1,29 @@
-import { ensureIndex } from '../../collectionIndexUtils';
-import { isAF } from '../../instanceSettings';
-import Sequences from './collection';
+import { ensureIndex } from "../../collectionIndexUtils";
+import { isAF } from "../../instanceSettings";
+import Sequences from "./collection";
 
 declare global {
   interface SequencesViewTerms extends ViewTermsBase {
-    view?: SequencesViewName
-    userId?: string
-    sequenceIds?: string[]
+    view?: SequencesViewName;
+    userId?: string;
+    sequenceIds?: string[];
   }
 }
 
 Sequences.addDefaultView((terms: SequencesViewTerms) => {
-  const alignmentForum = isAF ? {af: true} : {}
+  const alignmentForum = isAF ? { af: true } : {};
   let params = {
     selector: {
       hidden: false,
-      ...(terms.sequenceIds && {_id: {$in: terms.sequenceIds}}),
-      ...alignmentForum
-    }
-  }
+      ...(terms.sequenceIds && { _id: { $in: terms.sequenceIds } }),
+      ...alignmentForum,
+    },
+  };
   return params;
-})
+});
 
-function augmentForDefaultView(indexFields: MongoIndexKeyObj<DbSequence>): MongoIndexKeyObj<DbSequence>
-{
-  return { hidden:1, af:1, isDeleted:1, ...indexFields };
+function augmentForDefaultView(indexFields: MongoIndexKeyObj<DbSequence>): MongoIndexKeyObj<DbSequence> {
+  return { hidden: 1, af: 1, isDeleted: 1, ...indexFields };
 }
 
 Sequences.addView("userProfile", function (terms: SequencesViewTerms) {
@@ -33,34 +32,31 @@ Sequences.addView("userProfile", function (terms: SequencesViewTerms) {
       userId: terms.userId,
       isDeleted: false,
       draft: false,
-      hideFromAuthorPage: false
+      hideFromAuthorPage: false,
     },
     options: {
       sort: {
         userProfileOrder: 1,
         createdAt: -1,
-      }
+      },
     },
   };
 });
-ensureIndex(Sequences, augmentForDefaultView({ userId:1, userProfileOrder: -1 }));
+ensureIndex(Sequences, augmentForDefaultView({ userId: 1, userProfileOrder: -1 }));
 
 Sequences.addView("userProfilePrivate", function (terms: SequencesViewTerms) {
   return {
     selector: {
       userId: terms.userId,
       isDeleted: false,
-      $or: [
-        {draft: true},
-        {hideFromAuthorPage: true}
-      ]
+      $or: [{ draft: true }, { hideFromAuthorPage: true }],
     },
     options: {
       sort: {
         draft: -1,
         userProfileOrder: 1,
         createdAt: -1,
-      }
+      },
     },
   };
 });
@@ -69,56 +65,53 @@ Sequences.addView("userProfileAll", function (terms: SequencesViewTerms) {
   return {
     selector: {
       userId: terms.userId,
-      isDeleted: false
+      isDeleted: false,
     },
     options: {
       sort: {
         draft: -1,
         hideFromAuthorPage: 1,
         userProfileOrder: 1,
-        createdAt: -1
-      }
+        createdAt: -1,
+      },
     },
   };
 });
-ensureIndex(Sequences, augmentForDefaultView({ userId: 1, draft: 1, hideFromAuthorPage: 1, userProfileOrder: 1 }))
+ensureIndex(Sequences, augmentForDefaultView({ userId: 1, draft: 1, hideFromAuthorPage: 1, userProfileOrder: 1 }));
 
 Sequences.addView("curatedSequences", function (terms: SequencesViewTerms) {
   return {
     selector: {
       userId: terms.userId,
-      curatedOrder: {$exists: true},
+      curatedOrder: { $exists: true },
       isDeleted: false,
-      gridImageId: {$ne: null },
+      gridImageId: { $ne: null },
       draft: false,
     },
     options: {
       sort: {
         curatedOrder: -1,
-        createdAt: -1
-      }
+        createdAt: -1,
+      },
     },
   };
 });
-ensureIndex(Sequences, augmentForDefaultView({ curatedOrder:-1 }));
+ensureIndex(Sequences, augmentForDefaultView({ curatedOrder: -1 }));
 
 Sequences.addView("communitySequences", function (terms: SequencesViewTerms) {
   return {
     selector: {
       userId: terms.userId,
-      curatedOrder: {$exists: false},
-      gridImageId: {$ne: null },
+      curatedOrder: { $exists: false },
+      gridImageId: { $ne: null },
       isDeleted: false,
       draft: false,
-      $or: [
-        {canonicalCollectionSlug: ""},
-        {canonicalCollectionSlug: {$exists: false}},
-      ],
+      $or: [{ canonicalCollectionSlug: "" }, { canonicalCollectionSlug: { $exists: false } }],
     },
     options: {
       sort: {
-        createdAt: -1
-      }
+        createdAt: -1,
+      },
     },
   };
 });

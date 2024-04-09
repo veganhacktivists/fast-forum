@@ -4,26 +4,26 @@ export type UseObserverProps = {
   /**
    * The callback to run when the element enters the viewport.
    */
-  onEnter?: () => void,
+  onEnter?: () => void;
   /**
    * The callback to run when the element exits the viewport.
    */
-  onExit?: () => void,
+  onExit?: () => void;
   /**
    * The amount of the element that must be visible to trigger the callback. 1 means
    * the entire element must be visible (be careful on mobile) and 0 will trigger if
    * at least 1px is visible. 0.5 would require half the element to be visible.
    * See https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
    */
-  threshold?: number|number[],
+  threshold?: number | number[];
   /**
    * The maximum number of times the callback may be called. A negative value allows
    * an infinite number of calls. Note that this is tracked separately for `onEnter`
    * and `onExit` so when `maxTriggers` is 1 both callbacks can be triggered once
    * each.
    */
-  maxTriggers?: number,
-}
+  maxTriggers?: number;
+};
 
 /**
  * useObserver is used to run a callback when a certain element enters and/or exits
@@ -43,7 +43,7 @@ export const useObserver = <T extends Element>({
     const target = ref.current;
     if (target) {
       const observer = new IntersectionObserver(
-        ([{isIntersecting}]) => {
+        ([{ isIntersecting }]) => {
           if (isIntersecting) {
             if (maxTriggers < 0 || enterTriggerCount.current < maxTriggers) {
               enterTriggerCount.current++;
@@ -54,11 +54,11 @@ export const useObserver = <T extends Element>({
             onExit?.();
           }
         },
-        {threshold},
+        { threshold },
       );
       observer.observe(target);
       return () => observer.unobserve(target);
     }
   }, [ref, onEnter, onExit, threshold, maxTriggers]);
   return ref;
-}
+};

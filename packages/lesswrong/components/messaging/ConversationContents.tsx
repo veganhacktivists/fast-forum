@@ -17,16 +17,16 @@ const styles = (theme: ThemeType): JssStyles => ({
     marginBottom: 12,
   },
   editor: {
-    margin: '32px 0px',
+    margin: "32px 0px",
     position: "relative",
-    '& .form-submit': {
+    "& .form-submit": {
       // form-submit has display: block by default, which for some reason makes it take up 0 height
       // on mobile. This fixes that.
       display: "flex",
     },
     ...(isEAForum && {
       borderTop: theme.palette.border.grey200,
-    })
+    }),
   },
   backButton: {
     color: theme.palette.lwTertiary.main,
@@ -54,13 +54,9 @@ const ConversationContents = ({
   // by guaranteeing that it's a fresh set of react components each time.
   const [messageSentCount, setMessageSentCount] = useState(0);
 
-  const stateSignatureRef = useRef(stringify({conversationId: conversation._id, numMessagesShown: 0}));
+  const stateSignatureRef = useRef(stringify({ conversationId: conversation._id, numMessagesShown: 0 }));
 
-  const {
-    results,
-    refetch,
-    loading,
-  } = useMulti({
+  const { results, refetch, loading } = useMulti({
     terms: {
       view: "messagesConversation",
       conversationId: conversation._id,
@@ -85,14 +81,14 @@ const ConversationContents = ({
   // client/scrollRestoration.ts).
   useEffect(() => {
     const newNumMessages = results?.length ?? 0;
-    const newStateSignature = stringify({conversationId: conversation._id, numMessagesShown: newNumMessages});
+    const newStateSignature = stringify({ conversationId: conversation._id, numMessagesShown: newNumMessages });
     if (newStateSignature !== stateSignatureRef.current) {
       stateSignatureRef.current = newStateSignature;
       setTimeout(() => {
         // Always scroll the whole window. This may be a problem in future, but it's here to make
         // scroll work nicely on both desktop (uses inner div) and mobile (uses whole window)
         const scrollPadding = 550; // Stop it scrolling way off the end of the page
-        window.scroll({top: document.body.scrollHeight-scrollPadding, behavior: 'smooth'})
+        window.scroll({ top: document.body.scrollHeight - scrollPadding, behavior: "smooth" });
 
         // Also scroll the exact element we are embedded in, if we have a ref to it
         if (scrollRef?.current) {

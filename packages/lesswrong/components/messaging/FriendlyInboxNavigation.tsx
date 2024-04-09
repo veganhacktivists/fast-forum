@@ -5,8 +5,8 @@ import { UseMultiResult } from "../../lib/crud/withMulti";
 const styles = (theme: ThemeType): JssStyles => ({
   noConversationsMessage: {
     padding: 16,
-  }
-})
+  },
+});
 
 // The Navigation for the Inbox components
 const FriendlyInboxNavigation = ({
@@ -25,15 +25,10 @@ const FriendlyInboxNavigation = ({
 }) => {
   const { results: conversations, loading, loadMoreProps } = conversationsResult;
 
-  const {
-    FriendlyConversationItem,
-    Loading,
-    SectionFooter,
-    Typography,
-    LoadMore,
-  } = Components;
+  const { FriendlyConversationItem, Loading, SectionFooter, Typography, LoadMore } = Components;
 
-  return <>
+  return (
+    <>
       {conversations?.length ? (
         conversations.map((conversation, idx) => (
           <FriendlyConversationItem
@@ -54,10 +49,13 @@ const FriendlyInboxNavigation = ({
       <SectionFooter>
         <LoadMore {...loadMoreProps} sectionFooterStyles />
       </SectionFooter>
-  </>;
+    </>
+  );
 };
 
-const FriendlyInboxNavigationComponent = registerComponent("FriendlyInboxNavigation", FriendlyInboxNavigation, {styles});
+const FriendlyInboxNavigationComponent = registerComponent("FriendlyInboxNavigation", FriendlyInboxNavigation, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {

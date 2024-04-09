@@ -1,15 +1,17 @@
-import React from 'react';
-import Button from 'react-bootstrap/Button';
-import { registerComponent } from '../../../lib/vulcan-lib/components';
+import React from "react";
+import Button from "react-bootstrap/Button";
+import { registerComponent } from "../../../lib/vulcan-lib/components";
 
-const BootstrapButton = ({ children, variant, size, iconButton, ...rest }: AnyBecauseTodo) => 
-  <Button variant={variant} size={size} {...rest}>{children}</Button>;
+const BootstrapButton = ({ children, variant, size, iconButton, ...rest }: AnyBecauseTodo) => (
+  <Button variant={variant} size={size} {...rest}>
+    {children}
+  </Button>
+);
 
-const ButtonComponent = registerComponent('Button', BootstrapButton);
+const ButtonComponent = registerComponent("Button", BootstrapButton);
 
 declare global {
   interface ComponentTypes {
-    Button: typeof ButtonComponent
+    Button: typeof ButtonComponent;
   }
 }
-

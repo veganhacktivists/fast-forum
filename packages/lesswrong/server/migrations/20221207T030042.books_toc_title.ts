@@ -15,9 +15,9 @@ import { addField } from "./meta/utils";
  * -
  * --- Accepted on 2022-10-21T09:19:15.000Z by 20221021T091915.schema_hash.ts
  * +-- Overall schema hash: dc1ea5409f03e1b22c4c5835fd70e2a3
- *  
+ *
  * @@ -33,3 +31,3 @@ CREATE TABLE "Bans" (
- *  
+ *
  * --- Schema for "Books", hash: f7c58c313404e4c7f3e8dcd4406628e3
  * +-- Schema for "Books", hash: 2f345cb7645938cddd3470978f9825d2
  *  CREATE TABLE "Books" (
@@ -25,7 +25,7 @@ import { addField } from "./meta/utils";
  *      "subtitle" text,
  * +    "tocTitle" text,
  *      "collectionId" varchar(27) NOT NULL,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -36,6 +36,6 @@ import { addField } from "./meta/utils";
  */
 export const acceptsSchemaHash = "346664785a7ca60371b76fd9d92a4f30";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   await addField(db, Books, "tocTitle");
-}
+};

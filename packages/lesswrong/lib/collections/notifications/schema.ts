@@ -1,5 +1,5 @@
-import { userOwns } from '../../vulcan-users/permissions';
-import { schemaDefaultValue } from '../../utils/schemaUtils';
+import { userOwns } from "../../vulcan-users/permissions";
+import { schemaDefaultValue } from "../../utils/schemaUtils";
 
 const schema: SchemaType<"Notifications"> = {
   userId: {
@@ -58,9 +58,9 @@ const schema: SchemaType<"Notifications"> = {
     type: Boolean,
     optional: true,
     ...schemaDefaultValue(false),
-    canRead: ['members'],
-    canCreate: ['members'],
-    canUpdate: ['members'],
+    canRead: ["members"],
+    canCreate: ["members"],
+    canUpdate: ["members"],
     ...schemaDefaultValue(false),
   },
   emailed: {
@@ -76,10 +76,10 @@ const schema: SchemaType<"Notifications"> = {
 };
 
 export type NotificationCountsResult = {
-  checkedAt: Date,
-  unreadNotifications: number
-  unreadPrivateMessages: number
-  faviconBadgeNumber: number
-}
+  checkedAt: Date;
+  unreadNotifications: number;
+  unreadPrivateMessages: number;
+  faviconBadgeNumber: number;
+};
 
 export default schema;

@@ -7,36 +7,33 @@ const CommentExcerpt = ({
   comment,
   ...commonExcerptProps
 }: CommonExcerptProps & {
-  comment: CommentsList|CommentsListWithParentMetadata,
+  comment: CommentsList | CommentsListWithParentMetadata;
 }) => {
   const contentHtml = comment.contents?.html;
   if (!contentHtml) {
     return null;
   }
 
-  const {ContentExcerpt} = Components;
+  const { ContentExcerpt } = Components;
   return (
     <ContentExcerpt
       contentHtml={contentHtml}
       moreLink={commentGetPageUrlFromIds({
         commentId: comment._id,
         postId: comment.postId,
-        postSlug: "postSlug" in comment ? comment.postSlug as string : undefined,
+        postSlug: "postSlug" in comment ? (comment.postSlug as string) : undefined,
       })}
       contentType="comment"
       alwaysExpandInPlace
       {...commonExcerptProps}
     />
   );
-}
+};
 
-const CommentExcerptComponent = registerComponent(
-  "CommentExcerpt",
-  CommentExcerpt,
-);
+const CommentExcerptComponent = registerComponent("CommentExcerpt", CommentExcerpt);
 
 declare global {
   interface ComponentTypes {
-    CommentExcerpt: typeof CommentExcerptComponent,
+    CommentExcerpt: typeof CommentExcerptComponent;
   }
 }

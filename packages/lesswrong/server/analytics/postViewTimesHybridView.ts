@@ -15,7 +15,7 @@ const viewQuery = (crossoverTime: Date, materialized = false) => `
   WHERE
     client_id IS NOT NULL
     AND timestamp > '${crossoverTime.toISOString()}'
-    ${materialized ? 'AND timestamp < NOW()' : ''}
+    ${materialized ? "AND timestamp < NOW()" : ""}
   GROUP BY
     client_id,
     post_id,

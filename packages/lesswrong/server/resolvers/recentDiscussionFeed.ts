@@ -1,29 +1,33 @@
-import { mergeFeedQueries, defineFeedResolver, viewBasedSubquery, fixedIndexSubquery } from '../utils/feedUtil';
-import { Posts } from '../../lib/collections/posts/collection';
+import { mergeFeedQueries, defineFeedResolver, viewBasedSubquery, fixedIndexSubquery } from "../utils/feedUtil";
+import { Posts } from "../../lib/collections/posts/collection";
 import {
   EA_FORUM_COMMUNITY_TOPIC_ID,
   EA_FORUM_TRANSLATION_TOPIC_ID,
   Tags,
-} from '../../lib/collections/tags/collection';
-import { Revisions } from '../../lib/collections/revisions/collection';
-import { isEAForum } from '../../lib/instanceSettings';
-import { viewFieldAllowAny } from '../vulcan-lib';
-import ElectionVotes from '../../lib/collections/electionVotes/collection';
+} from "../../lib/collections/tags/collection";
+import { Revisions } from "../../lib/collections/revisions/collection";
+import { isEAForum } from "../../lib/instanceSettings";
+import { viewFieldAllowAny } from "../vulcan-lib";
+import ElectionVotes from "../../lib/collections/electionVotes/collection";
 
 const communityFilters = {
-  none: {$or: [
-    {[`tagRelevance.${EA_FORUM_COMMUNITY_TOPIC_ID}`]: {$lt: 1}},
-    {[`tagRelevance.${EA_FORUM_COMMUNITY_TOPIC_ID}`]: {$exists: false}},
-  ]},
-  lt10comments: {$or: [
-    {[`tagRelevance.${EA_FORUM_COMMUNITY_TOPIC_ID}`]: {$lt: 1}},
-    {[`tagRelevance.${EA_FORUM_COMMUNITY_TOPIC_ID}`]: {$exists: false}},
-    {commentCount: {$lt: 10}},
-  ]},
+  none: {
+    $or: [
+      { [`tagRelevance.${EA_FORUM_COMMUNITY_TOPIC_ID}`]: { $lt: 1 } },
+      { [`tagRelevance.${EA_FORUM_COMMUNITY_TOPIC_ID}`]: { $exists: false } },
+    ],
+  },
+  lt10comments: {
+    $or: [
+      { [`tagRelevance.${EA_FORUM_COMMUNITY_TOPIC_ID}`]: { $lt: 1 } },
+      { [`tagRelevance.${EA_FORUM_COMMUNITY_TOPIC_ID}`]: { $exists: false } },
+      { commentCount: { $lt: 10 } },
+    ],
+  },
   all: {},
 } as const;
 
-type CommunityFilter = typeof communityFilters[keyof typeof communityFilters];
+type CommunityFilter = (typeof communityFilters)[keyof typeof communityFilters];
 
 defineFeedResolver<Date>({
   name: "RecentDiscussionFeed",
@@ -36,18 +40,29 @@ defineFeedResolver<Date>({
     tagRevised: Revision
     electionVoted: ElectionVote
   `,
-  resolver: async ({limit=20, cutoff, offset, args, context}: {
-    limit?: number, cutoff?: Date, offset?: number,
-    args: {af: boolean},
-    context: ResolverContext
+  resolver: async ({
+    limit = 20,
+    cutoff,
+    offset,
+    args,
+    context,
+  }: {
+    limit?: number;
+    cutoff?: Date;
+    offset?: number;
+    args: { af: boolean };
+    context: ResolverContext;
   }) => {
     type SortKeyType = Date;
-    const {af} = args;
-    const {currentUser} = context;
+    const { af } = args;
+    const { currentUser } = context;
 
-    const shouldSuggestMeetupSubscription = currentUser && !currentUser.nearbyEventsNotifications && !currentUser.hideMeetupsPoke; //TODO: Check some more fields
+    const shouldSuggestMeetupSubscription =
+      currentUser && !currentUser.nearbyEventsNotifications && !currentUser.hideMeetupsPoke; //TODO: Check some more fields
 
-    const postCommentedEventsCriteria = {$or: [{isEvent: false}, {globalEvent: true}, {commentCount: {$gt: 0}}]}
+    const postCommentedEventsCriteria = {
+      $or: [{ isEvent: false }, { globalEvent: true }, { commentCount: { $gt: 0 } }],
+    };
 
     // On the EA Forum, we default to hiding posts tagged with "Community" from
     // Recent Discussion if they have at least 10 comments, or if the current user
@@ -59,30 +74,30 @@ defineFeedResolver<Date>({
       postCommentedExcludeCommunity = communityFilters.none;
     }
 
-    const translationFilter = {$or: [
-      {[`tagRelevance.${EA_FORUM_TRANSLATION_TOPIC_ID}`]: {$lt: 1}},
-      {[`tagRelevance.${EA_FORUM_TRANSLATION_TOPIC_ID}`]: {$exists: false}},
-    ]};
+    const translationFilter = {
+      $or: [
+        { [`tagRelevance.${EA_FORUM_TRANSLATION_TOPIC_ID}`]: { $lt: 1 } },
+        { [`tagRelevance.${EA_FORUM_TRANSLATION_TOPIC_ID}`]: { $exists: false } },
+      ],
+    };
 
     const postSelector = {
-      baseScore: {$gt:0},
+      baseScore: { $gt: 0 },
       hideFrontpageComments: false,
-      lastCommentedAt: {$exists: true},
-      hideFromRecentDiscussions: {$ne: true},
+      lastCommentedAt: { $exists: true },
+      hideFromRecentDiscussions: { $ne: true },
       hiddenRelatedQuestion: viewFieldAllowAny,
       groupId: viewFieldAllowAny,
-      ...(af ? {af: true} : undefined),
+      ...(af ? { af: true } : undefined),
       ...(isEAForum
-        ? {$and: [
-          postCommentedEventsCriteria,
-          postCommentedExcludeCommunity,
-          translationFilter,
-        ]}
+        ? { $and: [postCommentedEventsCriteria, postCommentedExcludeCommunity, translationFilter] }
         : postCommentedEventsCriteria),
     };
 
     return await mergeFeedQueries<SortKeyType>({
-      limit, cutoff, offset,
+      limit,
+      cutoff,
+      offset,
       subqueries: [
         // Post commented
         viewBasedSubquery({
@@ -92,10 +107,7 @@ defineFeedResolver<Date>({
           context,
           selector: {
             ...postSelector,
-            $or: [
-              {shortform: {$exists: false}},
-              {shortform: {$eq: false}},
-            ],
+            $or: [{ shortform: { $exists: false } }, { shortform: { $eq: false } }],
           },
         }),
         // Shortform/quick take commented
@@ -106,7 +118,7 @@ defineFeedResolver<Date>({
           context,
           selector: {
             ...postSelector,
-            shortform: {$eq: true},
+            shortform: { $eq: true },
           },
         }),
         // Tags with discussion comments
@@ -116,8 +128,8 @@ defineFeedResolver<Date>({
           sortField: "lastCommentedAt",
           context,
           selector: {
-            lastCommentedAt: {$exists: true},
-            ...(af ? {af: true} : undefined),
+            lastCommentedAt: { $exists: true },
+            ...(af ? { af: true } : undefined),
           },
         }),
         // Large revision to tag
@@ -129,8 +141,8 @@ defineFeedResolver<Date>({
           selector: {
             collectionName: "Tags",
             fieldName: "description",
-            "changeMetrics.added": {$gt: 100},
-            editedAt: {$exists: true},
+            "changeMetrics.added": { $gt: 100 },
+            editedAt: { $exists: true },
           },
         }),
         // Election votes
@@ -140,7 +152,7 @@ defineFeedResolver<Date>({
           sortField: "submittedAt",
           context,
           selector: {
-            submittedAt: {$exists: true},
+            submittedAt: { $exists: true },
           },
         }),
         // Suggestion to subscribe to curated
@@ -150,15 +162,16 @@ defineFeedResolver<Date>({
           result: {},
         }),
         // Suggestion to subscribe to meetups
-        ...(shouldSuggestMeetupSubscription ?
-          [fixedIndexSubquery({
-            type: "meetupsPoke",
-            index: 8,
-            result: {},
-          })]
-          : []
-        ),
+        ...(shouldSuggestMeetupSubscription
+          ? [
+              fixedIndexSubquery({
+                type: "meetupsPoke",
+                index: 8,
+                result: {},
+              }),
+            ]
+          : []),
       ],
     });
-  }
+  },
 });

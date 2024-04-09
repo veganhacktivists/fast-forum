@@ -1,5 +1,5 @@
 import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
-import { editableCollections, editableCollectionsFields } from "../../lib/editor/make_editable"
+import { editableCollections, editableCollectionsFields } from "../../lib/editor/make_editable";
 import { getCollection } from "../../lib/vulcan-lib";
 import { dataToWordCount } from "../editor/conversionUtils";
 import { Revisions } from "../../lib/collections/revisions/collection";
@@ -29,10 +29,10 @@ registerMigration({
                 filter: { _id: doc._id },
                 update: {
                   $set: {
-                    wordCount: wordCount
-                  }
-                }
-              }
+                    wordCount: wordCount,
+                  },
+                },
+              },
             });
           }
         }
@@ -45,7 +45,7 @@ registerMigration({
     });
     for (const collectionName of editableCollections) {
       for (const fieldName of editableCollectionsFields[collectionName]!) {
-        const collection: CollectionBase<any> = getCollection(collectionName)
+        const collection: CollectionBase<any> = getCollection(collectionName);
         await forEachDocumentBatchInCollection({
           collection,
           batchSize: 1000,
@@ -61,10 +61,10 @@ registerMigration({
                       filter: { _id: doc._id },
                       update: {
                         $set: {
-                          [`${fieldName}.wordCount`]: wordCount
-                        }
-                      }
-                    }
+                          [`${fieldName}.wordCount`]: wordCount,
+                        },
+                      },
+                    },
                   });
                 }
               }

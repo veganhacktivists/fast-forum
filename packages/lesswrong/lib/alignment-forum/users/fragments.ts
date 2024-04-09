@@ -1,4 +1,4 @@
-import { registerFragment } from '../../vulcan-lib';
+import { registerFragment } from "../../vulcan-lib";
 
 registerFragment(`
   fragment SuggestAlignmentUser on User {
@@ -10,4 +10,4 @@ registerFragment(`
     groups
     afApplicationText
     afSubmittedApplication
-  }`)
+  }`);

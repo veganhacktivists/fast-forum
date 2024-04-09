@@ -26,13 +26,30 @@
 //
 "use strict";
 
-var selfClosingTags = ["area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"];
+var selfClosingTags = [
+  "area",
+  "base",
+  "br",
+  "col",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "keygen",
+  "link",
+  "menuitem",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr",
+];
 
 interface TruncatiseOptions {
-  TruncateBy?: "words"|"characters"|"paragraphs",
-  TruncateLength?: number,
-  Strict?: boolean,
-  Suffix?: string,
+  TruncateBy?: "words" | "characters" | "paragraphs";
+  TruncateLength?: number;
+  Strict?: boolean;
+  Suffix?: string;
 }
 
 /**
@@ -50,123 +67,133 @@ interface TruncatiseOptions {
  *      length provided by the options. HTML tags may be stripped based
  *      on the given options.
  */
-export const truncatise = function(text: string, {TruncateBy="words", TruncateLength=50, Strict=true, Suffix="..."}: TruncatiseOptions): string {
-    var text            = (text || "").trim();
-    var currentState    = 0;
-    var currentTagStart = 0;
-    var tagStack: string[] = [];
+export const truncatise = function (
+  text: string,
+  { TruncateBy = "words", TruncateLength = 50, Strict = true, Suffix = "..." }: TruncatiseOptions,
+): string {
+  var text = (text || "").trim();
+  var currentState = 0;
+  var currentTagStart = 0;
+  var tagStack: string[] = [];
 
-    //Counters
-    var charCounter         = 0;
-    var wordCounter         = 0;
-    var paragraphCounter    = 0;
+  //Counters
+  var charCounter = 0;
+  var wordCounter = 0;
+  var paragraphCounter = 0;
 
-    //currentState values
-    const NOT_TAG = 0;
-    const TAG_START = 1;
-    const TAG_ATTRIBUTES = 2;
+  //currentState values
+  const NOT_TAG = 0;
+  const TAG_START = 1;
+  const TAG_ATTRIBUTES = 2;
 
-    //Set default values
-    const matchByWords = TruncateBy==="words";
-    const matchByCharacters = TruncateBy==="characters";
-    const matchByParagraphs = TruncateBy==="paragraphs";
-    
-    if(text === "" || (text.length <= TruncateLength)){
-        return text;
-    }
+  //Set default values
+  const matchByWords = TruncateBy === "words";
+  const matchByCharacters = TruncateBy === "characters";
+  const matchByParagraphs = TruncateBy === "paragraphs";
 
-    //Remove newline seperating paragraphs
-    text = text.replace(/<\/p>(\r?\n)+<p>/gm, '</p><p>');
+  if (text === "" || text.length <= TruncateLength) {
+    return text;
+  }
 
-    let pointer = 0;
-    for (; pointer < text.length; pointer++ ) {
-      var currentChar = text.charCodeAt(pointer);
+  //Remove newline seperating paragraphs
+  text = text.replace(/<\/p>(\r?\n)+<p>/gm, "</p><p>");
 
-      switch(currentChar) {
-        case 60: //"<"
-          if(currentState === NOT_TAG){
-            currentState = TAG_START;
-            currentTagStart = pointer+1;
-          }
-          break;
-        case 62: { //>
-          if(currentState === TAG_START || currentState === TAG_ATTRIBUTES){
-            currentState = NOT_TAG;
-            
-            // Get the tag
-            const currentTag: string = text.substring(currentTagStart, pointer).toLowerCase();
-            
-            // Separate the tag name from the attributes
-            const attributesStart = currentTag.indexOf(" ");
-            const tagWithoutAttributes = (attributesStart >= 0) ? currentTag.substring(0, attributesStart) : currentTag;
-            
-            if(tagWithoutAttributes === "/p"){
-              paragraphCounter++;
-            }
+  let pointer = 0;
+  for (; pointer < text.length; pointer++) {
+    var currentChar = text.charCodeAt(pointer);
 
-            // Ignore self-closing tags.
-            if ((selfClosingTags.indexOf(tagWithoutAttributes) === -1) && (selfClosingTags.indexOf(tagWithoutAttributes + '/') === -1)) {
-              if(tagWithoutAttributes.indexOf("/") >= 0){
-                tagStack.pop();
-              } else {
-                tagStack.push(tagWithoutAttributes);
-              }
-            }
-          }
-          break;
+    switch (currentChar) {
+      case 60: //"<"
+        if (currentState === NOT_TAG) {
+          currentState = TAG_START;
+          currentTagStart = pointer + 1;
         }
-        case 32: //' '
-          if(currentState === TAG_START){
-            currentState = TAG_ATTRIBUTES;
-          }
-          if(currentState === NOT_TAG){
-            wordCounter++;
-            charCounter++;
-          }
-          break;
-        default:
-          if(currentState === NOT_TAG){
-            charCounter++;
-          }
-          break;
-      }
+        break;
+      case 62: {
+        //>
+        if (currentState === TAG_START || currentState === TAG_ATTRIBUTES) {
+          currentState = NOT_TAG;
 
-      if(matchByWords && wordCounter >= TruncateLength){
+          // Get the tag
+          const currentTag: string = text.substring(currentTagStart, pointer).toLowerCase();
+
+          // Separate the tag name from the attributes
+          const attributesStart = currentTag.indexOf(" ");
+          const tagWithoutAttributes = attributesStart >= 0 ? currentTag.substring(0, attributesStart) : currentTag;
+
+          if (tagWithoutAttributes === "/p") {
+            paragraphCounter++;
+          }
+
+          // Ignore self-closing tags.
+          if (
+            selfClosingTags.indexOf(tagWithoutAttributes) === -1 &&
+            selfClosingTags.indexOf(tagWithoutAttributes + "/") === -1
+          ) {
+            if (tagWithoutAttributes.indexOf("/") >= 0) {
+              tagStack.pop();
+            } else {
+              tagStack.push(tagWithoutAttributes);
+            }
+          }
+        }
         break;
       }
-      if(matchByCharacters && TruncateLength <= charCounter) {
-        if (Strict) {
-          break;
-        } else if(!isWordCharCode(currentChar) || ((pointer+1<text.length) && !isWordCharCode(text.charCodeAt(pointer+1)))) {
-          break;
+      case 32: //' '
+        if (currentState === TAG_START) {
+          currentState = TAG_ATTRIBUTES;
         }
-      }
-      if (matchByParagraphs && TruncateLength === paragraphCounter) {
+        if (currentState === NOT_TAG) {
+          wordCounter++;
+          charCounter++;
+        }
+        break;
+      default:
+        if (currentState === NOT_TAG) {
+          charCounter++;
+        }
+        break;
+    }
+
+    if (matchByWords && wordCounter >= TruncateLength) {
+      break;
+    }
+    if (matchByCharacters && TruncateLength <= charCounter) {
+      if (Strict) {
+        break;
+      } else if (
+        !isWordCharCode(currentChar) ||
+        (pointer + 1 < text.length && !isWordCharCode(text.charCodeAt(pointer + 1)))
+      ) {
         break;
       }
     }
-    
-    let truncatedText = text.substring(0, pointer+1);
-    if(matchByWords && wordCounter >= TruncateLength){
-      truncatedText = truncatedText.trimEnd();
+    if (matchByParagraphs && TruncateLength === paragraphCounter) {
+      break;
     }
+  }
 
-    while(tagStack.length > 0){
-      var tag = tagStack.pop();
-      if(tag!=="!--"){
-        truncatedText += "</"+tag+">";
-      }
+  let truncatedText = text.substring(0, pointer + 1);
+  if (matchByWords && wordCounter >= TruncateLength) {
+    truncatedText = truncatedText.trimEnd();
+  }
+
+  while (tagStack.length > 0) {
+    var tag = tagStack.pop();
+    if (tag !== "!--") {
+      truncatedText += "</" + tag + ">";
     }
+  }
 
-    if(pointer < text.length-1) {
-      if(truncatedText.endsWith("</p>") || truncatedText.endsWith("</P>")) {
-        return truncatedText.substring(0, truncatedText.length - 4) + Suffix + "</p>";
-      } else {
-        return truncatedText + Suffix;
-      }
+  if (pointer < text.length - 1) {
+    if (truncatedText.endsWith("</p>") || truncatedText.endsWith("</P>")) {
+      return truncatedText.substring(0, truncatedText.length - 4) + Suffix + "</p>";
     } else {
-      return truncatedText.trim();
+      return truncatedText + Suffix;
     }
+  } else {
+    return truncatedText.trim();
+  }
 };
 
 function isWordCharCode(ch: number) {

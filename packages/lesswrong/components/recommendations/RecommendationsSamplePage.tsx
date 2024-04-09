@@ -24,8 +24,8 @@ import { useNavigate } from "../../lib/reactRouterWrapper";
 const styles = (theme: ThemeType) => ({
   root: {
     [theme.breakpoints.down("sm")]: {
-      paddingTop: 30
-    }
+      paddingTop: 30,
+    },
   },
   settings: {
     display: "flex",
@@ -43,9 +43,7 @@ const styles = (theme: ThemeType) => ({
 });
 
 const parseStrategy = (queryStrategy?: string): RecommendationStrategyName =>
-  queryStrategy && isRecommendationStrategyName(queryStrategy)
-    ? queryStrategy
-    : "tagWeightedCollabFilter";
+  queryStrategy && isRecommendationStrategyName(queryStrategy) ? queryStrategy : "tagWeightedCollabFilter";
 
 const parseNumber = (queryValue?: string, defaultValue = 1): number => {
   if (queryValue) {
@@ -55,7 +53,7 @@ const parseNumber = (queryValue?: string, defaultValue = 1): number => {
     }
   }
   return defaultValue;
-}
+};
 
 const getDefaultFeatures = (): Record<RecommendationFeatureName, string> => ({
   karma: "0.8",
@@ -65,43 +63,30 @@ const getDefaultFeatures = (): Record<RecommendationFeatureName, string> => ({
   textSimilarity: "1",
 });
 
-const featureInputToFeatures = (
-  input: Record<RecommendationFeatureName, string>,
-): WeightedFeature[] => {
+const featureInputToFeatures = (input: Record<RecommendationFeatureName, string>): WeightedFeature[] => {
   const result: WeightedFeature[] = [];
   for (const feature_ in input) {
     const feature = feature_ as RecommendationFeatureName;
-    result.push({feature, weight: parseNumber(input[feature])});
+    result.push({ feature, weight: parseNumber(input[feature]) });
   }
   return result;
-}
+};
 
-const RecommendationsSamplePage = ({classes}: {
-  classes: ClassesType,
-}) => {
+const RecommendationsSamplePage = ({ classes }: { classes: ClassesType }) => {
   const currentUser = useCurrentUser();
-  const {timezone} = useTimezone();
-  const {query} = useLocation();
+  const { timezone } = useTimezone();
+  const { query } = useLocation();
   const navigate = useNavigate();
-  const [strategy, setStrategy] = useState<RecommendationStrategyName>(
-    parseStrategy(query.strategy),
-  );
-  const [loggedOutView, setLoggedOutView] = useState(
-    query.loggedOutView ? query.loggedOutView === "true" : true,
-  );
+  const [strategy, setStrategy] = useState<RecommendationStrategyName>(parseStrategy(query.strategy));
+  const [loggedOutView, setLoggedOutView] = useState(query.loggedOutView ? query.loggedOutView === "true" : true);
   const [bias, setBias] = useState(parseNumber(query.bias, 1.5));
   const [biasInput, setBiasInput] = useState(String(bias));
   const [featureInput, setFeatureInput] = useState(getDefaultFeatures);
-  const [features, setFeatures] = useState(
-    () => featureInputToFeatures(getDefaultFeatures()),
-  );
+  const [features, setFeatures] = useState(() => featureInputToFeatures(getDefaultFeatures()));
 
-  const {results, loading, loadMoreProps} = useMulti({
+  const { results, loading, loadMoreProps } = useMulti({
     terms: {
-      after: moment().tz(timezone).subtract(
-        frontpageDaysAgoCutoffSetting.get(),
-        "days",
-      ).format("YYYY-MM-DD"),
+      after: moment().tz(timezone).subtract(frontpageDaysAgoCutoffSetting.get(), "days").format("YYYY-MM-DD"),
       view: "magic",
       forum: true,
       limit: 20,
@@ -114,102 +99,93 @@ const RecommendationsSamplePage = ({classes}: {
   });
 
   if (!currentUser?.isAdmin) {
-    return (
-      <Components.Error404 />
-    );
+    return <Components.Error404 />;
   }
 
   const onChangeStrategy = (e: ChangeEvent<HTMLSelectElement>) => {
     const name = e.target?.value;
     if (isRecommendationStrategyName(name)) {
       setStrategy(name);
-      navigate({
+      navigate(
+        {
+          ...location,
+          search: qs.stringify({
+            ...query,
+            strategy: name,
+          }),
+        },
+        { replace: true },
+      );
+    }
+  };
+
+  const onChangeLoggedOutView = (_: ChangeEvent<HTMLInputElement>, checked: boolean) => {
+    setLoggedOutView(checked);
+    navigate(
+      {
         ...location,
         search: qs.stringify({
           ...query,
-          strategy: name,
+          loggedOutView: checked ? "true" : "false",
         }),
-      }, {replace: true});
-    }
-  }
+      },
+      { replace: true },
+    );
+  };
 
-  const onChangeLoggedOutView = (
-    _: ChangeEvent<HTMLInputElement>,
-    checked: boolean,
-  ) => {
-    setLoggedOutView(checked);
-    navigate({
-      ...location,
-      search: qs.stringify({
-        ...query,
-        loggedOutView: checked ? "true" : "false",
-      }),
-    }, {replace: true});
-  }
-
-  const onChangeBias = (e: ChangeEvent<HTMLInputElement>) =>
-    setBiasInput(e.target?.value ?? "");
+  const onChangeBias = (e: ChangeEvent<HTMLInputElement>) => setBiasInput(e.target?.value ?? "");
 
   const onBlurBias = () => {
     const value = parseNumber(biasInput);
     setBias(value);
-    navigate({
-      ...location,
-      search: qs.stringify({
-        ...query,
-        bias: value,
-      }),
-    }, {replace: true});
-  }
+    navigate(
+      {
+        ...location,
+        search: qs.stringify({
+          ...query,
+          bias: value,
+        }),
+      },
+      { replace: true },
+    );
+  };
 
-  const onChangeFeature = (feature: RecommendationFeatureName) =>
-    (e: ChangeEvent<HTMLInputElement>) =>
-      setFeatureInput({...featureInput, [feature]: e.target?.value ?? ""});
+  const onChangeFeature = (feature: RecommendationFeatureName) => (e: ChangeEvent<HTMLInputElement>) =>
+    setFeatureInput({ ...featureInput, [feature]: e.target?.value ?? "" });
 
   const onBlurFeature = () => setFeatures(featureInputToFeatures(featureInput));
 
   const showBias = strategy === "tagWeightedCollabFilter";
   const showFeatures = strategy === "feature";
 
-  const {
-    SingleColumnSection, SectionTitle, PostsItem, PostsPageRecommendationsList,
-    LoadMore, Loading, MenuItem,
-  } = Components;
+  const { SingleColumnSection, SectionTitle, PostsItem, PostsPageRecommendationsList, LoadMore, Loading, MenuItem } =
+    Components;
 
   return (
     <div className={classes.root}>
       <SingleColumnSection>
-        <SectionTitle title="Recommendations Sample"/>
+        <SectionTitle title="Recommendations Sample" />
         <div className={classes.settings}>
-          <Select
-            value={strategy}
-            onChange={onChangeStrategy}
-          >
-            {Array.from(recommendationStrategyNames).map((name) =>
-              <MenuItem key={name} value={name}>{name}</MenuItem>
-            )}
+          <Select value={strategy} onChange={onChangeStrategy}>
+            {Array.from(recommendationStrategyNames).map((name) => (
+              <MenuItem key={name} value={name}>
+                {name}
+              </MenuItem>
+            ))}
           </Select>
           <div>
-            <Checkbox
-              checked={loggedOutView}
-              onChange={onChangeLoggedOutView}
-            />
+            <Checkbox checked={loggedOutView} onChange={onChangeLoggedOutView} />
             Force logged out view
           </div>
-          {showBias &&
+          {showBias && (
             <div>
-              <Input
-                placeholder={"Bias"}
-                value={biasInput}
-                onChange={onChangeBias}
-                onBlur={onBlurBias}
-              />
+              <Input placeholder={"Bias"} value={biasInput} onChange={onChangeBias} onBlur={onBlurBias} />
             </div>
-          }
+          )}
         </div>
-        {showFeatures &&
+        {showFeatures && (
           <div className={classes.settings}>
-            {Array.from(recommendationFeatureNames).map((feature) =>
+            {Array.from(recommendationFeatureNames).map((feature) => (
               <div key={feature}>
                 {feature}
                 <Input
@@ -219,10 +195,10 @@ const RecommendationsSamplePage = ({classes}: {
                   onBlur={onBlurFeature}
                 />
               </div>
-            )}
+            ))}
           </div>
-        }
-        {results?.map((post: PostsListWithVotes) =>
+        )}
+        {results?.map((post: PostsListWithVotes) => (
           <div key={post._id} className={classes.result}>
             <PostsItem post={post} />
             <PostsPageContext.Provider value={post as PostsWithNavigationAndRevision}>
@@ -235,24 +211,19 @@ const RecommendationsSamplePage = ({classes}: {
               />
             </PostsPageContext.Provider>
           </div>
-        )}
-        {loading
-          ? <Loading />
-          : <LoadMore {...loadMoreProps} />
-        }
+        ))}
+        {loading ? <Loading /> : <LoadMore {...loadMoreProps} />}
       </SingleColumnSection>
     </div>
   );
-}
+};
 
-const RecommendationsSamplePageComponent = registerComponent(
-  "RecommendationsSamplePage",
-  RecommendationsSamplePage,
-  {styles},
-);
+const RecommendationsSamplePageComponent = registerComponent("RecommendationsSamplePage", RecommendationsSamplePage, {
+  styles,
+});
 
 declare global {
   interface ComponentTypes {
-    RecommendationsSamplePage: typeof RecommendationsSamplePageComponent,
+    RecommendationsSamplePage: typeof RecommendationsSamplePageComponent;
   }
 }

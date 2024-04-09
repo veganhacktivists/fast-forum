@@ -9,7 +9,8 @@ const randomRecommendationSamples = async () => {
   cutoff = new Date(cutoff.setFullYear(cutoff.getFullYear() - 1));
 
   const db = getSqlClientOrThrow();
-  const posts = await db.many(`
+  const posts = await db.many(
+    `
     SELECT "_id", "title", "slug"
     FROM "Posts"
     WHERE "createdAt" > $1 AND
@@ -24,21 +25,23 @@ const randomRecommendationSamples = async () => {
       "isEvent" IS NOT TRUE
     ORDER BY RANDOM()
     LIMIT 50
-  `, [cutoff]);
+  `,
+    [cutoff],
+  );
 
   const service = new RecommendationService();
   const count = 3;
 
   const algorithms: ((postId: string) => StrategySpecification)[] = [
-    (postId: string) => ({postId, name: "moreFromTag"}),
-    (postId: string) => ({postId, name: "tagWeightedCollabFilter", bias: 0.5}),
-    (postId: string) => ({postId, name: "tagWeightedCollabFilter", bias: 1.5}),
+    (postId: string) => ({ postId, name: "moreFromTag" }),
+    (postId: string) => ({ postId, name: "tagWeightedCollabFilter", bias: 0.5 }),
+    (postId: string) => ({ postId, name: "tagWeightedCollabFilter", bias: 1.5 }),
   ];
 
   for (const algorithm of algorithms) {
-    const recommendations = await Promise.all(posts.map(({_id}) =>
-      service.recommend(null, null, count, algorithm(_id)),
-    ));
+    const recommendations = await Promise.all(
+      posts.map(({ _id }) => service.recommend(null, null, count, algorithm(_id))),
+    );
 
     let result = "";
 
@@ -60,6 +63,6 @@ const randomRecommendationSamples = async () => {
     // eslint-disable-next-line no-console
     console.log(result, "\n\n");
   }
-}
+};
 
 Globals.randomRecommendationSamples = randomRecommendationSamples;

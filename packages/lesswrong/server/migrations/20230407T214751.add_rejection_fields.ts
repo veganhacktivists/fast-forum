@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-04-04T17:05:23.000Z by 20230404T170523.add_subtitle.ts
  * +-- Overall schema hash: 380d30e2ea28cacb71bbc6d29e540a6e
- *  
+ *
  * @@ -108,3 +106,3 @@ CREATE TABLE "CommentModeratorActions" (
- *  
+ *
  * --- Schema for "Comments", hash: 31480d0beb75ffb592b7b20e68cbff13
  * +-- Schema for "Comments", hash: 1c77433ee8754e841a073c882ee2f7ef
  *  CREATE TABLE "Comments" (
@@ -24,7 +24,7 @@
  * +    "rejectedByUserId" varchar(27),
  *      "af" bool DEFAULT false,
  * @@ -459,3 +459,3 @@ CREATE TABLE "PostRelations" (
- *  
+ *
  * --- Schema for "Posts", hash: 7e15ffdf0cce8f17f7a7e1b5e09a7574
  * +-- Schema for "Posts", hash: 3af0a7c4d804abbea3f2a8396a737aeb
  *  CREATE TABLE "Posts" (
@@ -33,7 +33,7 @@
  * +    "rejected" bool DEFAULT false,
  * +    "rejectedByUserId" varchar(27),
  *      "subforumTagId" varchar(27),
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -48,16 +48,16 @@ import Comments from "../../lib/collections/comments/collection";
 import Posts from "../../lib/collections/posts/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, Posts, 'rejected');
-  await addField(db, Posts, 'rejectedByUserId');
-  await addField(db, Comments, 'rejected');
-  await addField(db, Comments, 'rejectedByUserId');
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, Posts, "rejected");
+  await addField(db, Posts, "rejectedByUserId");
+  await addField(db, Comments, "rejected");
+  await addField(db, Comments, "rejectedByUserId");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, Posts, 'rejected');
-  await dropField(db, Posts, 'rejectedByUserId');
-  await dropField(db, Comments, 'rejected');
-  await dropField(db, Comments, 'rejectedByUserId');
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, Posts, "rejected");
+  await dropField(db, Posts, "rejectedByUserId");
+  await dropField(db, Comments, "rejected");
+  await dropField(db, Comments, "rejectedByUserId");
+};

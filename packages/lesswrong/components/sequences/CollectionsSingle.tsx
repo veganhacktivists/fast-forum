@@ -1,17 +1,16 @@
-import { Components, registerComponent } from '../../lib/vulcan-lib';
-import React from 'react';
-import { useLocation } from '../../lib/routeUtil';
+import { Components, registerComponent } from "../../lib/vulcan-lib";
+import React from "react";
+import { useLocation } from "../../lib/routeUtil";
 
 const CollectionsSingle = () => {
   const { params } = useLocation();
-  return <Components.CollectionsPage documentId={params._id} />
+  return <Components.CollectionsPage documentId={params._id} />;
 };
 
-const CollectionsSingleComponent = registerComponent('CollectionsSingle', CollectionsSingle);
+const CollectionsSingleComponent = registerComponent("CollectionsSingle", CollectionsSingle);
 
 declare global {
   interface ComponentTypes {
-    CollectionsSingle: typeof CollectionsSingleComponent
+    CollectionsSingle: typeof CollectionsSingleComponent;
   }
 }
-

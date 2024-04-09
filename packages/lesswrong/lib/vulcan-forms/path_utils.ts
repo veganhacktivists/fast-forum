@@ -1,7 +1,7 @@
-import toPath from 'lodash/toPath';
-import initial from 'lodash/initial';
-import flow from 'lodash/fp/flow';
-import takeRight from 'lodash/takeRight';
+import toPath from "lodash/toPath";
+import initial from "lodash/initial";
+import flow from "lodash/fp/flow";
+import takeRight from "lodash/takeRight";
 
 /**
  * Splits a path in string format into an array.
@@ -20,15 +20,7 @@ export const splitPath = (s: string) => toPath(s);
  * @return {String}
  */
 const joinPath = (array: Array<string>) =>
-  array.reduce(
-    (str, item) =>
-      str + (
-        Number.isNaN(Number(item))
-          ? `${str === '' ? '' : '.'}${item}`
-          : `[${item}]`
-      ),
-    '',
-  );
+  array.reduce((str, item) => str + (Number.isNaN(Number(item)) ? `${str === "" ? "" : "."}${item}` : `[${item}]`), "");
 
 /**
  * Retrieves parent path from the given one.
@@ -53,10 +45,7 @@ export const removePrefix = (prefix: string, paths: string[]): string[] => {
       return path;
     }
     const explodedPath = splitPath(path);
-    const explodedSuffix = takeRight(
-      explodedPath,
-      explodedPath.length - explodedPrefix.length,
-    );
+    const explodedSuffix = takeRight(explodedPath, explodedPath.length - explodedPrefix.length);
     return joinPath(explodedSuffix);
   });
 };
@@ -69,8 +58,4 @@ export const removePrefix = (prefix: string, paths: string[]): string[] => {
  * @return {String[]}
  */
 export const filterPathsByPrefix = (prefix: string, paths: string[]): string[] =>
-  paths.filter(path => (
-    path === prefix ||
-    path.startsWith(`${prefix}.`) ||
-    path.startsWith(`${prefix}[`)
-  ));
+  paths.filter((path) => path === prefix || path.startsWith(`${prefix}.`) || path.startsWith(`${prefix}[`));

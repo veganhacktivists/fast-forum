@@ -1,7 +1,7 @@
 import { userCanUseTags } from "../../betas";
 import { addUniversalFields, getDefaultMutations, getDefaultResolvers } from "../../collectionUtils";
-import { foreignKeyField, schemaDefaultValue } from '../../utils/schemaUtils';
-import { createCollection } from '../../vulcan-lib';
+import { foreignKeyField, schemaDefaultValue } from "../../utils/schemaUtils";
+import { createCollection } from "../../vulcan-lib";
 import { userIsAdmin, userOwns } from "../../vulcan-users";
 
 const schema: SchemaType<"UserTagRels"> = {
@@ -12,8 +12,8 @@ const schema: SchemaType<"UserTagRels"> = {
       collectionName: "Tags",
       type: "Tag",
     }),
-    canRead: ['guests'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canCreate: ["members"],
   },
   userId: {
     nullable: false,
@@ -23,8 +23,8 @@ const schema: SchemaType<"UserTagRels"> = {
       collectionName: "Users",
       type: "User",
     }),
-    canRead: ['guests'],
-    canCreate: ['members'],
+    canRead: ["guests"],
+    canCreate: ["members"],
   },
   /**
    * @deprecated: may be reintroduced in the future but currently this isn't used anywhere and keeping it up to date adds extra complexity
@@ -33,16 +33,16 @@ const schema: SchemaType<"UserTagRels"> = {
     type: Date,
     optional: true,
     nullable: true,
-    hidden: true
+    hidden: true,
   },
   subforumShowUnreadInSidebar: {
     type: Boolean,
     nullable: false,
     optional: true,
     label: "Unread count in sidebar",
-    canRead: [userOwns, 'admins'],
-    canCreate: ['members', 'admins'],
-    canUpdate: [userOwns, 'admins'],
+    canRead: [userOwns, "admins"],
+    canCreate: ["members", "admins"],
+    canUpdate: [userOwns, "admins"],
     hidden: true,
     ...schemaDefaultValue(true),
   },
@@ -52,9 +52,9 @@ const schema: SchemaType<"UserTagRels"> = {
     optional: true,
     label: "Notify me of new discussions",
     // control: "SubforumNotifications", // TODO: Possibly add this back in (it shows the batching settings in the menu)
-    canRead: [userOwns, 'admins'],
-    canCreate: ['members', 'admins'],
-    canUpdate: [userOwns, 'admins'],
+    canRead: [userOwns, "admins"],
+    canCreate: ["members", "admins"],
+    canUpdate: [userOwns, "admins"],
     ...schemaDefaultValue(false),
   },
   subforumHideIntroPost: {
@@ -62,39 +62,44 @@ const schema: SchemaType<"UserTagRels"> = {
     optional: true,
     hidden: true,
     label: "Don't show the intro post at the top of topic feeds",
-    canRead: [userOwns, 'admins'],
-    canCreate: ['members', 'admins'],
-    canUpdate: [userOwns, 'admins'],
+    canRead: [userOwns, "admins"],
+    canCreate: ["members", "admins"],
+    canUpdate: [userOwns, "admins"],
     ...schemaDefaultValue(false),
   },
 };
 
 export const UserTagRels: UserTagRelsCollection = createCollection({
-  collectionName: 'UserTagRels',
-  typeName: 'UserTagRel',
+  collectionName: "UserTagRels",
+  typeName: "UserTagRel",
   schema,
-  resolvers: getDefaultResolvers('UserTagRels'),
-  mutations: getDefaultMutations('UserTagRels', {
-    newCheck: (user: DbUser|null, userTagRel: DbUserTagRel|null) => {
+  resolvers: getDefaultResolvers("UserTagRels"),
+  mutations: getDefaultMutations("UserTagRels", {
+    newCheck: (user: DbUser | null, userTagRel: DbUserTagRel | null) => {
       return userCanUseTags(user);
     },
-    editCheck: (user: DbUser|null, userTagRel: DbUserTagRel|null) => {
+    editCheck: (user: DbUser | null, userTagRel: DbUserTagRel | null) => {
       return userCanUseTags(user);
     },
-    removeCheck: (user: DbUser|null, userTagRel: DbUserTagRel|null) => {
+    removeCheck: (user: DbUser | null, userTagRel: DbUserTagRel | null) => {
       return false;
     },
   }),
   logChanges: true,
 });
-addUniversalFields({collection: UserTagRels})
+addUniversalFields({ collection: UserTagRels });
 
-UserTagRels.checkAccess = async (currentUser: DbUser|null, userTagRel: DbUserTagRel, context: ResolverContext|null): Promise<boolean> => {
-  if (userIsAdmin(currentUser) || userOwns(currentUser, userTagRel)) { // admins can always see everything, users can always see their own settings
+UserTagRels.checkAccess = async (
+  currentUser: DbUser | null,
+  userTagRel: DbUserTagRel,
+  context: ResolverContext | null,
+): Promise<boolean> => {
+  if (userIsAdmin(currentUser) || userOwns(currentUser, userTagRel)) {
+    // admins can always see everything, users can always see their own settings
     return true;
   } else {
     return false;
   }
-}
+};
 
 export default UserTagRels;

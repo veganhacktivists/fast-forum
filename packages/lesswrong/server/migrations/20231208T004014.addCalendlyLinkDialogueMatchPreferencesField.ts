@@ -12,9 +12,9 @@
  * -
  * --- Accepted on 2023-12-05T20:44:12.000Z by 20231205T204412.make_fields_not_nullable.ts
  * +-- Overall schema hash: a09712836b72d69f7456155ccc81ac83
- *  
+ *
  * @@ -264,3 +262,3 @@ CREATE TABLE "DialogueChecks" (
- *  
+ *
  * --- Schema for "DialogueMatchPreferences", hash: 325410e7914d56531d839fc137cf22f0
  * +-- Schema for "DialogueMatchPreferences", hash: 9dd09046585554d903ea22ac959ca687
  *  CREATE TABLE "DialogueMatchPreferences" (
@@ -22,7 +22,7 @@
  *      "formatNotes" text NOT NULL DEFAULT '',
  * +    "calendlyLink" text,
  *      "generatedDialogueId" text,
- * 
+ *
  * -------------------------------------------
  * (run `git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql` to see this more clearly)
  *
@@ -36,10 +36,10 @@ export const acceptsSchemaHash = "a09712836b72d69f7456155ccc81ac83";
 import DialogueMatchPreferences from "../../lib/collections/dialogueMatchPreferences/collection";
 import { addField, dropField } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
-  await addField(db, DialogueMatchPreferences, "calendlyLink")
-}
+export const up = async ({ db }: MigrationContext) => {
+  await addField(db, DialogueMatchPreferences, "calendlyLink");
+};
 
-export const down = async ({db}: MigrationContext) => {
-  await dropField(db, DialogueMatchPreferences, "calendlyLink")
-}
+export const down = async ({ db }: MigrationContext) => {
+  await dropField(db, DialogueMatchPreferences, "calendlyLink");
+};

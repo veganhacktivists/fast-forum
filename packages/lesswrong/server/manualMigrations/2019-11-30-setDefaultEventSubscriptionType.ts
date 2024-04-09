@@ -1,7 +1,6 @@
-import { registerMigration, fillDefaultValues } from './migrationUtils';
-import { recomputeDenormalizedValues } from '../scripts/recomputeDenormalized';
-import Users from '../../lib/collections/users/collection';
-
+import { registerMigration, fillDefaultValues } from "./migrationUtils";
+import { recomputeDenormalizedValues } from "../scripts/recomputeDenormalized";
+import Users from "../../lib/collections/users/collection";
 
 registerMigration({
   name: "setDefaultEventSubscriptionType",
@@ -12,7 +11,7 @@ registerMigration({
       collection: Users,
       fieldName: "notificationEventInRadius",
     });
-    await recomputeDenormalizedValues({collectionName: "Users", fieldName: "nearbyEventsNotificationsMongoLocation"})
-    await recomputeDenormalizedValues({collectionName: "Users", fieldName: "mongoLocation"})
+    await recomputeDenormalizedValues({ collectionName: "Users", fieldName: "nearbyEventsNotificationsMongoLocation" });
+    await recomputeDenormalizedValues({ collectionName: "Users", fieldName: "mongoLocation" });
   },
 });

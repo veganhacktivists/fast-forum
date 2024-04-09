@@ -1,37 +1,37 @@
-import React from 'react';
-import { postGetPageUrl, postGetLink, postGetLinkTarget } from '../../lib/collections/posts/helpers';
-import { Components, registerComponent } from '../../lib/vulcan-lib/components';
-import { useSingle } from '../../lib/crud/withSingle';
-import './EmailFormatDate';
-import './EmailPostAuthors';
-import './EmailContentItemBody';
-import './EmailPostDate';
-import './EmailFooterRecommendations';
+import React from "react";
+import { postGetPageUrl, postGetLink, postGetLinkTarget } from "../../lib/collections/posts/helpers";
+import { Components, registerComponent } from "../../lib/vulcan-lib/components";
+import { useSingle } from "../../lib/crud/withSingle";
+import "./EmailFormatDate";
+import "./EmailPostAuthors";
+import "./EmailContentItemBody";
+import "./EmailPostDate";
+import "./EmailFooterRecommendations";
 
 const styles = (theme: ThemeType): JssStyles => ({
   heading: {
     textAlign: "center",
     color: theme.palette.primary.main,
-    marginBottom: 30
+    marginBottom: 30,
   },
   headingRow: {
-    marginBottom: 8
+    marginBottom: 8,
   },
 
   podcastRow: {
-    '& p': {
+    "& p": {
       marginBottom: 16,
     },
-    fontStyle: "italic"
+    fontStyle: "italic",
   },
-  
+
   headingLink: {
     color: theme.palette.text.maxIntensity,
     textDecoration: "none",
     fontWeight: "normal",
-    fontFamily: "Arial, sans-serif"
+    fontFamily: "Arial, sans-serif",
   },
-  
+
   headingHR: {
     width: 210,
     height: 0,
@@ -47,113 +47,149 @@ const styles = (theme: ThemeType): JssStyles => ({
 });
 
 const getPodcastInfoElement = (podcastEpisode: PostsDetails_podcastEpisode) => {
-  const { podcast: { applePodcastLink, spotifyPodcastLink }, episodeLink, externalEpisodeId } = podcastEpisode;
+  const {
+    podcast: { applePodcastLink, spotifyPodcastLink },
+    episodeLink,
+    externalEpisodeId,
+  } = podcastEpisode;
   const episodeUrl = new URL(episodeLink);
 
   // episodeLink is something like https://www.buzzsprout.com/2037297/11391281-...
   // But they can also have multiple forward slashes between the origin and the podcast ID
   // Therefore, the first element returned by `episodeUrl.pathname.split('/').filter(pathSection => !!pathSection)` is `2037297`
-  const [buzzsproutPodcastId] = episodeUrl.pathname.split('/').filter(pathSection => !!pathSection);
+  const [buzzsproutPodcastId] = episodeUrl.pathname.split("/").filter((pathSection) => !!pathSection);
   const buzzsproutEpisodePath = `${buzzsproutPodcastId}/${externalEpisodeId}`;
 
   const directEpisodeUrl = new URL(episodeUrl.origin);
   directEpisodeUrl.pathname = buzzsproutEpisodePath;
 
-  const buzzsproutLinkElement = <a href={directEpisodeUrl.toString()}>Buzzsprout</a>
+  const buzzsproutLinkElement = <a href={directEpisodeUrl.toString()}>Buzzsprout</a>;
   const spotifyLinkElement = spotifyPodcastLink ? <a href={spotifyPodcastLink}>Spotify</a> : undefined;
   const appleLinkElement = applePodcastLink ? <a href={applePodcastLink}>Apple Podcasts</a> : undefined;
 
   const externalDirectoryAvailability = !!spotifyLinkElement && !!appleLinkElement;
 
-  return <p>
-    Listen to the podcast version of this post on {buzzsproutLinkElement}.
-    {externalDirectoryAvailability ? <>  You can also find it on {spotifyLinkElement} and {appleLinkElement}.</> : <></>}
-  </p>;
+  return (
+    <p>
+      Listen to the podcast version of this post on {buzzsproutLinkElement}.
+      {externalDirectoryAvailability ? (
+        <>
+          {" "}
+          You can also find it on {spotifyLinkElement} and {appleLinkElement}.
+        </>
+      ) : (
+        <></>
+      )}
+    </p>
+  );
 };
 
-const NewPostEmail = ({documentId, reason, hideRecommendations, classes}: {
-  documentId: string,
-  reason?: string,
-  hideRecommendations?: boolean,
-  classes: any,
+const NewPostEmail = ({
+  documentId,
+  reason,
+  hideRecommendations,
+  classes,
+}: {
+  documentId: string;
+  reason?: string;
+  hideRecommendations?: boolean;
+  classes: any;
 }) => {
   const { document } = useSingle({
     documentId,
-    
+
     collectionName: "Posts",
     fragmentName: "PostsRevision",
     extraVariables: {
-      version: 'String'
-    }
+      version: "String",
+    },
   });
   const { EmailPostAuthors, EmailContentItemBody, EmailPostDate, EmailFooterRecommendations } = Components;
   if (!document) return null;
-  
+
   // event location - for online events, attempt to show the meeting link
-  let eventLocation: string|JSX.Element = document.location
+  let eventLocation: string | JSX.Element = document.location;
   if (document.onlineEvent) {
-    eventLocation = document.joinEventLink ? <a
-      className={classes.onlineEventLocation}
-      href={document.joinEventLink}
-      target="_blank" rel="noopener noreferrer">
+    eventLocation = document.joinEventLink ? (
+      <a
+        className={classes.onlineEventLocation}
+        href={document.joinEventLink}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         {document.joinEventLink}
-    </a> : "Online Event"
+      </a>
+    ) : (
+      "Online Event"
+    );
   }
 
-  return (<React.Fragment>
-    <div className={classes.heading}>
-      <h1>
-        <a href={postGetPageUrl(document, true)} className={classes.headingLink}>{document.title}</a>
-      </h1>
-      
-      <hr className={classes.headingHR}/>
-      
-      <div className={classes.headingRow}>
-        <EmailPostAuthors post={document}/>
-      </div>
-      <div className={classes.headingRow}>
-        <EmailPostDate post={document}/>
-      </div>
-      {document.isEvent && <div className={classes.headingRow}>
-        {eventLocation}
-      </div>}
-      {document.contactInfo && <div className={classes.headingRow}>
-        Contact: {document.contactInfo}
-      </div>}
-      
-      {document.url && <div className={classes.headingRow}>
-        This is a linkpost for <a href={postGetLink(document)} target={postGetLinkTarget(document)}>{document.url}</a>
-      </div>}
-    </div>
+  return (
+    <React.Fragment>
+      <div className={classes.heading}>
+        <h1>
+          <a href={postGetPageUrl(document, true)} className={classes.headingLink}>
+            {document.title}
+          </a>
+        </h1>
 
-    {document.podcastEpisode && <div className={classes.podcastRow}>
-      {getPodcastInfoElement(document.podcastEpisode)}
-      <hr />
-    </div>}
-    
-    {document.contents && <EmailContentItemBody className="post-body" dangerouslySetInnerHTML={{
-      __html: document.contents.html
-    }} />}
-    
-    <a href={postGetPageUrl(document, true)}>Discuss</a>
-    
-    {!hideRecommendations && (
-      <>
-        <hr className={classes.hr}/>
-        <EmailFooterRecommendations />
-      </>
-    )}
-    
-    <hr className={classes.hr}/>
-    
-    {reason && `You are receiving this email because ${reason}.`}
-  </React.Fragment>);
-}
+        <hr className={classes.headingHR} />
 
-const NewPostEmailComponent = registerComponent("NewPostEmail", NewPostEmail, {styles});
+        <div className={classes.headingRow}>
+          <EmailPostAuthors post={document} />
+        </div>
+        <div className={classes.headingRow}>
+          <EmailPostDate post={document} />
+        </div>
+        {document.isEvent && <div className={classes.headingRow}>{eventLocation}</div>}
+        {document.contactInfo && <div className={classes.headingRow}>Contact: {document.contactInfo}</div>}
+
+        {document.url && (
+          <div className={classes.headingRow}>
+            This is a linkpost for{" "}
+            <a href={postGetLink(document)} target={postGetLinkTarget(document)}>
+              {document.url}
+            </a>
+          </div>
+        )}
+      </div>
+
+      {document.podcastEpisode && (
+        <div className={classes.podcastRow}>
+          {getPodcastInfoElement(document.podcastEpisode)}
+          <hr />
+        </div>
+      )}
+
+      {document.contents && (
+        <EmailContentItemBody
+          className="post-body"
+          dangerouslySetInnerHTML={{
+            __html: document.contents.html,
+          }}
+        />
+      )}
+
+      <a href={postGetPageUrl(document, true)}>Discuss</a>
+
+      {!hideRecommendations && (
+        <>
+          <hr className={classes.hr} />
+          <EmailFooterRecommendations />
+        </>
+      )}
+
+      <hr className={classes.hr} />
+
+      {reason && `You are receiving this email because ${reason}.`}
+    </React.Fragment>
+  );
+};
+
+const NewPostEmailComponent = registerComponent("NewPostEmail", NewPostEmail, { styles });
 
 declare global {
   interface ComponentTypes {
-    NewPostEmail: typeof NewPostEmailComponent
+    NewPostEmail: typeof NewPostEmailComponent;
   }
 }

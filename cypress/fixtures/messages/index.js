@@ -1,5 +1,3 @@
-const testMessage = require('./testMessage');
+const testMessage = require("./testMessage");
 
-module.exports = [
-  testMessage,
-];
+module.exports = [testMessage];

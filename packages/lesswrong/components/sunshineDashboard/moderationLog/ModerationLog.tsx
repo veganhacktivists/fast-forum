@@ -1,24 +1,24 @@
-import React from 'react';
-import { Components, registerComponent } from '../../../lib/vulcan-lib';
-import { Posts } from '../../../lib/collections/posts';
-import { postGetPageUrl } from '../../../lib/collections/posts/helpers';
-import { Comments } from '../../../lib/collections/comments'
-import Users from '../../../lib/collections/users/collection';
-import { Link } from '../../../lib/reactRouterWrapper'
-import classNames from 'classnames';
-import { useCurrentUser } from '../../common/withUser';
-import { isMod } from '../../../lib/collections/users/helpers';
-import { forumSelect } from '../../../lib/forumTypeUtils';
-import type { Column } from '../../vulcan-core/Datatable';
-import { ModeratorActions } from '../../../lib/collections/moderatorActions'
-import { UserRateLimits } from '../../../lib/collections/userRateLimits';
+import React from "react";
+import { Components, registerComponent } from "../../../lib/vulcan-lib";
+import { Posts } from "../../../lib/collections/posts";
+import { postGetPageUrl } from "../../../lib/collections/posts/helpers";
+import { Comments } from "../../../lib/collections/comments";
+import Users from "../../../lib/collections/users/collection";
+import { Link } from "../../../lib/reactRouterWrapper";
+import classNames from "classnames";
+import { useCurrentUser } from "../../common/withUser";
+import { isMod } from "../../../lib/collections/users/helpers";
+import { forumSelect } from "../../../lib/forumTypeUtils";
+import type { Column } from "../../vulcan-core/Datatable";
+import { ModeratorActions } from "../../../lib/collections/moderatorActions";
+import { UserRateLimits } from "../../../lib/collections/userRateLimits";
 
 const shouldShowEndUserModerationToNonMods = forumSelect({
   EAForum: false,
   LessWrong: true,
   AlignmentForum: true,
   default: true,
-})
+});
 
 const styles = (theme: JssStyles) => ({
   root: {
@@ -33,177 +33,165 @@ const styles = (theme: JssStyles) => ({
     "& h1": {
       ...theme.typography.display3,
     },
-  
+
     "& h2": {
       ...theme.typography.display2,
     },
-  
+
     "& h3": {
       ...theme.typography.display1,
       marginTop: 0,
       marginBottom: "0.5em",
     },
-  }
-})
+  },
+});
 
+const DateDisplay = ({ column, document }: { column: Column; document: AnyBecauseTodo }) => {
+  return <div>{document[column.name] && <Components.FormatDate date={document[column.name]} />}</div>;
+};
 
-const DateDisplay = ({column, document}: {
-  column: Column;
-  document: AnyBecauseTodo;
-}) => {
-  return <div>{document[column.name] && <Components.FormatDate date={document[column.name]}/>}</div>
-}
+const PostDisplay = ({ column, document }: { column: Column; document: AnyBecauseTodo }) => {
+  const post = document.post || document;
+  return (
+    <Link rel="nofollow" to={postGetPageUrl(post) + "#" + document._id}>
+      {post.title}
+    </Link>
+  );
+};
 
-const PostDisplay = ({column, document}: {
-  column: Column;
-  document: AnyBecauseTodo;
-}) => {
-  const post = document.post || document
-  return <Link rel="nofollow" to={postGetPageUrl(post) + "#" + document._id }>{ post.title }</Link>
-}
+const UserDisplay = ({ column, document }: { column: Column; document: AnyBecauseTodo }) => {
+  const user = document.user || document;
+  return (
+    <div>
+      <Components.UsersName user={user} nofollow />
+    </div>
+  );
+};
 
-const UserDisplay = ({column, document}: {
-  column: Column;
-  document: AnyBecauseTodo;
-}) => {
-  const user = document.user || document
-  return <div>
-    <Components.UsersName user={user} nofollow />
-  </div>
-}
+const DeletedByUserDisplay = ({ column, document }: { column: Column; document: AnyBecauseTodo }) => {
+  const user = document.deletedByUser || document.user || document;
+  return (
+    <span>
+      <Components.UsersName user={user} nofollow />
+    </span>
+  );
+};
 
-const DeletedByUserDisplay = ({column, document}: {
-  column: Column;
-  document: AnyBecauseTodo;
-}) => {
-  const user = document.deletedByUser || document.user || document
-  return <span>
-    <Components.UsersName user={user} nofollow />
-  </span>
-}
+const BannedUsersDisplay = ({ column, document }: { column: Column; document: AnyBecauseTodo }) => {
+  const bannedUsers = document[column.name] ?? [];
+  return (
+    <div>
+      {bannedUsers.map((userId: string) => (
+        <div key={userId}>
+          <Components.UsersNameWrapper documentId={userId} nofollow />
+        </div>
+      ))}
+    </div>
+  );
+};
 
-
-const BannedUsersDisplay = ({column, document}: {
-  column: Column;
-  document: AnyBecauseTodo;
-}) => {
-  const bannedUsers = document[column.name] ?? []
-  return <div>
-    { bannedUsers.map((userId: string) => <div key={userId}>
-      <Components.UsersNameWrapper documentId={userId} nofollow />
-      </div>)}
-  </div>
-}
-
-const ModeratorTypeDisplay = ({column, document}: {
-  column: Column;
-  document: AnyBecauseTodo;
-}) => {
-  return <div>{document[column.name]}</div>
-}
-
+const ModeratorTypeDisplay = ({ column, document }: { column: Column; document: AnyBecauseTodo }) => {
+  return <div>{document[column.name]}</div>;
+};
 
 const deletedCommentColumns: Column[] = [
   {
-    name: 'Comment Author',
+    name: "Comment Author",
     component: UserDisplay,
   },
   {
-    name: 'post',
+    name: "post",
     component: PostDisplay,
   },
   {
-    name: 'deletedByUser',
+    name: "deletedByUser",
     component: DeletedByUserDisplay,
   },
   {
-    name: 'deletedDate',
-    label: 'Deleted Date',
+    name: "deletedDate",
+    label: "Deleted Date",
     component: DateDisplay,
   },
   {
-    name:'deletedPublic',
-    label:'Deleted Public'
+    name: "deletedPublic",
+    label: "Deleted Public",
   },
   {
-    name:'deletedReason',
-    label:'Reason'
+    name: "deletedReason",
+    label: "Reason",
   },
-]
+];
 
 const moderatorActionColumns: Column[] = [
   {
-    name: 'user',
-    component: UserDisplay
+    name: "user",
+    component: UserDisplay,
   },
   {
-    name: 'endedAt',
+    name: "endedAt",
     component: DateDisplay,
   },
   {
-    name: 'type',
-    component: ModeratorTypeDisplay
-  }
-]
+    name: "type",
+    component: ModeratorTypeDisplay,
+  },
+];
 
 const userRateLimitColumns: Column[] = [
   {
-    name: 'user',
-    component: UserDisplay
+    name: "user",
+    component: UserDisplay,
   },
   {
-    name: 'endedAt',
+    name: "endedAt",
     component: DateDisplay,
   },
   {
-    name: 'type',
-    component: ModeratorTypeDisplay
-  }
-]
+    name: "type",
+    component: ModeratorTypeDisplay,
+  },
+];
 
 const usersBannedFromPostsColumns: Column[] = [
   {
-    name: 'user',
+    name: "user",
     label: "Author",
     component: UserDisplay,
   },
   {
-    name: '_id',
-    label: 'Post',
+    name: "_id",
+    label: "Post",
     component: PostDisplay,
   },
   {
-    name:'bannedUserIds',
-    label:'Banned Users',
-    component: BannedUsersDisplay
+    name: "bannedUserIds",
+    label: "Banned Users",
+    component: BannedUsersDisplay,
   },
-]
+];
 
 const usersBannedFromUsersColumns: Column[] = [
   {
-    name: '_id',
+    name: "_id",
     component: UserDisplay,
   },
   {
-    name:'bannedUserIds',
-    label:'Banned From Frontpage',
-    component: BannedUsersDisplay
+    name: "bannedUserIds",
+    label: "Banned From Frontpage",
+    component: BannedUsersDisplay,
   },
   {
-    name:'bannedPersonalUserIds',
-    label:'Banned from Personal Posts',
-    component: BannedUsersDisplay
+    name: "bannedPersonalUserIds",
+    label: "Banned from Personal Posts",
+    component: BannedUsersDisplay,
   },
-]
+];
 
-const ModerationLog = ({classes}: {
-  classes: ClassesType
-}) => {
-  const currentUser = useCurrentUser()
-  const shouldShowEndUserModeration = (currentUser && isMod(currentUser)) ||
-    shouldShowEndUserModerationToNonMods
-  const { SingleColumnSection, RejectedPostsList, RejectedCommentsList, SectionTitle, ToCColumn, TableOfContents } = Components;
-  
+const ModerationLog = ({ classes }: { classes: ClassesType }) => {
+  const currentUser = useCurrentUser();
+  const shouldShowEndUserModeration = (currentUser && isMod(currentUser)) || shouldShowEndUserModerationToNonMods;
+  const { SingleColumnSection, RejectedPostsList, RejectedCommentsList, SectionTitle, ToCColumn, TableOfContents } =
+    Components;
 
   const sectionData = {
     html: "",
@@ -211,111 +199,110 @@ const ModerationLog = ({classes}: {
       {
         title: "Deleted Comments",
         anchor: "deleted-comments",
-        level: 1
+        level: 1,
       },
       {
         title: "Users Banned From Posts",
         anchor: "users-banned-from-posts",
-        level: 1
+        level: 1,
       },
       {
         title: "Users Banned From Users",
         anchor: "users-banned-from-users",
-        level: 1
+        level: 1,
       },
       {
         title: "Moderated Users",
         anchor: "moderated-users",
-        level: 1
+        level: 1,
       },
       {
         title: "Rejected Posts",
         anchor: "rejected-posts",
-        level: 1
+        level: 1,
       },
       {
         title: "Rejected Comments",
         anchor: "rejected-comments",
-        level: 1
+        level: 1,
       },
     ],
-    headingsCount: 0
-  }
+    headingsCount: 0,
+  };
 
   return (
-    <ToCColumn tableOfContents={<TableOfContents
-        sectionData={sectionData}
-        title={"Moderation Log"}
-      />}>
+    <ToCColumn tableOfContents={<TableOfContents sectionData={sectionData} title={"Moderation Log"} />}>
       <SingleColumnSection className={classes.root}>
-        <SectionTitle title="Moderation Log"/>
+        <SectionTitle title="Moderation Log" />
         <div className={classes.section}>
           <h3 id="deleted-comments">Deleted Comments</h3>
           <Components.Datatable
             collectionName="Comments"
             columns={deletedCommentColumns}
-            fragmentName={'DeletedCommentsModerationLog'}
-            terms={{view: "allCommentsDeleted"}}
+            fragmentName={"DeletedCommentsModerationLog"}
+            terms={{ view: "allCommentsDeleted" }}
             limit={10}
           />
         </div>
-        {shouldShowEndUserModeration && <>
-          <div className={classNames(classes.section, classes.floatLeft)}>
-            <h3 id="users-banned-from-posts">Users Banned From Posts</h3>
-            <Components.Datatable
-              collectionName="Posts"
-              columns={usersBannedFromPostsColumns}
-              fragmentName={'UsersBannedFromPostsModerationLog'}
-              terms={{view: "postsWithBannedUsers"}}
-              limit={10}
-            />
-          </div>
-          <div className={classNames(classes.section, classes.floatLeft)}>
-            <h3 id="users-banned-from-users">Users Banned From Users</h3>
-            <Components.Datatable
-              collectionName="Users"
-              columns={usersBannedFromUsersColumns}
-              fragmentName={'UsersBannedFromUsersModerationLog'}
-              terms={{view: "usersWithBannedUsers"}}
-              limit={10}
-            />
-          </div>
-          <div className={classes.section}>
-            <h3 id="moderated-users">Moderated Users</h3>
-            <Components.Datatable
-              collectionName="ModeratorActions"
-              columns={moderatorActionColumns}
-              terms={{view: "restrictionModerationActions"}}
-              fragmentName={'ModeratorActionDisplay'}
-              limit={10}
-            />
-          </div>
-          <div className={classes.section}>
-            <h3 id="rate-limited-users">Rate Limited Users</h3>
-            <Components.Datatable
-              collectionName="UserRateLimits"
-              columns={userRateLimitColumns}
-              terms={{view: "activeUserRateLimits"}}
-              fragmentName={'UserRateLimitDisplay'}
-              limit={10}
-            />
-          </div>
-        </>}
+        {shouldShowEndUserModeration && (
+          <>
+            <div className={classNames(classes.section, classes.floatLeft)}>
+              <h3 id="users-banned-from-posts">Users Banned From Posts</h3>
+              <Components.Datatable
+                collectionName="Posts"
+                columns={usersBannedFromPostsColumns}
+                fragmentName={"UsersBannedFromPostsModerationLog"}
+                terms={{ view: "postsWithBannedUsers" }}
+                limit={10}
+              />
+            </div>
+            <div className={classNames(classes.section, classes.floatLeft)}>
+              <h3 id="users-banned-from-users">Users Banned From Users</h3>
+              <Components.Datatable
+                collectionName="Users"
+                columns={usersBannedFromUsersColumns}
+                fragmentName={"UsersBannedFromUsersModerationLog"}
+                terms={{ view: "usersWithBannedUsers" }}
+                limit={10}
+              />
+            </div>
+            <div className={classes.section}>
+              <h3 id="moderated-users">Moderated Users</h3>
+              <Components.Datatable
+                collectionName="ModeratorActions"
+                columns={moderatorActionColumns}
+                terms={{ view: "restrictionModerationActions" }}
+                fragmentName={"ModeratorActionDisplay"}
+                limit={10}
+              />
+            </div>
+            <div className={classes.section}>
+              <h3 id="rate-limited-users">Rate Limited Users</h3>
+              <Components.Datatable
+                collectionName="UserRateLimits"
+                columns={userRateLimitColumns}
+                terms={{ view: "activeUserRateLimits" }}
+                fragmentName={"UserRateLimitDisplay"}
+                limit={10}
+              />
+            </div>
+          </>
+        )}
         <div>
-          <SectionTitle title="Rejected Posts" anchor="rejected-posts"/>
+          <SectionTitle title="Rejected Posts" anchor="rejected-posts" />
           <RejectedPostsList />
-          <SectionTitle title="Rejected Comments" anchor="rejected-comments"/>
+          <SectionTitle title="Rejected Comments" anchor="rejected-comments" />
           <RejectedCommentsList />
         </div>
       </SingleColumnSection>
     </ToCColumn>
-  )
-}
+  );
+};
 
-const ModerationLogComponent = registerComponent('ModerationLog', ModerationLog, {styles});
+const ModerationLogComponent = registerComponent("ModerationLog", ModerationLog, { styles });
 
 declare global {
   interface ComponentTypes {
-    ModerationLog: typeof ModerationLogComponent
+    ModerationLog: typeof ModerationLogComponent;
   }
 }

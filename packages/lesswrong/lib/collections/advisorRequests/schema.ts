@@ -1,27 +1,27 @@
-import { foreignKeyField, schemaDefaultValue } from '../../utils/schemaUtils'
-import { userOwns } from '../../vulcan-users/permissions';
-import SimpleSchema from 'simpl-schema';
+import { foreignKeyField, schemaDefaultValue } from "../../utils/schemaUtils";
+import { userOwns } from "../../vulcan-users/permissions";
+import SimpleSchema from "simpl-schema";
 
 export interface JobAdsType {
-  state: 'seen'|'expanded'|'interested'|'uninterested'
-  uninterestedReason?: string
-  lastUpdated: Date
+  state: "seen" | "expanded" | "interested" | "uninterested";
+  uninterestedReason?: string;
+  lastUpdated: Date;
 }
 const jobAdsType = new SimpleSchema({
   state: {
     type: String,
-    allowedValues: ['seen', 'expanded', 'interested', 'uninterested'],
+    allowedValues: ["seen", "expanded", "interested", "uninterested"],
   },
   uninterestedReason: {
     type: String,
     optional: true,
-    nullable: true
+    nullable: true,
   },
   lastUpdated: {
     type: Date,
-    optional: true
+    optional: true,
   },
-})
+});
 
 const schema: SchemaType<"AdvisorRequests"> = {
   userId: {
@@ -35,18 +35,18 @@ const schema: SchemaType<"AdvisorRequests"> = {
     }),
     nullable: false,
     hidden: true,
-    canCreate: ['members', 'admins'],
-    canRead: [userOwns, 'admins'],
-    canUpdate: [userOwns, 'admins'],
+    canCreate: ["members", "admins"],
+    canRead: [userOwns, "admins"],
+    canUpdate: [userOwns, "admins"],
   },
   interestedInMetaculus: {
     type: Boolean,
     optional: true,
     // TODO not-null: is this collection being used at all?
     hidden: true,
-    canCreate: ['members', 'admins'],
-    canRead: [userOwns, 'admins'],
-    canUpdate: [userOwns, 'admins'],
+    canCreate: ["members", "admins"],
+    canRead: [userOwns, "admins"],
+    canUpdate: [userOwns, "admins"],
     ...schemaDefaultValue(false),
   },
   jobAds: {
@@ -56,13 +56,13 @@ const schema: SchemaType<"AdvisorRequests"> = {
     // TODO not-null: is this collection being used at all?
     hidden: true,
     blackbox: true,
-    canCreate: ['members', 'admins'],
-    canRead: [userOwns, 'admins'],
-    canUpdate: [userOwns, 'admins'],
+    canCreate: ["members", "admins"],
+    canRead: [userOwns, "admins"],
+    canUpdate: [userOwns, "admins"],
   },
-  'jobAds.$': {
+  "jobAds.$": {
     type: jobAdsType,
-    canRead: ['members'],
+    canRead: ["members"],
   },
 };
 

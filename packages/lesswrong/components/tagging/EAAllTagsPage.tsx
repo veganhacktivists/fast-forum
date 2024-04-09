@@ -1,24 +1,28 @@
-import React, { useState } from 'react';
-import { registerComponent, Components } from '../../lib/vulcan-lib';
-import { useTagBySlug } from './useTag';
-import { EditTagForm } from './EditTagPage';
-import { userCanEditTagPortal } from '../../lib/betas'
-import { useCurrentUser } from '../common/withUser';
+import React, { useState } from "react";
+import { registerComponent, Components } from "../../lib/vulcan-lib";
+import { useTagBySlug } from "./useTag";
+import { EditTagForm } from "./EditTagPage";
+import { userCanEditTagPortal } from "../../lib/betas";
+import { useCurrentUser } from "../common/withUser";
 import { AnalyticsContext } from "../../lib/analyticsEvents";
-import { Link } from '../../lib/reactRouterWrapper';
-import AddBoxIcon from '@material-ui/icons/AddBox';
-import { useDialog } from '../common/withDialog';
-import { taggingNameCapitalSetting, taggingNamePluralCapitalSetting, taggingNamePluralSetting } from '../../lib/instanceSettings';
-import { tagCreateUrl, tagUserHasSufficientKarma } from '../../lib/collections/tags/helpers';
+import { Link } from "../../lib/reactRouterWrapper";
+import AddBoxIcon from "@material-ui/icons/AddBox";
+import { useDialog } from "../common/withDialog";
+import {
+  taggingNameCapitalSetting,
+  taggingNamePluralCapitalSetting,
+  taggingNamePluralSetting,
+} from "../../lib/instanceSettings";
+import { tagCreateUrl, tagUserHasSufficientKarma } from "../../lib/collections/tags/helpers";
 
 const styles = (theme: ThemeType): JssStyles => ({
   coreTagsTitle: {
-    [theme.breakpoints.down('sm')]: {
-      marginTop: 20
-    }
+    [theme.breakpoints.down("sm")]: {
+      marginTop: 20,
+    },
   },
   portalSection: {
-    marginBottom: theme.spacing.unit*8,
+    marginBottom: theme.spacing.unit * 8,
   },
   alphabetical: {
     columns: 5,
@@ -26,19 +30,19 @@ const styles = (theme: ThemeType): JssStyles => ({
     columnGap: 0,
     background: theme.palette.panelBackground.default,
     padding: 20,
-    marginBottom: 24
+    marginBottom: 24,
   },
   portal: {
     marginBottom: 18,
     position: "relative",
     borderRadius: theme.borderRadius.default,
-    [theme.breakpoints.down('xs')]: {
-      '& td': {
-        display: 'block',
-        width: '100% !important',
-        height: 'inherit !important'
-      }
-    }
+    [theme.breakpoints.down("xs")]: {
+      "& td": {
+        display: "block",
+        width: "100% !important",
+        height: "inherit !important",
+      },
+    },
   },
   edit: {
     float: "right",
@@ -48,21 +52,27 @@ const styles = (theme: ThemeType): JssStyles => ({
   addTagButton: {
     verticalAlign: "middle",
   },
-})
+});
 
-
-const EAAllTagsPage = ({classes}: {
-  classes: ClassesType,
-}) => {
-  const { openDialog } = useDialog()
-  const currentUser = useCurrentUser()
+const EAAllTagsPage = ({ classes }: { classes: ClassesType }) => {
+  const { openDialog } = useDialog();
+  const currentUser = useCurrentUser();
   const { tag } = useTagBySlug("portal", "AllTagsPageFragment");
-  const [ editing, setEditing ] = useState(false)
+  const [editing, setEditing] = useState(false);
 
-  const { AllTagsAlphabetical, SectionButton, SectionTitle, ContentItemBody, ContentStyles, Loading, CoreTagsSection, SingleColumnSection } = Components;
+  const {
+    AllTagsAlphabetical,
+    SectionButton,
+    SectionTitle,
+    ContentItemBody,
+    ContentStyles,
+    Loading,
+    CoreTagsSection,
+    SingleColumnSection,
+  } = Components;
 
-  const portalTitle = `FAST Forum ${`${taggingNamePluralCapitalSetting.get()} `}Wiki`
-  
+  const portalTitle = `FAST Forum ${`${taggingNamePluralCapitalSetting.get()} `}Wiki`;
+
   const htmlWithAnchors = tag?.tableOfContents?.html || tag?.description?.html || "";
 
   return (
@@ -78,12 +88,12 @@ const EAAllTagsPage = ({classes}: {
       </SingleColumnSection>
     </AnalyticsContext>
   );
-}
+};
 
-const EAAllTagsPageComponent = registerComponent("EAAllTagsPage", EAAllTagsPage, {styles});
+const EAAllTagsPageComponent = registerComponent("EAAllTagsPage", EAAllTagsPage, { styles });
 
 declare global {
   interface ComponentTypes {
-    EAAllTagsPage: typeof EAAllTagsPageComponent
+    EAAllTagsPage: typeof EAAllTagsPageComponent;
   }
 }

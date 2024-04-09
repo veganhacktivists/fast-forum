@@ -1,3 +1,2 @@
-
-const createMathjaxPlugin: AnyBecauseTodo
-export default createMathjaxPlugin
+const createMathjaxPlugin: AnyBecauseTodo;
+export default createMathjaxPlugin;

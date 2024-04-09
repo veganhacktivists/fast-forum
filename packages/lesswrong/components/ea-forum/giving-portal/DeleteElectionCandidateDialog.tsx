@@ -21,14 +21,18 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
-const DeleteElectionCandidateDialog = ({candidateId, onClose, classes}: {
-  candidateId: string,
-  onClose: () => void,
-  classes: ClassesType,
+const DeleteElectionCandidateDialog = ({
+  candidateId,
+  onClose,
+  classes,
+}: {
+  candidateId: string;
+  onClose: () => void;
+  classes: ClassesType;
 }) => {
-  const {flash} = useMessages();
+  const { flash } = useMessages();
   const navigate = useNavigate();
-  const {deleteDocument} = useDelete({
+  const { deleteDocument } = useDelete({
     collectionName: "ElectionCandidates",
     fragment: getFragment("ElectionCandidateBasicInfo"),
   });
@@ -42,7 +46,7 @@ const DeleteElectionCandidateDialog = ({candidateId, onClose, classes}: {
       });
       onClose?.();
       flash("Candidate deleted");
-      navigate({pathname: "/admin/election-candidates"});
+      navigate({ pathname: "/admin/election-candidates" });
     } catch (e) {
       flash(`Error: ${e.message}`);
     }
@@ -53,7 +57,7 @@ const DeleteElectionCandidateDialog = ({candidateId, onClose, classes}: {
     return null;
   }
 
-  const {SectionTitle, LWDialog, EAButton} = Components;
+  const { SectionTitle, LWDialog, EAButton } = Components;
   return (
     <LWDialog open onClose={onClose}>
       <div className={classes.root}>
@@ -71,12 +75,12 @@ const DeleteElectionCandidateDialog = ({candidateId, onClose, classes}: {
       </div>
     </LWDialog>
   );
-}
+};
 
 const DeleteElectionCandidateDialogComponent = registerComponent(
   "DeleteElectionCandidateDialog",
   DeleteElectionCandidateDialog,
-  {styles},
+  { styles },
 );
 
 declare global {

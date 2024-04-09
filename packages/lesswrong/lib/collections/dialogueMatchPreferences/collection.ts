@@ -7,13 +7,13 @@ import DialogueChecks from "../dialogueChecks/collection";
 import schema from "./schema";
 
 const options: MutationOptions<DbDialogueMatchPreference> = {
-  newCheck: async (user: DbUser|null, document: DbDialogueMatchPreference|null) => {
+  newCheck: async (user: DbUser | null, document: DbDialogueMatchPreference | null) => {
     if (!user || !document) return false;
     const dialogueCheck = await DialogueChecks.findOne(document.dialogueCheckId);
     return !!dialogueCheck && userOwns(user, dialogueCheck);
   },
 
-  editCheck: async (user: DbUser|null, document: DbDialogueMatchPreference|null) => {
+  editCheck: async (user: DbUser | null, document: DbDialogueMatchPreference | null) => {
     if (!user || !document) return false;
     const dialogueCheck = await DialogueChecks.findOne(document.dialogueCheckId);
     if (!dialogueCheck) return false;
@@ -21,22 +21,26 @@ const options: MutationOptions<DbDialogueMatchPreference> = {
     return userOwns(user, dialogueCheck) || userIsAdmin(user);
   },
 
-  removeCheck: (user: DbUser|null, document: DbDialogueMatchPreference|null) => {
-    // Nobody should be allowed to remove documents completely from the DB. 
-    return false
+  removeCheck: (user: DbUser | null, document: DbDialogueMatchPreference | null) => {
+    // Nobody should be allowed to remove documents completely from the DB.
+    return false;
   },
 };
 
 export const DialogueMatchPreferences: DialogueMatchPreferencesCollection = createCollection({
-  collectionName: 'DialogueMatchPreferences',
-  typeName: 'DialogueMatchPreference',
+  collectionName: "DialogueMatchPreferences",
+  typeName: "DialogueMatchPreference",
   schema,
-  resolvers: getDefaultResolvers('DialogueMatchPreferences'),
-  mutations: getDefaultMutations('DialogueMatchPreferences', options),
+  resolvers: getDefaultResolvers("DialogueMatchPreferences"),
+  mutations: getDefaultMutations("DialogueMatchPreferences", options),
   logChanges: true,
 });
 
-DialogueMatchPreferences.checkAccess = async (user: DbUser|null, document: DbDialogueMatchPreference, context: ResolverContext|null): Promise<boolean> => {
+DialogueMatchPreferences.checkAccess = async (
+  user: DbUser | null,
+  document: DbDialogueMatchPreference,
+  context: ResolverContext | null,
+): Promise<boolean> => {
   if (!user) {
     return false;
   }
@@ -45,7 +49,7 @@ DialogueMatchPreferences.checkAccess = async (user: DbUser|null, document: DbDia
   const dialogueCheck = context
     ? await context.loaders.DialogueChecks.load(document.dialogueCheckId)
     : await DialogueChecks.findOne(document.dialogueCheckId);
-  
+
   if (dialogueCheck?.userId === user._id || dialogueCheck?.targetUserId === user._id) {
     return true;
   }

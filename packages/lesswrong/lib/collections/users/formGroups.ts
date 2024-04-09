@@ -4,7 +4,7 @@ export const formGroups: Partial<Record<string, FormGroupType<"Users">>> = {
   default: {
     name: "default",
     order: 0,
-    paddingStyle: true
+    paddingStyle: true,
   },
   siteCustomizations: {
     order: 1,
@@ -43,35 +43,35 @@ export const formGroups: Partial<Record<string, FormGroupType<"Users">>> = {
     startCollapsed: false,
   },
   disabledPrivileges: {
-    order:40,
+    order: 40,
     name: "disabledPrivileges",
     label: preferredHeadingCase("Disabled Privileges"),
     startCollapsed: true,
   },
   banUser: {
-    order:50,
+    order: 50,
     name: "banUser",
     label: preferredHeadingCase("Ban & Purge User"),
     startCollapsed: true,
   },
   moderationGroup: {
-    order:60,
+    order: 60,
     name: "moderation",
     label: preferredHeadingCase("Moderation & Moderation Guidelines"),
     startCollapsed: true,
   },
   aboutMe: {
-    name: 'aboutMe',
+    name: "aboutMe",
     order: 100,
     label: isFriendlyUI ? "About you" : "About Me",
   },
   socialMedia: {
-    name: 'socialMedia',
+    name: "socialMedia",
     order: 110,
     label: isFriendlyUI ? "Social media" : "My Social Media",
   },
   activity: {
-    name: 'activity',
+    name: "activity",
     order: 120,
     label: isFriendlyUI ? "Your activity" : "My Activity",
   },

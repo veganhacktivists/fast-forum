@@ -10,7 +10,7 @@ const getMaxExpandableWidth = (container: HTMLElement): number => {
     width -= child.getBoundingClientRect().width;
   }
   return width;
-}
+};
 
 /**
  * Here be dragons
@@ -32,11 +32,7 @@ export const recalculateTruncation = (
   ref: RefObject<HTMLDivElement>,
   expandContainer: RefObject<HTMLDivElement>,
   classes: ClassesType,
-  reformatPlaceholder: (
-    moreCount: number,
-    totalItems: number,
-    moreNode: Element,
-  ) => void,
+  reformatPlaceholder: (moreCount: number, totalItems: number, moreNode: Element) => void,
 ) => {
   if (!ref.current || !expandContainer.current) {
     return;
@@ -79,7 +75,7 @@ export const recalculateTruncation = (
   let width = bounds[0].width;
   let moreCount = 0;
   let i = 1;
-  for ( ; i < bounds.length; ++i) {
+  for (; i < bounds.length; ++i) {
     const newWidth = width + bounds[i].width + TRUNCATION_PADDING;
     if (newWidth > maxWidth) {
       const moreWidth = more?.getBoundingClientRect().width;
@@ -102,4 +98,4 @@ export const recalculateTruncation = (
     ref.current.appendChild(more);
   }
   ref.current.appendChild(scratch);
-}
+};

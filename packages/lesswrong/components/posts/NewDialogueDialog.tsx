@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Components, registerComponent } from "../../lib/vulcan-lib";
-import Button from '@material-ui/core/Button';
-import DialogActions from '@material-ui/core/DialogActions';
-import { useCreate } from '../../lib/crud/withCreate';
-import { useMessages } from '../common/withMessages';
-import Input from '@material-ui/core/Input';
-import { useNavigate } from '../../lib/reactRouterWrapper';
-import { isFriendlyUI, preferredHeadingCase } from '../../themes/forumTheme';
+import Button from "@material-ui/core/Button";
+import DialogActions from "@material-ui/core/DialogActions";
+import { useCreate } from "../../lib/crud/withCreate";
+import { useMessages } from "../common/withMessages";
+import Input from "@material-ui/core/Input";
+import { useNavigate } from "../../lib/reactRouterWrapper";
+import { isFriendlyUI, preferredHeadingCase } from "../../themes/forumTheme";
 
 const styles = (theme: ThemeType): JssStyles => ({
   dialog: {
@@ -37,23 +37,20 @@ const styles = (theme: ThemeType): JssStyles => ({
   },
   header: {
     ...theme.typography.headerStyle,
-    marginTop: 0
+    marginTop: 0,
   },
   info: {
     ...theme.typography.body2,
-    marginRight: 12
-  }
-})
+    marginRight: 12,
+  },
+});
 
-const NewDialogueDialog = ({onClose, classes}: {
-  onClose: ()=>void,
-  classes: ClassesType,
-}) => {
+const NewDialogueDialog = ({ onClose, classes }: { onClose: () => void; classes: ClassesType }) => {
   const { UsersListEditor, LWDialog, Loading, EAButton } = Components;
   const [title, setTitle] = useState("");
-  const {flash} = useMessages();
+  const { flash } = useMessages();
   const [participants, setParticipants] = useState<string[]>([]);
-  const {create: createPost, loading, error} = useCreate({ collectionName: "Posts", fragmentName: "PostsEdit" });
+  const { create: createPost, loading, error } = useCreate({ collectionName: "Posts", fragmentName: "PostsEdit" });
   const navigate = useNavigate();
 
   async function createDialogue() {
@@ -67,7 +64,7 @@ const NewDialogueDialog = ({onClose, classes}: {
         title,
         draft: true,
         collabEditorDialogue: true,
-        coauthorStatuses: participants.map(userId => ({userId, confirmed: true, requested: false})),
+        coauthorStatuses: participants.map((userId) => ({ userId, confirmed: true, requested: false })),
         shareWithUsers: participants,
         sharingSettings: {
           anyoneWithLinkCan: "none",
@@ -76,9 +73,9 @@ const NewDialogueDialog = ({onClose, classes}: {
         contents: {
           originalContents: {
             type: "ckEditorMarkup",
-            data: ""
-          }
-        } as AnyBecauseHard
+            data: "",
+          },
+        } as AnyBecauseHard,
       },
     });
     if (createResult?.data?.createPost?.data) {
@@ -93,50 +90,45 @@ const NewDialogueDialog = ({onClose, classes}: {
   }
 
   const ButtonComponent = isFriendlyUI ? EAButton : Button;
-  return <LWDialog
-    open={true}
-    onClose={onClose}
-    fullWidth
-    maxWidth={"sm"}
-    dialogClasses={{paper: classes.dialogPaper}}
-  >
-    <div className={classes.dialog}>
-      <h2 className={classes.header}>{preferredHeadingCase("Start Dialogue")}</h2>
-      <p className={classes.info}>
-        Invite users to a conversation where you can explore ideas, interview each other, or debate a topic. You can edit the transcript, and when you're ready, publish it as a post.
-      </p>
-      <p className={classes.info}>
-        You'll be able to see each other's comments as you're writing.
-      </p>
-      <Input
-        type="text"
-        placeholder={preferredHeadingCase("Dialogue Title")}
-        value={title}
-        className={classes.titleInput}
-        onChange={ev => setTitle(ev.currentTarget.value)}
-      />
-      <div className={classes.usersListEditor}>
-        <UsersListEditor
-          value={participants}
-          setValue={setParticipants}
-          label={preferredHeadingCase("Add Participants")}
+  return (
+    <LWDialog open={true} onClose={onClose} fullWidth maxWidth={"sm"} dialogClasses={{ paper: classes.dialogPaper }}>
+      <div className={classes.dialog}>
+        <h2 className={classes.header}>{preferredHeadingCase("Start Dialogue")}</h2>
+        <p className={classes.info}>
+          Invite users to a conversation where you can explore ideas, interview each other, or debate a topic. You can
+          edit the transcript, and when you're ready, publish it as a post.
+        </p>
+        <p className={classes.info}>You'll be able to see each other's comments as you're writing.</p>
+        <Input
+          type="text"
+          placeholder={preferredHeadingCase("Dialogue Title")}
+          value={title}
+          className={classes.titleInput}
+          onChange={(ev) => setTitle(ev.currentTarget.value)}
         />
+        <div className={classes.usersListEditor}>
+          <UsersListEditor
+            value={participants}
+            setValue={setParticipants}
+            label={preferredHeadingCase("Add Participants")}
+          />
+        </div>
+
+        <DialogActions>
+          {loading && <Loading />}
+          <ButtonComponent onClick={createDialogue} disabled={!!loading}>
+            {preferredHeadingCase("Create Dialogue")}
+          </ButtonComponent>
+        </DialogActions>
       </div>
+    </LWDialog>
+  );
+};
 
-      <DialogActions>
-        {loading && <Loading/>}
-        <ButtonComponent onClick={createDialogue} disabled={!!loading}>
-          {preferredHeadingCase("Create Dialogue")}
-        </ButtonComponent>
-      </DialogActions>
-    </div>
-  </LWDialog>
-}
-
-const NewDialogueDialogComponent = registerComponent('NewDialogueDialog', NewDialogueDialog, {styles});
+const NewDialogueDialogComponent = registerComponent("NewDialogueDialog", NewDialogueDialog, { styles });
 
 declare global {
   interface ComponentTypes {
-    NewDialogueDialog: typeof NewDialogueDialogComponent
+    NewDialogueDialog: typeof NewDialogueDialogComponent;
   }
 }

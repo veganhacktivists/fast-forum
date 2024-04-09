@@ -1,5 +1,5 @@
-export * from './collection';
-import './fragments';
-import './views';
-import './permissions'
-import './mutations'
+export * from "./collection";
+import "./fragments";
+import "./views";
+import "./permissions";
+import "./mutations";

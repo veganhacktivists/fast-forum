@@ -1,1 +1,1 @@
-export * from './renderEmail'
+export * from "./renderEmail";

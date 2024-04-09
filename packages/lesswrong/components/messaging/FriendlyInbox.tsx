@@ -22,7 +22,7 @@ const styles = (theme: ThemeType) => ({
     marginRight: "auto",
     padding: "24px 24px",
     zIndex: theme.zIndexes.singleColumnSection,
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       padding: 0,
       minHeight: "100%",
       height: "auto",
@@ -31,21 +31,21 @@ const styles = (theme: ThemeType) => ({
   modInboxLink: {
     ...theme.typography.body2,
     color: theme.palette.lwTertiary.main,
-    width: 'fit-content',
+    width: "fit-content",
     padding: "12px 12px 8px 16px",
     fontWeight: 600,
   },
   backButton: {
     ...theme.typography.body2,
     color: theme.palette.lwTertiary.main,
-    width: 'fit-content',
+    width: "fit-content",
     padding: "12px 0 0 0",
     fontWeight: 600,
     display: "none",
     // Only show on mobile
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       display: "block",
-    }
+    },
   },
   table: {
     minHeight: 0,
@@ -56,7 +56,7 @@ const styles = (theme: ThemeType) => ({
     border: theme.palette.border.grey200,
     borderRadius: `${theme.borderRadius.default}px ${theme.borderRadius.default}px 0px 0px`,
     backgroundColor: theme.palette.background.pageActiveAreaBackground,
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       border: "none",
     },
   },
@@ -68,11 +68,11 @@ const styles = (theme: ThemeType) => ({
     flex: "0 0 360px",
     borderRight: theme.palette.border.grey200,
     maxWidth: 360,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       flex: "0 0 280px",
       maxWidth: 280,
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       flex: "1 1 auto",
       maxWidth: "100%",
     },
@@ -81,7 +81,7 @@ const styles = (theme: ThemeType) => ({
     flex: "1 1 auto",
   },
   hideColumnSm: {
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       display: "none",
     },
   },
@@ -95,7 +95,7 @@ const styles = (theme: ThemeType) => ({
     borderBottom: theme.palette.border.grey200,
     padding: "0px 16px",
     flex: "1 1 auto",
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       padding: "0px 24px",
     },
   },
@@ -115,9 +115,9 @@ const styles = (theme: ThemeType) => ({
     display: "-webkit-box",
     "-webkit-box-orient": "vertical",
     "-webkit-line-clamp": 1,
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down("xs")]: {
       "-webkit-line-clamp": 2,
-    }
+    },
   },
   actionIcon: {
     color: theme.palette.grey[600],
@@ -187,7 +187,7 @@ const FriendlyInbox = ({
     (conversationId: string | undefined) => {
       navigate({ ...location, pathname: `/${isModInbox ? "moderatorInbox" : "inbox"}/${conversationId}` });
     },
-    [navigate, isModInbox, location]
+    [navigate, isModInbox, location],
   );
 
   const openNewConversationDialog = useCallback(() => {
@@ -233,7 +233,7 @@ const FriendlyInbox = ({
     });
   };
 
-  const showModeratorLink = userCanDo(currentUser, 'conversations.view.all') && !isModInbox;
+  const showModeratorLink = userCanDo(currentUser, "conversations.view.all") && !isModInbox;
 
   const title = selectedConversation
     ? conversationGetFriendlyTitle(selectedConversation, currentUser)

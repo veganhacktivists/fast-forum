@@ -124,7 +124,7 @@ const CookieCategory = ({
     ...new Set(
       Object.values(CookiesTable)
         .filter((cookie) => cookie.type === cookieType)
-        .map((cookie) => cookie.thirdPartyName)
+        .map((cookie) => cookie.thirdPartyName),
     ),
   ]
     .sort()
@@ -189,12 +189,18 @@ const CookieDialog = ({ onClose, classes }: { onClose?: () => void; classes: Cla
           stored in your browser as they are essential for the basic functionality of the website. We also use cookies
           for non-essential purposes such as remembering your preferences between visits, or for analytics. These
           cookies will be stored in your browser only with your consent. Read our full cookie policy{" "}
-          <a target="_blank" rel="noreferrer" href="/cookiePolicy">here</a>.
+          <a target="_blank" rel="noreferrer" href="/cookiePolicy">
+            here
+          </a>
+          .
         </Typography>
         <Typography variant="body2" className={classes.blurb}>
           If you have previously accepted cookies and are now rejecting them, you are responsible for removing any that
           have already been set. You can do so by refreshing the page and then following the instructions{" "}
-          <a target="_blank" rel="noreferrer" href="https://support.google.com/chrome/answer/95647">here</a>.
+          <a target="_blank" rel="noreferrer" href="https://support.google.com/chrome/answer/95647">
+            here
+          </a>
+          .
         </Typography>
         <CookieCategory
           title="Necessary"

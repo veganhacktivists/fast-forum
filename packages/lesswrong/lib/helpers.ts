@@ -1,6 +1,6 @@
-import { Utils, getCollection } from './vulcan-lib';
-import moment from 'moment';
-import { randomId } from './random';
+import { Utils, getCollection } from "./vulcan-lib";
+import moment from "moment";
+import { randomId } from "./random";
 
 // Get relative link to conversation (used only in session)
 export const conversationGetLink = (conversation: HasIdType): string => {
@@ -12,10 +12,10 @@ export const messageGetLink = (message: DbMessage): string => {
   return `/inbox/${message.conversationId}`;
 };
 
-export function constantTimeCompare({ correctValue, unknownValue }: { correctValue: string, unknownValue: string }) {
+export function constantTimeCompare({ correctValue, unknownValue }: { correctValue: string; unknownValue: string }) {
   try {
-    const correctValueChars = correctValue.split('');
-    const unknownValueChars = unknownValue.split('');
+    const correctValueChars = correctValue.split("");
+    const unknownValueChars = unknownValue.split("");
 
     let allCharsEqual = true;
 
@@ -47,80 +47,85 @@ Utils.getUnusedSlug = async function <N extends CollectionNameWithSlug>(
   useOldSlugs = false,
   documentId?: string,
 ): Promise<string> {
-  let suffix = '';
+  let suffix = "";
   let index = 0;
-  
+
   //eslint-disable-next-line no-constant-condition
-  while(true) {
+  while (true) {
     // Test if slug is already in use
-    const existingDocuments = await getDocumentsBySlug({slug, suffix, useOldSlugs, collection})
+    const existingDocuments = await getDocumentsBySlug({ slug, suffix, useOldSlugs, collection });
     // Filter out our own document (i.e. don't change the slug if the only conflict is with ourselves)
-    const conflictingDocuments = existingDocuments.filter((doc) => doc._id !== documentId)
+    const conflictingDocuments = existingDocuments.filter((doc) => doc._id !== documentId);
 
     // If no conflict, we're done
     if (!conflictingDocuments.length) {
-      return slug+suffix;
+      return slug + suffix;
     }
 
     // If there are other documents we conflict with, change the index and slug, then check again
     index++;
-    
+
     // Count up indexes sequentially up to 10. After that, randomly generate an ID. This
     // avoids making it so that creating n documents with the same base string is O(n^2).
     // (This came up in development with posts named "test", which there are hundreds of.)
     if (index <= 10) {
-      suffix = '-'+index;
+      suffix = "-" + index;
     } else {
-      const randomIndex = randomId(index<20 ? 4 : 8);
-      suffix = '-'+randomIndex;
+      const randomIndex = randomId(index < 20 ? 4 : 8);
+      suffix = "-" + randomIndex;
     }
   }
 };
 
-const getDocumentsBySlug = async <
-  N extends CollectionNameWithSlug,
->({slug, suffix, useOldSlugs, collection}: {
-  slug: string,
-  suffix: string,
-  useOldSlugs: boolean,
-  collection: CollectionBase<N>
+const getDocumentsBySlug = async <N extends CollectionNameWithSlug>({
+  slug,
+  suffix,
+  useOldSlugs,
+  collection,
+}: {
+  slug: string;
+  suffix: string;
+  useOldSlugs: boolean;
+  collection: CollectionBase<N>;
 }): Promise<ObjectsByCollectionName[N][]> => {
-  return await collection.find(useOldSlugs ? 
-    {$or: [{slug: slug+suffix},{oldSlugs: slug+suffix}]} : 
-    {slug: slug+suffix}
-  ).fetch()
-}
+  return await collection
+    .find(useOldSlugs ? { $or: [{ slug: slug + suffix }, { oldSlugs: slug + suffix }] } : { slug: slug + suffix })
+    .fetch();
+};
 
 // LESSWRONG version of getting unused slug by collection name. Modified to also include "oldSlugs" array
-Utils.getUnusedSlugByCollectionName = async function (collectionName: CollectionNameWithSlug, slug: string, useOldSlugs = false, documentId?: string): Promise<string> {
+Utils.getUnusedSlugByCollectionName = async function (
+  collectionName: CollectionNameWithSlug,
+  slug: string,
+  useOldSlugs = false,
+  documentId?: string,
+): Promise<string> {
   const collection = getCollection(collectionName);
   if (!collection.hasSlug()) {
     throw new Error(`Collection ${collection.collectionName} doesn't have a slug`);
   }
-  return await Utils.getUnusedSlug(collection, slug, useOldSlugs, documentId)
+  return await Utils.getUnusedSlug(collection, slug, useOldSlugs, documentId);
 };
 
 Utils.slugIsUsed = async (collectionName: CollectionNameWithSlug, slug: string): Promise<boolean> => {
-  const collection = getCollection(collectionName)
-  const existingUserWithSlug = await collection.findOne({$or: [
-    {slug: slug}, {oldSlugs: slug}
-  ]});
-  return !!existingUserWithSlug
-}
+  const collection = getCollection(collectionName);
+  const existingUserWithSlug = await collection.findOne({ $or: [{ slug: slug }, { oldSlugs: slug }] });
+  return !!existingUserWithSlug;
+};
 
 export function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
  * Logs how long it takes for a function to execute.  See usage example below.
- * 
+ *
  * Original:
- * 
+ *
  * `await sql.none(compiled.sql, compiled.args));`
- * 
+ *
  * Wrapped:
- * 
+ *
  * `await timedFunc('sql.none', () => sql.none(compiled.sql, compiled.args));`
  */
 export async function timedFunc<O>(label: string, func: () => O) {
@@ -171,23 +176,19 @@ export const getAtPath = <T extends {}, V extends AnyBecauseHard>(
     return undefined;
   }
   return path.length < 2
-    ? data[path[0] as keyof T] as V | undefined
+    ? (data[path[0] as keyof T] as V | undefined)
     : getAtPath(data[path[0] as keyof T] as AnyBecauseHard, path.slice(1));
-}
+};
 
 /**
  * Similar to `getAtPath`, but acts as a setter rather than a getter. See
  * `getAtPath` for details.
  */
-export const setAtPath = <T extends {}, V extends AnyBecauseHard>(
-  data: T,
-  path: (string | number)[],
-  value: V,
-): V => {
+export const setAtPath = <T extends {}, V extends AnyBecauseHard>(data: T, path: (string | number)[], value: V): V => {
   if (path.length < 2) {
     (data[path[0] as keyof T] as V) = value;
   } else {
     setAtPath(data[path[0] as keyof T] as AnyBecauseHard, path.slice(1), value);
   }
   return value;
-}
+};

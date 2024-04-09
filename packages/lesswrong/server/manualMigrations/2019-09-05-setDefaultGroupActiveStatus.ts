@@ -1,6 +1,6 @@
-import { registerMigration, fillDefaultValues } from './migrationUtils';
+import { registerMigration, fillDefaultValues } from "./migrationUtils";
 
-import { Localgroups } from '../../lib/collections/localgroups/collection';
+import { Localgroups } from "../../lib/collections/localgroups/collection";
 
 registerMigration({
   name: "setDefaultGroupActiveStatus",

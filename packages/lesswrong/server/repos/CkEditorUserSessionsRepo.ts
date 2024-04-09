@@ -8,7 +8,8 @@ class CkEditorUserSessionsRepo extends AbstractRepo<"CkEditorUserSessions"> {
   }
 
   getActiveDialogueUserSessions(since: Date): Promise<CkEditorUserSessionInfo[]> {
-    return this.getRawDb().any(`
+    return this.getRawDb().any(
+      `
     SELECT
       c."documentId",
       c."userId",
@@ -19,7 +20,9 @@ class CkEditorUserSessionsRepo extends AbstractRepo<"CkEditorUserSessions"> {
     WHERE
       (c."createdAt" > $1 AND c."endedAt" IS NULL)
       AND p."collabEditorDialogue" IS TRUE
-    `, [since])
+    `,
+      [since],
+    );
   }
 }
 

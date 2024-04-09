@@ -1,33 +1,31 @@
-import schema from './schema';
-import { createCollection, addGraphQLQuery, addGraphQLResolvers } from '../../vulcan-lib';
-import { userOwns, userCanDo } from '../../vulcan-users/permissions';
-import { addUniversalFields, getDefaultMutations, getDefaultResolvers } from '../../collectionUtils';
-import { makeEditable } from '../../editor/make_editable';
-import { formGroups } from './formGroups';
-import { isEAForum } from '../../instanceSettings';
+import schema from "./schema";
+import { createCollection, addGraphQLQuery, addGraphQLResolvers } from "../../vulcan-lib";
+import { userOwns, userCanDo } from "../../vulcan-users/permissions";
+import { addUniversalFields, getDefaultMutations, getDefaultResolvers } from "../../collectionUtils";
+import { makeEditable } from "../../editor/make_editable";
+import { formGroups } from "./formGroups";
+import { isEAForum } from "../../instanceSettings";
 
 export const Users = createCollection({
-  collectionName: 'Users',
-  typeName: 'User',
+  collectionName: "Users",
+  typeName: "User",
   schema,
-  resolvers: getDefaultResolvers('Users'),
-  mutations: getDefaultMutations('Users', {
-    editCheck: (user: DbUser|null, document: DbUser) => {
-      if (!user || !document)
-        return false;
-  
-      if (userCanDo(user, 'alignment.sidebar'))
-        return true
-  
+  resolvers: getDefaultResolvers("Users"),
+  mutations: getDefaultMutations("Users", {
+    editCheck: (user: DbUser | null, document: DbUser) => {
+      if (!user || !document) return false;
+
+      if (userCanDo(user, "alignment.sidebar")) return true;
+
       // OpenCRUD backwards compatibility
       return userOwns(user, document)
-        ? userCanDo(user, ['user.update.own', 'users.edit.own'])
-        : userCanDo(user, ['user.update.all', 'users.edit.all']);
+        ? userCanDo(user, ["user.update.own", "users.edit.own"])
+        : userCanDo(user, ["user.update.all", "users.edit.all"]);
     },
     // Anyone can create users
     newCheck: () => true,
     // Nobody can delete users
-    removeCheck: () => false
+    removeCheck: () => false,
   }),
   logChanges: true,
 });
@@ -36,12 +34,12 @@ addGraphQLResolvers({
   Query: {
     async currentUser(root: void, args: void, context: ResolverContext) {
       let user: any = null;
-      const userId: string|null = (context as any)?.userId;
+      const userId: string | null = (context as any)?.userId;
       if (userId) {
         user = await context.loaders.Users.load(userId);
 
         if (user.services) {
-          Object.keys(user.services).forEach(key => {
+          Object.keys(user.services).forEach((key) => {
             user.services[key] = {};
           });
         }
@@ -50,9 +48,9 @@ addGraphQLResolvers({
     },
   },
 });
-addGraphQLQuery('currentUser: User');
+addGraphQLQuery("currentUser: User");
 
-addUniversalFields({collection: Users});
+addUniversalFields({ collection: Users });
 
 makeEditable({
   collection: Users,
@@ -65,12 +63,12 @@ makeEditable({
     order: 50,
     fieldName: "moderationGuidelines",
     permissions: {
-      canRead: ['guests'],
-      canUpdate: [userOwns, 'sunshineRegiment', 'admins'],
-      canCreate: [userOwns, 'sunshineRegiment', 'admins']
-    }
-  }
-})
+      canRead: ["guests"],
+      canUpdate: [userOwns, "sunshineRegiment", "admins"],
+      canCreate: [userOwns, "sunshineRegiment", "admins"],
+    },
+  },
+});
 
 makeEditable({
   collection: Users,
@@ -80,16 +78,16 @@ makeEditable({
     formGroup: formGroups.aboutMe,
     hidden: true,
     order: 7,
-    fieldName: 'howOthersCanHelpMe',
+    fieldName: "howOthersCanHelpMe",
     label: "How others can help me",
     hintText: "Ex: I am looking for opportunities to do...",
     permissions: {
-      canRead: ['guests'],
-      canUpdate: [userOwns, 'sunshineRegiment', 'admins'],
-      canCreate: [userOwns, 'sunshineRegiment', 'admins']
+      canRead: ["guests"],
+      canUpdate: [userOwns, "sunshineRegiment", "admins"],
+      canCreate: [userOwns, "sunshineRegiment", "admins"],
     },
-  }
-})
+  },
+});
 
 makeEditable({
   collection: Users,
@@ -99,16 +97,16 @@ makeEditable({
     formGroup: formGroups.aboutMe,
     hidden: true,
     order: 8,
-    fieldName: 'howICanHelpOthers',
+    fieldName: "howICanHelpOthers",
     label: "How I can help others",
     hintText: "Ex: Reach out to me if you have questions about...",
     permissions: {
-      canRead: ['guests'],
-      canUpdate: [userOwns, 'sunshineRegiment', 'admins'],
-      canCreate: [userOwns, 'sunshineRegiment', 'admins']
+      canRead: ["guests"],
+      canUpdate: [userOwns, "sunshineRegiment", "admins"],
+      canCreate: [userOwns, "sunshineRegiment", "admins"],
     },
-  }
-})
+  },
+});
 
 // biography: Some text the user provides for their profile page and to display
 // when people hover over their name.
@@ -127,11 +125,11 @@ makeEditable({
     label: "Bio",
     hintText: "Tell us about yourself",
     permissions: {
-      canRead: ['guests'],
-      canUpdate: [userOwns, 'sunshineRegiment', 'admins'],
-      canCreate: [userOwns, 'sunshineRegiment', 'admins']
+      canRead: ["guests"],
+      canUpdate: [userOwns, "sunshineRegiment", "admins"],
+      canCreate: [userOwns, "sunshineRegiment", "admins"],
     },
-  }
+  },
 });
 
 Users.postProcess = (user: DbUser): DbUser => {
@@ -147,6 +145,6 @@ Users.postProcess = (user: DbUser): DbUser => {
     }
   }
   return user;
-}
+};
 
 export default Users;

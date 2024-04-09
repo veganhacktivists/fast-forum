@@ -1,4 +1,4 @@
-export * from './collection'
-import './fragments'
-import './permissions'
-import './views'
+export * from "./collection";
+import "./fragments";
+import "./permissions";
+import "./views";

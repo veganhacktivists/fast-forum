@@ -1,14 +1,14 @@
 import trim from "lodash/trim";
 
 export type QueryToken = {
-  type: "should" | "must" | "not",
-  token: string,
-}
+  type: "should" | "must" | "not";
+  token: string;
+};
 
 export type QueryParserResult = {
-  tokens: QueryToken[],
-  isAdvanced: boolean,
-}
+  tokens: QueryToken[];
+  isAdvanced: boolean;
+};
 
 const pattern = /(\w+:|-)?("[^"]*"|'[^']*'|[^\s]+)/g;
 
@@ -33,7 +33,7 @@ export const parseQuery = (query: string): QueryParserResult => {
       isAdvanced = true;
     }
 
-    if (prefix === '-') {
+    if (prefix === "-") {
       type = "not";
       isAdvanced = true;
     }
@@ -42,8 +42,8 @@ export const parseQuery = (query: string): QueryParserResult => {
     // isn't whitespace or a word
     token = token.replace(/[-_]/g, " ").replace(/[^\w\s]/g, "");
 
-    tokens.push({type, token});
+    tokens.push({ type, token });
   }
 
-  return {tokens, isAdvanced};
-}
+  return { tokens, isAdvanced };
+};

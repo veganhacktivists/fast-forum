@@ -1,12 +1,12 @@
-import {getDefaultKeyBinding, KeyBindingUtil} from 'draft-js';
+import { getDefaultKeyBinding, KeyBindingUtil } from "draft-js";
 const { hasCommandModifier } = KeyBindingUtil;
 
 export const myKeyBindingFn = (e) => {
   if (e.keyCode === 77 && hasCommandModifier(e)) {
-    return 'insert-texblock';
+    return "insert-texblock";
   }
-  if (e.key === '4' && hasCommandModifier(e)) {
-    return 'insert-inlinetex';
+  if (e.key === "4" && hasCommandModifier(e)) {
+    return "insert-inlinetex";
   }
   return getDefaultKeyBinding(e);
-}
+};

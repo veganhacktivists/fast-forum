@@ -1,7 +1,7 @@
 import { getAllCollections } from "../../lib/vulcan-lib/getCollection";
 import { createIndex, dropIndex } from "./meta/utils";
 
-export const up = async ({db}: MigrationContext) => {
+export const up = async ({ db }: MigrationContext) => {
   for (const collection of getAllCollections()) {
     const table = collection.getTable();
     for (const index of table.getIndexes()) {
@@ -16,4 +16,4 @@ export const up = async ({db}: MigrationContext) => {
       }
     }
   }
-}
+};

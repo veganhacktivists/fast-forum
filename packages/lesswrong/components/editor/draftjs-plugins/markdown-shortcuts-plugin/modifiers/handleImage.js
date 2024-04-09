@@ -1,4 +1,4 @@
-import insertImage from './insertImage';
+import insertImage from "./insertImage";
 
 const handleImage = (editorState, character) => {
   const re = /!\[([^\]]*)]\(([^)"]+)(?: "([^"]+)")?\)/g;

@@ -8,18 +8,19 @@ export const wrapConsoleLogFunctions = (wrapper: (originalFn: any, ...message: a
     // eslint-disable-next-line no-console
     console[functionName] = (...message: any[]) => {
       wrapper(originalFn, ...message);
-    }
+    };
   }
-}
+};
 
 export const filterConsoleLogSpam = () => {
-  // Suppress this deprecation warning because MaterialUI is on an old version that 
+  // Suppress this deprecation warning because MaterialUI is on an old version that
   // produces a separate warning for every unit test.
   const oldWarn = console.warn; //eslint-disable-line no-console
-  console.warn = (...message: any[]) => { //eslint-disable-line no-console
+  console.warn = (...message: any[]) => {
+    //eslint-disable-line no-console
     if (message[0]?.indexOf("React.createFactory() is deprecated") >= 0) {
       return;
     }
     oldWarn(...message);
-  }
-}
+  };
+};

@@ -1,6 +1,5 @@
-
-import { addAdminColumn } from '../../vulcan-lib';
+import { addAdminColumn } from "../../vulcan-lib";
 
 addAdminColumn({
-  name: '_id',
+  name: "_id",
 });
