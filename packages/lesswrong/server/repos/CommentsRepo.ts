@@ -203,13 +203,21 @@ class CommentsRepo extends AbstractRepo<"Comments"> {
       JOIN "Comments" c ON c."_id" = q."_id"
       JOIN "Posts" p ON c."postId" = p."_id"
       WHERE
-        p."hideFromPopularComments" IS NOT TRUE AND
-        COALESCE((p."tagRelevance"->$6)::INTEGER, 0) < 1
+        p."hideFromPopularComments" IS NOT TRUE
+        -- AND COALESCE((p."tagRelevance"->$6)::INTEGER, 0) < 1
       ORDER BY c."baseScore" * EXP((EXTRACT(EPOCH FROM CURRENT_TIMESTAMP - c."postedAt") + $5) / -$4) DESC
       OFFSET $2
       LIMIT $3
     `,
-      [minScore, offset, limit, recencyFactor, recencyBias, EA_FORUM_COMMUNITY_TOPIC_ID],
+      [
+        minScore,
+        offset,
+        limit,
+        recencyFactor,
+        recencyBias,
+        // this is not something we want to use in this filter
+        EA_FORUM_COMMUNITY_TOPIC_ID,
+      ],
     );
   }
 
