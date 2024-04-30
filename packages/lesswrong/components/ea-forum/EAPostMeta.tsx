@@ -50,11 +50,13 @@ const EAPostMeta = ({
   useEventStyles,
   className,
   classes,
+  hideDate = false,
 }: {
   post: PostsList | SunshinePostsList;
   useEventStyles?: boolean;
   className?: string;
   classes: ClassesType;
+  hideDate?: boolean;
 }) => {
   const authorExpandContainer = useRef(null);
 
@@ -89,10 +91,12 @@ const EAPostMeta = ({
         <TruncatedAuthorsList post={post} expandContainer={authorExpandContainer} />
       </InteractionWrapper>
       <div>
-        {/* <span className={classes.date}> */}
-        {/*   {" · "} */}
-        {/*   <PostsItemDate post={post} noStyles includeAgo /> */}
-        {/* </span> */}
+        {!hideDate && (
+          <span className={classes.date}>
+            {" · "}
+            <PostsItemDate post={post} noStyles includeAgo />
+          </span>
+        )}
         {(!post.fmCrosspost?.isCrosspost || post.fmCrosspost.hostedHere) && (
           <span className={classes.readTime}>
             {" · "}

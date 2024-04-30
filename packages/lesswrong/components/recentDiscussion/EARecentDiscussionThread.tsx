@@ -131,7 +131,7 @@ const EARecentDiscussionThread = ({
             className={classes.postTitle}
             linkEventProps={{ intent: "expandPost" }}
           />
-          <EAPostMeta post={post} useEventStyles />
+          <EAPostMeta hideDate post={post} useEventStyles />
         </div>
         {!post.isEvent && (
           <Link to={postGetCommentsUrl(post)} className={classes.commentCount}>
