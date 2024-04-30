@@ -89,10 +89,10 @@ const EAPostMeta = ({
         <TruncatedAuthorsList post={post} expandContainer={authorExpandContainer} />
       </InteractionWrapper>
       <div>
-        <span className={classes.date}>
-          {" · "}
-          <PostsItemDate post={post} noStyles includeAgo />
-        </span>
+        {/* <span className={classes.date}> */}
+        {/*   {" · "} */}
+        {/*   <PostsItemDate post={post} noStyles includeAgo /> */}
+        {/* </span> */}
         {(!post.fmCrosspost?.isCrosspost || post.fmCrosspost.hostedHere) && (
           <span className={classes.readTime}>
             {" · "}
