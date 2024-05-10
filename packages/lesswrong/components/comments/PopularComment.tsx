@@ -137,11 +137,11 @@ const PopularComment = ({ comment, classes }: { comment: CommentsListWithParentM
         {comment.post && <PopularCommentTitle post={comment.post} comment={comment} classes={classes} />}
         <InteractionWrapper className={classNames(classes.row, classes.wrap)}>
           <UsersName user={comment.user} className={classes.username} />
-          <div className={classes.date}>
-            <LWTooltip placement="right" title={<ExpandedDate date={comment.postedAt} />}>
-              {moment(new Date(comment.postedAt)).fromNow()}
-            </LWTooltip>
-          </div>
+          {/* <div className={classes.date}> */}
+          {/*   <LWTooltip placement="right" title={<ExpandedDate date={comment.postedAt} />}> */}
+          {/*     {moment(new Date(comment.postedAt)).fromNow()} */}
+          {/*   </LWTooltip> */}
+          {/* </div> */}
           {!comment.debateResponse && !comment.rejected && (
             <SmallSideVote document={comment} collection={Comments} hideKarma={comment.post?.hideCommentKarma} />
           )}

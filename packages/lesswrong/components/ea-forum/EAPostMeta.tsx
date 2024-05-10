@@ -50,7 +50,7 @@ const EAPostMeta = ({
   useEventStyles,
   className,
   classes,
-  hideDate = false,
+  hideDate = true,
 }: {
   post: PostsList | SunshinePostsList;
   useEventStyles?: boolean;
