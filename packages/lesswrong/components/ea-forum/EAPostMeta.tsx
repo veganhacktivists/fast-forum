@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useContext, useRef } from "react";
 import { Components, registerComponent } from "../../lib/vulcan-lib";
 import { InteractionWrapper } from "../common/useClickableCell";
 import { DateWithoutTime } from "../posts/PostsItemMeta";
@@ -45,19 +45,23 @@ const styles = (theme: ThemeType) => ({
   },
 });
 
+export const PostMetaContext = React.createContext<{ hideDate: boolean }>({ hideDate: false });
+
+export const usePostMetaContext = () => useContext(PostMetaContext);
+
 const EAPostMeta = ({
   post,
   useEventStyles,
   className,
   classes,
-  hideDate = true,
 }: {
   post: PostsList | SunshinePostsList;
   useEventStyles?: boolean;
   className?: string;
   classes: ClassesType;
-  hideDate?: boolean;
 }) => {
+  const { hideDate } = usePostMetaContext();
+
   const authorExpandContainer = useRef(null);
 
   const { TruncatedAuthorsList, PostsItemDate, ForumIcon, LWTooltip, EventTime } = Components;

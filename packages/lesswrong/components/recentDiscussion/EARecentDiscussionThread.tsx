@@ -6,6 +6,7 @@ import { postGetCommentsUrl } from "../../lib/collections/posts/helpers";
 import type { CommentTreeNode } from "../../lib/utils/unflatten";
 import type { EARecentDiscussionItemProps } from "./EARecentDiscussionItem";
 import classNames from "classnames";
+import { PostMetaContext } from "../ea-forum/EAPostMeta";
 
 const styles = (theme: ThemeType) => ({
   header: {
@@ -121,47 +122,49 @@ const EARecentDiscussionThread = ({
     PostsTitle,
   } = Components;
   return (
-    <EARecentDiscussionItem {...getItemProps(post, comments)}>
-      <div className={classes.header}>
-        {!post.isEvent && <EAKarmaDisplay post={post} className={classes.karmaDisplay} />}
-        <div className={classes.postInfo}>
-          <PostsTitle
-            post={post}
-            read={post.isRead}
-            className={classes.postTitle}
-            linkEventProps={{ intent: "expandPost" }}
-          />
-          <EAPostMeta post={post} useEventStyles />
+    <PostMetaContext.Provider value={{ hideDate: true }}>
+      <EARecentDiscussionItem {...getItemProps(post, comments)}>
+        <div className={classes.header}>
+          {!post.isEvent && <EAKarmaDisplay post={post} className={classes.karmaDisplay} />}
+          <div className={classes.postInfo}>
+            <PostsTitle
+              post={post}
+              read={post.isRead}
+              className={classes.postTitle}
+              linkEventProps={{ intent: "expandPost" }}
+            />
+            <EAPostMeta post={post} useEventStyles />
+          </div>
+          {!post.isEvent && (
+            <Link to={postGetCommentsUrl(post)} className={classes.commentCount}>
+              <ForumIcon icon="Comment" />
+              {post.commentCount ?? 0}
+            </Link>
+          )}
         </div>
-        {!post.isEvent && (
-          <Link to={postGetCommentsUrl(post)} className={classes.commentCount}>
-            <ForumIcon icon="Comment" />
-            {post.commentCount ?? 0}
-          </Link>
-        )}
-      </div>
-      {post.url && <LinkPostMessage post={post} />}
-      <PostExcerpt
-        post={post}
-        lines={comments?.length ? 3 : 10}
-        className={classNames({
-          [classes.excerptBottomMargin]: nestedComments.length,
-        })}
-      />
-      {nestedComments.map((comment: CommentTreeNode<CommentsList>) => (
-        <div key={comment.item._id}>
-          <CommentsNode
-            treeOptions={treeOptions}
-            startThreadTruncated={true}
-            expandAllThreads={expandAllThreads}
-            expandNewComments={false}
-            nestingLevel={1}
-            comment={comment.item}
-            childComments={comment.children}
-          />
-        </div>
-      ))}
-    </EARecentDiscussionItem>
+        {post.url && <LinkPostMessage post={post} />}
+        <PostExcerpt
+          post={post}
+          lines={comments?.length ? 3 : 10}
+          className={classNames({
+            [classes.excerptBottomMargin]: nestedComments.length,
+          })}
+        />
+        {nestedComments.map((comment: CommentTreeNode<CommentsList>) => (
+          <div key={comment.item._id}>
+            <CommentsNode
+              treeOptions={treeOptions}
+              startThreadTruncated={true}
+              expandAllThreads={expandAllThreads}
+              expandNewComments={false}
+              nestingLevel={1}
+              comment={comment.item}
+              childComments={comment.children}
+            />
+          </div>
+        ))}
+      </EARecentDiscussionItem>
+    </PostMetaContext.Provider>
   );
 };
 

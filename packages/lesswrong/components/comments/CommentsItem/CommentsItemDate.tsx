@@ -3,6 +3,7 @@ import { Components, registerComponent } from "../../../lib/vulcan-lib";
 import { useCommentLink, UseCommentLinkProps } from "./useCommentLink";
 import classNames from "classnames";
 import { isBookUI, isFriendlyUI } from "../../../themes/forumTheme";
+import { usePostMetaContext } from "../../ea-forum/EAPostMeta";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {
@@ -52,6 +53,7 @@ type CommentsItemDateProps = UseCommentLinkProps & {
 };
 
 const CommentsItemDate = ({ comment, classes, ...rest }: CommentsItemDateProps) => {
+  const { hideDate } = usePostMetaContext();
   const { FormatDate, ForumIcon } = Components;
 
   const LinkWrapper = useCommentLink({ comment, ...rest });
@@ -73,7 +75,7 @@ const CommentsItemDate = ({ comment, classes, ...rest }: CommentsItemDateProps) 
       })}
     >
       <LinkWrapper>
-        <FormatDate date={comment.postedAt} format={dateFormat} />
+        {!hideDate && <FormatDate date={comment.postedAt} format={dateFormat} />}
         {isBookUI && <ForumIcon icon="Link" className={classes.icon} />}
       </LinkWrapper>
     </span>
