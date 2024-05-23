@@ -6,6 +6,7 @@ import type { ForumIconName } from "../common/ForumIcon";
 import { tagGetUrl } from "../../lib/collections/tags/helpers";
 import classNames from "classnames";
 import { AnalyticsContext } from "../../lib/analyticsEvents";
+import { usePostMetaContext } from "../ea-forum/EAPostMeta";
 
 const ICON_WIDTH = 24;
 
@@ -117,6 +118,7 @@ const EARecentDiscussionItem = ({
   classes: ClassesType<typeof styles>;
 }) => {
   const { ForumIcon, UsersNameDisplay, FormatDate, TagTooltipWrapper } = Components;
+  const { hideDate } = usePostMetaContext();
   return (
     <AnalyticsContext pageSubSectionContext={pageSubSectionContext}>
       <div className={classes.root}>
@@ -149,7 +151,7 @@ const EARecentDiscussionItem = ({
                 </Link>
               </TagTooltipWrapper>
             )}{" "}
-            <FormatDate date={timestamp} includeAgo />
+            {!hideDate && <FormatDate date={timestamp} includeAgo />}
           </div>
         </div>
         {children && (
