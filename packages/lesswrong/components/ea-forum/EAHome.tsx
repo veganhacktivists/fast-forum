@@ -7,6 +7,7 @@ import { reviewIsActive, REVIEW_YEAR } from "../../lib/reviewUtils";
 import { maintenanceTime } from "../common/MaintenanceBanner";
 import { AnalyticsContext } from "../../lib/analyticsEvents";
 import { userHasPopularCommentsSection } from "../../lib/betas";
+import { PostMetaContext } from "./EAPostMeta";
 
 const eaHomeSequenceIdSetting = new PublicInstanceSetting<string | null>("eaHomeSequenceId", null, "optional"); // Sequence ID for the EAHomeHandbook sequence
 const showSmallpoxSetting = new DatabasePublicSetting<boolean>("showSmallpox", false);
@@ -99,15 +100,17 @@ const EAHome = ({ classes }: { classes: ClassesType }) => {
             <DismissibleSpotlightItem current className={classes.spotlightMargin} />
             <HomeLatestPosts />
             {!currentUser?.hideCommunitySection && <EAHomeCommunityPosts />}
-            {isEAForum && <QuickTakesSection />}
-            {userHasPopularCommentsSection(currentUser) && <EAPopularCommentsSection />}
-            <RecentDiscussionFeed
-              title="Recent discussion"
-              af={false}
-              commentsLimit={recentDiscussionCommentsPerPost}
-              maxAgeHours={72}
-              // maxAgeHours={18}
-            />
+            <PostMetaContext.Provider value={{ hideDate: true }}>
+              {isEAForum && <QuickTakesSection />}
+              {userHasPopularCommentsSection(currentUser) && <EAPopularCommentsSection />}
+              <RecentDiscussionFeed
+                title="Recent discussion"
+                af={false}
+                commentsLimit={recentDiscussionCommentsPerPost}
+                maxAgeHours={72}
+                // maxAgeHours={18}
+              />
+            </PostMetaContext.Provider>
           </>
         )}
       />

@@ -40,7 +40,7 @@ const QuickTakesSection = ({ classes }: { classes: ClassesType }) => {
 
   const { expanded: showCommunity } = useExpandedFrontpageSection({
     section: "quickTakesCommunity",
-    defaultExpanded: (currentUser: UsersCurrent | null) =>
+    defaultExpanded: (currentUser) =>
       currentUser?.hideCommunitySection ? false : !!currentUser?.expandedFrontpageSections?.community,
     onExpandEvent: "quickTakesSectionShowCommunity",
     onCollapseEvent: "quickTakesSectionHideCommunity",

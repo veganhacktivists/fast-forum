@@ -9,6 +9,7 @@ import { AnalyticsContext } from "../../lib/analyticsEvents";
 import { htmlToTextDefault } from "../../lib/htmlToText";
 import classNames from "classnames";
 import moment from "moment";
+import { usePostMetaContext } from "../ea-forum/EAPostMeta";
 
 const styles = (theme: ThemeType) => ({
   root: {
@@ -143,6 +144,9 @@ const QuickTakesCollapsedListItem = ({
   }, [commentsAreClickable, quickTake]);
 
   const { KarmaDisplay, ForumIcon, UsersName, LWTooltip, FooterTag, CommentsMenu, LWPopper, CommentsNode } = Components;
+
+  const { hideDate } = usePostMetaContext();
+
   return (
     <div onClick={onClick} className={classes.root}>
       <div className={classes.info}>
@@ -151,11 +155,13 @@ const QuickTakesCollapsedListItem = ({
           <ForumIcon icon="SoftUpArrow" />
         </div>
         <UsersName user={quickTake.user} className={classes.username} />
-        <div className={classes.date}>
-          <LWTooltip placement="right" title={<ExpandedDate date={quickTake.postedAt} />}>
-            {moment(new Date(quickTake.postedAt)).fromNow()}
-          </LWTooltip>
-        </div>
+        {!hideDate && (
+          <div className={classes.date}>
+            <LWTooltip placement="right" title={<ExpandedDate date={quickTake.postedAt} />}>
+              {moment(new Date(quickTake.postedAt)).fromNow()}
+            </LWTooltip>
+          </div>
+        )}
         {quickTake.relevantTags.length > 0 && (
           <InteractionWrapper className={classes.relevantTags}>
             {quickTake.relevantTags.map((tag) => (
