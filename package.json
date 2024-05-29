@@ -6,7 +6,6 @@
     "lint": "scripts/lint_and_checktypes.sh",
     "acceptmigrations": "ts-node scripts/acceptMigrations.ts || git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql",
     "makemigrations": "ts-node scripts/makeMigrations.ts",
-    "tsc": "tsc --noEmit --skipLibCheck",
     "eslint": "eslint --max-warnings 0 --cache --ext .jsx,js,tsx,ts packages",
     "build": "./build.js",
     "migrate": "node migrate",
