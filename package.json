@@ -2,7 +2,6 @@
   "name": "lesswrong",
   "version": "2.1.0",
   "scripts": {
-    "postinstall": "[ \"$NODE_ENV\" = production ] && exit 0; cd node_modules/bcrypt && pnpm run install",
     "checktypes": "scripts/lint_and_checktypes.sh",
     "lint": "scripts/lint_and_checktypes.sh",
     "acceptmigrations": "ts-node scripts/acceptMigrations.ts || git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql",
@@ -366,14 +365,6 @@
   "engines": {
     "node": "18.x",
     "pnpm": "9.1.2"
-  },
-  "pnpm": {
-    "overrides": {
-      "esbuild": "0.11.23"
-    },
-    "neverBuiltDependencies": [
-      "bcrypt"
-    ]
   },
   "packageManager": "pnpm@9.1.2+sha256.19c17528f9ca20bd442e4ca42f00f1b9808a9cb419383cd04ba32ef19322aba7"
 }
