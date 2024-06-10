@@ -29,25 +29,26 @@ export const getMeta = (url: string) => {
   };
 };
 
-type KarmaThreshold = 2 | 30 | 45 | 75 | 125 | 200;
+// type KarmaThreshold = 2 | 30 | 45 | 75 | 125 | 200;
 
-// LESSWRONG - this was added to handle karmaThresholds
-const roundKarmaThreshold = (threshold: number): KarmaThreshold =>
-  threshold < 16 || !threshold
-    ? 2
-    : threshold < 37
-      ? 30
-      : threshold < 60
-        ? 45
-        : threshold < 100
-          ? 75
-          : threshold < 162
-            ? 125
-            : 200;
+// // LESSWRONG - this was added to handle karmaThresholds
+// const roundKarmaThreshold = (threshold: number): KarmaThreshold =>
+//   threshold < 16 || !threshold
+//     ? 2
+//     : threshold < 37
+//       ? 30
+//       : threshold < 60
+//         ? 45
+//         : threshold < 100
+//           ? 75
+//           : threshold < 162
+//             ? 125
+//             : 200;
 
 const servePostRSS = async (terms: RSSTerms, url?: string) => {
   // LESSWRONG - this was added to handle karmaThresholds
-  let karmaThreshold = (terms.karmaThreshold = roundKarmaThreshold(parseInt(terms.karmaThreshold, 10)));
+  // let karmaThreshold = (terms.karmaThreshold = roundKarmaThreshold(parseInt(terms.karmaThreshold, 10)));
+  const karmaThreshold = 0 as number;
   url = url || rssTermsToUrl(terms); // Default value is the custom rss feed computed from terms
   const feed = new RSS(getMeta(url));
   const context = createAnonymousContext();
