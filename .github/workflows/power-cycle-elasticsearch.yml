@@ -1,4 +1,4 @@
-name: Power Cycle elasticsearch
+name: Power Cycle Elasticsearch
 
 on:
   schedule:
@@ -15,4 +15,4 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       - name: Powercycle Elasticsearch droplet
-        run: "doctl compute droplet-action power-cycle ${{ secrets.ELASTICSEARCH_DROPLET_ID }}"
+        run: "doctl compute droplet-action power-cycle --wait ${{ secrets.ELASTICSEARCH_DROPLET_ID }}"
