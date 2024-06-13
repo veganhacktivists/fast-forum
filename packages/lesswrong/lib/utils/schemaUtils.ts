@@ -9,6 +9,8 @@ import DataLoader from "dataloader";
 import * as _ from "underscore";
 import { loggerConstructor } from "./logging";
 import { DeferredForumSelect } from "../forumTypeUtils";
+import { PublicInstanceSetting } from "../instanceSettings";
+import { DatabasePublicSetting } from "../publicSettings";
 
 export const generateIdResolverSingle = <CollectionName extends CollectionNameString>({
   collectionName,
@@ -459,8 +461,23 @@ export function googleLocationToMongoLocation(gmaps: AnyBecauseTodo) {
   };
 }
 export function schemaDefaultValue<N extends CollectionNameString>(
-  defaultValue: any,
+  defaultValue: PublicInstanceSetting<unknown> | DatabasePublicSetting<unknown> | unknown,
 ): Partial<CollectionFieldSpecification<N>> {
+  const isFn = typeof defaultValue === "function";
+  const isGetter = defaultValue instanceof PublicInstanceSetting || defaultValue instanceof DatabasePublicSetting;
+
+  const getValue = () => {
+    if (isGetter) {
+      return defaultValue.get();
+    }
+
+    if (isFn) {
+      return defaultValue();
+    }
+
+    return defaultValue;
+  };
+
   // Used for both onCreate and onUpdate
   const fillIfMissing = ({
     newDocument,
@@ -470,7 +487,7 @@ export function schemaDefaultValue<N extends CollectionNameString>(
     fieldName: string;
   }) => {
     if (newDocument[fieldName as keyof ObjectsByCollectionName[N]] === undefined) {
-      return defaultValue instanceof DeferredForumSelect ? defaultValue.get() : defaultValue;
+      return getValue();
     } else {
       return undefined;
     }
@@ -493,7 +510,7 @@ export function schemaDefaultValue<N extends CollectionNameString>(
   };
 
   return {
-    defaultValue: defaultValue,
+    defaultValue: isGetter || isFn ? undefined : getValue(),
     onCreate: fillIfMissing,
     onUpdate: throwIfSetToNull,
     canAutofillDefault: true,
