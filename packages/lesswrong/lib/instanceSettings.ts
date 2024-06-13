@@ -246,3 +246,9 @@ export const hasPostInlineReactionsSetting = new PublicInstanceSetting<boolean>(
   isLWorAF,
   "optional",
 );
+
+export const autoreviewerUserIdSetting = new PublicInstanceSetting<string | null>(
+  "autoreviewerUserId",
+  "autoreviewuserid",
+  "optional",
+);

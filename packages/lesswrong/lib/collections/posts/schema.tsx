@@ -33,6 +33,7 @@ import { DEFAULT_QUALITATIVE_VOTE } from "../reviewVotes/schema";
 import { getCollaborativeEditorAccess } from "./collabEditingPermissions";
 import { getVotingSystems } from "../../voting/votingSystems";
 import {
+  autoreviewerUserIdSetting,
   fmCrosspostBaseUrlSetting,
   fmCrosspostSiteNameSetting,
   forumTypeSetting,
@@ -2039,11 +2040,15 @@ const schema: SchemaType<"Posts"> = {
       type: "User",
       nullable: true,
     }),
+    ...schemaDefaultValue(autoreviewerUserIdSetting.get()),
     optional: true,
     canRead: ["guests"],
     canUpdate: ["sunshineRegiment", "admins"],
     canCreate: ["sunshineRegiment", "admins"],
     hidden: true,
+    // onCreate: () => {
+    // // TODO: this or defaultvalue?
+    // },
   },
 
   reviewForCuratedUserId: {

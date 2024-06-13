@@ -14,6 +14,7 @@ import {
   taggingNamePluralCapitalSetting,
   taggingNamePluralSetting,
   taggingNameSetting,
+  autoreviewerUserIdSetting,
 } from "../../instanceSettings";
 import {
   accessFilterMultiple,
@@ -1959,6 +1960,7 @@ const schema: SchemaType<"Users"> = {
       type: "User",
       nullable: true,
     }),
+    ...schemaDefaultValue(autoreviewerUserIdSetting.get()),
     optional: true,
     canRead: ["sunshineRegiment", "admins", "guests"],
     canUpdate: ["sunshineRegiment", "admins"],
@@ -1966,6 +1968,7 @@ const schema: SchemaType<"Users"> = {
     group: formGroups.adminOptions,
   },
 
+  // TODO: might be interesting to use this instead but the DBUser type doesn't have it :(
   isReviewed: resolverOnlyField({
     type: Boolean,
     canRead: [userOwns, "sunshineRegiment", "admins"],
@@ -1973,11 +1976,15 @@ const schema: SchemaType<"Users"> = {
   }),
 
   reviewedAt: {
+    ...schemaDefaultValue(() => new Date()),
     type: Date,
     canRead: ["admins", "sunshineRegiment"],
     canUpdate: ["admins", "sunshineRegiment"],
     group: formGroups.adminOptions,
     optional: true,
+    // onCreate:(a)=>{
+    //   // TODO maybe?
+    // }
   },
 
   // A number from 0 to 1, where 0 is almost certainly spam, and 1 is almost
