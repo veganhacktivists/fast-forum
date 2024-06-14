@@ -353,7 +353,6 @@ export const eaForumTheme: SiteThemeSpecification = {
         },
         MuiListItemIcon: {
           root: {
-            color: "#fff",
             marginRight: 12,
           },
         },
