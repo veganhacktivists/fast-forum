@@ -4,177 +4,36 @@ const { build, cliopts } = require("estrella");
 const fs = require("fs");
 const process = require("process");
 const { zlib } = require("mz");
-const { getOutputDir, setOutputDir } = require("./scripts/startup/buildUtil");
-const {
-  setClientRebuildInProgress,
-  setServerRebuildInProgress,
-  generateBuildId,
-  startAutoRefreshServer,
-  initiateRefresh,
-  startLint,
-} = require("./scripts/startup/autoRefreshServer");
-
-/**
- * This is used for clean exiting in Github workflows by the dev
- * only route /api/quit
- */
-process.on("SIGQUIT", () => process.exit(0));
-
-const [opts, args] = cliopts.parse(
-  ["production", "Run in production mode"],
-  ["settings", "A JSON config file for the server", "<file>"],
-  ["db", "A path to a database connection config file", "<file>"],
-  ["postgresUrl", "A postgresql connection connection string", "<url>"],
-  ["postgresUrlFile", "The name of a text file which contains a postgresql URL for the database", "<file>"],
-  ["shell", "Open an interactive shell instead of running a webserver"],
-  ["command", "Run the given server shell command, then exit", "<string>"],
-  ["lint", "Run the linter on site refresh"],
-);
-
-const defaultServerPort = 3000;
-
-const getServerPort = () => {
-  if (opts.command) {
-    return 5001;
-  }
-  const port = parseInt(process.env.PORT ?? "");
-  return Number.isNaN(port) ? defaultServerPort : port;
-};
-
-let latestCompletedBuildId = generateBuildId();
-let inProgressBuildId = null;
-const serverPort = getServerPort();
-const websocketPort = serverPort + 1;
-
-setOutputDir(`./build`);
-
-const isProduction = "production" in opts ? opts.production : process.env.NODE_ENV === "production";
-
-const settingsFile = opts.settings ?? process.env.SETTINGS_FILE ?? "settings.json";
-
-const clientBundleBanner = `/*
- * LessWrong 2.0 (client JS bundle)
- * Copyright (c) 2022 the LessWrong development team. See https://github.com/ForumMagnum/ForumMagnum
- * for source and license details.
- *
- * Includes CkEditor.
- * Copyright (c) 2003-2022, CKSource - Frederico Knabben. All rights reserved.
- * For licensing, see https://github.com/ckeditor/ckeditor5/blob/master/LICENSE.md
- */`;
+const { startAutoRefreshServer } = require("./scripts/startup/autoRefreshServer");
 
 const bundleDefinitions = {
-  bundleIsProduction: isProduction,
+  bundleIsProduction: process.env.NODE_ENV === "production",
   bundleIsTest: false,
   bundleIsMigrations: false,
   defaultSiteAbsoluteUrl: `\"${process.env.ROOT_URL || ""}\"`,
-  buildId: `"${latestCompletedBuildId}"`,
-  serverPort: getServerPort(),
+  serverPort: parseInt(process.env.PORT ?? ""),
   ddEnv: `\"${process.env.DD_ENV || "local"}\"`,
 };
 
-const clientBundleDefinitions = {
-  bundleIsServer: false,
-  global: "window",
-};
-
-const serverBundleDefinitions = {
-  bundleIsServer: true,
-  estrellaPid: process.pid,
-};
-
-const clientOutfilePath = `${getOutputDir()}/client/js/bundle.js`;
+const clientOutfilePath = `./build/client/js/bundle.js`;
 build({
   entryPoints: ["./packages/lesswrong/client/clientStartup.ts"],
   bundle: true,
   target: "es6",
   sourcemap: true,
-  sourcesContent: true,
   outfile: clientOutfilePath,
-  minify: isProduction,
-  banner: {
-    js: clientBundleBanner,
-  },
+  sourcesContent: true,
   treeShaking: "ignore-annotations",
-  run: false,
-  onStart: (config, changedFiles, ctx) => {
-    setClientRebuildInProgress(true);
-    inProgressBuildId = generateBuildId();
-    config.define.buildId = `"${inProgressBuildId}"`;
-    if (opts.lint) {
-      startLint();
-    }
-  },
-  onEnd: (config, buildResult, ctx) => {
-    setClientRebuildInProgress(false);
-    if (buildResult?.errors?.length > 0) {
-      console.log("Skipping browser refresh notification because there were build errors");
-    } else {
-      // Creating brotli compressed version of bundle.js to save on client download size:
-      const brotliOutfilePath = `${clientOutfilePath}.br`;
-      // Always delete compressed version if it exists, to avoid stale files
-      if (fs.existsSync(brotliOutfilePath)) {
-        fs.unlinkSync(brotliOutfilePath);
-      }
-      if (isProduction) {
-        fs.writeFileSync(brotliOutfilePath, zlib.brotliCompressSync(fs.readFileSync(clientOutfilePath, "utf8")));
-      }
-
-      latestCompletedBuildId = inProgressBuildId;
-      if (cliopts.watch) {
-        initiateRefresh({ serverPort });
-      }
-    }
-    inProgressBuildId = null;
-  },
-  define: {
-    ...bundleDefinitions,
-    ...clientBundleDefinitions,
-  },
+  define: { ...bundleDefinitions, bundleIsServer: false },
 });
-
-let serverCli = [
-  process.argv[0],
-  "-r",
-  "source-map-support/register",
-  "--",
-  `${getOutputDir()}/server/js/serverBundle.js`,
-  "--settings",
-  settingsFile,
-];
-if (opts.shell) serverCli.push("--shell");
-if (opts.command) {
-  serverCli.push("--command");
-  serverCli.push(opts.command);
-}
-if (!isProduction) {
-  serverCli.splice(1, 0, "--inspect");
-}
 
 build({
   entryPoints: ["./packages/lesswrong/server/runServer.ts"],
   bundle: true,
-  outfile: `${getOutputDir()}/server/js/serverBundle.js`,
+  outfile: `./build/server/js/serverBundle.js`,
   platform: "node",
-  sourcemap: true,
-  sourcesContent: true,
-  minify: false,
-  run: cliopts.run && serverCli,
-  onStart: (config, changedFiles, ctx) => {
-    setServerRebuildInProgress(true);
-    if (opts.lint) {
-      startLint();
-    }
-  },
-  onEnd: () => {
-    setServerRebuildInProgress(false);
-    if (cliopts.watch) {
-      initiateRefresh({ serverPort });
-    }
-  },
-  define: {
-    ...bundleDefinitions,
-    ...serverBundleDefinitions,
-  },
+  define: { ...bundleDefinitions, bundleIsServer: true },
+  run: true,
   external: [
     "akismet-api",
     "canvas",
