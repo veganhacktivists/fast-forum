@@ -37,5 +37,7 @@ import { addField } from "./meta/utils";
 export const acceptsSchemaHash = "346664785a7ca60371b76fd9d92a4f30";
 
 export const up = async ({ db }: MigrationContext) => {
+  console.log(Books.getTable());
+
   await addField(db, Books, "tocTitle");
 };

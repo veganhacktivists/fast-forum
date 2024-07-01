@@ -84,27 +84,28 @@ export class PublicInstanceSetting<SettingValueType> {
     private settingType: "optional" | "warning" | "required",
   ) {
     initializeSetting(settingName, "instance");
-    if (isDevelopment && settingType !== "optional") {
-      const settingValue = getSetting(settingName);
-      if (typeof settingValue === "undefined") {
-        if (settingType === "warning") {
-          if (!isAnyTest) {
-            // eslint-disable-next-line no-console
-            console.log(
-              `No setting value provided for public instance setting for setting with name ${settingName} despite it being marked as warning`,
-            );
-          }
-        }
-        if (settingType === "required") {
-          throw Error(
-            `No setting value provided for public instance setting for setting with name ${settingName} despite it being marked as required`,
-          );
-        }
-      }
-    }
+    // if (isDevelopment && settingType !== "optional") {
+    //   const settingValue = getSetting(settingName);
+    //   if (typeof settingValue === "undefined") {
+    //     if (settingType === "warning") {
+    //       if (!isAnyTest) {
+    //         // eslint-disable-next-line no-console
+    //         console.log(
+    //           `No setting value provided for public instance setting for setting with name ${settingName} despite it being marked as warning`,
+    //         );
+    //       }
+    //     }
+    //     if (settingType === "required") {
+    //       throw Error(
+    //         `No setting value provided for public instance setting for setting with name ${settingName} despite it being marked as required`,
+    //       );
+    //     }
+    //   }
+    // }
   }
   get(): SettingValueType {
-    return getSetting(this.settingName, this.defaultValue);
+    return this.defaultValue;
+    // return getSetting(this.settingName, this.defaultValue);
   }
 }
 
@@ -114,7 +115,7 @@ export class PublicInstanceSetting<SettingValueType> {
 
 export const allForumTypes = new TupleSet(["LessWrong", "AlignmentForum", "EAForum"] as const);
 export type ForumTypeString = UnionOf<typeof allForumTypes>;
-export const forumTypeSetting = new PublicInstanceSetting<ForumTypeString>("forumType", "LessWrong", "warning"); // What type of Forum is being run, {LessWrong, AlignmentForum, EAForum}
+export const forumTypeSetting = new PublicInstanceSetting<ForumTypeString>("forumType", "EAForum", "warning"); // What type of Forum is being run, {LessWrong, AlignmentForum, EAForum}
 
 export const isLW = forumTypeSetting.get() === "LessWrong";
 export const isEAForum = forumTypeSetting.get() === "EAForum";

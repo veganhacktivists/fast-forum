@@ -7,7 +7,7 @@
 require("ts-node/register");
 const { getDatabaseConfig } = require("./scripts/startup/buildUtil");
 
-const initGlobals = (args, isProd) => {
+const initGlobals = async (args, isProd) => {
   global.bundleIsServer = true;
   global.bundleIsTest = false;
   global.bundleIsProduction = isProd;
@@ -16,12 +16,15 @@ const initGlobals = (args, isProd) => {
   global.serverPort = 5001;
   global.estrellaPid = -1;
 
+  const { initPostgres } = require("./packages/lesswrong/server/serverStartup.ts");
+  // console.log(require("./packages/lesswrong/server/serverStartup.ts"));
+  await initPostgres();
   const { getInstanceSettings } = require("./packages/lesswrong/lib/executionEnvironment");
   getInstanceSettings(args); // These args will be cached for later
 };
 
-const fetchImports = (args, isProd) => {
-  initGlobals(args, isProd);
+const fetchImports = async (args, isProd) => {
+  await initGlobals(args, isProd);
 
   const { getSqlClient, getSqlClientOrThrow, setSqlClient } = require("./packages/lesswrong/lib/sql/sqlClient");
   const { createSqlConnection } = require("./packages/lesswrong/server/sqlConnection");
@@ -89,7 +92,7 @@ const settingsFileName = (mode) => {
     throw new Error("Unable to run migration without a mode or environment (PG_URL and SETTINGS_FILE)");
   }
 
-  const { getSqlClient, setSqlClient, createSqlConnection } = fetchImports(args, mode === "prod");
+  const { getSqlClient, setSqlClient, createSqlConnection } = await fetchImports(args, mode === "prod");
 
   let exitCode = 0;
 

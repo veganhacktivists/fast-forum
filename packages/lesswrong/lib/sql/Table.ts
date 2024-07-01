@@ -66,7 +66,7 @@ class Table<T extends DbObject> {
     forumType?: ForumTypeString,
   ): Table<T> {
     const table = new Table<T>(collection.collectionName);
-    forumType ??= forumTypeSetting.get() ?? "EAForum";
+    forumType ??= forumTypeSetting.get();
 
     const schema = collection._schemaFields;
     for (const field of Object.keys(schema)) {
