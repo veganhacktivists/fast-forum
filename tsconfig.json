@@ -19,6 +19,7 @@
     "noEmit": true
   },
   "include": ["packages/lesswrong", "public/lesswrong-editor/src", "cypress"],
+  "files": ["./build.ts"],
   "exclude": ["node_modules", "build"],
   "ts-node": {
     "files": true

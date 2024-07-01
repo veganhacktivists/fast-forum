@@ -23,9 +23,9 @@ const initGlobals = (args, isProd) => {
 const fetchImports = (args, isProd) => {
   initGlobals(args, isProd);
 
-  const { getSqlClientOrThrow, setSqlClient } = require("./packages/lesswrong/lib/sql/sqlClient");
+  const { getSqlClient, getSqlClientOrThrow, setSqlClient } = require("./packages/lesswrong/lib/sql/sqlClient");
   const { createSqlConnection } = require("./packages/lesswrong/server/sqlConnection");
-  return { getSqlClientOrThrow, setSqlClient, createSqlConnection };
+  return { getSqlClient, getSqlClientOrThrow, setSqlClient, createSqlConnection };
 };
 
 const credentialsPath = (forumType) => {
@@ -89,16 +89,11 @@ const settingsFileName = (mode) => {
     throw new Error("Unable to run migration without a mode or environment (PG_URL and SETTINGS_FILE)");
   }
 
-  const { getSqlClientOrThrow, setSqlClient, createSqlConnection } = fetchImports(args, mode === "prod");
-
-  if (isRunCommand) {
-    const { initServer } = require("./packages/lesswrong/server/serverStartup");
-    await initServer(args);
-  }
+  const { getSqlClient, setSqlClient, createSqlConnection } = fetchImports(args, mode === "prod");
 
   let exitCode = 0;
 
-  const db = isRunCommand ? getSqlClientOrThrow() : await createSqlConnection(args.postgresUrl);
+  const db = getSqlClient() ?? (await createSqlConnection(args.postgresUrl));
 
   try {
     await db.tx(async (transaction) => {
