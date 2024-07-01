@@ -5,32 +5,21 @@ import { updateDefaultValue, dropDefaultValue } from "./meta/utils";
 
 export const up = async ({ db }: MigrationContext) => {
   await db.tx(async (db) => {
-    await Promise.all([
-      Posts.rawUpdateMany(
-        {
-          reviewedByUserId: null,
-        },
-        { $set: { reviewedByUserId: autoreviewerUserIdSetting.get() } },
-      ),
-      Users.rawUpdateMany(
-        {
-          reviewedByUserId: null,
-        },
-        { $set: { reviewedByUserId: autoreviewerUserIdSetting.get() } },
-      ),
-      Users.rawUpdateMany(
-        {
-          reviewedAt: null,
-        },
-        { $set: { reviewedAt: new Date() } },
-      ),
-    ]);
-
-    await Promise.all([
-      updateDefaultValue(db, Posts, "reviewedByUserId"),
-      updateDefaultValue(db, Users, "reviewedByUserId"),
-      updateDefaultValue(db, Users, "reviewedAt"),
-    ]);
+    await db.none(`UPDATE "${Posts.collectionName}"
+                  SET "reviewedByUserId" = '${autoreviewerUserIdSetting.get()}'
+                  WHERE "reviewedByUserId" IS NULL
+                  `);
+    await db.none(`UPDATE "${Users.collectionName}"
+                  SET "reviewedByUserId" = '${autoreviewerUserIdSetting.get()}'
+                  WHERE "reviewedByUserId" IS NULL
+                  `);
+    await db.none(`UPDATE "${Users.collectionName}"
+                  SET "reviewedByUserId" = NOW()
+                  WHERE "reviewedAt" IS NULL
+                  `);
+    await updateDefaultValue(db, Posts, "reviewedByUserId");
+    await updateDefaultValue(db, Users, "reviewedByUserId");
+    await updateDefaultValue(db, Users, "reviewedAt");
   });
 };
 
@@ -42,24 +31,17 @@ export const down = async ({ db }: MigrationContext) => {
       dropDefaultValue(db, Users, "reviewedAt"),
     ]);
 
-    await Promise.all([
-      Posts.rawUpdateMany(
-        { reviewedByUserId: autoreviewerUserIdSetting.get() },
-        {
-          $set: {
-            reviewedByUserId: null,
-          },
-        },
-      ),
-      Users.rawUpdateMany(
-        { reviewedByUserId: autoreviewerUserIdSetting.get() },
-        {
-          $set: {
-            reviewedByUserId: null,
-            reviewedAt: null,
-          },
-        },
-      ),
-    ]);
+    await db.none(`UPDATE "${Posts.collectionName}"
+                  SET "reviewedByUserId" = NULL
+                  WHERE "reviewedByUserId" = '${autoreviewerUserIdSetting.get()}'
+                  `);
+    await db.none(`UPDATE "${Users.collectionName}"
+                  SET "reviewedByUserId" = NULL, "reviewedAt" = NULL
+                  WHERE "reviewedByUserId" = '${autoreviewerUserIdSetting.get()}'
+                  `);
+    await db.none(`UPDATE "${Users.collectionName}"
+                  SET "reviewedByUserId" = NOW()
+                  WHERE "reviewedAt" IS NULL
+                  `);
   });
 };
