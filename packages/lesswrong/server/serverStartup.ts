@@ -85,14 +85,22 @@ const initSettings = () => {
   return refreshSettingsCaches();
 };
 
-const initPostgres = async () => {
-  if (Collections.some((collection) => collection instanceof PgCollection)) {
-    for (const collection of Collections) {
-      if (collection instanceof PgCollection) {
-        collection.buildPostgresTable();
-      }
+export const initPostgres = async () => {
+  Collections.filter((collection) => collection instanceof PgCollection).map((collection: PgCollection) => {
+    console.log("building table", collection.tableName);
+    try {
+      collection.buildPostgresTable();
+    } catch (e: unknown) {
+      console.error(e);
     }
-  }
+  });
+  // if (Collections.some((collection) => collection instanceof PgCollection)) {
+  //   for (const collection of Collections) {
+  //     if (collection instanceof PgCollection) {
+  //       collection.buildPostgresTable();
+  //     }
+  //   }
+  // }
 
   // If we're migrating up, we might be migrating from the start on a fresh database, so skip the check
   // for whether postgres views exist
