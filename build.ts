@@ -1,39 +1,48 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 
-const { build, cliopts } = require("estrella");
-const fs = require("fs");
-const process = require("process");
-const { zlib } = require("mz");
-const { startAutoRefreshServer } = require("./scripts/startup/autoRefreshServer");
+import { BuildConfig, build } from "estrella";
+import process from "process";
+
+const isProd = process.env.NODE_ENV === "production";
 
 const bundleDefinitions = {
-  bundleIsProduction: process.env.NODE_ENV === "production",
+  bundleIsProduction: isProd,
   bundleIsTest: false,
   bundleIsMigrations: false,
-  defaultSiteAbsoluteUrl: `\"${process.env.ROOT_URL || ""}\"`,
+  defaultSiteAbsoluteUrl: `"${process.env.ROOT_URL || ""}"`,
   serverPort: parseInt(process.env.PORT ?? ""),
-  ddEnv: `\"${process.env.DD_ENV || "local"}\"`,
+  ddEnv: `"${process.env.DD_ENV || "local"}"`,
+} as unknown as Record<string, string>;
+
+const commonOpts: Partial<BuildConfig> = {
+  sourcemap: true,
+  sourcesContent: true,
+  bundle: true,
+  minify: isProd,
 };
 
-const clientOutfilePath = `./build/client/js/bundle.js`;
-build({
+const clientOutPath = "./build/client/js/bundle.js";
+const serverOutPath = "./build/server/js/serverBundle.js";
+
+const clientBuild = build({
+  ...commonOpts,
   entryPoints: ["./packages/lesswrong/client/clientStartup.ts"],
   bundle: true,
   target: "es6",
-  sourcemap: true,
-  outfile: clientOutfilePath,
-  sourcesContent: true,
+  run: false,
+  outfile: clientOutPath,
   treeShaking: "ignore-annotations",
-  define: { ...bundleDefinitions, bundleIsServer: false },
+  define: { ...bundleDefinitions, bundleIsServer: false as unknown as string },
+  globalName: "window",
 });
 
-build({
+const serverBuild = build({
+  ...commonOpts,
   entryPoints: ["./packages/lesswrong/server/runServer.ts"],
   bundle: true,
-  outfile: `./build/server/js/serverBundle.js`,
+  outfile: serverOutPath,
   platform: "node",
-  define: { ...bundleDefinitions, bundleIsServer: true },
-  run: true,
+  define: { ...bundleDefinitions, bundleIsServer: true as unknown as string },
   external: [
     "akismet-api",
     "canvas",
@@ -70,7 +79,3 @@ build({
     "node-abort-controller",
   ],
 });
-
-if (cliopts.watch && cliopts.run && !isProduction) {
-  startAutoRefreshServer({ serverPort, websocketPort });
-}
