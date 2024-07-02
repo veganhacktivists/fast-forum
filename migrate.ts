@@ -73,16 +73,13 @@ void (async () => {
   const db = getSqlClient() ?? (await createSqlConnection(args.postgresUrl));
 
   try {
-    await db.tx(async (_transaction) => {
-      const transaction = _transaction as unknown as SqlClient;
-      const migrator = await createMigrator(transaction);
-      const result = await migrator.runAsCLI();
-      if (!result) {
-        // If the migration throws an error it will have already been reported,
-        // but we need to manually propagate it to the exitCode
-        exitCode = 1;
-      }
-    });
+    const migrator = await createMigrator(db);
+    const result = await migrator.runAsCLI();
+    if (!result) {
+      // If the migration throws an error it will have already been reported,
+      // but we need to manually propagate it to the exitCode
+      exitCode = 1;
+    }
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error("An error occurred while running migrations:", e);
