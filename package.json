@@ -8,7 +8,7 @@
     "makemigrations": "ts-node scripts/makeMigrations.ts",
     "eslint": "eslint --max-warnings 0 --cache --ext .jsx,js,tsx,ts packages",
     "build": "ts-node ./build.ts",
-    "start": "pnpm build -r",
+    "start": "pnpm build --run",
     "prod": "NODE_ENV=production pnpm start",
     "migrate": "ts-node ./migrate.ts",
     "branchdb": "ts-node scripts/branchDb.ts",

@@ -32,7 +32,10 @@ const clientBuild = build({
   run: false,
   outfile: clientOutPath,
   treeShaking: "ignore-annotations",
-  define: { ...bundleDefinitions, bundleIsServer: false as unknown as string },
+  define: {
+    ...bundleDefinitions,
+    bundleIsServer: false as unknown as string,
+  },
   globalName: "window",
 });
 
