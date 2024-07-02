@@ -23,11 +23,59 @@ const commonOpts: Partial<BuildConfig> = {
 
 const clientOutPath = "./build/client/js/bundle.js";
 const serverOutPath = "./build/server/js/serverBundle.js";
+const migrationOutPath = "./build/migration/js/runMigrations.js";
+
+const migrationBuild = build({
+  ...commonOpts,
+  entryPoints: ["./migrate.ts"],
+  platform: "node",
+  run: false,
+  outfile: migrationOutPath,
+  define: {
+    ...bundleDefinitions,
+    bundleIsServer: true,
+    bundleIsMigrations: true,
+  } as unknown as typeof bundleDefinitions,
+  external: [
+    "akismet-api",
+    "canvas",
+    "express",
+    "mz",
+    "pg",
+    "pg-promise",
+    "mathjax",
+    "mathjax-node",
+    "mathjax-node-page",
+    "jsdom",
+    "@sentry/node",
+    "node-fetch",
+    "later",
+    "turndown",
+    "apollo-server",
+    "apollo-server-express",
+    "graphql",
+    "csso",
+    "io-ts",
+    "fp-ts",
+    "bcrypt",
+    "node-pre-gyp",
+    "intercom-client",
+    "node:*",
+    "fsevents",
+    "chokidar",
+    "auth0",
+    "dd-trace",
+    "pg-formatter",
+    "gpt-3-encoder",
+    "@elastic/elasticsearch",
+    "zod",
+    "node-abort-controller",
+  ],
+});
 
 const clientBuild = build({
   ...commonOpts,
   entryPoints: ["./packages/lesswrong/client/clientStartup.ts"],
-  bundle: true,
   target: "es6",
   run: false,
   outfile: clientOutPath,
@@ -42,7 +90,6 @@ const clientBuild = build({
 const serverBuild = build({
   ...commonOpts,
   entryPoints: ["./packages/lesswrong/server/runServer.ts"],
-  bundle: true,
   outfile: serverOutPath,
   platform: "node",
   define: { ...bundleDefinitions, bundleIsServer: true as unknown as string },

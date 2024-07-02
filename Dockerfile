@@ -1,27 +1,38 @@
 # Node 18.x is LTS
-FROM node:18
+FROM node:18 as base
+ENV CI=true
 ENV IS_DOCKER=true
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+WORKDIR /app
+
 RUN corepack enable
-WORKDIR /usr/src/app
-
-COPY pnpm-lock.yaml package.json ./
-RUN pnpm install --frozen-lockfile --shamefully-hoist
-
-# COPY yarn.lock yarn.lock
-# RUN yarn install && yarn cache clean
-
-COPY public/lesswrong-editor public/lesswrong-editor
-COPY . .
-
-ENV SETTINGS_FILE="settings.json"
 
 ENV NODE_ENV="production"
 ENV NODE_OPTIONS="--max_old_space_size=2560 --heapsnapshot-signal=SIGUSR2"
 
+COPY pnpm-lock.yaml package.json ./
+
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile --shamefully-hoist --no-optional
+
+FROM base AS dev-deps
+COPY public/lesswrong-editor public/lesswrong-editor
+COPY . .
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod=false --shamefully-hoist --no-optional
+
+FROM dev-deps as build
+RUN pnpm run build
+
+FROM base
+COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY --from=build /app/build /app/build
+
+ENV SETTINGS_FILE="settings.json"
 ARG PORT=3000
+ENV PORT=${PORT}
 EXPOSE $PORT
 
-# migrate up runs migrations and starts the service
-CMD ["sh", "-c", "pnpm migrate up && pnpm production"]
+COPY settings.json .
+
+CMD ["sh", "-c", "node ./build/migration/js/runMigrations.js up && exec node ./build/server/js/serverBundle.js"]
