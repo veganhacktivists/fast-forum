@@ -1,5 +1,12 @@
 import { initializeSetting } from "./publicSettings";
-import { isServer, isDevelopment, isAnyTest, getInstanceSettings, getAbsoluteUrl } from "./executionEnvironment";
+import {
+  isServer,
+  isDevelopment,
+  isAnyTest,
+  isMigrations,
+  getInstanceSettings,
+  getAbsoluteUrl,
+} from "./executionEnvironment";
 import { pluralize } from "./vulcan-lib/pluralize";
 import startCase from "lodash/startCase"; // AKA: capitalize, titleCase
 import { TupleSet, UnionOf } from "./utils/typeGuardUtils";
@@ -84,28 +91,27 @@ export class PublicInstanceSetting<SettingValueType> {
     private settingType: "optional" | "warning" | "required",
   ) {
     initializeSetting(settingName, "instance");
-    // if (isDevelopment && settingType !== "optional") {
-    //   const settingValue = getSetting(settingName);
-    //   if (typeof settingValue === "undefined") {
-    //     if (settingType === "warning") {
-    //       if (!isAnyTest) {
-    //         // eslint-disable-next-line no-console
-    //         console.log(
-    //           `No setting value provided for public instance setting for setting with name ${settingName} despite it being marked as warning`,
-    //         );
-    //       }
-    //     }
-    //     if (settingType === "required") {
-    //       throw Error(
-    //         `No setting value provided for public instance setting for setting with name ${settingName} despite it being marked as required`,
-    //       );
-    //     }
-    //   }
-    // }
+    if (isDevelopment && settingType !== "optional") {
+      const settingValue = getSetting(settingName);
+      if (typeof settingValue === "undefined") {
+        if (settingType === "warning") {
+          if (!isAnyTest && !isMigrations) {
+            // eslint-disable-next-line no-console
+            console.log(
+              `No setting value provided for public instance setting for setting with name ${settingName} despite it being marked as warning`,
+            );
+          }
+        }
+        if (settingType === "required") {
+          throw Error(
+            `No setting value provided for public instance setting for setting with name ${settingName} despite it being marked as required`,
+          );
+        }
+      }
+    }
   }
   get(): SettingValueType {
-    return this.defaultValue;
-    // return getSetting(this.settingName, this.defaultValue);
+    return getSetting(this.settingName, this.defaultValue);
   }
 }
 
