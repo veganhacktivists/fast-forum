@@ -4,12 +4,6 @@
  * If no environment is specified, you can use the environment variables PG_URL
  * and SETTINGS_FILE
  */
-//@ts-expect-error Not a TS file
-import { getDatabaseConfig } from "./scripts/startup/buildUtil";
-import { initDatabases, initPostgres, initServer, initSettings } from "./packages/lesswrong/server/serverStartup.ts";
-import { getSqlClient } from "./packages/lesswrong/lib/sql/sqlClient.ts";
-import { createSqlConnection } from "./packages/lesswrong/server/sqlConnection.ts";
-import { createMigrator } from "./packages/lesswrong/server/migrations/meta/umzug.ts";
 
 global.bundleIsServer = true;
 global.bundleIsTest = false;
@@ -18,6 +12,14 @@ global.bundleIsMigrations = true;
 global.defaultSiteAbsoluteUrl = "";
 global.serverPort = 5001;
 global.estrellaPid = -1;
+
+//@ts-expect-error Not a TS file
+import { getDatabaseConfig } from "./scripts/startup/buildUtil";
+
+import { initDatabases, initPostgres, initServer, initSettings } from "./packages/lesswrong/server/serverStartup.ts";
+import { getSqlClient } from "./packages/lesswrong/lib/sql/sqlClient.ts";
+import { createSqlConnection } from "./packages/lesswrong/server/sqlConnection.ts";
+import { createMigrator } from "./packages/lesswrong/server/migrations/meta/umzug.ts";
 
 const { postgresUrl } = getDatabaseConfig();
 
@@ -36,6 +38,7 @@ const settingsFileName = (mode: string) => {
 void (async () => {
   const command = process.argv[2];
   if (["dev", "development", "staging", "production", "prod"].includes(command)) {
+    // eslint-disable-next-line no-console
     console.error("Please specify the command before the mode");
     process.exit(1);
   }
@@ -81,6 +84,7 @@ void (async () => {
       }
     });
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error("An error occurred while running migrations:", e);
     exitCode = 1;
   }
