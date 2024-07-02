@@ -15,13 +15,10 @@ importers:
     dependencies:
       '@anthropic-ai/sdk':
         specifier: ^0.5.4
-        version: 0.5.4
+        version: 0.5.4(encoding@0.1.13)
       '@apollo/client':
         specifier: ^3.2.0
-        version: 3.3.5(graphql@14.7.0)(react@16.14.0)
-      '@babel/runtime':
-        specifier: ^7.12.1
-        version: 7.23.2
+        version: 3.3.5(graphql@14.7.0)(react@16.14.0)(subscriptions-transport-ws@0.9.19(bufferutil@4.0.8)(graphql@14.7.0)(utf-8-validate@5.0.10))
       '@centreforeffectivealtruism/umzug':
         specifier: ^3.2.1
         version: 3.2.1
@@ -39,13 +36,13 @@ importers:
         version: 2.0.16(react@16.14.0)
       '@material-ui/core':
         specifier: 3.1.2
-        version: 3.1.2(react-dom@16.14.0)(react@16.14.0)
+        version: 3.1.2(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       '@material-ui/icons':
         specifier: ^3.0.0
-        version: 3.0.2(@material-ui/core@3.1.2)(react-dom@16.14.0)(react@16.14.0)
+        version: 3.0.2(@material-ui/core@3.1.2(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       '@material-ui/lab':
         specifier: ^3.0.0-alpha.30
-        version: 3.0.0-alpha.30(@material-ui/core@3.1.2)(react-dom@16.14.0)(react@16.14.0)
+        version: 3.0.0-alpha.30(@material-ui/core@3.1.2(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       '@popperjs/core':
         specifier: ^2.11.5
         version: 2.11.5
@@ -69,202 +66,7 @@ importers:
         version: 1.11.0
       '@testing-library/react-hooks':
         specifier: ^7.0.2
-        version: 7.0.2(react-dom@16.14.0)(react-test-renderer@16.14.0)(react@16.14.0)
-      '@types/algoliasearch':
-        specifier: ^3.34.11
-        version: 3.34.11
-      '@types/auth0':
-        specifier: ^2.35.2
-        version: 2.35.3
-      '@types/bcrypt':
-        specifier: ^3.0.0
-        version: 3.0.0
-      '@types/chai-as-promised':
-        specifier: ^7.1.2
-        version: 7.1.3
-      '@types/cheerio':
-        specifier: ^0.22.28
-        version: 0.22.28
-      '@types/classnames':
-        specifier: ^2.2.9
-        version: 2.2.11
-      '@types/cookie-parser':
-        specifier: ^1.4.2
-        version: 1.4.2
-      '@types/crypto-js':
-        specifier: ^3.1.44
-        version: 3.1.47
-      '@types/diff-match-patch':
-        specifier: ^1.0.34
-        version: 1.0.34
-      '@types/draft-convert':
-        specifier: ^2.1.1
-        version: 2.1.1
-      '@types/draft-js':
-        specifier: ^0.10.40
-        version: 0.10.44
-      '@types/enzyme':
-        specifier: ^3.10.5
-        version: 3.10.8
-      '@types/express':
-        specifier: 4.17.14
-        version: 4.17.14
-      '@types/express-session':
-        specifier: ^1.17.3
-        version: 1.17.3
-      '@types/gapi':
-        specifier: 0.0.39
-        version: 0.0.39
-      '@types/google__maps':
-        specifier: ^0.5.14
-        version: 0.5.14
-      '@types/graphql-date':
-        specifier: ^1.0.5
-        version: 1.0.5
-      '@types/graphql-type-json':
-        specifier: ^0.3.2
-        version: 0.3.2
-      '@types/html-to-text':
-        specifier: ^9.0.0
-        version: 9.0.0
-      '@types/htmlparser2':
-        specifier: ^3.10.1
-        version: 3.10.7
-      '@types/intercom-client':
-        specifier: ^2.11.10
-        version: 2.11.10
-      '@types/jest':
-        specifier: ^26.0.19
-        version: 26.0.19
-      '@types/jsdom':
-        specifier: ^16.2.1
-        version: 16.2.5
-      '@types/jsonwebtoken':
-        specifier: ^8.3.9
-        version: 8.5.0
-      '@types/later':
-        specifier: ^1.2.6
-        version: 1.2.6
-      '@types/lodash':
-        specifier: ^4.14.150
-        version: 4.14.165
-      '@types/lolex':
-        specifier: ^5.1.0
-        version: 5.1.0
-      '@types/lru-cache':
-        specifier: ^5.1.0
-        version: 5.1.0
-      '@types/markdown-it':
-        specifier: ^12.0.1
-        version: 12.0.1
-      '@types/markdown-it-container':
-        specifier: ^2.0.3
-        version: 2.0.3
-      '@types/md5':
-        specifier: ^2.3.2
-        version: 2.3.2
-      '@types/mocha':
-        specifier: ^5.2.7
-        version: 5.2.7
-      '@types/mz':
-        specifier: ^2.7.3
-        version: 2.7.3
-      '@types/node':
-        specifier: 18.11.0
-        version: 18.11.0
-      '@types/nodemailer':
-        specifier: ^6.4.1
-        version: 6.4.1
-      '@types/papaparse':
-        specifier: ^5.0.3
-        version: 5.2.4
-      '@types/passport':
-        specifier: ^1.0.6
-        version: 1.0.6
-      '@types/passport-auth0':
-        specifier: ^1.0.4
-        version: 1.0.4
-      '@types/passport-facebook':
-        specifier: ^2.1.10
-        version: 2.1.10
-      '@types/passport-github2':
-        specifier: ^1.2.4
-        version: 1.2.4
-      '@types/passport-google-oauth20':
-        specifier: ^2.0.6
-        version: 2.0.6
-      '@types/passport-strategy':
-        specifier: ^0.2.35
-        version: 0.2.35
-      '@types/pg':
-        specifier: ^7.14.3
-        version: 7.14.7
-      '@types/qs':
-        specifier: 6.9.1
-        version: 6.9.1
-      '@types/react':
-        specifier: ^17.0.0
-        version: 17.0.43
-      '@types/react-autosuggest':
-        specifier: ^9.3.13
-        version: 9.3.14
-      '@types/react-copy-to-clipboard':
-        specifier: ^5.0.0
-        version: 5.0.0
-      '@types/react-dom':
-        specifier: ^17.0.0
-        version: 17.0.14
-      '@types/react-geosuggest':
-        specifier: ^2.7.10
-        version: 2.7.10
-      '@types/react-helmet':
-        specifier: ^5.0.15
-        version: 5.0.16
-      '@types/react-instantsearch':
-        specifier: ^6.10.0
-        version: 6.10.0
-      '@types/react-instantsearch-dom':
-        specifier: ^6.3.0
-        version: 6.10.0
-      '@types/react-map-gl':
-        specifier: ^5.2.2
-        version: 5.2.9
-      '@types/react-no-ssr':
-        specifier: ^1.1.1
-        version: 1.1.1
-      '@types/react-router':
-        specifier: ^5.1.13
-        version: 5.1.20
-      '@types/react-router-dom':
-        specifier: ^5.1.13
-        version: 5.3.3
-      '@types/recompose':
-        specifier: ^0.30.7
-        version: 0.30.7
-      '@types/request':
-        specifier: ^2.48.5
-        version: 2.48.5
-      '@types/rss':
-        specifier: ^0.0.28
-        version: 0.0.28
-      '@types/sanitize-html':
-        specifier: ^1.22.0
-        version: 1.27.0
-      '@types/simpl-schema':
-        specifier: ^1.10.4
-        version: 1.10.4
-      '@types/speakingurl':
-        specifier: ^13.0.2
-        version: 13.0.2
-      '@types/turndown':
-        specifier: ^5.0.0
-        version: 5.0.0
-      '@types/underscore':
-        specifier: 1.9.4
-        version: 1.9.4
-      '@types/uuid':
-        specifier: ^7.0.2
-        version: 7.0.4
+        version: 7.0.2(react-dom@16.14.0(react@16.14.0))(react-test-renderer@16.14.0(react@16.14.0))(react@16.14.0)
       akismet-api:
         specifier: ^4.2.0
         version: 4.2.0
@@ -276,16 +78,16 @@ importers:
         version: 1.9.0
       apollo-server:
         specifier: 2.25.4
-        version: 2.25.4(graphql@14.7.0)
+        version: 2.25.4(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10)
       apollo-server-express:
         specifier: 2.15.0
-        version: 2.15.0(graphql@14.7.0)
+        version: 2.15.0(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10)
       auth0:
         specifier: ^2.42.0
         version: 2.42.0
       bcrypt:
         specifier: ^5.0.1
-        version: 5.0.1
+        version: 5.0.1(encoding@0.1.13)
       bowser:
         specifier: ^1.9.4
         version: 1.9.4
@@ -333,52 +135,52 @@ importers:
         version: 1.0.5
       draft-convert:
         specifier: ^2.1.2
-        version: 2.1.10(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.1.10(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js:
         specifier: ^0.10.4
-        version: 0.10.5(react-dom@16.14.0)(react@16.14.0)
+        version: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js-alignment-plugin:
         specifier: 2.0.6
-        version: 2.0.6(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.0.6(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js-anchor-plugin:
         specifier: ^2.0.2
-        version: 2.0.3(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.0.3(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js-block-breakout-plugin:
         specifier: ^2.0.1
-        version: 2.0.1(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.0.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js-buttons:
         specifier: 2.0.1
-        version: 2.0.1(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.0.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js-divider-plugin:
         specifier: ^0.1.1
-        version: 0.1.1(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+        version: 0.1.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js-focus-plugin:
         specifier: ^2.1.0
-        version: 2.2.0(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.2.0(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js-image-plugin:
         specifier: ^2.0.5
-        version: 2.0.7(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.0.7(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js-inline-toolbar-plugin:
         specifier: ^2.0.3
-        version: 2.0.3(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.0.3(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js-linkify-plugin:
         specifier: ^2.0.0-rc8
-        version: 2.0.2(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.0.2(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js-markdown-shortcuts-plugin:
         specifier: ^0.3.0
-        version: 0.3.0(draft-js-plugins-editor@2.1.1)(react-dom@16.14.0)(react@16.14.0)
+        version: 0.3.0(draft-js-plugins-editor@2.1.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js-mathjax-plugin:
         specifier: ^1.3.4
-        version: 1.3.4(draft-js-plugins-editor@2.1.1)(draft-js@0.10.5)(immutable@3.8.2)(react@16.14.0)
+        version: 1.3.4(draft-js-plugins-editor@2.1.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(immutable@3.7.6)(react@16.14.0)
       draft-js-plugins-editor:
         specifier: ^2.1.1
-        version: 2.1.1(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.1.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js-resizeable-plugin:
         specifier: ^2.0.6
-        version: 2.0.9(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.0.9(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       draft-js-richbuttons-plugin:
         specifier: ^2.1.0
-        version: 2.2.0(draft-js-plugins-editor@2.1.1)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.2.0(draft-js-plugins-editor@2.1.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       element-closest:
         specifier: ^2.0.2
         version: 2.0.2
@@ -387,13 +189,10 @@ importers:
         version: 3.1.0
       enzyme-adapter-react-16:
         specifier: 1.0.1
-        version: 1.0.1(enzyme@3.1.0)(react-dom@16.14.0)(react-test-renderer@16.14.0)(react@16.14.0)
+        version: 1.0.1(enzyme@3.1.0)(react-dom@16.14.0(react@16.14.0))(react-test-renderer@16.14.0(react@16.14.0))(react@16.14.0)
       escape-string-regexp:
         specifier: ^1.0.5
         version: 1.0.5
-      estrella:
-        specifier: 1.4.1
-        version: 1.4.1
       express:
         specifier: 5.0.0-alpha.8
         version: 5.0.0-alpha.8
@@ -429,7 +228,7 @@ importers:
         version: 0.1.4(graphql@14.7.0)
       graphql-voyager:
         specifier: ^1.0.0-rc.26
-        version: 1.0.0-rc.31(graphql@14.7.0)(react-dom@16.14.0)(react@16.14.0)
+        version: 1.0.0-rc.31(graphql@14.7.0)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       he:
         specifier: ^1.1.1
         version: 1.2.0
@@ -459,7 +258,7 @@ importers:
         version: 2.2.19(fp-ts@2.13.1)
       jsdom:
         specifier: ^16.5.0
-        version: 16.7.0
+        version: 16.7.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       json-stringify-deterministic:
         specifier: ^1.0.8
         version: 1.0.8
@@ -468,7 +267,7 @@ importers:
         version: 9.0.0
       juice:
         specifier: ^7.0.0
-        version: 7.0.0
+        version: 7.0.0(encoding@0.1.13)
       later:
         specifier: ^1.2.0
         version: 1.2.0
@@ -504,10 +303,10 @@ importers:
         version: 2.7.9
       mathjax-node:
         specifier: ^2.1.1
-        version: 2.1.1
+        version: 2.1.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       mathjax-node-page:
         specifier: 3.2.0
-        version: 3.2.0
+        version: 3.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       md5:
         specifier: ^2.3.0
         version: 2.3.0
@@ -531,7 +330,7 @@ importers:
         version: 6.6.1
       openai:
         specifier: ^4.18.0
-        version: 4.18.0
+        version: 4.18.0(encoding@0.1.13)
       papaparse:
         specifier: ^5.2.0
         version: 5.2.0
@@ -585,7 +384,7 @@ importers:
         version: 9.4.3(react@16.14.0)
       react-bootstrap:
         specifier: 1.0.0-beta.14
-        version: 1.0.0-beta.14(react-dom@16.14.0)(react@16.14.0)
+        version: 1.0.0-beta.14(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react-confetti:
         specifier: ^6.1.0
         version: 6.1.0(react@16.14.0)
@@ -597,37 +396,37 @@ importers:
         version: 5.0.2(react@16.14.0)
       react-datetime:
         specifier: ^2.15.0
-        version: 2.16.3(moment@2.29.4)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.16.3(moment@2.29.4)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react-dom:
         specifier: ^16.13.1
         version: 16.14.0(react@16.14.0)
       react-geosuggest:
         specifier: ^2.8.0
-        version: 2.14.0(react-dom@16.14.0)(react@16.14.0)
+        version: 2.14.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react-helmet:
         specifier: ^6.1.0
         version: 6.1.0(react@16.14.0)
       react-instantsearch:
         specifier: ^6.1.0
-        version: 6.8.2(algoliasearch@3.35.1)(react-dom@16.14.0)(react-native@0.73.2)(react@16.14.0)
+        version: 6.8.2(algoliasearch@3.35.1)(react-dom@16.14.0(react@16.14.0))(react-native@0.73.2(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))(bufferutil@4.0.8)(encoding@0.1.13)(react@16.14.0)(utf-8-validate@5.0.10))(react@16.14.0)
       react-instantsearch-core:
         specifier: ^6.8.1
         version: 6.8.2(algoliasearch@3.35.1)(react@16.14.0)
       react-instantsearch-dom:
         specifier: ^6.8.1
-        version: 6.8.2(algoliasearch@3.35.1)(react-dom@16.14.0)(react@16.14.0)
+        version: 6.8.2(algoliasearch@3.35.1)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react-jss:
         specifier: ^8.1.0
         version: 8.6.1(react@16.14.0)
       react-map-gl:
         specifier: ^5.2.9
-        version: 5.2.10(react-dom@16.14.0)(react@16.14.0)
+        version: 5.2.10(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react-no-ssr:
         specifier: ^1.1.0
         version: 1.1.0(react@16.14.0)
       react-popper:
         specifier: ^2.3.0
-        version: 2.3.0(@popperjs/core@2.11.5)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.3.0(@popperjs/core@2.11.5)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react-router:
         specifier: ^5.2.0
         version: 5.3.4(react@16.14.0)
@@ -636,13 +435,13 @@ importers:
         version: 5.3.4(react@16.14.0)
       react-sortable-hoc:
         specifier: ^1.10.1
-        version: 1.11.0(prop-types@15.8.1)(react-dom@16.14.0)(react@16.14.0)
+        version: 1.11.0(prop-types@15.8.1)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react-test-renderer:
         specifier: ^16.13.1
         version: 16.14.0(react@16.14.0)
       recharts:
         specifier: ^2.1.4
-        version: 2.1.4(prop-types@15.8.1)(react-dom@16.14.0)(react@16.14.0)
+        version: 2.1.4(prop-types@15.8.1)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       recompose:
         specifier: ^0.26.0
         version: 0.26.0(react@16.14.0)
@@ -678,16 +477,13 @@ importers:
         version: 1.214.0
       turndown:
         specifier: ^4.0.2
-        version: 4.0.2
+        version: 4.0.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       turndown-plugin-gfm:
         specifier: ^1.0.2
         version: 1.0.2
       type-fest:
         specifier: ^1.1.1
         version: 1.1.1
-      typescript:
-        specifier: ^5.0.0
-        version: 5.0.4
       underscore:
         specifier: ^1.12.1
         version: 1.12.1
@@ -709,6 +505,10 @@ importers:
       zod:
         specifier: ^3.22.3
         version: 3.22.3
+    optionalDependencies:
+      cypress:
+        specifier: ^10.4.0
+        version: 10.4.0
     devDependencies:
       '@babel/core':
         specifier: 7.12.3
@@ -734,6 +534,9 @@ importers:
       '@babel/preset-typescript':
         specifier: ^7.12.7
         version: 7.12.7(@babel/core@7.12.3)
+      '@babel/runtime':
+        specifier: ^7.12.1
+        version: 7.23.2
       '@ckeditor/ckeditor5-core':
         specifier: ^39.0.0
         version: 39.0.2
@@ -742,37 +545,232 @@ importers:
         version: 39.0.2
       '@graphql-codegen/cli':
         specifier: ^1.9.1
-        version: 1.19.4(@types/node@18.11.0)(graphql@14.7.0)(typescript@5.0.4)
+        version: 1.19.4(@types/node@18.11.0)(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(typescript@5.0.4)(utf-8-validate@5.0.10)
       '@graphql-codegen/fragment-matcher':
         specifier: ^1.9.0
         version: 1.17.8(graphql@14.7.0)
       '@graphql-codegen/introspection':
         specifier: ^1.9.0
         version: 1.18.1(graphql@14.7.0)
+      '@types/algoliasearch':
+        specifier: ^3.34.11
+        version: 3.34.11
+      '@types/auth0':
+        specifier: ^2.35.2
+        version: 2.35.3
+      '@types/bcrypt':
+        specifier: ^3.0.0
+        version: 3.0.0
+      '@types/chai-as-promised':
+        specifier: ^7.1.2
+        version: 7.1.3
+      '@types/cheerio':
+        specifier: ^0.22.28
+        version: 0.22.28
+      '@types/classnames':
+        specifier: ^2.2.9
+        version: 2.2.11
+      '@types/cookie-parser':
+        specifier: ^1.4.2
+        version: 1.4.2
+      '@types/crypto-js':
+        specifier: ^3.1.44
+        version: 3.1.47
       '@types/csso':
         specifier: ^5.0.0
         version: 5.0.0
+      '@types/diff-match-patch':
+        specifier: ^1.0.34
+        version: 1.0.34
+      '@types/draft-convert':
+        specifier: ^2.1.1
+        version: 2.1.1
+      '@types/draft-js':
+        specifier: ^0.10.40
+        version: 0.10.44
+      '@types/enzyme':
+        specifier: ^3.10.5
+        version: 3.10.8
+      '@types/express':
+        specifier: 4.17.14
+        version: 4.17.14
+      '@types/express-session':
+        specifier: ^1.17.3
+        version: 1.17.3
+      '@types/gapi':
+        specifier: 0.0.39
+        version: 0.0.39
+      '@types/google__maps':
+        specifier: ^0.5.14
+        version: 0.5.14
+      '@types/graphql-date':
+        specifier: ^1.0.5
+        version: 1.0.5
+      '@types/graphql-type-json':
+        specifier: ^0.3.2
+        version: 0.3.2
       '@types/hepburn':
         specifier: ^1.2.0
         version: 1.2.0
+      '@types/html-to-text':
+        specifier: ^9.0.0
+        version: 9.0.0
+      '@types/htmlparser2':
+        specifier: ^3.10.1
+        version: 3.10.7
+      '@types/intercom-client':
+        specifier: ^2.11.10
+        version: 2.11.10
+      '@types/jest':
+        specifier: ^26.0.19
+        version: 26.0.19
+      '@types/jsdom':
+        specifier: ^16.2.1
+        version: 16.2.5
+      '@types/jsonwebtoken':
+        specifier: ^8.3.9
+        version: 8.5.0
+      '@types/later':
+        specifier: ^1.2.6
+        version: 1.2.6
+      '@types/lodash':
+        specifier: ^4.14.150
+        version: 4.14.165
+      '@types/lolex':
+        specifier: ^5.1.0
+        version: 5.1.0
+      '@types/lru-cache':
+        specifier: ^5.1.0
+        version: 5.1.0
+      '@types/markdown-it':
+        specifier: ^12.0.1
+        version: 12.0.1
+      '@types/markdown-it-container':
+        specifier: ^2.0.3
+        version: 2.0.3
+      '@types/md5':
+        specifier: ^2.3.2
+        version: 2.3.2
+      '@types/mocha':
+        specifier: ^5.2.7
+        version: 5.2.7
       '@types/multer':
         specifier: ^1.4.11
         version: 1.4.11
+      '@types/mz':
+        specifier: ^2.7.3
+        version: 2.7.3
+      '@types/node':
+        specifier: 18.11.0
+        version: 18.11.0
+      '@types/nodemailer':
+        specifier: ^6.4.1
+        version: 6.4.1
+      '@types/papaparse':
+        specifier: ^5.0.3
+        version: 5.2.4
+      '@types/passport':
+        specifier: ^1.0.6
+        version: 1.0.6
+      '@types/passport-auth0':
+        specifier: ^1.0.4
+        version: 1.0.4
+      '@types/passport-facebook':
+        specifier: ^2.1.10
+        version: 2.1.10
+      '@types/passport-github2':
+        specifier: ^1.2.4
+        version: 1.2.4
+      '@types/passport-google-oauth20':
+        specifier: ^2.0.6
+        version: 2.0.6
+      '@types/passport-strategy':
+        specifier: ^0.2.35
+        version: 0.2.35
+      '@types/pg':
+        specifier: ^7.14.3
+        version: 7.14.7
+      '@types/qs':
+        specifier: 6.9.1
+        version: 6.9.1
       '@types/raf':
         specifier: ^3.4.0
         version: 3.4.0
+      '@types/react':
+        specifier: ^17.0.0
+        version: 17.0.43
+      '@types/react-autosuggest':
+        specifier: ^9.3.13
+        version: 9.3.14
+      '@types/react-copy-to-clipboard':
+        specifier: ^5.0.0
+        version: 5.0.0
+      '@types/react-dom':
+        specifier: ^17.0.0
+        version: 17.0.14
+      '@types/react-geosuggest':
+        specifier: ^2.7.10
+        version: 2.7.10
+      '@types/react-helmet':
+        specifier: ^5.0.15
+        version: 5.0.16
       '@types/react-html-parser':
         specifier: ^2.0.6
         version: 2.0.6
+      '@types/react-instantsearch':
+        specifier: ^6.10.0
+        version: 6.10.0
+      '@types/react-instantsearch-dom':
+        specifier: ^6.3.0
+        version: 6.10.0
+      '@types/react-map-gl':
+        specifier: ^5.2.2
+        version: 5.2.9
+      '@types/react-no-ssr':
+        specifier: ^1.1.1
+        version: 1.1.1
+      '@types/react-router':
+        specifier: ^5.1.13
+        version: 5.1.20
+      '@types/react-router-dom':
+        specifier: ^5.1.13
+        version: 5.3.3
+      '@types/recompose':
+        specifier: ^0.30.7
+        version: 0.30.7
+      '@types/request':
+        specifier: ^2.48.5
+        version: 2.48.5
+      '@types/rss':
+        specifier: ^0.0.28
+        version: 0.0.28
+      '@types/sanitize-html':
+        specifier: ^1.22.0
+        version: 1.27.0
       '@types/shallowequal':
         specifier: ^1.1.1
         version: 1.1.1
+      '@types/simpl-schema':
+        specifier: ^1.10.4
+        version: 1.10.4
+      '@types/speakingurl':
+        specifier: ^13.0.2
+        version: 13.0.2
+      '@types/turndown':
+        specifier: ^5.0.0
+        version: 5.0.0
+      '@types/underscore':
+        specifier: 1.9.4
+        version: 1.9.4
+      '@types/uuid':
+        specifier: ^7.0.2
+        version: 7.0.4
       '@types/websocket':
         specifier: ^1
         version: 1.0.10
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.59.7
-        version: 5.59.7(@typescript-eslint/parser@5.59.7)(eslint@8.41.0)(typescript@5.0.4)
+        version: 5.59.7(@typescript-eslint/parser@5.59.7(eslint@8.41.0)(typescript@5.0.4))(eslint@8.41.0)(typescript@5.0.4)
       '@typescript-eslint/parser':
         specifier: ^5.59.7
         version: 5.59.7(eslint@8.41.0)(typescript@5.0.4)
@@ -788,9 +786,6 @@ importers:
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
-      cypress:
-        specifier: ^10.4.0
-        version: 10.4.0
       esbuild:
         specifier: ^0.15.7
         version: 0.15.7
@@ -799,7 +794,7 @@ importers:
         version: 0.5.0(esbuild@0.15.7)
       esbuild-loader:
         specifier: ^2.6.1
-        version: 2.6.1(webpack@5.89.0)
+        version: 2.6.1(webpack@5.89.0(esbuild@0.15.7))
       eslint:
         specifier: ^8.41.0
         version: 8.41.0
@@ -817,19 +812,22 @@ importers:
         version: 2.13.3(eslint@8.41.0)
       eslint-plugin-import:
         specifier: ^2.27.5
-        version: 2.27.5(@typescript-eslint/parser@5.59.7)(eslint@8.41.0)
+        version: 2.27.5(@typescript-eslint/parser@5.59.7(eslint@8.41.0)(typescript@5.0.4))(eslint@8.41.0)
       eslint-plugin-prettier:
         specifier: ^5.1.3
-        version: 5.1.3(eslint-config-prettier@9.1.0)(eslint@8.41.0)(prettier@3.2.5)
+        version: 5.1.3(@types/eslint@8.56.1)(eslint-config-prettier@9.1.0(eslint@8.41.0))(eslint@8.41.0)(prettier@3.2.5)
       eslint-plugin-react:
         specifier: ^7.32.2
         version: 7.32.2(eslint@8.41.0)
       eslint-plugin-react-hooks:
         specifier: ^4.2.0
         version: 4.6.0(eslint@8.41.0)
+      estrella:
+        specifier: 1.4.1
+        version: 1.4.1
       jest:
         specifier: ^27.3.1
-        version: 27.3.1(ts-node@10.9.1)
+        version: 27.3.1(bufferutil@4.0.8)(ts-node@10.9.1(@types/node@18.11.0)(typescript@5.0.4))(utf-8-validate@5.0.10)
       pg-formatter:
         specifier: ^1.3.0
         version: 1.3.0
@@ -838,13 +836,16 @@ importers:
         version: 3.2.5
       ts-jest:
         specifier: ^27.0.7
-        version: 27.0.7(@babel/core@7.12.3)(@types/jest@26.0.19)(jest@27.3.1)(typescript@5.0.4)
+        version: 27.0.7(@babel/core@7.12.3)(@types/jest@26.0.19)(babel-jest@27.3.1(@babel/core@7.12.3))(jest@27.3.1(bufferutil@4.0.8)(ts-node@10.9.1(@types/node@18.11.0)(typescript@5.0.4))(utf-8-validate@5.0.10))(typescript@5.0.4)
       ts-loader:
         specifier: ^8.0.5
-        version: 8.0.11(typescript@5.0.4)(webpack@5.89.0)
+        version: 8.0.11(typescript@5.0.4)(webpack@5.89.0(esbuild@0.15.7))
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@18.11.0)(typescript@5.0.4)
+      typescript:
+        specifier: ^5.0.0
+        version: 5.0.4
       wait-on:
         specifier: ^6.0.1
         version: 6.0.1
@@ -5658,6 +5659,11 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
+  fsevents@2.3.3:
+    resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+
   function-bind@1.1.1:
     resolution: {integrity: sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==}
 
@@ -6099,10 +6105,6 @@ packages:
   immutable@3.7.6:
     resolution: {integrity: sha512-AizQPcaofEtO11RZhPPHBOJRdo/20MKQF9mBLnVkBoyHi1/zXK8fzVdnEpSV9gxqtnh6Qomfp3F0xT5qP/vThw==}
     engines: {node: '>=0.8.0'}
-
-  immutable@3.8.2:
-    resolution: {integrity: sha512-15gZoQ38eYjEjxkorfbcgBKBL6R7T459OuK+CpcWt7O3KF4uPCx2tD0uFETlUDIyo+1789crbMhTvQBSR5yBMg==}
-    engines: {node: '>=0.10.0'}
 
   import-fresh@2.0.0:
     resolution: {integrity: sha512-eZ5H8rcgYazHbKC3PG4ClHNykCSxtAhxSSEM+2mb+7evD2CKF5V7c0dNum7AdpDh0ZdICwZY9sRSn8f+KH96sg==}
@@ -8071,6 +8073,9 @@ packages:
   picocolors@1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
 
+  picocolors@1.0.1:
+    resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
+
   picomatch@2.3.0:
     resolution: {integrity: sha512-lY1Q/PiJGC2zOv/z391WOTD+Z02bCgsFfvxoXXf6h7kv9o+WmsmzYqrAwY63sNgOxE4xEdq0WyUnXfKeBrSvYw==}
     engines: {node: '>=8.6'}
@@ -8806,6 +8811,7 @@ packages:
 
   rimraf@2.6.3:
     resolution: {integrity: sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   rimraf@3.0.2:
@@ -10202,7 +10208,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.20
 
-  '@anthropic-ai/sdk@0.5.4':
+  '@anthropic-ai/sdk@0.5.4(encoding@0.1.13)':
     dependencies:
       '@types/node': 18.16.19
       '@types/node-fetch': 2.6.4
@@ -10212,13 +10218,13 @@ snapshots:
       digest-fetch: 1.3.0
       form-data-encoder: 1.7.2
       formdata-node: 4.4.1
-      node-fetch: 2.6.7
+      node-fetch: 2.6.7(encoding@0.1.13)
       qs: 6.11.2
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  '@apollo/client@3.3.5(graphql@14.7.0)(react@16.14.0)':
+  '@apollo/client@3.3.5(graphql@14.7.0)(react@16.14.0)(subscriptions-transport-ws@0.9.19(bufferutil@4.0.8)(graphql@14.7.0)(utf-8-validate@5.0.10))':
     dependencies:
       '@graphql-typed-document-node/core': 3.1.0(graphql@14.7.0)
       '@types/zen-observable': 0.8.1
@@ -10230,11 +10236,13 @@ snapshots:
       hoist-non-react-statics: 3.3.2
       optimism: 0.13.1
       prop-types: 15.8.1
-      react: 16.14.0
       symbol-observable: 2.0.3
       ts-invariant: 0.6.0
       tslib: 1.14.1
       zen-observable: 0.8.15
+    optionalDependencies:
+      react: 16.14.0
+      subscriptions-transport-ws: 0.9.19(bufferutil@4.0.8)(graphql@14.7.0)(utf-8-validate@5.0.10)
 
   '@apollo/protobufjs@1.2.2':
     dependencies:
@@ -10826,6 +10834,12 @@ snapshots:
       '@babel/core': 7.16.0
       '@babel/helper-plugin-utils': 7.14.5
 
+  '@babel/plugin-syntax-bigint@7.8.3(@babel/core@7.12.3)':
+    dependencies:
+      '@babel/core': 7.12.3
+      '@babel/helper-plugin-utils': 7.14.5
+    optional: true
+
   '@babel/plugin-syntax-bigint@7.8.3(@babel/core@7.16.0)':
     dependencies:
       '@babel/core': 7.16.0
@@ -10865,6 +10879,12 @@ snapshots:
     dependencies:
       '@babel/core': 7.23.7
       '@babel/helper-plugin-utils': 7.22.5
+
+  '@babel/plugin-syntax-import-meta@7.10.4(@babel/core@7.12.3)':
+    dependencies:
+      '@babel/core': 7.12.3
+      '@babel/helper-plugin-utils': 7.14.5
+    optional: true
 
   '@babel/plugin-syntax-import-meta@7.10.4(@babel/core@7.16.0)':
     dependencies:
@@ -11591,6 +11611,7 @@ snapshots:
       tough-cookie: 2.5.0
       tunnel-agent: 0.6.0
       uuid: 8.3.2
+    optional: true
 
   '@cypress/xvfb@1.2.4(supports-color@8.1.1)':
     dependencies:
@@ -11598,6 +11619,7 @@ snapshots:
       lodash.once: 4.1.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@datadog/native-appsec@1.2.1':
     dependencies:
@@ -11721,7 +11743,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@graphql-codegen/cli@1.19.4(@types/node@18.11.0)(graphql@14.7.0)(typescript@5.0.4)':
+  '@graphql-codegen/cli@1.19.4(@types/node@18.11.0)(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(typescript@5.0.4)(utf-8-validate@5.0.10)':
     dependencies:
       '@graphql-codegen/core': 1.17.9(graphql@14.7.0)
       '@graphql-codegen/plugin-helpers': 1.18.2(graphql@14.7.0)
@@ -11732,8 +11754,8 @@ snapshots:
       '@graphql-tools/graphql-file-loader': 6.2.6(graphql@14.7.0)
       '@graphql-tools/json-file-loader': 6.2.6(graphql@14.7.0)
       '@graphql-tools/load': 6.2.5(graphql@14.7.0)
-      '@graphql-tools/prisma-loader': 6.2.7(graphql@14.7.0)
-      '@graphql-tools/url-loader': 6.7.0(graphql@14.7.0)
+      '@graphql-tools/prisma-loader': 6.2.7(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10)
+      '@graphql-tools/url-loader': 6.7.0(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10)
       '@graphql-tools/utils': 6.2.4(graphql@14.7.0)
       ansi-escapes: 4.3.2
       camel-case: 4.1.2
@@ -11747,7 +11769,7 @@ snapshots:
       detect-indent: 6.0.0
       glob: 7.1.6
       graphql: 14.7.0
-      graphql-config: 3.2.0(@types/node@18.11.0)(graphql@14.7.0)(typescript@5.0.4)
+      graphql-config: 3.2.0(@types/node@18.11.0)(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(typescript@5.0.4)(utf-8-validate@5.0.10)
       indent-string: 4.0.0
       inquirer: 7.3.3
       is-glob: 4.0.3
@@ -11921,9 +11943,9 @@ snapshots:
       graphql: 14.7.0
       tslib: 2.0.3
 
-  '@graphql-tools/prisma-loader@6.2.7(graphql@14.7.0)':
+  '@graphql-tools/prisma-loader@6.2.7(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10)':
     dependencies:
-      '@graphql-tools/url-loader': 6.7.0(graphql@14.7.0)
+      '@graphql-tools/url-loader': 6.7.0(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10)
       '@graphql-tools/utils': 7.1.4(graphql@14.7.0)
       '@types/http-proxy-agent': 2.0.2
       '@types/js-yaml': 3.12.5
@@ -11938,7 +11960,7 @@ snapshots:
       graphql-request: 3.3.0(graphql@14.7.0)
       http-proxy-agent: 4.0.1
       https-proxy-agent: 5.0.0
-      isomorphic-fetch: 3.0.0
+      isomorphic-fetch: 3.0.0(encoding@0.1.13)
       js-yaml: 3.14.1
       json-stable-stringify: 1.0.1
       jsonwebtoken: 8.5.1
@@ -11959,7 +11981,7 @@ snapshots:
       graphql: 14.7.0
       tslib: 2.0.3
 
-  '@graphql-tools/url-loader@6.7.0(graphql@14.7.0)':
+  '@graphql-tools/url-loader@6.7.0(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10)':
     dependencies:
       '@graphql-tools/delegate': 7.0.7(graphql@14.7.0)
       '@graphql-tools/utils': 7.1.4(graphql@14.7.0)
@@ -11973,12 +11995,12 @@ snapshots:
       graphql-ws: 3.0.2(graphql@14.7.0)
       is-promise: 4.0.0
       isomorphic-form-data: 2.0.0
-      isomorphic-ws: 4.0.1(ws@7.4.1)
+      isomorphic-ws: 4.0.1(ws@7.4.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       sse-z: 0.3.0
-      sync-fetch: 0.3.0
+      sync-fetch: 0.3.0(encoding@0.1.13)
       tslib: 2.0.3
       valid-url: 1.0.9
-      ws: 7.4.1
+      ws: 7.4.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -12056,7 +12078,7 @@ snapshots:
       jest-util: 27.3.1
       slash: 3.0.0
 
-  '@jest/core@27.3.1(ts-node@10.9.1)':
+  '@jest/core@27.3.1(bufferutil@4.0.8)(ts-node@10.9.1(@types/node@18.11.0)(typescript@5.0.4))(utf-8-validate@5.0.10)':
     dependencies:
       '@jest/console': 27.3.1
       '@jest/reporters': 27.3.1
@@ -12070,13 +12092,13 @@ snapshots:
       exit: 0.1.2
       graceful-fs: 4.2.11
       jest-changed-files: 27.3.0
-      jest-config: 27.3.1(ts-node@10.9.1)
+      jest-config: 27.3.1(bufferutil@4.0.8)(ts-node@10.9.1(@types/node@18.11.0)(typescript@5.0.4))(utf-8-validate@5.0.10)
       jest-haste-map: 27.3.1
       jest-message-util: 27.3.1
       jest-regex-util: 27.0.6
       jest-resolve: 27.3.1
       jest-resolve-dependencies: 27.3.1
-      jest-runner: 27.3.1
+      jest-runner: 27.3.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       jest-runtime: 27.3.1
       jest-snapshot: 27.3.1
       jest-util: 27.3.1
@@ -12313,12 +12335,12 @@ snapshots:
     dependencies:
       mapbox-gl: 1.3.1
 
-  '@mapbox/node-pre-gyp@1.0.10':
+  '@mapbox/node-pre-gyp@1.0.10(encoding@0.1.13)':
     dependencies:
       detect-libc: 2.0.1
       https-proxy-agent: 5.0.0
       make-dir: 3.1.0
-      node-fetch: 2.6.7
+      node-fetch: 2.6.7(encoding@0.1.13)
       nopt: 5.0.0
       npmlog: 5.0.1
       rimraf: 3.0.2
@@ -12340,7 +12362,7 @@ snapshots:
 
   '@mapbox/whoots-js@3.1.0': {}
 
-  '@material-ui/core@3.1.2(react-dom@16.14.0)(react@16.14.0)':
+  '@material-ui/core@3.1.2(react-dom@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
       '@babel/runtime': 7.0.0
       '@types/jss': 9.5.8
@@ -12368,15 +12390,15 @@ snapshots:
       react-dom: 16.14.0(react@16.14.0)
       react-event-listener: 0.6.6(react@16.14.0)
       react-jss: 8.6.1(react@16.14.0)
-      react-transition-group: 2.9.0(react-dom@16.14.0)(react@16.14.0)
+      react-transition-group: 2.9.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       recompose: 0.30.0(react@16.14.0)
       warning: 4.0.3
 
-  '@material-ui/core@3.9.4(react-dom@16.14.0)(react@16.14.0)':
+  '@material-ui/core@3.9.4(react-dom@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
       '@babel/runtime': 7.23.2
-      '@material-ui/system': 3.0.0-alpha.2(react-dom@16.14.0)(react@16.14.0)
-      '@material-ui/utils': 3.0.0-alpha.3(react-dom@16.14.0)(react@16.14.0)
+      '@material-ui/system': 3.0.0-alpha.2(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      '@material-ui/utils': 3.0.0-alpha.3(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       '@types/jss': 9.5.8
       '@types/react-transition-group': 2.9.2
       brcast: 3.0.2
@@ -12400,30 +12422,30 @@ snapshots:
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
       react-event-listener: 0.6.6(react@16.14.0)
-      react-transition-group: 2.9.0(react-dom@16.14.0)(react@16.14.0)
+      react-transition-group: 2.9.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       recompose: 0.30.0(react@16.14.0)
       warning: 4.0.3
 
-  '@material-ui/icons@3.0.2(@material-ui/core@3.1.2)(react-dom@16.14.0)(react@16.14.0)':
+  '@material-ui/icons@3.0.2(@material-ui/core@3.1.2(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
       '@babel/runtime': 7.23.2
-      '@material-ui/core': 3.1.2(react-dom@16.14.0)(react@16.14.0)
+      '@material-ui/core': 3.1.2(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
       recompose: 0.30.0(react@16.14.0)
 
-  '@material-ui/lab@3.0.0-alpha.30(@material-ui/core@3.1.2)(react-dom@16.14.0)(react@16.14.0)':
+  '@material-ui/lab@3.0.0-alpha.30(@material-ui/core@3.1.2(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
       '@babel/runtime': 7.23.2
-      '@material-ui/core': 3.1.2(react-dom@16.14.0)(react@16.14.0)
-      '@material-ui/utils': 3.0.0-alpha.3(react-dom@16.14.0)(react@16.14.0)
+      '@material-ui/core': 3.1.2(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      '@material-ui/utils': 3.0.0-alpha.3(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       classnames: 2.2.6
       keycode: 2.2.0
       prop-types: 15.8.1
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
 
-  '@material-ui/system@3.0.0-alpha.2(react-dom@16.14.0)(react@16.14.0)':
+  '@material-ui/system@3.0.0-alpha.2(react-dom@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
       '@babel/runtime': 7.23.2
       deepmerge: 3.3.0
@@ -12432,7 +12454,7 @@ snapshots:
       react-dom: 16.14.0(react@16.14.0)
       warning: 4.0.3
 
-  '@material-ui/utils@3.0.0-alpha.3(react-dom@16.14.0)(react@16.14.0)':
+  '@material-ui/utils@3.0.0-alpha.3(react-dom@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
       '@babel/runtime': 7.23.2
       prop-types: 15.8.1
@@ -12484,17 +12506,17 @@ snapshots:
 
   '@protobufjs/utf8@1.1.0': {}
 
-  '@react-native-community/cli-clean@12.3.0':
+  '@react-native-community/cli-clean@12.3.0(encoding@0.1.13)':
     dependencies:
-      '@react-native-community/cli-tools': 12.3.0
+      '@react-native-community/cli-tools': 12.3.0(encoding@0.1.13)
       chalk: 4.1.2
       execa: 5.1.1
     transitivePeerDependencies:
       - encoding
 
-  '@react-native-community/cli-config@12.3.0':
+  '@react-native-community/cli-config@12.3.0(encoding@0.1.13)':
     dependencies:
-      '@react-native-community/cli-tools': 12.3.0
+      '@react-native-community/cli-tools': 12.3.0(encoding@0.1.13)
       chalk: 4.1.2
       cosmiconfig: 5.2.1
       deepmerge: 4.3.1
@@ -12509,12 +12531,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@react-native-community/cli-doctor@12.3.0':
+  '@react-native-community/cli-doctor@12.3.0(encoding@0.1.13)':
     dependencies:
-      '@react-native-community/cli-config': 12.3.0
-      '@react-native-community/cli-platform-android': 12.3.0
-      '@react-native-community/cli-platform-ios': 12.3.0
-      '@react-native-community/cli-tools': 12.3.0
+      '@react-native-community/cli-config': 12.3.0(encoding@0.1.13)
+      '@react-native-community/cli-platform-android': 12.3.0(encoding@0.1.13)
+      '@react-native-community/cli-platform-ios': 12.3.0(encoding@0.1.13)
+      '@react-native-community/cli-tools': 12.3.0(encoding@0.1.13)
       chalk: 4.1.2
       command-exists: 1.2.9
       deepmerge: 4.3.1
@@ -12531,19 +12553,19 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@react-native-community/cli-hermes@12.3.0':
+  '@react-native-community/cli-hermes@12.3.0(encoding@0.1.13)':
     dependencies:
-      '@react-native-community/cli-platform-android': 12.3.0
-      '@react-native-community/cli-tools': 12.3.0
+      '@react-native-community/cli-platform-android': 12.3.0(encoding@0.1.13)
+      '@react-native-community/cli-tools': 12.3.0(encoding@0.1.13)
       chalk: 4.1.2
       hermes-profile-transformer: 0.0.6
       ip: 1.1.8
     transitivePeerDependencies:
       - encoding
 
-  '@react-native-community/cli-platform-android@12.3.0':
+  '@react-native-community/cli-platform-android@12.3.0(encoding@0.1.13)':
     dependencies:
-      '@react-native-community/cli-tools': 12.3.0
+      '@react-native-community/cli-tools': 12.3.0(encoding@0.1.13)
       chalk: 4.1.2
       execa: 5.1.1
       fast-xml-parser: 4.3.3
@@ -12552,9 +12574,9 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@react-native-community/cli-platform-ios@12.3.0':
+  '@react-native-community/cli-platform-ios@12.3.0(encoding@0.1.13)':
     dependencies:
-      '@react-native-community/cli-tools': 12.3.0
+      '@react-native-community/cli-tools': 12.3.0(encoding@0.1.13)
       chalk: 4.1.2
       execa: 5.1.1
       fast-xml-parser: 4.3.3
@@ -12565,30 +12587,30 @@ snapshots:
 
   '@react-native-community/cli-plugin-metro@12.3.0': {}
 
-  '@react-native-community/cli-server-api@12.3.0':
+  '@react-native-community/cli-server-api@12.3.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
     dependencies:
       '@react-native-community/cli-debugger-ui': 12.3.0
-      '@react-native-community/cli-tools': 12.3.0
+      '@react-native-community/cli-tools': 12.3.0(encoding@0.1.13)
       compression: 1.7.4
       connect: 3.7.0
       errorhandler: 1.5.1
       nocache: 3.0.4
       pretty-format: 26.6.2
       serve-static: 1.14.1
-      ws: 7.5.8
+      ws: 7.5.8(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - encoding
       - supports-color
       - utf-8-validate
 
-  '@react-native-community/cli-tools@12.3.0':
+  '@react-native-community/cli-tools@12.3.0(encoding@0.1.13)':
     dependencies:
       appdirsjs: 1.2.7
       chalk: 4.1.2
       find-up: 5.0.0
       mime: 2.4.6
-      node-fetch: 2.6.7
+      node-fetch: 2.6.7(encoding@0.1.13)
       open: 6.4.0
       ora: 5.4.1
       semver: 7.5.4
@@ -12601,16 +12623,16 @@ snapshots:
     dependencies:
       joi: 17.6.1
 
-  '@react-native-community/cli@12.3.0':
+  '@react-native-community/cli@12.3.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
     dependencies:
-      '@react-native-community/cli-clean': 12.3.0
-      '@react-native-community/cli-config': 12.3.0
+      '@react-native-community/cli-clean': 12.3.0(encoding@0.1.13)
+      '@react-native-community/cli-config': 12.3.0(encoding@0.1.13)
       '@react-native-community/cli-debugger-ui': 12.3.0
-      '@react-native-community/cli-doctor': 12.3.0
-      '@react-native-community/cli-hermes': 12.3.0
+      '@react-native-community/cli-doctor': 12.3.0(encoding@0.1.13)
+      '@react-native-community/cli-hermes': 12.3.0(encoding@0.1.13)
       '@react-native-community/cli-plugin-metro': 12.3.0
-      '@react-native-community/cli-server-api': 12.3.0
-      '@react-native-community/cli-tools': 12.3.0
+      '@react-native-community/cli-server-api': 12.3.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@react-native-community/cli-tools': 12.3.0(encoding@0.1.13)
       '@react-native-community/cli-types': 12.3.0
       chalk: 4.1.2
       commander: 9.5.0
@@ -12629,14 +12651,14 @@ snapshots:
 
   '@react-native/assets-registry@0.73.1': {}
 
-  '@react-native/babel-plugin-codegen@0.73.2(@babel/preset-env@7.11.5)':
+  '@react-native/babel-plugin-codegen@0.73.2(@babel/preset-env@7.11.5(@babel/core@7.12.3))':
     dependencies:
-      '@react-native/codegen': 0.73.2(@babel/preset-env@7.11.5)
+      '@react-native/codegen': 0.73.2(@babel/preset-env@7.11.5(@babel/core@7.12.3))
     transitivePeerDependencies:
       - '@babel/preset-env'
       - supports-color
 
-  '@react-native/babel-preset@0.73.19(@babel/core@7.12.3)(@babel/preset-env@7.11.5)':
+  '@react-native/babel-preset@0.73.19(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))':
     dependencies:
       '@babel/core': 7.12.3
       '@babel/plugin-proposal-async-generator-functions': 7.12.1(@babel/core@7.12.3)
@@ -12677,38 +12699,38 @@ snapshots:
       '@babel/plugin-transform-typescript': 7.23.6(@babel/core@7.12.3)
       '@babel/plugin-transform-unicode-regex': 7.12.1(@babel/core@7.12.3)
       '@babel/template': 7.22.15
-      '@react-native/babel-plugin-codegen': 0.73.2(@babel/preset-env@7.11.5)
+      '@react-native/babel-plugin-codegen': 0.73.2(@babel/preset-env@7.11.5(@babel/core@7.12.3))
       babel-plugin-transform-flow-enums: 0.0.2(@babel/core@7.12.3)
       react-refresh: 0.14.0
     transitivePeerDependencies:
       - '@babel/preset-env'
       - supports-color
 
-  '@react-native/codegen@0.73.2(@babel/preset-env@7.11.5)':
+  '@react-native/codegen@0.73.2(@babel/preset-env@7.11.5(@babel/core@7.12.3))':
     dependencies:
       '@babel/parser': 7.23.6
       '@babel/preset-env': 7.11.5(@babel/core@7.12.3)
       flow-parser: 0.206.0
       glob: 7.1.6
       invariant: 2.2.4
-      jscodeshift: 0.14.0(@babel/preset-env@7.11.5)
+      jscodeshift: 0.14.0(@babel/preset-env@7.11.5(@babel/core@7.12.3))
       mkdirp: 0.5.6
       nullthrows: 1.1.1
     transitivePeerDependencies:
       - supports-color
 
-  '@react-native/community-cli-plugin@0.73.12(@babel/core@7.12.3)(@babel/preset-env@7.11.5)':
+  '@react-native/community-cli-plugin@0.73.12(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
     dependencies:
-      '@react-native-community/cli-server-api': 12.3.0
-      '@react-native-community/cli-tools': 12.3.0
-      '@react-native/dev-middleware': 0.73.7
-      '@react-native/metro-babel-transformer': 0.73.13(@babel/core@7.12.3)(@babel/preset-env@7.11.5)
+      '@react-native-community/cli-server-api': 12.3.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@react-native-community/cli-tools': 12.3.0(encoding@0.1.13)
+      '@react-native/dev-middleware': 0.73.7(encoding@0.1.13)
+      '@react-native/metro-babel-transformer': 0.73.13(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))
       chalk: 4.1.2
       execa: 5.1.1
-      metro: 0.80.4
-      metro-config: 0.80.4
+      metro: 0.80.4(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      metro-config: 0.80.4(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       metro-core: 0.80.4
-      node-fetch: 2.6.7
+      node-fetch: 2.6.7(encoding@0.1.13)
       readline: 1.3.0
     transitivePeerDependencies:
       - '@babel/core'
@@ -12720,7 +12742,7 @@ snapshots:
 
   '@react-native/debugger-frontend@0.73.3': {}
 
-  '@react-native/dev-middleware@0.73.7':
+  '@react-native/dev-middleware@0.73.7(encoding@0.1.13)':
     dependencies:
       '@isaacs/ttlcache': 1.4.1
       '@react-native/debugger-frontend': 0.73.3
@@ -12728,7 +12750,7 @@ snapshots:
       chromium-edge-launcher: 1.0.0
       connect: 3.7.0
       debug: 2.6.9
-      node-fetch: 2.6.7
+      node-fetch: 2.6.7(encoding@0.1.13)
       open: 7.4.2
       serve-static: 1.14.1
       temp-dir: 2.0.0
@@ -12740,10 +12762,10 @@ snapshots:
 
   '@react-native/js-polyfills@0.73.1': {}
 
-  '@react-native/metro-babel-transformer@0.73.13(@babel/core@7.12.3)(@babel/preset-env@7.11.5)':
+  '@react-native/metro-babel-transformer@0.73.13(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))':
     dependencies:
       '@babel/core': 7.12.3
-      '@react-native/babel-preset': 0.73.19(@babel/core@7.12.3)(@babel/preset-env@7.11.5)
+      '@react-native/babel-preset': 0.73.19(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))
       hermes-parser: 0.15.0
       nullthrows: 1.1.1
     transitivePeerDependencies:
@@ -12752,11 +12774,11 @@ snapshots:
 
   '@react-native/normalize-colors@0.73.2': {}
 
-  '@react-native/virtualized-lists@0.73.4(react-native@0.73.2)':
+  '@react-native/virtualized-lists@0.73.4(react-native@0.73.2(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))(bufferutil@4.0.8)(encoding@0.1.13)(react@16.14.0)(utf-8-validate@5.0.10))':
     dependencies:
       invariant: 2.2.4
       nullthrows: 1.1.1
-      react-native: 0.73.2(@babel/core@7.12.3)(@babel/preset-env@7.11.5)(react@16.14.0)
+      react-native: 0.73.2(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))(bufferutil@4.0.8)(encoding@0.1.13)(react@16.14.0)(utf-8-validate@5.0.10)
 
   '@restart/context@2.1.4(react@16.14.0)':
     dependencies:
@@ -12778,6 +12800,7 @@ snapshots:
   '@samverschueren/stream-to-observable@0.3.1(rxjs@6.6.7)':
     dependencies:
       any-observable: 0.3.0(rxjs@6.6.7)
+    optionalDependencies:
       rxjs: 6.6.7
     transitivePeerDependencies:
       - zenObservable
@@ -12886,15 +12909,16 @@ snapshots:
     dependencies:
       defer-to-connect: 1.1.3
 
-  '@testing-library/react-hooks@7.0.2(react-dom@16.14.0)(react-test-renderer@16.14.0)(react@16.14.0)':
+  '@testing-library/react-hooks@7.0.2(react-dom@16.14.0(react@16.14.0))(react-test-renderer@16.14.0(react@16.14.0))(react@16.14.0)':
     dependencies:
       '@babel/runtime': 7.23.2
       '@types/react': 17.0.43
       '@types/react-dom': 17.0.14
       '@types/react-test-renderer': 17.0.1
       react: 16.14.0
-      react-dom: 16.14.0(react@16.14.0)
       react-error-boundary: 3.1.4(react@16.14.0)
+    optionalDependencies:
+      react-dom: 16.14.0(react@16.14.0)
       react-test-renderer: 16.14.0(react@16.14.0)
 
   '@tootallnate/once@1.1.2': {}
@@ -13276,7 +13300,8 @@ snapshots:
 
   '@types/node@10.17.48': {}
 
-  '@types/node@14.17.11': {}
+  '@types/node@14.17.11':
+    optional: true
 
   '@types/node@18.11.0': {}
 
@@ -13489,9 +13514,11 @@ snapshots:
     dependencies:
       '@types/meteor': 1.4.70
 
-  '@types/sinonjs__fake-timers@8.1.1': {}
+  '@types/sinonjs__fake-timers@8.1.1':
+    optional: true
 
-  '@types/sizzle@2.3.3': {}
+  '@types/sizzle@2.3.3':
+    optional: true
 
   '@types/speakingurl@13.0.2': {}
 
@@ -13546,7 +13573,7 @@ snapshots:
 
   '@types/zen-observable@0.8.1': {}
 
-  '@typescript-eslint/eslint-plugin@5.59.7(@typescript-eslint/parser@5.59.7)(eslint@8.41.0)(typescript@4.9.5)':
+  '@typescript-eslint/eslint-plugin@5.59.7(@typescript-eslint/parser@5.59.7(eslint@8.41.0)(typescript@4.9.5))(eslint@8.41.0)(typescript@4.9.5)':
     dependencies:
       '@eslint-community/regexpp': 4.5.1
       '@typescript-eslint/parser': 5.59.7(eslint@8.41.0)(typescript@4.9.5)
@@ -13560,11 +13587,12 @@ snapshots:
       natural-compare-lite: 1.4.0
       semver: 7.5.4
       tsutils: 3.21.0(typescript@4.9.5)
+    optionalDependencies:
       typescript: 4.9.5
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/eslint-plugin@5.59.7(@typescript-eslint/parser@5.59.7)(eslint@8.41.0)(typescript@5.0.4)':
+  '@typescript-eslint/eslint-plugin@5.59.7(@typescript-eslint/parser@5.59.7(eslint@8.41.0)(typescript@5.0.4))(eslint@8.41.0)(typescript@5.0.4)':
     dependencies:
       '@eslint-community/regexpp': 4.5.1
       '@typescript-eslint/parser': 5.59.7(eslint@8.41.0)(typescript@5.0.4)
@@ -13578,6 +13606,7 @@ snapshots:
       natural-compare-lite: 1.4.0
       semver: 7.5.4
       tsutils: 3.21.0(typescript@5.0.4)
+    optionalDependencies:
       typescript: 5.0.4
     transitivePeerDependencies:
       - supports-color
@@ -13589,6 +13618,7 @@ snapshots:
       '@typescript-eslint/typescript-estree': 5.59.7(typescript@4.9.5)
       debug: 4.3.4(supports-color@8.1.1)
       eslint: 8.41.0
+    optionalDependencies:
       typescript: 4.9.5
     transitivePeerDependencies:
       - supports-color
@@ -13600,6 +13630,7 @@ snapshots:
       '@typescript-eslint/typescript-estree': 5.59.7(typescript@5.0.4)
       debug: 4.3.4(supports-color@8.1.1)
       eslint: 8.41.0
+    optionalDependencies:
       typescript: 5.0.4
     transitivePeerDependencies:
       - supports-color
@@ -13616,6 +13647,7 @@ snapshots:
       debug: 4.3.4(supports-color@8.1.1)
       eslint: 8.41.0
       tsutils: 3.21.0(typescript@4.9.5)
+    optionalDependencies:
       typescript: 4.9.5
     transitivePeerDependencies:
       - supports-color
@@ -13627,6 +13659,7 @@ snapshots:
       debug: 4.3.4(supports-color@8.1.1)
       eslint: 8.41.0
       tsutils: 3.21.0(typescript@5.0.4)
+    optionalDependencies:
       typescript: 5.0.4
     transitivePeerDependencies:
       - supports-color
@@ -13642,6 +13675,7 @@ snapshots:
       is-glob: 4.0.3
       semver: 7.5.4
       tsutils: 3.21.0(typescript@4.9.5)
+    optionalDependencies:
       typescript: 4.9.5
     transitivePeerDependencies:
       - supports-color
@@ -13655,6 +13689,7 @@ snapshots:
       is-glob: 4.0.3
       semver: 7.5.4
       tsutils: 3.21.0(typescript@5.0.4)
+    optionalDependencies:
       typescript: 5.0.4
     transitivePeerDependencies:
       - supports-color
@@ -13855,6 +13890,7 @@ snapshots:
     dependencies:
       clean-stack: 2.2.0
       indent-string: 4.0.0
+    optional: true
 
   airbnb-prop-types@2.16.0(react@16.14.0):
     dependencies:
@@ -13973,7 +14009,7 @@ snapshots:
   ansicolors@0.2.1: {}
 
   any-observable@0.3.0(rxjs@6.6.7):
-    dependencies:
+    optionalDependencies:
       rxjs: 6.6.7
 
   any-promise@1.3.0: {}
@@ -13990,18 +14026,18 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.0
 
-  apollo-cache-control@0.15.0(graphql@14.7.0):
+  apollo-cache-control@0.15.0(encoding@0.1.13)(graphql@14.7.0):
     dependencies:
-      apollo-server-env: 3.2.0
-      apollo-server-plugin-base: 0.14.0(graphql@14.7.0)
+      apollo-server-env: 3.2.0(encoding@0.1.13)
+      apollo-server-plugin-base: 0.14.0(encoding@0.1.13)(graphql@14.7.0)
       graphql: 14.7.0
     transitivePeerDependencies:
       - encoding
 
-  apollo-datasource@0.10.0:
+  apollo-datasource@0.10.0(encoding@0.1.13):
     dependencies:
       apollo-server-caching: 0.7.0
-      apollo-server-env: 3.2.0
+      apollo-server-env: 3.2.0(encoding@0.1.13)
     transitivePeerDependencies:
       - encoding
 
@@ -14041,49 +14077,49 @@ snapshots:
     dependencies:
       lru-cache: 6.0.0
 
-  apollo-server-core@2.26.2(graphql@14.7.0):
+  apollo-server-core@2.26.2(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10):
     dependencies:
       '@apollographql/apollo-tools': 0.5.2(graphql@14.7.0)
       '@apollographql/graphql-playground-html': 1.6.27
       '@apollographql/graphql-upload-8-fork': 8.1.4(graphql@14.7.0)
       '@josephg/resolvable': 1.0.1
       '@types/ws': 7.4.0
-      apollo-cache-control: 0.15.0(graphql@14.7.0)
-      apollo-datasource: 0.10.0
+      apollo-cache-control: 0.15.0(encoding@0.1.13)(graphql@14.7.0)
+      apollo-datasource: 0.10.0(encoding@0.1.13)
       apollo-graphql: 0.9.5(graphql@14.7.0)
       apollo-reporting-protobuf: 0.8.0
       apollo-server-caching: 0.7.0
-      apollo-server-env: 3.2.0
+      apollo-server-env: 3.2.0(encoding@0.1.13)
       apollo-server-errors: 2.5.0(graphql@14.7.0)
-      apollo-server-plugin-base: 0.14.0(graphql@14.7.0)
-      apollo-server-types: 0.10.0(graphql@14.7.0)
-      apollo-tracing: 0.16.0(graphql@14.7.0)
+      apollo-server-plugin-base: 0.14.0(encoding@0.1.13)(graphql@14.7.0)
+      apollo-server-types: 0.10.0(encoding@0.1.13)(graphql@14.7.0)
+      apollo-tracing: 0.16.0(encoding@0.1.13)(graphql@14.7.0)
       async-retry: 1.3.1
       fast-json-stable-stringify: 2.1.0
       graphql: 14.7.0
-      graphql-extensions: 0.16.0(graphql@14.7.0)
+      graphql-extensions: 0.16.0(encoding@0.1.13)(graphql@14.7.0)
       graphql-tag: 2.11.0(graphql@14.7.0)
       graphql-tools: 4.0.8(graphql@14.7.0)
       loglevel: 1.7.1
       lru-cache: 6.0.0
       sha.js: 2.4.11
-      subscriptions-transport-ws: 0.9.19(graphql@14.7.0)
+      subscriptions-transport-ws: 0.9.19(bufferutil@4.0.8)(graphql@14.7.0)(utf-8-validate@5.0.10)
       uuid: 8.3.2
     transitivePeerDependencies:
       - bufferutil
       - encoding
       - utf-8-validate
 
-  apollo-server-env@2.4.5:
+  apollo-server-env@2.4.5(encoding@0.1.13):
     dependencies:
-      node-fetch: 2.6.7
+      node-fetch: 2.6.7(encoding@0.1.13)
       util.promisify: 1.0.1
     transitivePeerDependencies:
       - encoding
 
-  apollo-server-env@3.2.0:
+  apollo-server-env@3.2.0(encoding@0.1.13):
     dependencies:
-      node-fetch: 2.6.7
+      node-fetch: 2.6.7(encoding@0.1.13)
       util.promisify: 1.0.1
     transitivePeerDependencies:
       - encoding
@@ -14092,7 +14128,7 @@ snapshots:
     dependencies:
       graphql: 14.7.0
 
-  apollo-server-express@2.15.0(graphql@14.7.0):
+  apollo-server-express@2.15.0(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10):
     dependencies:
       '@apollographql/graphql-playground-html': 1.6.26
       '@types/accepts': 1.3.5
@@ -14100,8 +14136,8 @@ snapshots:
       '@types/cors': 2.8.10
       '@types/express': 4.17.4
       accepts: 1.3.7
-      apollo-server-core: 2.26.2(graphql@14.7.0)
-      apollo-server-types: 0.5.1(graphql@14.7.0)
+      apollo-server-core: 2.26.2(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10)
+      apollo-server-types: 0.5.1(encoding@0.1.13)(graphql@14.7.0)
       body-parser: 1.19.0
       cors: 2.8.5
       express: 4.17.1
@@ -14109,7 +14145,7 @@ snapshots:
       graphql-subscriptions: 1.1.0(graphql@14.7.0)
       graphql-tools: 4.0.8(graphql@14.7.0)
       parseurl: 1.3.3
-      subscriptions-transport-ws: 0.9.19(graphql@14.7.0)
+      subscriptions-transport-ws: 0.9.19(bufferutil@4.0.8)(graphql@14.7.0)(utf-8-validate@5.0.10)
       type-is: 1.6.18
     transitivePeerDependencies:
       - bufferutil
@@ -14117,7 +14153,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  apollo-server-express@2.26.0(graphql@14.7.0):
+  apollo-server-express@2.26.0(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10):
     dependencies:
       '@apollographql/graphql-playground-html': 1.6.27
       '@types/accepts': 1.3.5
@@ -14126,8 +14162,8 @@ snapshots:
       '@types/express': 4.17.14
       '@types/express-serve-static-core': 4.17.25
       accepts: 1.3.7
-      apollo-server-core: 2.26.2(graphql@14.7.0)
-      apollo-server-types: 0.10.0(graphql@14.7.0)
+      apollo-server-core: 2.26.2(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10)
+      apollo-server-types: 0.10.0(encoding@0.1.13)(graphql@14.7.0)
       body-parser: 1.19.0
       cors: 2.8.5
       express: 4.17.1
@@ -14135,7 +14171,7 @@ snapshots:
       graphql-subscriptions: 1.1.0(graphql@14.7.0)
       graphql-tools: 4.0.8(graphql@14.7.0)
       parseurl: 1.3.3
-      subscriptions-transport-ws: 0.9.19(graphql@14.7.0)
+      subscriptions-transport-ws: 0.9.19(bufferutil@4.0.8)(graphql@14.7.0)(utf-8-validate@5.0.10)
       type-is: 1.6.18
     transitivePeerDependencies:
       - bufferutil
@@ -14143,35 +14179,35 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  apollo-server-plugin-base@0.14.0(graphql@14.7.0):
+  apollo-server-plugin-base@0.14.0(encoding@0.1.13)(graphql@14.7.0):
     dependencies:
-      apollo-server-types: 0.10.0(graphql@14.7.0)
+      apollo-server-types: 0.10.0(encoding@0.1.13)(graphql@14.7.0)
       graphql: 14.7.0
     transitivePeerDependencies:
       - encoding
 
-  apollo-server-types@0.10.0(graphql@14.7.0):
+  apollo-server-types@0.10.0(encoding@0.1.13)(graphql@14.7.0):
     dependencies:
       apollo-reporting-protobuf: 0.8.0
       apollo-server-caching: 0.7.0
-      apollo-server-env: 3.2.0
+      apollo-server-env: 3.2.0(encoding@0.1.13)
       graphql: 14.7.0
     transitivePeerDependencies:
       - encoding
 
-  apollo-server-types@0.5.1(graphql@14.7.0):
+  apollo-server-types@0.5.1(encoding@0.1.13)(graphql@14.7.0):
     dependencies:
       apollo-engine-reporting-protobuf: 0.5.2
       apollo-server-caching: 0.5.2
-      apollo-server-env: 2.4.5
+      apollo-server-env: 2.4.5(encoding@0.1.13)
       graphql: 14.7.0
     transitivePeerDependencies:
       - encoding
 
-  apollo-server@2.25.4(graphql@14.7.0):
+  apollo-server@2.25.4(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10):
     dependencies:
-      apollo-server-core: 2.26.2(graphql@14.7.0)
-      apollo-server-express: 2.26.0(graphql@14.7.0)
+      apollo-server-core: 2.26.2(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10)
+      apollo-server-express: 2.26.0(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10)
       express: 4.17.1
       graphql: 14.7.0
       graphql-subscriptions: 1.1.0(graphql@14.7.0)
@@ -14183,10 +14219,10 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  apollo-tracing@0.16.0(graphql@14.7.0):
+  apollo-tracing@0.16.0(encoding@0.1.13)(graphql@14.7.0):
     dependencies:
-      apollo-server-env: 3.2.0
-      apollo-server-plugin-base: 0.14.0(graphql@14.7.0)
+      apollo-server-env: 3.2.0(encoding@0.1.13)
+      apollo-server-plugin-base: 0.14.0(encoding@0.1.13)(graphql@14.7.0)
       graphql: 14.7.0
     transitivePeerDependencies:
       - encoding
@@ -14205,7 +14241,8 @@ snapshots:
 
   aproba@2.0.0: {}
 
-  arch@2.2.0: {}
+  arch@2.2.0:
+    optional: true
 
   are-we-there-yet@2.0.0:
     dependencies:
@@ -14304,11 +14341,12 @@ snapshots:
 
   ast-types@0.15.2:
     dependencies:
-      tslib: 2.5.0
+      tslib: 2.6.2
 
   astral-regex@1.0.0: {}
 
-  astral-regex@2.0.0: {}
+  astral-regex@2.0.0:
+    optional: true
 
   async-limiter@1.0.1: {}
 
@@ -14316,11 +14354,13 @@ snapshots:
     dependencies:
       retry: 0.12.0
 
-  async@3.2.3: {}
+  async@3.2.3:
+    optional: true
 
   asynckit@0.4.0: {}
 
-  at-least-node@1.0.0: {}
+  at-least-node@1.0.0:
+    optional: true
 
   atob@2.1.2: {}
 
@@ -14408,6 +14448,21 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  babel-jest@27.3.1(@babel/core@7.12.3):
+    dependencies:
+      '@babel/core': 7.12.3
+      '@jest/transform': 27.3.1
+      '@jest/types': 27.2.5
+      '@types/babel__core': 7.1.16
+      babel-plugin-istanbul: 6.0.0
+      babel-preset-jest: 27.2.0(@babel/core@7.12.3)
+      chalk: 4.1.0
+      graceful-fs: 4.2.11
+      slash: 3.0.0
+    transitivePeerDependencies:
+      - supports-color
+    optional: true
+
   babel-jest@27.3.1(@babel/core@7.16.0):
     dependencies:
       '@babel/core': 7.16.0
@@ -14471,6 +14526,23 @@ snapshots:
     transitivePeerDependencies:
       - '@babel/core'
 
+  babel-preset-current-node-syntax@1.0.1(@babel/core@7.12.3):
+    dependencies:
+      '@babel/core': 7.12.3
+      '@babel/plugin-syntax-async-generators': 7.8.4(@babel/core@7.12.3)
+      '@babel/plugin-syntax-bigint': 7.8.3(@babel/core@7.12.3)
+      '@babel/plugin-syntax-class-properties': 7.12.1(@babel/core@7.12.3)
+      '@babel/plugin-syntax-import-meta': 7.10.4(@babel/core@7.12.3)
+      '@babel/plugin-syntax-json-strings': 7.8.3(@babel/core@7.12.3)
+      '@babel/plugin-syntax-logical-assignment-operators': 7.10.4(@babel/core@7.12.3)
+      '@babel/plugin-syntax-nullish-coalescing-operator': 7.8.3(@babel/core@7.12.3)
+      '@babel/plugin-syntax-numeric-separator': 7.10.4(@babel/core@7.12.3)
+      '@babel/plugin-syntax-object-rest-spread': 7.8.3(@babel/core@7.12.3)
+      '@babel/plugin-syntax-optional-catch-binding': 7.8.3(@babel/core@7.12.3)
+      '@babel/plugin-syntax-optional-chaining': 7.8.3(@babel/core@7.12.3)
+      '@babel/plugin-syntax-top-level-await': 7.12.1(@babel/core@7.12.3)
+    optional: true
+
   babel-preset-current-node-syntax@1.0.1(@babel/core@7.16.0):
     dependencies:
       '@babel/core': 7.16.0
@@ -14492,6 +14564,13 @@ snapshots:
       '@babel/core': 7.16.0
       babel-plugin-jest-hoist: 26.6.2
       babel-preset-current-node-syntax: 1.0.1(@babel/core@7.16.0)
+
+  babel-preset-jest@27.2.0(@babel/core@7.12.3):
+    dependencies:
+      '@babel/core': 7.12.3
+      babel-plugin-jest-hoist: 27.2.0
+      babel-preset-current-node-syntax: 1.0.1(@babel/core@7.12.3)
+    optional: true
 
   babel-preset-jest@27.2.0(@babel/core@7.16.0):
     dependencies:
@@ -14561,9 +14640,9 @@ snapshots:
     dependencies:
       tweetnacl: 0.14.5
 
-  bcrypt@5.0.1:
+  bcrypt@5.0.1(encoding@0.1.13):
     dependencies:
-      '@mapbox/node-pre-gyp': 1.0.10
+      '@mapbox/node-pre-gyp': 1.0.10(encoding@0.1.13)
       node-addon-api: 3.2.1
     transitivePeerDependencies:
       - encoding
@@ -14584,7 +14663,8 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 3.6.0
 
-  blob-util@2.0.2: {}
+  blob-util@2.0.2:
+    optional: true
 
   bluebird@3.7.2: {}
 
@@ -14662,7 +14742,8 @@ snapshots:
     dependencies:
       node-int64: 0.4.0
 
-  buffer-crc32@0.2.13: {}
+  buffer-crc32@0.2.13:
+    optional: true
 
   buffer-equal-constant-time@1.0.1: {}
 
@@ -14715,7 +14796,8 @@ snapshots:
       normalize-url: 4.5.1
       responselike: 1.0.2
 
-  cachedir@2.3.0: {}
+  cachedir@2.3.0:
+    optional: true
 
   call-bind@1.0.2:
     dependencies:
@@ -14837,7 +14919,8 @@ snapshots:
 
   check-error@1.0.2: {}
 
-  check-more-types@2.24.0: {}
+  check-more-types@2.24.0:
+    optional: true
 
   cheerio-select@1.4.0:
     dependencies:
@@ -14908,7 +14991,8 @@ snapshots:
 
   classnames@2.2.6: {}
 
-  clean-stack@2.2.0: {}
+  clean-stack@2.2.0:
+    optional: true
 
   cli-cursor@2.1.0:
     dependencies:
@@ -14925,6 +15009,7 @@ snapshots:
       string-width: 4.2.3
     optionalDependencies:
       '@colors/colors': 1.5.0
+    optional: true
 
   cli-truncate@0.2.1:
     dependencies:
@@ -14935,6 +15020,7 @@ snapshots:
     dependencies:
       slice-ansi: 3.0.0
       string-width: 4.2.3
+    optional: true
 
   cli-width@3.0.0: {}
 
@@ -15334,6 +15420,7 @@ snapshots:
       tmp: 0.2.1
       untildify: 4.0.0
       yauzl: 2.10.0
+    optional: true
 
   d3-array@2.12.1:
     dependencies:
@@ -15440,11 +15527,13 @@ snapshots:
   debug@3.2.7(supports-color@8.1.1):
     dependencies:
       ms: 2.1.3
+    optionalDependencies:
       supports-color: 8.1.1
 
   debug@4.3.4(supports-color@8.1.1):
     dependencies:
       ms: 2.1.2
+    optionalDependencies:
       supports-color: 8.1.1
 
   decamelize@1.2.0: {}
@@ -15667,165 +15756,165 @@ snapshots:
 
   dotenv@8.2.0: {}
 
-  draft-convert@2.1.10(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0):
+  draft-convert@2.1.10(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       '@babel/runtime': 7.23.2
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       immutable: 3.7.6
       invariant: 2.2.4
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
 
-  draft-js-alignment-plugin@2.0.6(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0):
+  draft-js-alignment-plugin@2.0.6(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
-      draft-js-buttons: 2.0.2(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      draft-js-buttons: 2.0.2(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
 
-  draft-js-anchor-plugin@2.0.3(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0):
+  draft-js-anchor-plugin@2.0.3(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       clsx: 1.1.1
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
-      draft-js-plugins-utils: 2.0.2(draft-js@0.10.5)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      draft-js-plugins-utils: 2.0.2(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))
       prepend-http: 1.0.4
       prop-types: 15.8.1
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
       tlds: 1.214.0
 
-  draft-js-block-breakout-plugin@2.0.1(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0):
+  draft-js-block-breakout-plugin@2.0.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       immutable: 3.7.6
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
 
-  draft-js-buttons@2.0.1(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0):
+  draft-js-buttons@2.0.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
       union-class-names: 1.0.0
 
-  draft-js-buttons@2.0.2(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0):
+  draft-js-buttons@2.0.2(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       clsx: 1.1.1
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
 
-  draft-js-checkable-list-item@2.0.6(draft-js@0.10.5)(immutable@3.7.6)(react-dom@16.14.0)(react@16.14.0):
+  draft-js-checkable-list-item@2.0.6(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(immutable@3.7.6)(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
-      draft-js-modifiers: 0.1.5(react-dom@16.14.0)(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      draft-js-modifiers: 0.1.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       immutable: 3.7.6
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
 
-  draft-js-divider-plugin@0.1.1(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0):
+  draft-js-divider-plugin@0.1.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       decorate-component-with-props: 1.1.0(react@16.14.0)
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       prop-types: 15.8.1
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
       union-class-names: 1.0.0
 
-  draft-js-focus-plugin@2.2.0(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0):
+  draft-js-focus-plugin@2.2.0(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       decorate-component-with-props: 1.1.0(react@16.14.0)
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
-      find-with-regex: 1.1.3(draft-js@0.10.5)
-      immutable: 3.7.6
-      prop-types: 15.8.1
-      react: 16.14.0
-      react-dom: 16.14.0(react@16.14.0)
-      union-class-names: 1.0.0
-
-  draft-js-image-plugin@2.0.7(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0):
-    dependencies:
-      clsx: 1.1.1
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
-      react: 16.14.0
-      react-dom: 16.14.0(react@16.14.0)
-
-  draft-js-inline-toolbar-plugin@2.0.3(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0):
-    dependencies:
-      decorate-component-with-props: 1.1.0(react@16.14.0)
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
-      draft-js-buttons: 2.0.2(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
-      find-with-regex: 1.1.3(draft-js@0.10.5)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      find-with-regex: 1.1.3(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))
       immutable: 3.7.6
       prop-types: 15.8.1
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
       union-class-names: 1.0.0
 
-  draft-js-linkify-plugin@2.0.2(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0):
+  draft-js-image-plugin@2.0.7(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       clsx: 1.1.1
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      react: 16.14.0
+      react-dom: 16.14.0(react@16.14.0)
+
+  draft-js-inline-toolbar-plugin@2.0.3(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
+    dependencies:
+      decorate-component-with-props: 1.1.0(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      draft-js-buttons: 2.0.2(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      find-with-regex: 1.1.3(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))
+      immutable: 3.7.6
+      prop-types: 15.8.1
+      react: 16.14.0
+      react-dom: 16.14.0(react@16.14.0)
+      union-class-names: 1.0.0
+
+  draft-js-linkify-plugin@2.0.2(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
+    dependencies:
+      clsx: 1.1.1
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       linkify-it: 2.2.0
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
       tlds: 1.214.0
 
-  draft-js-markdown-shortcuts-plugin@0.3.0(draft-js-plugins-editor@2.1.1)(react-dom@16.14.0)(react@16.14.0):
+  draft-js-markdown-shortcuts-plugin@0.3.0(draft-js-plugins-editor@2.1.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       decorate-component-with-props: 1.1.0(react@16.14.0)
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
-      draft-js-checkable-list-item: 2.0.6(draft-js@0.10.5)(immutable@3.7.6)(react-dom@16.14.0)(react@16.14.0)
-      draft-js-plugins-editor: 2.1.1(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      draft-js-checkable-list-item: 2.0.6(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(immutable@3.7.6)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      draft-js-plugins-editor: 2.1.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       immutable: 3.7.6
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
 
-  draft-js-mathjax-plugin@1.3.4(draft-js-plugins-editor@2.1.1)(draft-js@0.10.5)(immutable@3.8.2)(react@16.14.0):
+  draft-js-mathjax-plugin@1.3.4(draft-js-plugins-editor@2.1.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(immutable@3.7.6)(react@16.14.0):
     dependencies:
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
-      draft-js-plugins-editor: 2.1.1(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
-      immutable: 3.8.2
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      draft-js-plugins-editor: 2.1.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      immutable: 3.7.6
       react: 16.14.0
 
-  draft-js-modifiers@0.1.5(react-dom@16.14.0)(react@16.14.0):
+  draft-js-modifiers@0.1.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       immutable: 3.7.6
     transitivePeerDependencies:
       - react
       - react-dom
 
-  draft-js-plugins-editor@2.1.1(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0):
+  draft-js-plugins-editor@2.1.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       decorate-component-with-props: 1.1.0(react@16.14.0)
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
-      find-with-regex: 1.1.3(draft-js@0.10.5)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      find-with-regex: 1.1.3(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))
       immutable: 3.7.6
       prop-types: 15.8.1
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
       union-class-names: 1.0.0
 
-  draft-js-plugins-utils@2.0.2(draft-js@0.10.5):
+  draft-js-plugins-utils@2.0.2(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)):
     dependencies:
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
 
-  draft-js-resizeable-plugin@2.0.9(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0):
+  draft-js-resizeable-plugin@2.0.9(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
 
-  draft-js-richbuttons-plugin@2.2.0(draft-js-plugins-editor@2.1.1)(react-dom@16.14.0)(react@16.14.0):
+  draft-js-richbuttons-plugin@2.2.0(draft-js-plugins-editor@2.1.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       decorate-component-with-props: 1.1.0(react@16.14.0)
-      draft-js-plugins-editor: 2.1.1(draft-js@0.10.5)(react-dom@16.14.0)(react@16.14.0)
+      draft-js-plugins-editor: 2.1.1(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       prop-types: 15.8.1
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
 
-  draft-js@0.10.5(react-dom@16.14.0)(react@16.14.0):
+  draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       fbjs: 0.8.17
       immutable: 3.7.6
@@ -15888,6 +15977,7 @@ snapshots:
   enquirer@2.3.6:
     dependencies:
       ansi-colors: 4.1.1
+    optional: true
 
   entities@1.1.2: {}
 
@@ -15904,7 +15994,7 @@ snapshots:
 
   envinfo@7.11.0: {}
 
-  enzyme-adapter-react-16@1.0.1(enzyme@3.1.0)(react-dom@16.14.0)(react-test-renderer@16.14.0)(react@16.14.0):
+  enzyme-adapter-react-16@1.0.1(enzyme@3.1.0)(react-dom@16.14.0(react@16.14.0))(react-test-renderer@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       enzyme: 3.1.0
       enzyme-adapter-utils: 1.13.1(react@16.14.0)
@@ -16081,7 +16171,7 @@ snapshots:
   esbuild-linux-s390x@0.15.7:
     optional: true
 
-  esbuild-loader@2.6.1(webpack@5.89.0):
+  esbuild-loader@2.6.1(webpack@5.89.0(esbuild@0.15.7)):
     dependencies:
       esbuild: 0.8.22
       loader-utils: 2.0.0
@@ -16167,7 +16257,7 @@ snapshots:
 
   eslint-config-ckeditor5@4.4.0(eslint@8.41.0):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 5.59.7(@typescript-eslint/parser@5.59.7)(eslint@8.41.0)(typescript@4.9.5)
+      '@typescript-eslint/eslint-plugin': 5.59.7(@typescript-eslint/parser@5.59.7(eslint@8.41.0)(typescript@4.9.5))(eslint@8.41.0)(typescript@4.9.5)
       '@typescript-eslint/parser': 5.59.7(eslint@8.41.0)(typescript@4.9.5)
       eslint: 8.41.0
       eslint-plugin-ckeditor5-rules: 4.4.0(eslint@8.41.0)(typescript@4.9.5)
@@ -16188,10 +16278,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.8.0(@typescript-eslint/parser@5.59.7)(eslint-import-resolver-node@0.3.7)(eslint@8.41.0):
+  eslint-module-utils@2.8.0(@typescript-eslint/parser@5.59.7(eslint@8.41.0)(typescript@5.0.4))(eslint-import-resolver-node@0.3.7)(eslint@8.41.0):
     dependencies:
-      '@typescript-eslint/parser': 5.59.7(eslint@8.41.0)(typescript@5.0.4)
       debug: 3.2.7(supports-color@8.1.1)
+    optionalDependencies:
+      '@typescript-eslint/parser': 5.59.7(eslint@8.41.0)(typescript@5.0.4)
       eslint: 8.41.0
       eslint-import-resolver-node: 0.3.7
     transitivePeerDependencies:
@@ -16216,9 +16307,8 @@ snapshots:
       eslint: 8.41.0
       globals: 11.12.0
 
-  eslint-plugin-import@2.27.5(@typescript-eslint/parser@5.59.7)(eslint@8.41.0):
+  eslint-plugin-import@2.27.5(@typescript-eslint/parser@5.59.7(eslint@8.41.0)(typescript@5.0.4))(eslint@8.41.0):
     dependencies:
-      '@typescript-eslint/parser': 5.59.7(eslint@8.41.0)(typescript@5.0.4)
       array-includes: 3.1.6
       array.prototype.flat: 1.3.1
       array.prototype.flatmap: 1.3.1
@@ -16226,7 +16316,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.41.0
       eslint-import-resolver-node: 0.3.7
-      eslint-module-utils: 2.8.0(@typescript-eslint/parser@5.59.7)(eslint-import-resolver-node@0.3.7)(eslint@8.41.0)
+      eslint-module-utils: 2.8.0(@typescript-eslint/parser@5.59.7(eslint@8.41.0)(typescript@5.0.4))(eslint-import-resolver-node@0.3.7)(eslint@8.41.0)
       has: 1.0.3
       is-core-module: 2.12.1
       is-glob: 4.0.3
@@ -16235,6 +16325,8 @@ snapshots:
       resolve: 1.22.2
       semver: 6.3.1
       tsconfig-paths: 3.14.1
+    optionalDependencies:
+      '@typescript-eslint/parser': 5.59.7(eslint@8.41.0)(typescript@5.0.4)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -16246,13 +16338,15 @@ snapshots:
       eslint-utils: 2.1.0
       ramda: 0.27.1
 
-  eslint-plugin-prettier@5.1.3(eslint-config-prettier@9.1.0)(eslint@8.41.0)(prettier@3.2.5):
+  eslint-plugin-prettier@5.1.3(@types/eslint@8.56.1)(eslint-config-prettier@9.1.0(eslint@8.41.0))(eslint@8.41.0)(prettier@3.2.5):
     dependencies:
       eslint: 8.41.0
-      eslint-config-prettier: 9.1.0(eslint@8.41.0)
       prettier: 3.2.5
       prettier-linter-helpers: 1.0.0
       synckit: 0.8.8
+    optionalDependencies:
+      '@types/eslint': 8.56.1
+      eslint-config-prettier: 9.1.0(eslint@8.41.0)
 
   eslint-plugin-react-hooks@4.6.0(eslint@8.41.0):
     dependencies:
@@ -16375,7 +16469,8 @@ snapshots:
 
   event-target-shim@5.0.1: {}
 
-  eventemitter2@6.4.4: {}
+  eventemitter2@6.4.4:
+    optional: true
 
   eventemitter3@3.1.2: {}
 
@@ -16412,6 +16507,7 @@ snapshots:
       onetime: 5.1.2
       signal-exit: 3.0.6
       strip-final-newline: 2.0.0
+    optional: true
 
   execa@5.1.1:
     dependencies:
@@ -16428,6 +16524,7 @@ snapshots:
   executable@4.1.1:
     dependencies:
       pify: 2.3.0
+    optional: true
 
   exit@0.1.2: {}
 
@@ -16583,6 +16680,7 @@ snapshots:
       '@types/yauzl': 2.9.2
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   extsprintf@1.3.0: {}
 
@@ -16633,6 +16731,7 @@ snapshots:
   fd-slicer@1.1.0:
     dependencies:
       pend: 1.2.0
+    optional: true
 
   feedparser-promised@1.5.0:
     dependencies:
@@ -16720,9 +16819,9 @@ snapshots:
       locate-path: 6.0.0
       path-exists: 4.0.0
 
-  find-with-regex@1.1.3(draft-js@0.10.5):
+  find-with-regex@1.1.3(draft-js@0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)):
     dependencies:
-      draft-js: 0.10.5(react-dom@16.14.0)(react@16.14.0)
+      draft-js: 0.10.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
 
   findit2@2.2.3: {}
 
@@ -16738,7 +16837,7 @@ snapshots:
   flow-parser@0.206.0: {}
 
   follow-redirects@1.15.2(debug@4.3.4):
-    dependencies:
+    optionalDependencies:
       debug: 4.3.4(supports-color@8.1.1)
 
   follow-redirects@1.5.10:
@@ -16810,6 +16909,7 @@ snapshots:
       graceful-fs: 4.2.11
       jsonfile: 6.1.0
       universalify: 2.0.0
+    optional: true
 
   fs-minipass@2.1.0:
     dependencies:
@@ -16818,6 +16918,9 @@ snapshots:
   fs.realpath@1.0.0: {}
 
   fsevents@2.3.2:
+    optional: true
+
+  fsevents@2.3.3:
     optional: true
 
   function-bind@1.1.1: {}
@@ -16882,6 +16985,7 @@ snapshots:
   getos@3.2.1:
     dependencies:
       async: 3.2.3
+    optional: true
 
   getpass@0.1.7:
     dependencies:
@@ -16919,6 +17023,7 @@ snapshots:
   global-dirs@3.0.0:
     dependencies:
       ini: 2.0.0
+    optional: true
 
   global@4.4.0:
     dependencies:
@@ -16987,14 +17092,14 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  graphql-config@3.2.0(@types/node@18.11.0)(graphql@14.7.0)(typescript@5.0.4):
+  graphql-config@3.2.0(@types/node@18.11.0)(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(typescript@5.0.4)(utf-8-validate@5.0.10):
     dependencies:
       '@endemolshinegroup/cosmiconfig-typescript-loader': 3.0.2(@types/node@18.11.0)(cosmiconfig@6.0.0)(typescript@5.0.4)
       '@graphql-tools/graphql-file-loader': 6.2.6(graphql@14.7.0)
       '@graphql-tools/json-file-loader': 6.2.6(graphql@14.7.0)
       '@graphql-tools/load': 6.2.5(graphql@14.7.0)
       '@graphql-tools/merge': 6.2.6(graphql@14.7.0)
-      '@graphql-tools/url-loader': 6.7.0(graphql@14.7.0)
+      '@graphql-tools/url-loader': 6.7.0(bufferutil@4.0.8)(encoding@0.1.13)(graphql@14.7.0)(utf-8-validate@5.0.10)
       '@graphql-tools/utils': 6.2.4(graphql@14.7.0)
       cosmiconfig: 6.0.0
       cosmiconfig-toml-loader: 1.0.0
@@ -17016,11 +17121,11 @@ snapshots:
       assert-err: 1.1.0
       graphql: 14.7.0
 
-  graphql-extensions@0.16.0(graphql@14.7.0):
+  graphql-extensions@0.16.0(encoding@0.1.13)(graphql@14.7.0):
     dependencies:
       '@apollographql/apollo-tools': 0.5.2(graphql@14.7.0)
-      apollo-server-env: 3.2.0
-      apollo-server-types: 0.10.0(graphql@14.7.0)
+      apollo-server-env: 3.2.0(encoding@0.1.13)
+      apollo-server-types: 0.10.0(encoding@0.1.13)(graphql@14.7.0)
       graphql: 14.7.0
     transitivePeerDependencies:
       - encoding
@@ -17080,10 +17185,10 @@ snapshots:
       isobject: 4.0.0
       object-path: 0.11.8
 
-  graphql-voyager@1.0.0-rc.31(graphql@14.7.0)(react-dom@16.14.0)(react@16.14.0):
+  graphql-voyager@1.0.0-rc.31(graphql@14.7.0)(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       '@f/animate': 1.0.1
-      '@material-ui/core': 3.9.4(react-dom@16.14.0)(react@16.14.0)
+      '@material-ui/core': 3.9.4(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       classnames: 2.2.6
       clipboard: 2.0.6
       commonmark: 0.29.2
@@ -17303,6 +17408,7 @@ snapshots:
       assert-plus: 1.0.0
       jsprim: 2.0.2
       sshpk: 1.17.0
+    optional: true
 
   https-proxy-agent@5.0.0:
     dependencies:
@@ -17311,7 +17417,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  human-signals@1.1.1: {}
+  human-signals@1.1.1:
+    optional: true
 
   human-signals@2.1.0: {}
 
@@ -17340,8 +17447,6 @@ snapshots:
   immediate@3.0.6: {}
 
   immutable@3.7.6: {}
-
-  immutable@3.8.2: {}
 
   import-fresh@2.0.0:
     dependencies:
@@ -17392,7 +17497,8 @@ snapshots:
 
   ini@1.3.5: {}
 
-  ini@2.0.0: {}
+  ini@2.0.0:
+    optional: true
 
   inquirer@7.3.3:
     dependencies:
@@ -17487,6 +17593,7 @@ snapshots:
   is-ci@3.0.0:
     dependencies:
       ci-info: 3.2.0
+    optional: true
 
   is-core-module@2.12.1:
     dependencies:
@@ -17552,6 +17659,7 @@ snapshots:
     dependencies:
       global-dirs: 3.0.0
       is-path-inside: 3.0.3
+    optional: true
 
   is-interactive@1.0.0: {}
 
@@ -17661,9 +17769,9 @@ snapshots:
       node-fetch: 1.7.3
       whatwg-fetch: 3.5.0
 
-  isomorphic-fetch@3.0.0:
+  isomorphic-fetch@3.0.0(encoding@0.1.13):
     dependencies:
-      node-fetch: 2.6.7
+      node-fetch: 2.6.7(encoding@0.1.13)
       whatwg-fetch: 3.5.0
     transitivePeerDependencies:
       - encoding
@@ -17672,9 +17780,9 @@ snapshots:
     dependencies:
       form-data: 2.5.1
 
-  isomorphic-ws@4.0.1(ws@7.4.1):
+  isomorphic-ws@4.0.1(ws@7.4.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)):
     dependencies:
-      ws: 7.4.1
+      ws: 7.4.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
 
   isstream@0.1.2: {}
 
@@ -17740,16 +17848,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  jest-cli@27.3.1(ts-node@10.9.1):
+  jest-cli@27.3.1(bufferutil@4.0.8)(ts-node@10.9.1(@types/node@18.11.0)(typescript@5.0.4))(utf-8-validate@5.0.10):
     dependencies:
-      '@jest/core': 27.3.1(ts-node@10.9.1)
+      '@jest/core': 27.3.1(bufferutil@4.0.8)(ts-node@10.9.1(@types/node@18.11.0)(typescript@5.0.4))(utf-8-validate@5.0.10)
       '@jest/test-result': 27.3.1
       '@jest/types': 27.2.5
       chalk: 4.1.0
       exit: 0.1.2
       graceful-fs: 4.2.11
       import-local: 3.0.2
-      jest-config: 27.3.1(ts-node@10.9.1)
+      jest-config: 27.3.1(bufferutil@4.0.8)(ts-node@10.9.1(@types/node@18.11.0)(typescript@5.0.4))(utf-8-validate@5.0.10)
       jest-util: 27.3.1
       jest-validate: 27.3.1
       prompts: 2.4.0
@@ -17761,7 +17869,7 @@ snapshots:
       - ts-node
       - utf-8-validate
 
-  jest-config@27.3.1(ts-node@10.9.1):
+  jest-config@27.3.1(bufferutil@4.0.8)(ts-node@10.9.1(@types/node@18.11.0)(typescript@5.0.4))(utf-8-validate@5.0.10):
     dependencies:
       '@babel/core': 7.16.0
       '@jest/test-sequencer': 27.3.1
@@ -17773,17 +17881,18 @@ snapshots:
       glob: 7.1.6
       graceful-fs: 4.2.11
       jest-circus: 27.3.1
-      jest-environment-jsdom: 27.3.1
+      jest-environment-jsdom: 27.3.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       jest-environment-node: 27.3.1
       jest-get-type: 27.3.1
       jest-jasmine2: 27.3.1
       jest-regex-util: 27.0.6
       jest-resolve: 27.3.1
-      jest-runner: 27.3.1
+      jest-runner: 27.3.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       jest-util: 27.3.1
       jest-validate: 27.3.1
       micromatch: 4.0.4
       pretty-format: 27.3.1
+    optionalDependencies:
       ts-node: 10.9.1(@types/node@18.11.0)(typescript@5.0.4)
     transitivePeerDependencies:
       - bufferutil
@@ -17817,7 +17926,7 @@ snapshots:
       jest-util: 27.3.1
       pretty-format: 27.3.1
 
-  jest-environment-jsdom@27.3.1:
+  jest-environment-jsdom@27.3.1(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       '@jest/environment': 27.3.1
       '@jest/fake-timers': 27.3.1
@@ -17825,7 +17934,7 @@ snapshots:
       '@types/node': 18.16.19
       jest-mock: 27.3.0
       jest-util: 27.3.1
-      jsdom: 16.7.0
+      jsdom: 16.7.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - canvas
@@ -17964,7 +18073,7 @@ snapshots:
       jest-util: 29.7.0
 
   jest-pnp-resolver@1.2.2(jest-resolve@27.3.1):
-    dependencies:
+    optionalDependencies:
       jest-resolve: 27.3.1
 
   jest-regex-util@26.0.0: {}
@@ -17992,7 +18101,7 @@ snapshots:
       resolve.exports: 1.1.0
       slash: 3.0.0
 
-  jest-runner@27.3.1:
+  jest-runner@27.3.1(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       '@jest/console': 27.3.1
       '@jest/environment': 27.3.1
@@ -18005,7 +18114,7 @@ snapshots:
       exit: 0.1.2
       graceful-fs: 4.2.11
       jest-docblock: 27.0.6
-      jest-environment-jsdom: 27.3.1
+      jest-environment-jsdom: 27.3.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       jest-environment-node: 27.3.1
       jest-haste-map: 27.3.1
       jest-leak-detector: 27.3.1
@@ -18172,11 +18281,11 @@ snapshots:
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
-  jest@27.3.1(ts-node@10.9.1):
+  jest@27.3.1(bufferutil@4.0.8)(ts-node@10.9.1(@types/node@18.11.0)(typescript@5.0.4))(utf-8-validate@5.0.10):
     dependencies:
-      '@jest/core': 27.3.1(ts-node@10.9.1)
+      '@jest/core': 27.3.1(bufferutil@4.0.8)(ts-node@10.9.1(@types/node@18.11.0)(typescript@5.0.4))(utf-8-validate@5.0.10)
       import-local: 3.0.2
-      jest-cli: 27.3.1(ts-node@10.9.1)
+      jest-cli: 27.3.1(bufferutil@4.0.8)(ts-node@10.9.1(@types/node@18.11.0)(typescript@5.0.4))(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - canvas
@@ -18211,7 +18320,7 @@ snapshots:
 
   jsc-safe-url@0.2.4: {}
 
-  jscodeshift@0.14.0(@babel/preset-env@7.11.5):
+  jscodeshift@0.14.0(@babel/preset-env@7.11.5(@babel/core@7.12.3)):
     dependencies:
       '@babel/core': 7.23.7
       '@babel/parser': 7.23.6
@@ -18238,7 +18347,7 @@ snapshots:
 
   jsdoc-type-pratt-parser@3.1.0: {}
 
-  jsdom@11.12.0:
+  jsdom@11.12.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       abab: 2.0.5
       acorn: 5.7.4
@@ -18264,13 +18373,13 @@ snapshots:
       whatwg-encoding: 1.0.5
       whatwg-mimetype: 2.3.0
       whatwg-url: 6.5.0
-      ws: 5.2.2
+      ws: 5.2.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       xml-name-validator: 3.0.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  jsdom@16.7.0:
+  jsdom@16.7.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       abab: 2.0.5
       acorn: 8.10.0
@@ -18297,7 +18406,7 @@ snapshots:
       whatwg-encoding: 1.0.5
       whatwg-mimetype: 2.3.0
       whatwg-url: 8.7.0
-      ws: 7.5.8
+      ws: 7.5.8(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       xml-name-validator: 3.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -18318,7 +18427,8 @@ snapshots:
 
   json-schema@0.2.3: {}
 
-  json-schema@0.4.0: {}
+  json-schema@0.4.0:
+    optional: true
 
   json-stable-stringify-without-jsonify@1.0.1: {}
 
@@ -18354,6 +18464,7 @@ snapshots:
       universalify: 2.0.0
     optionalDependencies:
       graceful-fs: 4.2.11
+    optional: true
 
   jsonify@0.0.0: {}
 
@@ -18390,6 +18501,7 @@ snapshots:
       extsprintf: 1.3.0
       json-schema: 0.4.0
       verror: 1.10.0
+    optional: true
 
   jss-camel-case@6.1.0(jss@9.8.7):
     dependencies:
@@ -18462,13 +18574,13 @@ snapshots:
       array-includes: 3.1.6
       object.assign: 4.1.4
 
-  juice@7.0.0:
+  juice@7.0.0(encoding@0.1.13):
     dependencies:
       cheerio: 1.0.0-rc.9
       commander: 5.1.0
       mensch: 0.3.4
       slick: 1.12.2
-      web-resource-inliner: 5.0.0
+      web-resource-inliner: 5.0.0(encoding@0.1.13)
     transitivePeerDependencies:
       - encoding
 
@@ -18530,7 +18642,8 @@ snapshots:
     dependencies:
       package-json: 6.5.0
 
-  lazy-ass@1.6.0: {}
+  lazy-ass@1.6.0:
+    optional: true
 
   lcid@2.0.0:
     dependencies:
@@ -18610,6 +18723,7 @@ snapshots:
       rxjs: 6.6.7
       through: 2.3.8
       wrap-ansi: 7.0.0
+    optional: true
 
   listr@0.14.3:
     dependencies:
@@ -18744,6 +18858,7 @@ snapshots:
       cli-cursor: 3.1.0
       slice-ansi: 4.0.0
       wrap-ansi: 6.2.0
+    optional: true
 
   logkitty@0.7.1:
     dependencies:
@@ -18900,18 +19015,18 @@ snapshots:
 
   marky@1.2.5: {}
 
-  mathjax-node-page@3.2.0:
+  mathjax-node-page@3.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
-      mathjax-node: 2.1.1
+      mathjax-node: 2.1.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       yargs: 11.1.1
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  mathjax-node@2.1.1:
+  mathjax-node@2.1.1(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       is-fullwidth-code-point: 2.0.0
-      jsdom: 11.12.0
+      jsdom: 11.12.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       mathjax: 2.7.9
     transitivePeerDependencies:
       - bufferutil
@@ -18973,12 +19088,12 @@ snapshots:
       metro-core: 0.80.4
       rimraf: 3.0.2
 
-  metro-config@0.80.4:
+  metro-config@0.80.4(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10):
     dependencies:
       connect: 3.7.0
       cosmiconfig: 5.2.1
       jest-validate: 29.7.0
-      metro: 0.80.4
+      metro: 0.80.4(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       metro-cache: 0.80.4
       metro-core: 0.80.4
       metro-runtime: 0.80.4
@@ -19006,7 +19121,7 @@ snapshots:
       nullthrows: 1.1.1
       walker: 1.0.8
     optionalDependencies:
-      fsevents: 2.3.2
+      fsevents: 2.3.3
     transitivePeerDependencies:
       - supports-color
 
@@ -19054,13 +19169,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  metro-transform-worker@0.80.4:
+  metro-transform-worker@0.80.4(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10):
     dependencies:
       '@babel/core': 7.23.7
       '@babel/generator': 7.23.6
       '@babel/parser': 7.23.6
       '@babel/types': 7.23.6
-      metro: 0.80.4
+      metro: 0.80.4(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       metro-babel-transformer: 0.80.4
       metro-cache: 0.80.4
       metro-cache-key: 0.80.4
@@ -19073,7 +19188,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  metro@0.80.4:
+  metro@0.80.4(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10):
     dependencies:
       '@babel/code-frame': 7.23.5
       '@babel/core': 7.23.7
@@ -19099,7 +19214,7 @@ snapshots:
       metro-babel-transformer: 0.80.4
       metro-cache: 0.80.4
       metro-cache-key: 0.80.4
-      metro-config: 0.80.4
+      metro-config: 0.80.4(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       metro-core: 0.80.4
       metro-file-map: 0.80.4
       metro-minify-terser: 0.80.4
@@ -19108,16 +19223,16 @@ snapshots:
       metro-source-map: 0.80.4
       metro-symbolicate: 0.80.4
       metro-transform-plugins: 0.80.4
-      metro-transform-worker: 0.80.4
+      metro-transform-worker: 0.80.4(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       mime-types: 2.1.27
-      node-fetch: 2.6.7
+      node-fetch: 2.6.7(encoding@0.1.13)
       nullthrows: 1.1.1
       rimraf: 3.0.2
       serialize-error: 2.1.0
       source-map: 0.5.7
       strip-ansi: 6.0.1
       throat: 5.0.0
-      ws: 7.5.8
+      ws: 7.5.8(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       yargs: 17.7.2
     transitivePeerDependencies:
       - bufferutil
@@ -19325,9 +19440,11 @@ snapshots:
 
   node-fetch@2.6.1: {}
 
-  node-fetch@2.6.7:
+  node-fetch@2.6.7(encoding@0.1.13):
     dependencies:
       whatwg-url: 5.0.0
+    optionalDependencies:
+      encoding: 0.1.13
 
   node-gyp-build@3.9.0: {}
 
@@ -19482,7 +19599,7 @@ snapshots:
       is-docker: 2.2.1
       is-wsl: 2.2.0
 
-  openai@4.18.0:
+  openai@4.18.0(encoding@0.1.13):
     dependencies:
       '@types/node': 18.16.19
       '@types/node-fetch': 2.6.4
@@ -19491,7 +19608,7 @@ snapshots:
       digest-fetch: 1.3.0
       form-data-encoder: 1.7.2
       formdata-node: 4.4.1
-      node-fetch: 2.6.7
+      node-fetch: 2.6.7(encoding@0.1.13)
       web-streams-polyfill: 3.2.1
     transitivePeerDependencies:
       - encoding
@@ -19545,7 +19662,8 @@ snapshots:
 
   os-tmpdir@1.0.2: {}
 
-  ospath@1.2.2: {}
+  ospath@1.2.2:
+    optional: true
 
   p-cancelable@1.1.0: {}
 
@@ -19592,6 +19710,7 @@ snapshots:
   p-map@4.0.0:
     dependencies:
       aggregate-error: 3.1.0
+    optional: true
 
   p-try@1.0.0: {}
 
@@ -19754,7 +19873,8 @@ snapshots:
 
   peberminta@0.8.0: {}
 
-  pend@1.2.0: {}
+  pend@1.2.0:
+    optional: true
 
   performance-now@2.1.0: {}
 
@@ -19813,9 +19933,12 @@ snapshots:
 
   picocolors@1.0.0: {}
 
+  picocolors@1.0.1: {}
+
   picomatch@2.3.0: {}
 
-  pify@2.3.0: {}
+  pify@2.3.0:
+    optional: true
 
   pify@4.0.1: {}
 
@@ -19877,7 +20000,8 @@ snapshots:
 
   prettier@3.2.5: {}
 
-  pretty-bytes@5.6.0: {}
+  pretty-bytes@5.6.0:
+    optional: true
 
   pretty-format@26.6.2:
     dependencies:
@@ -19961,7 +20085,8 @@ snapshots:
       forwarded: 0.1.2
       ipaddr.js: 1.9.1
 
-  proxy-from-env@1.0.0: {}
+  proxy-from-env@1.0.0:
+    optional: true
 
   proxy-from-env@1.1.0: {}
 
@@ -20059,7 +20184,7 @@ snapshots:
       react-themeable: 1.1.0
       section-iterator: 2.0.0
 
-  react-bootstrap@1.0.0-beta.14(react-dom@16.14.0)(react@16.14.0):
+  react-bootstrap@1.0.0-beta.14(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       '@babel/runtime': 7.23.2
       '@restart/context': 2.1.4(react@16.14.0)
@@ -20074,8 +20199,8 @@ snapshots:
       prop-types-extra: 1.1.1(react@16.14.0)
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
-      react-overlays: 1.2.0(react-dom@16.14.0)(react@16.14.0)
-      react-transition-group: 4.4.1(react-dom@16.14.0)(react@16.14.0)
+      react-overlays: 1.2.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      react-transition-group: 4.4.1(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       uncontrollable: 7.1.1(react@16.14.0)
       warning: 4.0.3
 
@@ -20101,7 +20226,7 @@ snapshots:
       prop-types: 15.8.1
       react: 16.14.0
 
-  react-datetime@2.16.3(moment@2.29.4)(react-dom@16.14.0)(react@16.14.0):
+  react-datetime@2.16.3(moment@2.29.4)(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       create-react-class: 15.7.0
       moment: 2.29.4
@@ -20109,12 +20234,12 @@ snapshots:
       prop-types: 15.8.1
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
-      react-onclickoutside: 6.9.0(react-dom@16.14.0)(react@16.14.0)
+      react-onclickoutside: 6.9.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
 
-  react-devtools-core@4.28.5:
+  react-devtools-core@4.28.5(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       shell-quote: 1.7.4
-      ws: 7.5.8
+      ws: 7.5.8(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -20141,7 +20266,7 @@ snapshots:
 
   react-fast-compare@3.2.0: {}
 
-  react-geosuggest@2.14.0(react-dom@16.14.0)(react@16.14.0):
+  react-geosuggest@2.14.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       classnames: 2.2.6
       lodash.debounce: 4.0.8
@@ -20174,7 +20299,7 @@ snapshots:
       react: 16.14.0
       react-fast-compare: 3.2.0
 
-  react-instantsearch-dom@6.8.2(algoliasearch@3.35.1)(react-dom@16.14.0)(react@16.14.0):
+  react-instantsearch-dom@6.8.2(algoliasearch@3.35.1)(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       '@babel/runtime': 7.23.2
       algoliasearch-helper: 3.6.2(algoliasearch@3.35.1)
@@ -20187,20 +20312,20 @@ snapshots:
     transitivePeerDependencies:
       - algoliasearch
 
-  react-instantsearch-native@6.8.2(react-native@0.73.2)(react@16.14.0):
+  react-instantsearch-native@6.8.2(react-native@0.73.2(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))(bufferutil@4.0.8)(encoding@0.1.13)(react@16.14.0)(utf-8-validate@5.0.10))(react@16.14.0):
     dependencies:
       '@babel/runtime': 7.23.2
       algoliasearch: 4.8.2
       react: 16.14.0
       react-instantsearch-core: 6.8.2(algoliasearch@4.8.2)(react@16.14.0)
-      react-native: 0.73.2(@babel/core@7.12.3)(@babel/preset-env@7.11.5)(react@16.14.0)
+      react-native: 0.73.2(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))(bufferutil@4.0.8)(encoding@0.1.13)(react@16.14.0)(utf-8-validate@5.0.10)
 
-  react-instantsearch@6.8.2(algoliasearch@3.35.1)(react-dom@16.14.0)(react-native@0.73.2)(react@16.14.0):
+  react-instantsearch@6.8.2(algoliasearch@3.35.1)(react-dom@16.14.0(react@16.14.0))(react-native@0.73.2(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))(bufferutil@4.0.8)(encoding@0.1.13)(react@16.14.0)(utf-8-validate@5.0.10))(react@16.14.0):
     dependencies:
       '@babel/runtime': 7.23.2
       react-instantsearch-core: 6.8.2(algoliasearch@3.35.1)(react@16.14.0)
-      react-instantsearch-dom: 6.8.2(algoliasearch@3.35.1)(react-dom@16.14.0)(react@16.14.0)
-      react-instantsearch-native: 6.8.2(react-native@0.73.2)(react@16.14.0)
+      react-instantsearch-dom: 6.8.2(algoliasearch@3.35.1)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      react-instantsearch-native: 6.8.2(react-native@0.73.2(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))(bufferutil@4.0.8)(encoding@0.1.13)(react@16.14.0)(utf-8-validate@5.0.10))(react@16.14.0)
     transitivePeerDependencies:
       - algoliasearch
       - react
@@ -20226,31 +20351,31 @@ snapshots:
 
   react-lifecycles-compat@3.0.4: {}
 
-  react-map-gl@5.2.10(react-dom@16.14.0)(react@16.14.0):
+  react-map-gl@5.2.10(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       '@babel/runtime': 7.23.2
       mapbox-gl: 1.13.0
       mjolnir.js: 2.4.1
       prop-types: 15.8.1
       react: 16.14.0
-      react-virtualized-auto-sizer: 1.0.2(react-dom@16.14.0)(react@16.14.0)
+      react-virtualized-auto-sizer: 1.0.2(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       viewport-mercator-project: 7.0.1
     transitivePeerDependencies:
       - react-dom
 
-  react-native@0.73.2(@babel/core@7.12.3)(@babel/preset-env@7.11.5)(react@16.14.0):
+  react-native@0.73.2(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))(bufferutil@4.0.8)(encoding@0.1.13)(react@16.14.0)(utf-8-validate@5.0.10):
     dependencies:
       '@jest/create-cache-key-function': 29.7.0
-      '@react-native-community/cli': 12.3.0
-      '@react-native-community/cli-platform-android': 12.3.0
-      '@react-native-community/cli-platform-ios': 12.3.0
+      '@react-native-community/cli': 12.3.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@react-native-community/cli-platform-android': 12.3.0(encoding@0.1.13)
+      '@react-native-community/cli-platform-ios': 12.3.0(encoding@0.1.13)
       '@react-native/assets-registry': 0.73.1
-      '@react-native/codegen': 0.73.2(@babel/preset-env@7.11.5)
-      '@react-native/community-cli-plugin': 0.73.12(@babel/core@7.12.3)(@babel/preset-env@7.11.5)
+      '@react-native/codegen': 0.73.2(@babel/preset-env@7.11.5(@babel/core@7.12.3))
+      '@react-native/community-cli-plugin': 0.73.12(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
       '@react-native/gradle-plugin': 0.73.4
       '@react-native/js-polyfills': 0.73.1
       '@react-native/normalize-colors': 0.73.2
-      '@react-native/virtualized-lists': 0.73.4(react-native@0.73.2)
+      '@react-native/virtualized-lists': 0.73.4(react-native@0.73.2(@babel/core@7.12.3)(@babel/preset-env@7.11.5(@babel/core@7.12.3))(bufferutil@4.0.8)(encoding@0.1.13)(react@16.14.0)(utf-8-validate@5.0.10))
       abort-controller: 3.0.0
       anser: 1.4.10
       ansi-regex: 5.0.1
@@ -20269,14 +20394,14 @@ snapshots:
       pretty-format: 26.6.2
       promise: 8.3.0
       react: 16.14.0
-      react-devtools-core: 4.28.5
+      react-devtools-core: 4.28.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       react-refresh: 0.14.0
       react-shallow-renderer: 16.15.0(react@16.14.0)
       regenerator-runtime: 0.13.7
       scheduler: 0.24.0-canary-efb381bbf-20230505
       stacktrace-parser: 0.1.10
       whatwg-fetch: 3.5.0
-      ws: 6.2.2
+      ws: 6.2.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       yargs: 17.7.2
     transitivePeerDependencies:
       - '@babel/core'
@@ -20291,12 +20416,12 @@ snapshots:
       babel-runtime: 6.26.0
       react: 16.14.0
 
-  react-onclickoutside@6.9.0(react-dom@16.14.0)(react@16.14.0):
+  react-onclickoutside@6.9.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
 
-  react-overlays@1.2.0(react-dom@16.14.0)(react@16.14.0):
+  react-overlays@1.2.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       classnames: 2.2.6
       dom-helpers: 3.4.0
@@ -20320,7 +20445,7 @@ snapshots:
       typed-styles: 0.0.7
       warning: 4.0.3
 
-  react-popper@2.3.0(@popperjs/core@2.11.5)(react-dom@16.14.0)(react@16.14.0):
+  react-popper@2.3.0(@popperjs/core@2.11.5)(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       '@popperjs/core': 2.11.5
       react: 16.14.0
@@ -20330,7 +20455,7 @@ snapshots:
 
   react-refresh@0.14.0: {}
 
-  react-resize-detector@6.7.6(react-dom@16.14.0)(react@16.14.0):
+  react-resize-detector@6.7.6(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       '@types/resize-observer-browser': 0.1.6
       lodash.debounce: 4.0.8
@@ -20373,16 +20498,16 @@ snapshots:
     dependencies:
       react: 16.14.0
 
-  react-smooth@2.0.0(prop-types@15.8.1)(react-dom@16.14.0)(react@16.14.0):
+  react-smooth@2.0.0(prop-types@15.8.1)(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       fast-equals: 2.0.3
       prop-types: 15.8.1
       raf: 3.4.1
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
-      react-transition-group: 2.9.0(react-dom@16.14.0)(react@16.14.0)
+      react-transition-group: 2.9.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
 
-  react-sortable-hoc@1.11.0(prop-types@15.8.1)(react-dom@16.14.0)(react@16.14.0):
+  react-sortable-hoc@1.11.0(prop-types@15.8.1)(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       '@babel/runtime': 7.23.2
       invariant: 2.2.4
@@ -20402,7 +20527,7 @@ snapshots:
     dependencies:
       object-assign: 3.0.0
 
-  react-transition-group@2.9.0(react-dom@16.14.0)(react@16.14.0):
+  react-transition-group@2.9.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       dom-helpers: 3.4.0
       loose-envify: 1.4.0
@@ -20411,7 +20536,7 @@ snapshots:
       react-dom: 16.14.0(react@16.14.0)
       react-lifecycles-compat: 3.0.4
 
-  react-transition-group@4.4.1(react-dom@16.14.0)(react@16.14.0):
+  react-transition-group@4.4.1(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       '@babel/runtime': 7.23.2
       dom-helpers: 5.2.0
@@ -20420,7 +20545,7 @@ snapshots:
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
 
-  react-virtualized-auto-sizer@1.0.2(react-dom@16.14.0)(react@16.14.0):
+  react-virtualized-auto-sizer@1.0.2(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
@@ -20458,13 +20583,13 @@ snapshots:
       ast-types: 0.15.2
       esprima: 4.0.1
       source-map: 0.6.1
-      tslib: 2.5.0
+      tslib: 2.6.2
 
   recharts-scale@0.4.5:
     dependencies:
       decimal.js-light: 2.5.1
 
-  recharts@2.1.4(prop-types@15.8.1)(react-dom@16.14.0)(react@16.14.0):
+  recharts@2.1.4(prop-types@15.8.1)(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       '@types/d3-interpolate': 2.0.2
       '@types/d3-scale': 3.3.2
@@ -20478,8 +20603,8 @@ snapshots:
       react: 16.14.0
       react-dom: 16.14.0(react@16.14.0)
       react-is: 16.10.2
-      react-resize-detector: 6.7.6(react-dom@16.14.0)(react@16.14.0)
-      react-smooth: 2.0.0(prop-types@15.8.1)(react-dom@16.14.0)(react@16.14.0)
+      react-resize-detector: 6.7.6(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      react-smooth: 2.0.0(prop-types@15.8.1)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       recharts-scale: 0.4.5
       reduce-css-calc: 2.1.8
     transitivePeerDependencies:
@@ -20585,6 +20710,7 @@ snapshots:
   request-progress@3.0.0:
     dependencies:
       throttleit: 1.0.0
+    optional: true
 
   request-promise-core@1.1.4(request@2.88.2):
     dependencies:
@@ -20949,12 +21075,14 @@ snapshots:
       ansi-styles: 4.3.0
       astral-regex: 2.0.0
       is-fullwidth-code-point: 3.0.0
+    optional: true
 
   slice-ansi@4.0.0:
     dependencies:
       ansi-styles: 4.3.0
       astral-regex: 2.0.0
       is-fullwidth-code-point: 3.0.0
+    optional: true
 
   slick@1.12.2: {}
 
@@ -21176,14 +21304,14 @@ snapshots:
 
   strnum@1.0.5: {}
 
-  subscriptions-transport-ws@0.9.19(graphql@14.7.0):
+  subscriptions-transport-ws@0.9.19(bufferutil@4.0.8)(graphql@14.7.0)(utf-8-validate@5.0.10):
     dependencies:
       backo2: 1.0.2
       eventemitter3: 3.1.2
       graphql: 14.7.0
       iterall: 1.3.0
       symbol-observable: 1.2.0
-      ws: 7.5.8
+      ws: 7.5.8(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -21263,10 +21391,10 @@ snapshots:
 
   symbol-tree@3.2.4: {}
 
-  sync-fetch@0.3.0:
+  sync-fetch@0.3.0(encoding@0.1.13):
     dependencies:
       buffer: 5.7.1
-      node-fetch: 2.6.7
+      node-fetch: 2.6.7(encoding@0.1.13)
     transitivePeerDependencies:
       - encoding
 
@@ -21299,15 +21427,16 @@ snapshots:
       ansi-escapes: 4.3.2
       supports-hyperlinks: 2.1.0
 
-  terser-webpack-plugin@5.3.10(esbuild@0.15.7)(webpack@5.89.0):
+  terser-webpack-plugin@5.3.10(esbuild@0.15.7)(webpack@5.89.0(esbuild@0.15.7)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.20
-      esbuild: 0.15.7
       jest-worker: 27.5.1
       schema-utils: 3.3.0
       serialize-javascript: 6.0.2
       terser: 5.26.0
       webpack: 5.89.0(esbuild@0.15.7)
+    optionalDependencies:
+      esbuild: 0.15.7
 
   terser@5.26.0:
     dependencies:
@@ -21344,7 +21473,8 @@ snapshots:
 
   throat@6.0.1: {}
 
-  throttleit@1.0.0: {}
+  throttleit@1.0.0:
+    optional: true
 
   through2@2.0.5:
     dependencies:
@@ -21375,6 +21505,7 @@ snapshots:
   tmp@0.2.1:
     dependencies:
       rimraf: 3.0.2
+    optional: true
 
   tmpl@1.0.5: {}
 
@@ -21439,13 +21570,11 @@ snapshots:
       '@ungap/global-this': 0.4.2
       tslib: 1.14.1
 
-  ts-jest@27.0.7(@babel/core@7.12.3)(@types/jest@26.0.19)(jest@27.3.1)(typescript@5.0.4):
+  ts-jest@27.0.7(@babel/core@7.12.3)(@types/jest@26.0.19)(babel-jest@27.3.1(@babel/core@7.12.3))(jest@27.3.1(bufferutil@4.0.8)(ts-node@10.9.1(@types/node@18.11.0)(typescript@5.0.4))(utf-8-validate@5.0.10))(typescript@5.0.4):
     dependencies:
-      '@babel/core': 7.12.3
-      '@types/jest': 26.0.19
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
-      jest: 27.3.1(ts-node@10.9.1)
+      jest: 27.3.1(bufferutil@4.0.8)(ts-node@10.9.1(@types/node@18.11.0)(typescript@5.0.4))(utf-8-validate@5.0.10)
       jest-util: 27.3.1
       json5: 2.1.3
       lodash.memoize: 4.1.2
@@ -21453,8 +21582,12 @@ snapshots:
       semver: 7.5.4
       typescript: 5.0.4
       yargs-parser: 20.2.4
+    optionalDependencies:
+      '@babel/core': 7.12.3
+      '@types/jest': 26.0.19
+      babel-jest: 27.3.1(@babel/core@7.12.3)
 
-  ts-loader@8.0.11(typescript@5.0.4)(webpack@5.89.0):
+  ts-loader@8.0.11(typescript@5.0.4)(webpack@5.89.0(esbuild@0.15.7)):
     dependencies:
       chalk: 2.4.2
       enhanced-resolve: 4.3.0
@@ -21515,9 +21648,9 @@ snapshots:
 
   turndown-plugin-gfm@1.0.2: {}
 
-  turndown@4.0.2:
+  turndown@4.0.2(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
-      jsdom: 11.12.0
+      jsdom: 11.12.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -21646,7 +21779,8 @@ snapshots:
 
   universalify@0.1.2: {}
 
-  universalify@2.0.0: {}
+  universalify@2.0.0:
+    optional: true
 
   unix-dgram@2.0.6:
     dependencies:
@@ -21665,13 +21799,14 @@ snapshots:
       has-value: 0.3.1
       isobject: 3.0.1
 
-  untildify@4.0.0: {}
+  untildify@4.0.0:
+    optional: true
 
   update-browserslist-db@1.0.13(browserslist@4.22.2):
     dependencies:
       browserslist: 4.22.2
       escalade: 3.1.1
-      picocolors: 1.0.0
+      picocolors: 1.0.1
 
   upper-case-first@1.1.2:
     dependencies:
@@ -21815,13 +21950,13 @@ snapshots:
     dependencies:
       defaults: 1.0.4
 
-  web-resource-inliner@5.0.0:
+  web-resource-inliner@5.0.0(encoding@0.1.13):
     dependencies:
       ansi-colors: 4.1.1
       escape-goat: 3.0.0
       htmlparser2: 4.1.0
       mime: 2.4.6
-      node-fetch: 2.6.7
+      node-fetch: 2.6.7(encoding@0.1.13)
       valid-data-url: 3.0.1
     transitivePeerDependencies:
       - encoding
@@ -21868,7 +22003,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(esbuild@0.15.7)(webpack@5.89.0)
+      terser-webpack-plugin: 5.3.10(esbuild@0.15.7)(webpack@5.89.0(esbuild@0.15.7))
       watchpack: 2.4.0
       webpack-sources: 3.2.3
     transitivePeerDependencies:
@@ -21990,17 +22125,29 @@ snapshots:
       signal-exit: 3.0.6
       typedarray-to-buffer: 3.1.5
 
-  ws@5.2.2:
+  ws@5.2.2(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       async-limiter: 1.0.1
+    optionalDependencies:
+      bufferutil: 4.0.8
+      utf-8-validate: 5.0.10
 
-  ws@6.2.2:
+  ws@6.2.2(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       async-limiter: 1.0.1
+    optionalDependencies:
+      bufferutil: 4.0.8
+      utf-8-validate: 5.0.10
 
-  ws@7.4.1: {}
+  ws@7.4.1(bufferutil@4.0.8)(utf-8-validate@5.0.10):
+    optionalDependencies:
+      bufferutil: 4.0.8
+      utf-8-validate: 5.0.10
 
-  ws@7.5.8: {}
+  ws@7.5.8(bufferutil@4.0.8)(utf-8-validate@5.0.10):
+    optionalDependencies:
+      bufferutil: 4.0.8
+      utf-8-validate: 5.0.10
 
   xml-name-validator@3.0.0: {}
 
@@ -22111,6 +22258,7 @@ snapshots:
     dependencies:
       buffer-crc32: 0.2.13
       fd-slicer: 1.1.0
+    optional: true
 
   yn@3.1.1: {}
 
