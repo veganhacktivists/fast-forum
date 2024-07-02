@@ -1,23 +1,17 @@
 import * as _ from "underscore";
 
-declare global {
-  let bundleIsServer: boolean;
-  let bundleIsTest: boolean;
-  let bundleIsProduction: boolean;
-  let bundleIsMigrations: boolean;
-  let defaultSiteAbsoluteUrl: string;
-  let serverPort: number;
-  let estrellaPid: number;
-  let ddEnv: string;
-}
+// TODO: fix not being propagated
+global.bundleIsServer = true;
 
-export const isClient = !bundleIsServer;
-export const isServer = bundleIsServer;
-export const isDevelopment = !bundleIsProduction;
-export const isProduction = bundleIsProduction;
-export const isMigrations = bundleIsMigrations;
-export const isAnyTest = bundleIsTest;
-export const isPackageTest = bundleIsTest;
+export const isClient = !global.bundleIsServer;
+export const isServer = global.bundleIsServer;
+export const isDevelopment = !global.bundleIsProduction;
+export const isProduction = global.bundleIsProduction;
+export const isMigrations = global.bundleIsMigrations;
+export const isAnyTest = global.bundleIsTest;
+export const isPackageTest = global.bundleIsTest;
+export const defaultSiteAbsoluteUrl = global.defaultSiteAbsoluteUrl;
+export const serverPort = global.serverPort;
 
 export interface CommandLineArguments {
   postgresUrl: string;

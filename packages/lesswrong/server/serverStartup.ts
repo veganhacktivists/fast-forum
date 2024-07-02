@@ -75,10 +75,10 @@ const connectToPostgres = async (connectionString: string, target: DbTarget = "w
   }
 };
 
-const initDatabases = ({ postgresUrl, postgresReadUrl }: CommandLineArguments) =>
+export const initDatabases = ({ postgresUrl, postgresReadUrl }: CommandLineArguments) =>
   Promise.all([connectToPostgres(postgresUrl), connectToPostgres(postgresReadUrl, "read")]);
 
-const initSettings = () => {
+export const initSettings = () => {
   if (!isAnyTest) {
     setInterval(refreshSettingsCaches, 1000 * 60 * 5); // We refresh the cache every 5 minutes on all servers
   }
@@ -87,12 +87,7 @@ const initSettings = () => {
 
 export const initPostgres = async () => {
   Collections.filter((collection) => collection instanceof PgCollection).map((collection: PgCollection) => {
-    console.log("building table", collection.tableName);
-    try {
-      collection.buildPostgresTable();
-    } catch (e: unknown) {
-      console.error(e);
-    }
+    collection.buildPostgresTable();
   });
   // if (Collections.some((collection) => collection instanceof PgCollection)) {
   //   for (const collection of Collections) {
