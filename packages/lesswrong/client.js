@@ -14,7 +14,7 @@ import "./client/publicSettings";
 import "./client/reCaptchaStart";
 
 // Then do the rest
-import "./client/autoRefresh";
+// import "./client/autoRefresh";
 import "./client/scrollRestoration";
 import "./client/clickableCheckboxLabels";
 import "./client/themeProvider";
