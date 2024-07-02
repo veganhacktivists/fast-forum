@@ -79,7 +79,7 @@ export const initDatabases = ({ postgresUrl, postgresReadUrl }: CommandLineArgum
   Promise.all([connectToPostgres(postgresUrl), connectToPostgres(postgresReadUrl, "read")]);
 
 export const initSettings = () => {
-  if (!isAnyTest) {
+  if (!isAnyTest && !isMigrations) {
     setInterval(refreshSettingsCaches, 1000 * 60 * 5); // We refresh the cache every 5 minutes on all servers
   }
   return refreshSettingsCaches();
@@ -89,13 +89,6 @@ export const initPostgres = async () => {
   Collections.filter((collection) => collection instanceof PgCollection).map((collection: PgCollection) => {
     collection.buildPostgresTable();
   });
-  // if (Collections.some((collection) => collection instanceof PgCollection)) {
-  //   for (const collection of Collections) {
-  //     if (collection instanceof PgCollection) {
-  //       collection.buildPostgresTable();
-  //     }
-  //   }
-  // }
 
   // If we're migrating up, we might be migrating from the start on a fresh database, so skip the check
   // for whether postgres views exist
