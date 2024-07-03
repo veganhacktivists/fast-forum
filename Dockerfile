@@ -22,7 +22,8 @@ COPY . .
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod=false --shamefully-hoist --no-optional
 
 FROM dev-deps as build
-RUN pnpm run build
+ARG BUILD_ARGS=""
+RUN pnpm run build ${BUILD_ARGS}
 
 FROM base
 COPY --from=prod-deps /app/node_modules /app/node_modules
