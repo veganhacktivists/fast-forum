@@ -1,4 +1,4 @@
-import { onStartup, getWebsocketPort } from "../lib/executionEnvironment";
+import { onStartup, getWebsocketPort, isProduction } from "../lib/executionEnvironment";
 import type { MessageEvent, OpenEvent, CloseEvent } from "ws";
 
 // In development, make a websocket connection (on a different port) to get
@@ -58,7 +58,7 @@ function disconnectWebsocket() {
   }
 }
 
-if (!bundleIsProduction) {
+if (!isProduction) {
   onStartup(() => {
     setTimeout(() => {
       connectWebsocket();
