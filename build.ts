@@ -79,6 +79,7 @@ const clientBuild = build({
     ...bundleDefinitions,
     bundleIsServer: false as unknown as string,
     "process.env.ROOT_URL": JSON.stringify(process.env.ROOT_URL || ""),
+    "process.env.PORT": JSON.stringify(process.env.PORT || ""),
     global: "window",
   },
   globalName: "window",
