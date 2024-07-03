@@ -44,7 +44,7 @@ import { addCrosspostRoutes } from "./fmCrosspost/routes";
 import { getUserEmail } from "../lib/collections/users/helpers";
 import { inspect } from "util";
 import { renderJssSheetPreloads } from "./utils/renderJssSheetImports";
-import { datadogMiddleware } from "./datadog/datadogMiddleware";
+// import { datadogMiddleware } from "./datadog/datadogMiddleware";
 import { Sessions } from "../lib/collections/sessions";
 import { addServerSentEventsEndpoint } from "./serverSentEvents";
 import { botRedirectMiddleware } from "./botRedirect";
@@ -154,7 +154,7 @@ export function startWebserver() {
   addForumSpecificMiddleware(addMiddleware);
   addSentryMiddlewares(addMiddleware);
   addClientIdMiddleware(addMiddleware);
-  app.use(datadogMiddleware);
+  // app.use(datadogMiddleware);
   app.use(pickerMiddleware);
   app.use(botRedirectMiddleware);
   app.use(hstsMiddleware);
