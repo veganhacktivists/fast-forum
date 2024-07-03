@@ -9,7 +9,7 @@ import { addCronJob } from "./cronUtil";
 
 addCronJob({
   name: "updateScoreActiveDocuments",
-  interval: `every 30 seconds`,
+  interval: `every 3 minutes`,
   job() {
     VoteableCollections.forEach((collection) => {
       const options = VoteableCollectionOptions[collection.collectionName]!;

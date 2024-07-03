@@ -185,7 +185,7 @@ defineQuery({
 
 addCronJob({
   name: "addNewRSSPosts",
-  interval: "every 10 minutes",
+  interval: "every 30 minutes",
   job: runRSSImport,
 });
 
