@@ -10,7 +10,7 @@ export const isAnyTest = process.env.NODE_ENV === "test";
 export const isPackageTest = isAnyTest;
 
 export const isMigrations = bundleIsMigrations;
-export const defaultSiteAbsoluteUrl = process.env.ROOT_URL || "";
+export const defaultSiteAbsoluteUrl = bundleRootUrl;
 
 export interface CommandLineArguments {
   postgresUrl: string;
@@ -76,7 +76,7 @@ export const addGlobalForShell = (name: string, value: any) => {
   // TODO
 };
 
-export const getServerPort = () => parseInt(process.env.PORT || "");
+export const getServerPort = () => bundlePort;
 export const getWebsocketPort = () => getServerPort() + 1;
 
 // Polyfill
