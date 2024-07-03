@@ -27,6 +27,7 @@ RUN pnpm run build
 FROM base
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/build /app/build
+COPY public .
 
 ENV SETTINGS_FILE="settings.json"
 ARG PORT=3000
