@@ -276,11 +276,6 @@ export function startWebserver() {
     }),
   );
 
-  app.get("/health", async function (_req, res) {
-    res.status(200);
-    res.end();
-  });
-
   app.get("/api/eag-application-data", async function (req, res, next) {
     if (!isEAForum) {
       next();
