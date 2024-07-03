@@ -1,5 +1,5 @@
 module.exports = {
-  "extends": [
+  extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
@@ -13,32 +13,35 @@ module.exports = {
     "plugin:import/typescript",
     "plugin:prettier/recommended",
   ],
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "allowImportExportEverywhere": true,
-    "ecmaVersion": 6,
-    "sourceType": "module",
-    "project": "./tsconfig.json",
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    allowImportExportEverywhere: true,
+    ecmaVersion: 6,
+    sourceType: "module",
+    project: "./tsconfig.json",
   },
-  "rules": {
+  rules: {
     "babel/generator-star-spacing": 0,
-    
+
     // A function with a name starting with an uppercase letter should only be
     // used as a constructor
-    "babel/new-cap": [1, {
-      "capIsNewExceptions": [
-        "Optional",
-        "OneOf",
-        "Maybe",
-        "MailChimpAPI",
-        "Juice",
-        "Run",
-        "AppComposer",
-        "Query",
-        "Map",
-        "List"
-      ]
-    }],
+    "babel/new-cap": [
+      1,
+      {
+        capIsNewExceptions: [
+          "Optional",
+          "OneOf",
+          "Maybe",
+          "MailChimpAPI",
+          "Juice",
+          "Run",
+          "AppComposer",
+          "Query",
+          "Map",
+          "List",
+        ],
+      },
+    ],
     "babel/array-bracket-spacing": 0,
     "babel/object-curly-spacing": 0,
     "babel/object-shorthand": 0,
@@ -46,16 +49,19 @@ module.exports = {
     "eol-last": 1,
     "no-await-in-loop": 0,
     "comma-dangle": 0,
-    "eqeqeq": [1, "always", {"null": "ignore"}],
+    eqeqeq: [1, "always", { null: "ignore" }],
     "key-spacing": 0,
     "no-extra-boolean-cast": 0,
     "no-undef": 1,
-    "no-unused-vars": [1, {
-      "vars": "all",
-      "args": "none",
-      "varsIgnorePattern": "React|PropTypes|Component"
-    }],
-    "no-console": 1,
+    "no-unused-vars": [
+      1,
+      {
+        vars: "all",
+        args: "none",
+        varsIgnorePattern: "React|PropTypes|Component",
+      },
+    ],
+    "no-console": ["warn", { allow: ["info", "warn", "error"] }],
     "no-template-curly-in-string": 1,
     "no-tabs": 1,
     "no-extend-native": 1,
@@ -85,55 +91,90 @@ module.exports = {
     "import/extensions": 0,
     "import/no-cycle": 1,
     "import/no-mutable-exports": 1,
-    "import/no-restricted-paths": ["error", {"zones": [
+    "import/no-restricted-paths": [
+      "error",
       {
-        target: "packages/lesswrong/components",
-        from: "packages/lesswrong/server",
-        message: "server cannot be imported into components - move the shared code into lib",
+        zones: [
+          {
+            target: "packages/lesswrong/components",
+            from: "packages/lesswrong/server",
+            message: "server cannot be imported into components - move the shared code into lib",
+          },
+          {
+            target: "packages/lesswrong/lib",
+            from: "packages/lesswrong/server",
+            message: "server cannot be imported into lib - move the shared code into lib",
+          },
+          {
+            target: "packages/lesswrong/client",
+            from: "packages/lesswrong/server",
+            message: "server cannot be imported into client - move the shared code into lib",
+          },
+          {
+            target: "packages/lesswrong/themes",
+            from: "packages/lesswrong/server",
+            message: "server cannot be imported into themes - move the shared code into lib",
+          },
+        ],
       },
-      {
-        target: "packages/lesswrong/lib",
-        from: "packages/lesswrong/server",
-        message: "server cannot be imported into lib - move the shared code into lib",
-      },
-      {
-        target: "packages/lesswrong/client",
-        from: "packages/lesswrong/server",
-        message: "server cannot be imported into client - move the shared code into lib",
-      },
-      {
-        target: "packages/lesswrong/themes",
-        from: "packages/lesswrong/server",
-        message: "server cannot be imported into themes - move the shared code into lib",
-      },
-    ]}],
-    "no-restricted-imports": ["error", {"paths": [
-      { name: "lodash", message: "Don't import all of lodash, import a specific lodash function, eg lodash/sumBy" },
-      { name: "lodash/fp", message: "Don't import all of lodash/fp, import a specific lodash function, eg lodash/fp/capitalize" },
-      { name: "@material-ui", message: "Don't import all of material-ui/icons" },
-      { name: "@material-ui/core", message: "Don't import all of material-ui/core" },
-      { name: "@material-ui/core/colors", message: "Don't use material-ui/core/colors, use the theme palette" },
-      { name: "@material-ui/icons", message: "Don't import all of material-ui/icons" },
-      { name: "@material-ui/core/Hidden", message: "Don't use material-UI's Hidden component, it's subtly broken; use breapoints and JSS styles instead" },
-      { name: "@material-ui/core/Typography", message: "Don't use material-UI's Typography component; use Components.LWTypography or JSS styles" },
-      { name: "@material-ui/core/Dialog", message: "Don't use material-UI's Dialog component directly, use LWDialog instead" },
-      { name: "@material-ui/core/Popper", importNames: ["Popper"], message: "Don't use material-UI's Popper component directly, use LWPopper instead" },
-      { name: "@material-ui/core/MenuItem", message: "Don't use material-UI's MenuItem component directly; use Components.MenuItem or JSS styles" },
-      { name: "@material-ui/core/NoSsr", importNames: ["Popper"], message: "Don't use @material-ui/core/NoSsr/NoSsr; use react-no-ssr instead" },
-      { name: "react-router", message: "Don't import react-router, use lib/reactRouterWrapper" },
-      { name: "react-router-dom", message: "Don't import react-router-dom, use lib/reactRouterWrapper" },
     ],
-    patterns: [
-      "@material-ui/core/colors/*"
-    ]}],
+    "no-restricted-imports": [
+      "error",
+      {
+        paths: [
+          { name: "lodash", message: "Don't import all of lodash, import a specific lodash function, eg lodash/sumBy" },
+          {
+            name: "lodash/fp",
+            message: "Don't import all of lodash/fp, import a specific lodash function, eg lodash/fp/capitalize",
+          },
+          { name: "@material-ui", message: "Don't import all of material-ui/icons" },
+          { name: "@material-ui/core", message: "Don't import all of material-ui/core" },
+          { name: "@material-ui/core/colors", message: "Don't use material-ui/core/colors, use the theme palette" },
+          { name: "@material-ui/icons", message: "Don't import all of material-ui/icons" },
+          {
+            name: "@material-ui/core/Hidden",
+            message:
+              "Don't use material-UI's Hidden component, it's subtly broken; use breapoints and JSS styles instead",
+          },
+          {
+            name: "@material-ui/core/Typography",
+            message: "Don't use material-UI's Typography component; use Components.LWTypography or JSS styles",
+          },
+          {
+            name: "@material-ui/core/Dialog",
+            message: "Don't use material-UI's Dialog component directly, use LWDialog instead",
+          },
+          {
+            name: "@material-ui/core/Popper",
+            importNames: ["Popper"],
+            message: "Don't use material-UI's Popper component directly, use LWPopper instead",
+          },
+          {
+            name: "@material-ui/core/MenuItem",
+            message: "Don't use material-UI's MenuItem component directly; use Components.MenuItem or JSS styles",
+          },
+          {
+            name: "@material-ui/core/NoSsr",
+            importNames: ["Popper"],
+            message: "Don't use @material-ui/core/NoSsr/NoSsr; use react-no-ssr instead",
+          },
+          { name: "react-router", message: "Don't import react-router, use lib/reactRouterWrapper" },
+          { name: "react-router-dom", message: "Don't import react-router-dom, use lib/reactRouterWrapper" },
+        ],
+        patterns: ["@material-ui/core/colors/*"],
+      },
+    ],
 
     // Warn on missing await
     // The ignoreVoid option makes it so that
     //   void someAwaitableFunction()
     // can be used as a way of marking a function as deliberately not-awaited.
-    "@typescript-eslint/no-floating-promises": [1, {
-      ignoreVoid: true
-    }],
+    "@typescript-eslint/no-floating-promises": [
+      1,
+      {
+        ignoreVoid: true,
+      },
+    ],
 
     // Like no-implicit-any, but specifically for things that are exported. Turn
     // on some day, but not yet.
@@ -145,132 +186,122 @@ module.exports = {
     // explicit-function-return-type: Disabled. Would forbid functions with
     // undeclared return type.
     "@typescript-eslint/explicit-function-return-type": 0,
-    
+
     // no-use-before-define: Disabled. This would require all function calls to
     // be below their definition in files, which there's no good reason for.
     "@typescript-eslint/no-use-before-define": 0,
-    
+
     // prefer-const: Disabled. Would forbit declaring a variable as mutable
     // (with let) when it could have been immutable (with const).
     "prefer-const": 0,
-    
+
     // no-var: Disabled. Would forbid declaring a variable with "var" (as
     // opposed to let or const).
     "no-var": 0,
-    
+
     // ban-ts-ignore: Disabled. Would forbid use of @ts-ignore, which suppresses
     // type-checking errors.
     "@typescript-eslint/ban-ts-ignore": 0,
-    
+
     // no-non-null-assertion: Currently disabled, may enable later. Forbids use
     // of "somevar!" to coerce somevar from Type|null to Type.
     "@typescript-eslint/no-non-null-assertion": 0,
-    
+
     // no-empty-interface: Disabled. Would forbid interfaces with no members
     // (ie, interfaces defined solely by other interfaces that they extend).
     "@typescript-eslint/no-empty-interface": 0,
-    
+
     // member-delimiter-style: Disabled. Would make semicolons between
     // interface members non-optional.
     "@typescript-eslint/member-delimiter-style": 0,
-    
+
     // type-annotation-spacing: Disabled. Would enforce spaces around => and
     // after : in type annotations.
     "@typescript-eslint/type-annotation-spacing": 0,
-    
+
     // no-empty-function: Disabled. Would forbid functions with empty bodies.
     "@typescript-eslint/no-empty-function": 0,
-    
+
     // ban-types: Disabled. Would forbid '{}' as a type, which means "any non-
     // nullish value".
     "@typescript-eslint/ban-types": 0,
-    
+
     // prefer-rest-params: Currently disabled. Would forbid use of the `arguments`
     // keyword.
     "prefer-rest-params": 0,
-    
+
     // prefer-spread: Disabled. Would forbid use of fn.apply(foo) as opposed to
     // fn(...foo).
     "prefer-spread": 0,
-    
+
     // no-this-alias. Currently disabled. Would forbid 'const self=this'.
     "@typescript-eslint/no-this-alias": 0,
-    
+
     // class-name-casing: Disabled. Forbids types from deviating from upper-
     // camelcase, which would forbid the naming convention we are using for
     // subfragments.
     "@typescript-eslint/class-name-casing": 0,
-    
+
     // camelcase: Disabled. Would force type and variable names to be camel
     // case.
     "@typescript-eslint/camelcase": 0,
-    
+
     // no-prototype-builtins: Disabled. Would forbid hasOwnProperty.
     "no-prototype-builtins": 0,
-    
+
     // no-extra-semi: Disabled. Would forbid semicolons after class declarations
     "no-extra-semi": 0,
     "@typescript-eslint/no-extra-semi": 0,
-    
+
     // no-var-requires: Disabled. Would forbid use of require() statements of
     // libraries from node_modules.
     "@typescript-eslint/no-var-requires": 0,
-    
+
     // no-undef: Currently disabled due to excessive false positives which are
     // hard to resolve (in particular, the `registerComponent` idiom generates
     // a false positive). If something were truly undefined, it would generate
     // an error in `npm run checktypes`, which does not have this issue.
     "no-undef": 0,
-    
+
     // no-explicit-any: Some day, we may be ready to turn on this rule. That day
     // is not today. Activating this would require *everything* be fully typed,
     // including interface points with libraries that might not have type
     // annotations available.
     "@typescript-eslint/no-explicit-any": 0,
-    
+
     // no-unused-vars: Currently disabled due to excessive false positives which
     // are hard to resolve (this counts things as unused when they actually are
     // used, if the usage is as a type rather than as a value.)
     "no-unused-vars": 0,
     "@typescript-eslint/no-unused-vars": 0,
   },
-  "env": {
-    "browser": true,
-    "commonjs": true,
-    "es6": true,
-    "node": true
+  env: {
+    browser: true,
+    commonjs: true,
+    es6: true,
+    node: true,
   },
-  "plugins": [
-    "@typescript-eslint",
-    "babel",
-    "react",
-    "react-hooks",
-    "import"
-  ],
-  "settings": {
-    "import/core-modules": [
-      "sinon",
-      "sinon-chai",
-      "chai-enzyme",
-    ],
-    "react": {
-      "version": "16.4.1"
-    }
+  plugins: ["@typescript-eslint", "babel", "react", "react-hooks", "import"],
+  settings: {
+    "import/core-modules": ["sinon", "sinon-chai", "chai-enzyme"],
+    react: {
+      version: "16.4.1",
+    },
   },
-  "root": true,
-  "globals": {
-    "param": true,
-    "returns": true,
-    "describe": true,
-    "it": true,
-    "before": true,
-    "after": true,
-    "beforeEach": true,
-    "afterEach": true
+  root: true,
+  globals: {
+    param: true,
+    returns: true,
+    describe: true,
+    it: true,
+    before: true,
+    after: true,
+    beforeEach: true,
+    afterEach: true,
   },
-  "ignorePatterns": [
+  ignorePatterns: [
     "build.js",
     // You wouldn't have thought this was necessary would you
-    ".eslintrc.js"
-  ]
-}
+    ".eslintrc.js",
+  ],
+};
