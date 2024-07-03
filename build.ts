@@ -10,8 +10,8 @@ const bundleDefinitions = {
 } as unknown as Record<string, string>;
 
 const commonOpts: Partial<BuildConfig> = {
-  sourcemap: true,
-  sourcesContent: true,
+  sourcemap: !isProd,
+  sourcesContent: !isProd,
   bundle: true,
   minify: isProd,
 };
@@ -78,6 +78,8 @@ const clientBuild = build({
   define: {
     ...bundleDefinitions,
     bundleIsServer: false as unknown as string,
+    "process.env.ROOT_URL": JSON.stringify(process.env.ROOT_URL || ""),
+    global: "window",
   },
   globalName: "window",
 });
