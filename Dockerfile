@@ -1,5 +1,5 @@
 # Node 18.x is LTS
-FROM node:18 as base
+FROM node:18 AS base
 ENV CI=true
 ENV IS_DOCKER=true
 ENV PNPM_HOME="/pnpm"
@@ -21,7 +21,7 @@ COPY public/lesswrong-editor public/lesswrong-editor
 COPY . .
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod=false --shamefully-hoist --no-optional
 
-FROM dev-deps as build
+FROM dev-deps AS build
 ARG BUILD_ARGS=""
 RUN pnpm run build ${BUILD_ARGS}
 
