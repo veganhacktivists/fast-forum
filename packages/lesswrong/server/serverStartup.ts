@@ -118,7 +118,7 @@ const executeServerWithArgs = async ({ shellMode, command }: CommandLineArgument
     const result = await func();
     // eslint-disable-next-line no-console
     console.log("Finished. Result: ", result);
-    process.kill(estrellaPid, "SIGQUIT");
+    process.kill(process.pid, "SIGQUIT");
   } else if (!isAnyTest && !isMigrations) {
     watchForShellCommands();
     startWebserver();
