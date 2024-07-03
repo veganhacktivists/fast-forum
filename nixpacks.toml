@@ -1,0 +1,22 @@
+providers = ['node']
+
+[phases.build]
+dependsOn = ['install']
+cmds = [
+  'pnpm run build',
+  'pnpm install --prod', # cleanup dev dependencies
+]
+cacheDirectories = ['node_modules/.cache']
+
+[phases.install]
+cmds = [
+  'npm install -g corepack@0.24.1 && corepack enable',
+  'pnpm i --frozen-lockfile --prod=false --no-optional',
+]
+
+[phases.setup]
+nixPkgs = ['...', 'python3Minimal']
+
+[start]
+cmd = 'node ./build/server/js/serverBundle.js'
+onlyIncludeFiles = ['./node_modules', './public', './build', './settings.json']
