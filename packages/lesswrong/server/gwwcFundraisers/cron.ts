@@ -70,12 +70,12 @@ async function updateFundraiserAmounts() {
   await ElectionCandidates.rawCollection().bulkWrite(updates);
 }
 
-if (isEAForum) {
-  addCronJob({
-    name: "updateFundraiserAmounts",
-    interval: "every 5 minutes",
-    job: updateFundraiserAmounts,
-  });
-}
+// if (isEAForum) {
+//   addCronJob({
+//     name: "updateFundraiserAmounts",
+//     interval: "every 5 minutes",
+//     job: updateFundraiserAmounts,
+//   });
+// }
 
 Globals.updateFundraiserAmounts = updateFundraiserAmounts;

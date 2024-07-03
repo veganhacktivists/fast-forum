@@ -3,7 +3,7 @@ import PageCacheRepo from "../repos/PageCacheRepo";
 
 addCronJob({
   name: "clearExpiredPageCacheEntries",
-  interval: "every 5 minutes",
+  interval: "every 10 minutes",
   async job() {
     const pageCacheRepo = new PageCacheRepo();
     await pageCacheRepo.clearExpiredEntries();
