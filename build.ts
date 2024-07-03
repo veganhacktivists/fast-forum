@@ -7,6 +7,9 @@ const isProd = process.env.NODE_ENV === "production";
 
 const bundleDefinitions = {
   bundleIsMigrations: false,
+  bundleIsServer: false as unknown as string,
+  bundlePort: JSON.stringify(parseInt(process.env.PORT || "")),
+  bundleRootUrl: JSON.stringify(process.env.ROOT_URL || ""),
 } as unknown as Record<string, string>;
 
 const commonOpts: Partial<BuildConfig> = {
@@ -78,8 +81,6 @@ const clientBuild = build({
   define: {
     ...bundleDefinitions,
     bundleIsServer: false as unknown as string,
-    "process.env.ROOT_URL": JSON.stringify(process.env.ROOT_URL || ""),
-    "process.env.PORT": JSON.stringify(process.env.PORT || ""),
     global: "window",
   },
   globalName: "window",
