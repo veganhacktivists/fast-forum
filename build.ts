@@ -6,12 +6,7 @@ import process from "process";
 const isProd = process.env.NODE_ENV === "production";
 
 const bundleDefinitions = {
-  bundleIsProduction: isProd,
-  bundleIsTest: false,
   bundleIsMigrations: false,
-  defaultSiteAbsoluteUrl: `"${process.env.ROOT_URL || ""}"`,
-  serverPort: parseInt(process.env.PORT ?? ""),
-  ddEnv: `"${process.env.DD_ENV || "local"}"`,
 } as unknown as Record<string, string>;
 
 const commonOpts: Partial<BuildConfig> = {

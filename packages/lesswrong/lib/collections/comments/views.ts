@@ -7,6 +7,7 @@ import { viewFieldNullOrMissing } from "../../vulcan-lib";
 import { Comments } from "./collection";
 import { EA_FORUM_COMMUNITY_TOPIC_ID } from "../tags/collection";
 import pick from "lodash/pick";
+import { isServer } from "../../executionEnvironment";
 
 declare global {
   interface CommentsViewTerms extends ViewTermsBase {
@@ -71,7 +72,7 @@ Comments.addDefaultView((terms: CommentsViewTerms, _, context?: ResolverContext)
   // We set `{$ne: true}` instead of `false` to allow for comments that haven't
   // had the default value set yet (ie: those created by the frontend
   // immediately prior to appearing)
-  const shouldHideNewUnreviewedAuthorComments = hideSince && bundleIsServer;
+  const shouldHideNewUnreviewedAuthorComments = hideSince && isServer;
   const hideNewUnreviewedAuthorComments = shouldHideNewUnreviewedAuthorComments && {
     $or: [
       { authorIsUnreviewed: { $ne: true } },

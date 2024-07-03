@@ -10,6 +10,7 @@ import DropIndexQuery from "./DropIndexQuery";
 import Pipeline from "./Pipeline";
 import BulkWriter, { BulkWriterResult } from "./BulkWriter";
 import util from "util";
+import { isServer } from "../executionEnvironment";
 
 let executingQueries = 0;
 
@@ -77,7 +78,7 @@ class PgCollection<N extends CollectionNameString = CollectionNameString> implem
   }
 
   getTable() {
-    if (bundleIsServer) {
+    if (isServer) {
       return this.table;
     } else {
       throw new Error("Attempted to run postgres query on the client");

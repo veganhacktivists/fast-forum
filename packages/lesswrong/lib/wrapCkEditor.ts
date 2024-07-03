@@ -1,5 +1,7 @@
+import { isServer } from "./executionEnvironment";
+
 export const getCkEditor = () => {
-  if (bundleIsServer) {
+  if (isServer) {
     return {};
   }
   const ckEditor = require("../../../public/lesswrong-editor/build/ckeditor");

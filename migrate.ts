@@ -5,17 +5,10 @@
  * and SETTINGS_FILE
  */
 
-global.bundleIsServer = true;
-global.bundleIsTest = false;
-global.bundleIsProduction = process.env.NODE_ENV === "production";
-global.bundleIsMigrations = true;
-global.defaultSiteAbsoluteUrl = "";
-global.serverPort = 5001;
-
 //@ts-expect-error Not a TS file
 import { getDatabaseConfig } from "./scripts/startup/buildUtil";
 
-import { initDatabases, initPostgres, initServer, initSettings } from "./packages/lesswrong/server/serverStartup.ts";
+import { initDatabases, initPostgres, initSettings } from "./packages/lesswrong/server/serverStartup.ts";
 import { getSqlClient } from "./packages/lesswrong/lib/sql/sqlClient.ts";
 import { createSqlConnection } from "./packages/lesswrong/server/sqlConnection.ts";
 import { createMigrator } from "./packages/lesswrong/server/migrations/meta/umzug.ts";

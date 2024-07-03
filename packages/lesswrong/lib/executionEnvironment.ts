@@ -1,13 +1,16 @@
 import * as _ from "underscore";
 
-export const isClient = !bundleIsServer;
 export const isServer = bundleIsServer;
-export const isDevelopment = !bundleIsProduction;
-export const isProduction = bundleIsProduction;
+export const isClient = !isServer;
+
+export const isProduction = process.env.NODE_ENV === "production";
+export const isDevelopment = !isProduction;
+
+export const isAnyTest = process.env.NODE_ENV === "test";
+export const isPackageTest = isAnyTest;
+
 export const isMigrations = bundleIsMigrations;
-export const isAnyTest = bundleIsTest;
-export const isPackageTest = bundleIsTest;
-export { defaultSiteAbsoluteUrl, serverPort };
+export const defaultSiteAbsoluteUrl = process.env.ROOT_URL || "";
 
 export interface CommandLineArguments {
   postgresUrl: string;
@@ -73,8 +76,8 @@ export const addGlobalForShell = (name: string, value: any) => {
   // TODO
 };
 
-export const getServerPort = () => serverPort;
-export const getWebsocketPort = () => serverPort + 1;
+export const getServerPort = () => parseInt(process.env.PORT || "");
+export const getWebsocketPort = () => getServerPort() + 1;
 
 // Polyfill
 import "setimmediate";
