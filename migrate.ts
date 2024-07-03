@@ -11,7 +11,6 @@ global.bundleIsProduction = process.env.NODE_ENV === "production";
 global.bundleIsMigrations = true;
 global.defaultSiteAbsoluteUrl = "";
 global.serverPort = 5001;
-global.estrellaPid = -1;
 
 //@ts-expect-error Not a TS file
 import { getDatabaseConfig } from "./scripts/startup/buildUtil";

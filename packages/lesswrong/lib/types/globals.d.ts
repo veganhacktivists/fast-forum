@@ -5,7 +5,6 @@ declare global {
   var bundleIsMigrations: boolean;
   var defaultSiteAbsoluteUrl: string;
   var serverPort: number;
-  var estrellaPid: number;
 }
 
 export {};
