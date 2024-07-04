@@ -4,7 +4,7 @@ providers = ['node']
 dependsOn = ['install']
 cmds = [
   'pnpm run build',
-  'pnpm install --prod', # cleanup dev dependencies
+  'pnpm install --prod --no-optional', # cleanup dev dependencies
 ]
 
 [phases.install]
