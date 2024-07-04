@@ -6,7 +6,6 @@ cmds = [
   'pnpm run build',
   'pnpm install --prod', # cleanup dev dependencies
 ]
-cacheDirectories = ['node_modules/.cache']
 
 [phases.install]
 cmds = [
