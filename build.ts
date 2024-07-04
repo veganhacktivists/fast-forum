@@ -7,7 +7,7 @@ const isProd = process.env.NODE_ENV === "production";
 
 const bundleDefinitions = {
   bundleIsMigrations: false,
-  bundleIsServer: false as unknown as string,
+  bundleIsServer: false,
   bundlePort: JSON.stringify(parseInt(process.env.PORT || "")),
   bundleRootUrl: JSON.stringify(process.env.ROOT_URL || ""),
 } as unknown as Record<string, string>;
