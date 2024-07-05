@@ -18,7 +18,12 @@
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "include": ["packages/lesswrong", "public/lesswrong-editor/src", "cypress"],
+  "include": [
+    "packages/lesswrong",
+    "public/lesswrong-editor/src",
+    "cypress",
+    "scripts/*.ts"
+  ],
   "files": ["./build.ts", "./migrate.ts"],
   "exclude": ["**/node_modules", "**/.*/", "build"],
   "ts-node": {

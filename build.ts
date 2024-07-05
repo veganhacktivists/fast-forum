@@ -22,6 +22,51 @@ const commonOpts: Partial<BuildConfig> = {
 const clientOutPath = "./build/client/js/bundle.js";
 const serverOutPath = "./build/server/js/serverBundle.js";
 const migrationOutPath = "./build/migration/js/runMigrations.js";
+const elasticExportOutPath = "./build/elastic/js/elasticExport.js";
+
+const elasticExportBuild = build({
+  ...commonOpts,
+  entryPoints: ["./scripts/exportElastic.ts"],
+  platform: "node",
+  run: false,
+  outfile: elasticExportOutPath,
+  define: { ...bundleDefinitions, bundleIsServer: true } as unknown as typeof bundleDefinitions,
+  external: [
+    "akismet-api",
+    "canvas",
+    "express",
+    "mz",
+    "pg",
+    "pg-promise",
+    "mathjax",
+    "mathjax-node",
+    "mathjax-node-page",
+    "jsdom",
+    "@sentry/node",
+    "node-fetch",
+    "later",
+    "turndown",
+    "apollo-server",
+    "apollo-server-express",
+    "graphql",
+    "csso",
+    "io-ts",
+    "fp-ts",
+    "bcrypt",
+    "node-pre-gyp",
+    "intercom-client",
+    "node:*",
+    "fsevents",
+    "chokidar",
+    "auth0",
+    "dd-trace",
+    "pg-formatter",
+    "gpt-3-encoder",
+    "@elastic/elasticsearch",
+    "zod",
+    "node-abort-controller",
+  ],
+});
 
 const migrationBuild = build({
   ...commonOpts,
