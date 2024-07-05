@@ -17,6 +17,6 @@ cmds = [
 nixPkgs = ['...', 'python3Minimal']
 
 [start]
-cmd = 'node ./build/migration/js/runMigrations.js up && node ./build/server/js/serverBundle.js'
+cmd = 'node ./build/migration/js/migrate.js up && node ./build/server/js/serverBundle.js'
 # it doesn't work
 # onlyIncludeFiles = ['./node_modules', './public', './build', './settings.json']
