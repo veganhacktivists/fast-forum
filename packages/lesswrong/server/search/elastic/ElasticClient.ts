@@ -37,10 +37,10 @@ class ElasticClient {
           username,
           password,
         },
-        caFingerprint,
         tls: {
           rejectUnauthorized: false,
         },
+        ...(caFingerprint && { caFingerprint }),
       });
       if (!globalClient) {
         throw new Error("Failed to connect to Elasticsearch");
