@@ -23,7 +23,9 @@ class ElasticExporter {
   }
 
   async exportAll() {
-    await Promise.all(searchIndexedCollectionNames.map((collectionName) => this.exportCollection(collectionName)));
+    for await (const collectionName of searchIndexedCollectionNames) {
+      await this.exportCollection(collectionName);
+    }
   }
 
   private isBackingIndexName(name: string): boolean {
