@@ -14,4 +14,6 @@ import { getDatabaseConfig } from "./startup/buildUtil";
 
   await exporter.configureIndexes();
   await exporter.exportAll();
+
+  process.exit(0);
 })();
