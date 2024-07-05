@@ -22,7 +22,7 @@
     "packages/lesswrong",
     "public/lesswrong-editor/src",
     "cypress",
-    "scripts/*.ts"
+    "scripts/**/*.[jt]s"
   ],
   "files": ["./build.ts", "./migrate.ts"],
   "exclude": ["**/node_modules", "**/.*/", "build"],

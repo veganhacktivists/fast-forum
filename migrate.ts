@@ -5,7 +5,7 @@
  * and SETTINGS_FILE
  */
 
-//@ts-expect-error Not a TS file
+// @ts-expect-error not a TS file
 import { getDatabaseConfig } from "./scripts/startup/buildUtil";
 
 import { initDatabases, initPostgres, initSettings } from "./packages/lesswrong/server/serverStartup.ts";
@@ -56,10 +56,9 @@ void (async () => {
 
   let exitCode = 0;
 
-  //@ts-expect-error
   await initDatabases(args);
   await initSettings();
-  require("./packages/lesswrong/migration_env.ts");
+  require("./packages/lesswrong/minimum_env.ts");
   await initPostgres();
 
   const db = getSqlClient() ?? (await createSqlConnection(args.postgresUrl));

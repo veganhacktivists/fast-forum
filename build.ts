@@ -17,6 +17,7 @@ const commonOpts: Partial<BuildConfig> = {
   sourcesContent: !isProd,
   bundle: true,
   minify: isProd,
+  tslint: false,
 };
 
 const clientOutPath = "./build/client/js/bundle.js";
@@ -30,7 +31,11 @@ const elasticExportBuild = build({
   platform: "node",
   run: false,
   outfile: elasticExportOutPath,
-  define: { ...bundleDefinitions, bundleIsServer: true } as unknown as typeof bundleDefinitions,
+  define: {
+    ...bundleDefinitions,
+    bundleIsServer: true,
+    bundleIsMigrations: true,
+  } as unknown as typeof bundleDefinitions,
   external: [
     "akismet-api",
     "canvas",
@@ -133,10 +138,16 @@ const clientBuild = build({
 
 const serverBuild = build({
   ...commonOpts,
+  // Typecheck using default behaviour (compliant with flags like -no-diag)
+  // It's set to false on the other bundles to avoid checking it multiple times
+  tslint: "auto",
   entryPoints: ["./packages/lesswrong/server/runServer.ts"],
   outfile: serverOutPath,
   platform: "node",
-  define: { ...bundleDefinitions, bundleIsServer: true as unknown as string },
+  define: {
+    ...bundleDefinitions,
+    bundleIsServer: true as unknown as string,
+  },
   external: [
     "akismet-api",
     "canvas",

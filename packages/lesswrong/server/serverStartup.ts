@@ -55,7 +55,7 @@ const initConsole = () => {
   });
 };
 
-const connectToPostgres = async (connectionString: string, target: DbTarget = "write") => {
+const connectToPostgres = async (connectionString?: string, target: DbTarget = "write") => {
   try {
     if (connectionString) {
       const branchDb = await getBranchDbName();
@@ -75,7 +75,7 @@ const connectToPostgres = async (connectionString: string, target: DbTarget = "w
   }
 };
 
-export const initDatabases = ({ postgresUrl, postgresReadUrl }: CommandLineArguments) =>
+export const initDatabases = ({ postgresUrl, postgresReadUrl }: Partial<CommandLineArguments>) =>
   Promise.all([connectToPostgres(postgresUrl), connectToPostgres(postgresReadUrl, "read")]);
 
 export const initSettings = () => {
