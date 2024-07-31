@@ -2,6 +2,7 @@
   "compilerOptions": {
     "lib": ["es2019", "dom"],
     "noImplicitAny": true,
+    "incremental": true,
     "noImplicitThis": true,
     "strictNullChecks": true,
     "jsx": "react",
