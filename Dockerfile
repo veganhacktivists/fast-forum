@@ -37,4 +37,4 @@ EXPOSE $PORT
 
 COPY settings.json .
 
-CMD ["sh", "-c", "node ./build/migration/js/runMigrations.js up && exec node ./build/server/js/serverBundle.js"]
+CMD ["sh", "-c", "pnpm migrate up && exec node ./build/server/js/serverBundle.js"]

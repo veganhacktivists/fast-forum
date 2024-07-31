@@ -5,15 +5,7 @@
  * and SETTINGS_FILE
  */
 
-// @ts-expect-error not a TS file
-import { getDatabaseConfig } from "./scripts/startup/buildUtil";
-
-import { initDatabases, initPostgres, initSettings } from "./packages/lesswrong/server/serverStartup.ts";
-import { getSqlClient } from "./packages/lesswrong/lib/sql/sqlClient.ts";
-import { createSqlConnection } from "./packages/lesswrong/server/sqlConnection.ts";
-import { createMigrator } from "./packages/lesswrong/server/migrations/meta/umzug.ts";
-
-const { postgresUrl } = getDatabaseConfig();
+process.env.IS_MIGRATION = "1";
 
 const settingsFileName = (mode: string) => {
   if (process.env.SETTINGS_FILE) {
@@ -28,6 +20,15 @@ const settingsFileName = (mode: string) => {
 };
 
 void (async () => {
+  // @ts-expect-error not a TS file
+  const { getDatabaseConfig } = await import("./scripts/startup/buildUtil");
+  const { initDatabases, initPostgres, initSettings } = await import("./packages/lesswrong/server/serverStartup.ts");
+  const { getSqlClient } = await import("./packages/lesswrong/lib/sql/sqlClient.ts");
+  const { createSqlConnection } = await import("./packages/lesswrong/server/sqlConnection.ts");
+  const { createMigrator } = await import("./packages/lesswrong/server/migrations/meta/umzug.ts");
+
+  const { postgresUrl } = getDatabaseConfig();
+
   const command = process.argv[2];
   if (["dev", "development", "staging", "production", "prod"].includes(command)) {
     // eslint-disable-next-line no-console

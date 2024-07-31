@@ -1,6 +1,5 @@
 import { CommandLineArguments, isAnyTest, isMigrations } from "../lib/executionEnvironment";
 import process from "process";
-import fs from "fs";
 
 const parseCommandLine = (argv: Array<string>): CommandLineArguments => {
   const commandLine: CommandLineArguments = {
@@ -56,5 +55,11 @@ function loadSettingsFile(filename: string) {
 }
 
 const readTextFile = (filename: string): string | null => {
-  return fs.readFileSync(filename, "utf8");
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const fs = require("fs");
+    return fs.readFileSync(filename, "utf8");
+  } catch (e) {
+    throw e;
+  }
 };

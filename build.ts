@@ -5,12 +5,19 @@ import process from "process";
 
 const isProd = process.env.NODE_ENV === "production";
 
-const bundleDefinitions = {
-  bundleIsMigrations: false,
-  bundleIsServer: false,
-  bundlePort: JSON.stringify(parseInt(process.env.PORT || "")),
-  bundleRootUrl: JSON.stringify(process.env.ROOT_URL || ""),
-} as unknown as Record<string, string>;
+const envToDefinition = (env: Record<string, string | number | undefined>) => {
+  return Object.fromEntries(
+    Object.entries(env).map(([key, value]) => {
+      return [`process.env.${key}`, JSON.stringify(value)];
+    }),
+  );
+};
+
+const bundleDefinitions = envToDefinition({
+  NODE_ENV: process.env.NODE_ENV ?? "production",
+  PORT: process.env.PORT ?? "",
+  ROOT_URL: process.env.ROOT_URL ?? "",
+});
 
 const commonOpts: Partial<BuildConfig> = {
   sourcemap: !isProd,
@@ -22,70 +29,17 @@ const commonOpts: Partial<BuildConfig> = {
 
 const clientOutPath = "./build/client/js/bundle.js";
 const serverOutPath = "./build/server/js/serverBundle.js";
-const migrationOutDir = "./build/migration/js";
 
 void (async () => {
-  const migrationBuild = await build({
-    ...commonOpts,
-    entryPoints: ["./migrate.ts", "./scripts/exportElastic.ts"],
-    platform: "node",
-    run: false,
-    outdir: migrationOutDir,
-    define: {
-      ...bundleDefinitions,
-      bundleIsServer: true,
-      bundleIsMigrations: true,
-    } as unknown as typeof bundleDefinitions,
-    external: [
-      "akismet-api",
-      "canvas",
-      "express",
-      "mz",
-      "pg",
-      "pg-promise",
-      "mathjax",
-      "mathjax-node",
-      "mathjax-node-page",
-      "jsdom",
-      "@sentry/node",
-      "node-fetch",
-      "later",
-      "turndown",
-      "apollo-server",
-      "apollo-server-express",
-      "graphql",
-      "csso",
-      "io-ts",
-      "fp-ts",
-      "bcrypt",
-      "node-pre-gyp",
-      "intercom-client",
-      "node:*",
-      "fsevents",
-      "chokidar",
-      "auth0",
-      "dd-trace",
-      "pg-formatter",
-      "gpt-3-encoder",
-      "@elastic/elasticsearch",
-      "zod",
-      "node-abort-controller",
-    ],
-  });
-
   const clientBuild = await build({
     ...commonOpts,
     entryPoints: ["./packages/lesswrong/client/clientStartup.ts"],
     target: "es6",
     run: false,
     outfile: clientOutPath,
+    platform: "browser",
     treeShaking: "ignore-annotations",
-    define: {
-      ...bundleDefinitions,
-      bundleIsServer: false as unknown as string,
-      global: "window",
-    },
-    globalName: "window",
+    define: { ...bundleDefinitions, global: "window" },
   });
 
   const serverBuild = await build({
@@ -96,10 +50,7 @@ void (async () => {
     entryPoints: ["./packages/lesswrong/server/runServer.ts"],
     outfile: serverOutPath,
     platform: "node",
-    define: {
-      ...bundleDefinitions,
-      bundleIsServer: true as unknown as string,
-    },
+    define: bundleDefinitions,
     external: [
       "akismet-api",
       "canvas",

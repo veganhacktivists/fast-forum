@@ -1,8 +1,11 @@
 declare global {
-  var bundleIsServer: boolean;
-  var bundleIsMigrations: boolean;
-  var bundlePort: number;
-  var bundleRootUrl: string;
+  namespace NodeJS {
+    interface ProcessEnv {
+      PORT?: string;
+      NODE_ENV?: "development" | "production" | "test";
+      ROOT_URL?: string;
+    }
+  }
 }
 
 export {};
