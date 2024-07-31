@@ -77,7 +77,7 @@ module.exports = {
     // Differs from no-mixed-operators default only in that "??" is added to the first group
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
-    "import/no-unresolved": 1,
+    "import/no-unresolved": "off",
     "import/named": 1,
     "import/default": 1,
     "import/namespace": 1,
