@@ -4,15 +4,15 @@
   "scripts": {
     "checktypes": "scripts/lint_and_checktypes.sh",
     "lint": "scripts/lint_and_checktypes.sh",
-    "acceptmigrations": "ts-node scripts/acceptMigrations.ts || git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql",
-    "makemigrations": "ts-node scripts/makeMigrations.ts",
+    "acceptmigrations": "tsx scripts/acceptMigrations.ts || git diff --no-index schema/accepted_schema.sql schema/schema_to_accept.sql",
+    "makemigrations": "tsx scripts/makeMigrations.ts",
     "eslint": "eslint --max-warnings 0 --cache --ext .jsx,js,tsx,ts packages",
-    "build": "ts-node ./build.ts",
+    "build": "tsx ./build.ts",
     "start": "pnpm build --run",
     "prod": "NODE_ENV=production pnpm start",
     "production": "pnpm prod",
-    "migrate": "ts-node ./migrate.ts",
-    "branchdb": "ts-node scripts/branchDb.ts",
+    "migrate": "tsx ./migrate.ts",
+    "branchdb": "tsx scripts/branchDb.ts",
     "dev": "pnpm build --watch --run",
     "start-dev-db": "pnpm build --no-clear -run --watch --lint --db ../LessWrong-Credentials/connectionConfigs/dev.json --settings ../LessWrong-Credentials/settings-local-dev-devdb.json",
     "start-prod-db": "pnpm build --no-clear -run --watch --lint --db ../LessWrong-Credentials/connectionConfigs/prod.json --settings ../LessWrong-Credentials/settings-local-dev-proddb.json",
@@ -65,15 +65,15 @@
     "ea-pg-prod": "psql $(< ../ForumCredentials/prod-pg-conn.txt)",
     "ea-pg-dev-admin": "psql $(< ../ForumCredentials/dev-staging-admin-pg-conn.txt)",
     "ea-pg-prod-admin": "psql $(< ../ForumCredentials/prod-admin-pg-conn.txt)",
-    "ea-load-dev-db": "ts-node ./scripts/loadDbSettings.ts dev",
-    "ea-load-xpost-dev-db": "ts-node ./scripts/loadDbSettings.ts xpost",
-    "ea-load-staging-db": "ts-node ./scripts/loadDbSettings.ts staging",
-    "ea-load-prod-db": "node ../ForumCredentials/assertSafeToUpdateDbSettings.js && ts-node ./scripts/loadDbSettings.ts prod",
-    "ea-load-testing-db": "ts-node ./scripts/loadDbSettings.ts testing",
+    "ea-load-dev-db": "tsx ./scripts/loadDbSettings.ts dev",
+    "ea-load-xpost-dev-db": "tsx ./scripts/loadDbSettings.ts xpost",
+    "ea-load-staging-db": "tsx ./scripts/loadDbSettings.ts staging",
+    "ea-load-prod-db": "node ../ForumCredentials/assertSafeToUpdateDbSettings.js && tsx ./scripts/loadDbSettings.ts prod",
+    "ea-load-testing-db": "tsx ./scripts/loadDbSettings.ts testing",
     "ea-replicate-dev-db": "./scripts/eaReplicateDevDb.sh",
     "local-cypress-run": "pnpm cypress run",
     "local-cypress-open": "pnpm cypress open",
-    "brigader-check": "ts-node scripts/brigaderCheck.ts"
+    "brigader-check": "tsx scripts/brigaderCheck.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.5.4",
@@ -230,7 +230,7 @@
     "speakingurl": "^9.0.0",
     "stripe": "^8.126.0",
     "tlds": "^1.203.1",
-    "ts-node": "^10.9.1",
+    "tsx": "^4.16.3",
     "turndown": "^4.0.2",
     "turndown-plugin-gfm": "^1.0.2",
     "type-fest": "^1.1.1",
@@ -358,8 +358,7 @@
   },
   "resolutions": {
     "graphql": "^14.5.8",
-    "graphql-tools": "^4.0.7",
-    "ts-node": "^10.9.1"
+    "graphql-tools": "^4.0.7"
   },
   "engines": {
     "node": "18.x",

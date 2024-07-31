@@ -22,17 +22,23 @@ COPY . .
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod=false --shamefully-hoist --no-optional
 
 FROM dev-deps AS build
+ARG PORT=3000
+ENV PORT=${PORT}
 ARG BUILD_ARGS=""
 RUN pnpm run build ${BUILD_ARGS}
 
 FROM base
+COPY ./packages ./packages
+COPY ./migrate.ts ./migrate.ts
+COPY ./cypress ./cypress
+COPY ./scripts ./scripts 
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/build /app/build
 COPY public /app/public
 
-ENV SETTINGS_FILE="settings.json"
 ARG PORT=3000
 ENV PORT=${PORT}
+ENV SETTINGS_FILE="settings.json"
 EXPOSE $PORT
 
 COPY settings.json .
