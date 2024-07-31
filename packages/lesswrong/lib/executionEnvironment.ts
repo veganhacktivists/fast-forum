@@ -1,6 +1,6 @@
 import * as _ from "underscore";
 
-export const isServer = bundleIsServer;
+export const isServer = typeof process !== "undefined";
 export const isClient = !isServer;
 
 export const isProduction = process.env.NODE_ENV === "production";
@@ -9,8 +9,8 @@ export const isDevelopment = !isProduction;
 export const isAnyTest = process.env.NODE_ENV === "test";
 export const isPackageTest = isAnyTest;
 
-export const isMigrations = bundleIsMigrations;
-export const defaultSiteAbsoluteUrl = bundleRootUrl;
+export const isMigrations = isServer ? process.env.IS_MIGRATION === "1" : false;
+export const defaultSiteAbsoluteUrl = process.env.ROOT_URL ?? "";
 
 export interface CommandLineArguments {
   postgresUrl: string;
@@ -48,7 +48,7 @@ export const runStartupFunctions = async () => {
 let instanceSettings: any = null;
 export const getInstanceSettings = (args?: CommandLineArguments): any => {
   if (!instanceSettings) {
-    if (bundleIsServer) {
+    if (isServer) {
       // eslint-disable-next-line import/no-restricted-paths
       const { loadInstanceSettings } = require("../server/commandLine.ts");
       instanceSettings = loadInstanceSettings(args);
@@ -76,7 +76,7 @@ export const addGlobalForShell = (name: string, value: any) => {
   // TODO
 };
 
-export const getServerPort = () => bundlePort;
+export const getServerPort = () => parseInt(process.env.PORT ?? "") ?? 3000;
 export const getWebsocketPort = () => getServerPort() + 1;
 
 // Polyfill

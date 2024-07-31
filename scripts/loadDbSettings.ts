@@ -73,7 +73,6 @@ const deleteByName = async (db: Database, name: string) => {
 (async () => {
   process.chdir(__dirname);
 
-  (global as any).bundleIsServer = false;
   const { randomId } = require("../packages/lesswrong/lib/random");
 
   const mode = process.argv[2];

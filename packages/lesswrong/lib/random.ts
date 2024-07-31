@@ -1,4 +1,15 @@
-const crypto = bundleIsServer ? require("crypto") : null;
+import { isServer } from "./executionEnvironment";
+
+const getCrypto = () => {
+  if (!isServer) {
+    return null;
+  }
+  try {
+    return require("crypto");
+  } catch {
+    return null;
+  }
+};
 
 // Excludes 0O1lIUV
 const unmistakableChars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTWXYZ23456789";
@@ -14,8 +25,8 @@ export const ID_LENGTH = 17;
 // other. If run on the server, cryptographically secure; if run on the client,
 // not.
 export const randomId = (length = ID_LENGTH) => {
-  if (bundleIsServer) {
-    const bytes = crypto.randomBytes(length);
+  if (isServer) {
+    const bytes = getCrypto()!.randomBytes(length);
     const result: Array<string> = [];
     for (let byte of bytes) {
       // Discards part of each byte and has modulo bias. Doesn't matter in
@@ -33,8 +44,8 @@ export const randomId = (length = ID_LENGTH) => {
 // A 30 digit (15 byte) random hexadecimal string, generated from a CSPRNG.
 // Not available on the client (throws an exception).
 export const randomSecret = () => {
-  if (bundleIsServer) {
-    return crypto.randomBytes(15).toString("hex");
+  if (isServer) {
+    return getCrypto()!.randomBytes(15).toString("hex");
   } else {
     throw new Error("No CSPRNG available on the client");
   }
