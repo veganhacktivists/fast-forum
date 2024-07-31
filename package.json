@@ -230,6 +230,7 @@
     "speakingurl": "^9.0.0",
     "stripe": "^8.126.0",
     "tlds": "^1.203.1",
+    "ts-node": "^10.9.1",
     "turndown": "^4.0.2",
     "turndown-plugin-gfm": "^1.0.2",
     "type-fest": "^1.1.1",
@@ -352,7 +353,6 @@
     "prettier": "^3.2.5",
     "ts-jest": "^27.0.7",
     "ts-loader": "^8.0.5",
-    "ts-node": "^10.9.1",
     "typescript": "^5.0.0",
     "wait-on": "^6.0.1"
   },
