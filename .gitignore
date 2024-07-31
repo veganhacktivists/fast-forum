@@ -98,6 +98,7 @@ schema/schema_to_accept.sql
 ml
 
 .env
+*.tsbuildinfo
 
 .pnp.*
 .yarn/*
