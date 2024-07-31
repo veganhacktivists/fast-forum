@@ -26,8 +26,5 @@
     "scripts/**/*.[jt]s"
   ],
   "files": ["./build.ts", "./migrate.ts"],
-  "exclude": ["**/node_modules", "**/.*/", "build"],
-  "ts-node": {
-    "files": true
-  }
+  "exclude": ["**/node_modules", "**/.*/", "build"]
 }
