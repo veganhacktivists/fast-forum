@@ -76,7 +76,7 @@ export const addGlobalForShell = (name: string, value: any) => {
   // TODO
 };
 
-export const getServerPort = () => parseInt(process.env.PORT ?? "") ?? 3000;
+export const getServerPort = () => parseInt(process.env.PORT || "3000");
 export const getWebsocketPort = () => getServerPort() + 1;
 
 // Polyfill

@@ -15,7 +15,7 @@ const envToDefinition = (env: Record<string, string | number | undefined>) => {
 
 const bundleDefinitions = envToDefinition({
   NODE_ENV: process.env.NODE_ENV ?? "production",
-  PORT: process.env.PORT ?? "",
+  PORT: process.env.PORT ?? "3000",
   ROOT_URL: process.env.ROOT_URL ?? "",
 });
 
