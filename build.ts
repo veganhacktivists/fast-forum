@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-import { BuildConfig, build } from "estrella";
+import { BuildConfig, build, cliopts } from "estrella";
 import process from "process";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -20,29 +20,30 @@ const bundleDefinitions = envToDefinition({
 });
 
 const commonOpts: Partial<BuildConfig> = {
+  clear: false,
   sourcemap: !isProd,
   sourcesContent: !isProd,
   bundle: true,
   minify: isProd,
-  tslint: false,
 };
 
 const clientOutPath = "./build/client/js/bundle.js";
 const serverOutPath = "./build/server/js/serverBundle.js";
 
 void (async () => {
-  const clientBuild = await build({
+  const clientBuild = build({
     ...commonOpts,
     entryPoints: ["./packages/lesswrong/client/clientStartup.ts"],
     target: "es6",
-    run: false,
     outfile: clientOutPath,
     platform: "browser",
     treeShaking: "ignore-annotations",
+    run: false,
+    tslint: false,
     define: { ...bundleDefinitions, global: "window" },
   });
 
-  const serverBuild = await build({
+  const serverBuild = build({
     ...commonOpts,
     // Typecheck using default behaviour (compliant with flags like -no-diag)
     // It's set to false on the other bundles to avoid checking it multiple times
@@ -87,4 +88,11 @@ void (async () => {
       "node-abort-controller",
     ],
   });
+
+  const buildProcesses = [clientBuild, serverBuild];
+
+  if ((cliopts as { run?: boolean }).run) {
+    return await Promise.race(buildProcesses);
+  }
+  return await Promise.all(buildProcesses);
 })();
