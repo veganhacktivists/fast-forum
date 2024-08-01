@@ -17,12 +17,6 @@ import Messages from "../lib/collections/messages/collection";
 import LocalGroups from "../lib/collections/localgroups/collection";
 import Users from "../lib/collections/users/collection";
 
-import seedPosts from "../../../cypress/fixtures/posts";
-import seedComments from "../../../cypress/fixtures/comments";
-import seedConversations from "../../../cypress/fixtures/conversations";
-import seedMessages from "../../../cypress/fixtures/messages";
-import seedLocalGroups from "../../../cypress/fixtures/localgroups";
-import seedUsers from "../../../cypress/fixtures/users";
 import { DatabaseMetadata } from "../lib/collections/databaseMetadata/collection";
 import DebouncerEvents from "../lib/collections/debouncerEvents/collection";
 import PageCache from "../lib/collections/pagecache/collection";
@@ -260,6 +254,13 @@ type DropAndCreatePgArgs = {
 };
 
 export const dropAndCreatePg = async ({ seed, templateId, dropExisting }: DropAndCreatePgArgs) => {
+  const seedPosts = require("../../../cypress/fixtures/posts");
+  const seedComments = require("../../../cypress/fixtures/comments");
+  const seedConversations = require("../../../cypress/fixtures/conversations");
+  const seedMessages = require("../../../cypress/fixtures/messages");
+  const seedLocalGroups = require("../../../cypress/fixtures/localgroups");
+  const seedUsers = require("../../../cypress/fixtures/users");
+
   const oldClient = getSqlClient();
   setSqlClient(await createSqlConnection());
   await oldClient?.$pool.end();
