@@ -20,9 +20,13 @@ services:
       PG_HOST: "db"
       PG_URL: "${PG_URL}"
       ELASTIC_URL: "${ELASTIC_URL:-https://elastic:9200}"
+      ELASTIC_USER: "${ELASTIC_USER:-elastic}"
+      ELASTIC_PASSWORD: "${ELASTIC_PASSWORD:-elastic}"
       PORT: "3000"
     ports:
       - "${PORT:-3000}:3000"
+    volumes:
+      - "./tmp:/app/tmp"
     profiles:
       - web
   elastic:
