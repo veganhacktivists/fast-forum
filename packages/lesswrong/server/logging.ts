@@ -30,31 +30,31 @@ process.on("unhandledRejection", (r: any) => {
   }
 });
 
-captureEvent("serverStarted", {});
-
-onStartup(() => {
-  const sentryUrl = sentryUrlSetting.get();
-  const sentryEnvironment = sentryEnvironmentSetting.get();
-  const sentryRelease = sentryReleaseSetting.get();
-
-  if (sentryUrl && sentryEnvironment && sentryRelease) {
-    Sentry.init({
-      dsn: sentryUrl,
-      environment: sentryEnvironment,
-      release: sentryRelease,
-      integrations: [new SentryIntegrations.Dedupe(), new SentryIntegrations.ExtraErrorData()],
-    });
-  } else {
-    if (!isAnyTest) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        "Sentry is not configured. To activate error reporting, please set the sentry.url variable in your settings file.",
-      );
-    }
-  }
-
-  checkForCoreDumps();
-});
+// captureEvent("serverStarted", {});
+//
+// onStartup(() => {
+//   const sentryUrl = sentryUrlSetting.get();
+//   const sentryEnvironment = sentryEnvironmentSetting.get();
+//   const sentryRelease = sentryReleaseSetting.get();
+//
+//   if (sentryUrl && sentryEnvironment && sentryRelease) {
+//     Sentry.init({
+//       dsn: sentryUrl,
+//       environment: sentryEnvironment,
+//       release: sentryRelease,
+//       integrations: [new SentryIntegrations.Dedupe(), new SentryIntegrations.ExtraErrorData()],
+//     });
+//   } else {
+//     if (!isAnyTest) {
+//       // eslint-disable-next-line no-console
+//       console.warn(
+//         "Sentry is not configured. To activate error reporting, please set the sentry.url variable in your settings file.",
+//       );
+//     }
+//   }
+//
+//   checkForCoreDumps();
+// });
 
 export const addSentryMiddlewares = (addConnectHandler: AddMiddlewareType) => {
   addConnectHandler(Sentry.Handlers.requestHandler());
