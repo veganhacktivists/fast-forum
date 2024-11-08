@@ -32,6 +32,6 @@ export const createClient = async (context: ResolverContext | null, foreign = fa
     cache,
     assumeImmutableResults: true,
   });
-  await client.clearStore();
+  // await client.clearStore();
   return client;
 };

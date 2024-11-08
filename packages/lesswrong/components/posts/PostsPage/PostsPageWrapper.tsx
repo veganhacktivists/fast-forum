@@ -37,13 +37,9 @@ const PostsPageWrapper = ({
     documentId,
   };
 
-  const {
-    document: post,
-    refetch,
-    loading,
-    error,
-  } = useSingle<"PostsWithNavigation" | "PostsWithNavigationAndRevision">(fetchProps);
-
+  const result = useSingle<"PostsWithNavigation" | "PostsWithNavigationAndRevision">(fetchProps);
+  // console.log({ result });
+  const { document: post, refetch, loading, error } = result;
   // This section is a performance optimisation to make comment fetching start as soon as possible rather than waiting for
   // the post to be fetched first. This is mainly beneficial in SSR
 
@@ -68,6 +64,7 @@ const PostsPageWrapper = ({
   };
   // End of performance section
 
+  console.log(result);
   const { Error404, Loading, PostsPageCrosspostWrapper, PostsPage } = Components;
   if (error && !isMissingDocumentError(error) && !isOperationNotAllowedError(error)) {
     throw new Error(error.message);
@@ -89,9 +86,11 @@ const PostsPageWrapper = ({
     } else {
       throw new Error(error.message);
     }
-  } else if (!post) {
-    return <Error404 />;
-  } else if (isPostWithForeignId(post)) {
+  }
+  // else if (!post) {
+  //   return <Error404 />;
+  // }
+  else if (isPostWithForeignId(post)) {
     return (
       <PostsPageCrosspostWrapper
         post={post}

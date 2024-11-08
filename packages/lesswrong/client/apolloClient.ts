@@ -10,7 +10,7 @@ export const createApolloClient = (baseUrl = "/"): ApolloClient<NormalizedCacheO
   //   },
   // }
 
-  const cachedState = baseUrl === "/" ? window.__APOLLO_STATE__ : window.__APOLLO_FOREIGN_STATE__;
+  const cachedState = window.__APOLLO_STATE__; // baseUrl === "/" ? window.__APOLLO_STATE__ : window.__APOLLO_FOREIGN_STATE__;
   cache.restore(cachedState ?? ""); // ssr
 
   return new ApolloClient({
