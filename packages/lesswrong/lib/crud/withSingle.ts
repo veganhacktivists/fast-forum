@@ -154,7 +154,7 @@ export function useSingle<FragmentTypeName extends keyof FragmentTypes>({
   const query = getGraphQLQueryFromOptions({ extraVariables, collection, fragment, fragmentName });
   const resolverName = getResolverNameFromOptions(collection);
   // TODO: Properly type this generic query
-  const { data, error, ...rest } = useQuery(query, {
+  const result = useQuery(query, {
     variables: {
       input: {
         selector: { documentId, slug },
@@ -168,6 +168,8 @@ export function useSingle<FragmentTypeName extends keyof FragmentTypes>({
     skip: skip || (!documentId && !slug),
     client: apolloClient,
   });
+  // console.log({ result });
+  const { data, error, ...rest } = result;
   if (error) {
     // This error was already caught by the apollo middleware, but the
     // middleware had no idea who  made the query. To aid in debugging, log a

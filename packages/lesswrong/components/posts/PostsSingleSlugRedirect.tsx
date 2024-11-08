@@ -3,11 +3,17 @@ import React from "react";
 import { useLocation } from "../../lib/routeUtil";
 import { usePostBySlug } from "./usePost";
 import { postGetPageUrl } from "../../lib/collections/posts/helpers";
+import { useCurrentUser } from "../common/withUser";
 
 const PostsSingleSlugRedirect = () => {
   const { params } = useLocation();
   const slug = params.slug;
-  const { post, loading } = usePostBySlug({ slug });
+  // TODO: this 404s
+  const { post, loading, error } = usePostBySlug({ slug });
+
+  const user = useCurrentUser();
+
+  console.log({ user });
 
   if (post) {
     const canonicalUrl = postGetPageUrl(post);
