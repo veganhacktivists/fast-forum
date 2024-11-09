@@ -7,11 +7,12 @@ import { fmCrosspostBaseUrlSetting } from "../../../lib/instanceSettings";
 // This client is used to prefetch data server side (necessary for SSR)
 // It is recreated on every request.
 export const createClient = async (context: ResolverContext | null, foreign = false) => {
-  const cache = new InMemoryCache({
-    possibleTypes: {
-      ...apolloCacheVoteablePossibleTypes(),
-    },
-  });
+  const cache = new InMemoryCache();
+  //   {
+  //   possibleTypes: {
+  //     ...apolloCacheVoteablePossibleTypes(),
+  //   },
+  // }
 
   const links: ApolloLink[] = [];
 
