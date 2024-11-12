@@ -838,6 +838,29 @@ interface VotesDefaultFragment { // fragment on Votes
   readonly silenceNotification: boolean,
 }
 
+interface RevisionsDefaultFragment { // fragment on Revisions
+  readonly documentId: string,
+  readonly collectionName: string,
+  readonly fieldName: string,
+  readonly editedAt: Date,
+  readonly updateType: "initial" | "patch" | "minor" | "major",
+  readonly version: string,
+  readonly commitMessage: string,
+  readonly userId: string,
+  readonly draft: boolean,
+  readonly originalContents: any /*ContentType*/,
+  readonly html: string,
+  readonly markdown: string,
+  readonly draftJS: any /*JSON*/,
+  readonly ckEditorMarkup: string,
+  readonly wordCount: number | null,
+  readonly htmlHighlight: string,
+  readonly htmlHighlightStartingAtHash: string,
+  readonly plaintextDescription: string,
+  readonly plaintextMainText: string,
+  readonly changeMetrics: any /*{"definitions":[{"blackbox":true}]}*/,
+}
+
 interface LWEventsDefaultFragment { // fragment on LWEvents
   readonly userId: string,
   readonly name: string,
@@ -845,6 +868,52 @@ interface LWEventsDefaultFragment { // fragment on LWEvents
   readonly important: boolean,
   readonly properties: any /*{"definitions":[{"blackbox":true}]}*/,
   readonly intercom: boolean,
+}
+
+interface NotificationsDefaultFragment { // fragment on Notifications
+  readonly userId: string,
+  readonly documentId: string,
+  readonly documentType: string,
+  readonly extraData: any /*{"definitions":[{"blackbox":true}]}*/,
+  readonly link: string,
+  readonly title: string,
+  readonly message: string,
+  readonly type: string,
+  readonly deleted: boolean,
+  readonly viewed: boolean,
+  readonly emailed: boolean,
+  readonly waitingForBatch: boolean,
+}
+
+interface SubscriptionsDefaultFragment { // fragment on Subscriptions
+  readonly userId: string,
+  readonly state: "subscribed" | "suppressed",
+  readonly documentId: string,
+  readonly collectionName: string,
+  readonly deleted: boolean,
+  readonly type: "newComments" | "newShortform" | "newPosts" | "newRelatedQuestions" | "newEvents" | "newReplies" | "newTagPosts" | "newDebateComments" | "newDialogueMessages" | "newPublishedDialogueMessages",
+}
+
+interface MessagesDefaultFragment { // fragment on Messages
+  readonly userId: string,
+  readonly conversationId: string,
+  readonly noEmail: boolean,
+}
+
+interface DialogueMatchPreferencesDefaultFragment { // fragment on DialogueMatchPreferences
+  readonly dialogueCheckId: string,
+  readonly topicPreferences: Array<{
+    text: string,
+    preference: "Yes" | "No",
+    commentSourceId: string | null,
+  }>,
+  readonly topicNotes: string,
+  readonly syncPreference: "Yes" | "Meh" | "No",
+  readonly asyncPreference: "Yes" | "Meh" | "No",
+  readonly formatNotes: string,
+  readonly calendlyLink: string | null,
+  readonly generatedDialogueId: string | null,
+  readonly deleted: boolean,
 }
 
 interface newEventFragment { // fragment on LWEvents
@@ -904,13 +973,6 @@ interface ModeratorClientIDInfo { // fragment on ClientIds
   readonly users: Array<UsersMinimumInfo>,
 }
 
-interface SessionsDefaultFragment { // fragment on Sessions
-  readonly _id: string,
-  readonly session: any /*{"definitions":[{"blackbox":true}]}*/,
-  readonly expires: Date | null,
-  readonly lastModified: Date | null,
-}
-
 interface CronHistoriesDefaultFragment { // fragment on CronHistories
   readonly _id: string,
   readonly intendedAt: Date,
@@ -920,25 +982,11 @@ interface CronHistoriesDefaultFragment { // fragment on CronHistories
   readonly result: any /*{"definitions":[{"blackbox":true}]}*/,
 }
 
-interface MessagesDefaultFragment { // fragment on Messages
-  readonly userId: string,
-  readonly conversationId: string,
-  readonly noEmail: boolean,
-}
-
-interface NotificationsDefaultFragment { // fragment on Notifications
-  readonly userId: string,
-  readonly documentId: string,
-  readonly documentType: string,
-  readonly extraData: any /*{"definitions":[{"blackbox":true}]}*/,
-  readonly link: string,
-  readonly title: string,
-  readonly message: string,
-  readonly type: string,
-  readonly deleted: boolean,
-  readonly viewed: boolean,
-  readonly emailed: boolean,
-  readonly waitingForBatch: boolean,
+interface SessionsDefaultFragment { // fragment on Sessions
+  readonly _id: string,
+  readonly session: any /*{"definitions":[{"blackbox":true}]}*/,
+  readonly expires: Date | null,
+  readonly lastModified: Date | null,
 }
 
 interface ModeratorActionsDefaultFragment { // fragment on ModeratorActions
@@ -2553,15 +2601,6 @@ interface DigestsMinimumInfo { // fragment on Digests
   readonly publishedDate: Date | null,
 }
 
-interface SubscriptionsDefaultFragment { // fragment on Subscriptions
-  readonly userId: string,
-  readonly state: "subscribed" | "suppressed",
-  readonly documentId: string,
-  readonly collectionName: string,
-  readonly deleted: boolean,
-  readonly type: "newComments" | "newShortform" | "newPosts" | "newRelatedQuestions" | "newEvents" | "newReplies" | "newTagPosts" | "newDebateComments" | "newDialogueMessages" | "newPublishedDialogueMessages",
-}
-
 interface SubscriptionState { // fragment on Subscriptions
   readonly _id: string,
   readonly userId: string,
@@ -2597,29 +2636,6 @@ interface PodcastEpisodeFull { // fragment on PodcastEpisodes
   readonly title: string,
   readonly episodeLink: string,
   readonly externalEpisodeId: string,
-}
-
-interface RevisionsDefaultFragment { // fragment on Revisions
-  readonly documentId: string,
-  readonly collectionName: string,
-  readonly fieldName: string,
-  readonly editedAt: Date,
-  readonly updateType: "initial" | "patch" | "minor" | "major",
-  readonly version: string,
-  readonly commitMessage: string,
-  readonly userId: string,
-  readonly draft: boolean,
-  readonly originalContents: any /*ContentType*/,
-  readonly html: string,
-  readonly markdown: string,
-  readonly draftJS: any /*JSON*/,
-  readonly ckEditorMarkup: string,
-  readonly wordCount: number | null,
-  readonly htmlHighlight: string,
-  readonly htmlHighlightStartingAtHash: string,
-  readonly plaintextDescription: string,
-  readonly plaintextMainText: string,
-  readonly changeMetrics: any /*{"definitions":[{"blackbox":true}]}*/,
 }
 
 interface UsersMinimumInfo { // fragment on Users
@@ -3508,22 +3524,6 @@ interface DialogueCheckInfo { // fragment on DialogueChecks
   readonly reciprocalMatchPreference: DialogueMatchPreferencesDefaultFragment|null,
 }
 
-interface DialogueMatchPreferencesDefaultFragment { // fragment on DialogueMatchPreferences
-  readonly dialogueCheckId: string,
-  readonly topicPreferences: Array<{
-    text: string,
-    preference: "Yes" | "No",
-    commentSourceId: string | null,
-  }>,
-  readonly topicNotes: string,
-  readonly syncPreference: "Yes" | "Meh" | "No",
-  readonly asyncPreference: "Yes" | "Meh" | "No",
-  readonly formatNotes: string,
-  readonly calendlyLink: string | null,
-  readonly generatedDialogueId: string | null,
-  readonly deleted: boolean,
-}
-
 interface DialogueMatchPreferenceInfo { // fragment on DialogueMatchPreferences
   readonly _id: string,
   readonly dialogueCheckId: string,
@@ -3586,17 +3586,20 @@ interface FragmentTypes {
   PostsDefaultFragment: PostsDefaultFragment
   TypingIndicatorsDefaultFragment: TypingIndicatorsDefaultFragment
   VotesDefaultFragment: VotesDefaultFragment
+  RevisionsDefaultFragment: RevisionsDefaultFragment
   LWEventsDefaultFragment: LWEventsDefaultFragment
+  NotificationsDefaultFragment: NotificationsDefaultFragment
+  SubscriptionsDefaultFragment: SubscriptionsDefaultFragment
+  MessagesDefaultFragment: MessagesDefaultFragment
+  DialogueMatchPreferencesDefaultFragment: DialogueMatchPreferencesDefaultFragment
   newEventFragment: newEventFragment
   lastEventFragment: lastEventFragment
   lwEventsAdminPageFragment: lwEventsAdminPageFragment
   emailHistoryFragment: emailHistoryFragment
   ClientIdsDefaultFragment: ClientIdsDefaultFragment
   ModeratorClientIDInfo: ModeratorClientIDInfo
-  SessionsDefaultFragment: SessionsDefaultFragment
   CronHistoriesDefaultFragment: CronHistoriesDefaultFragment
-  MessagesDefaultFragment: MessagesDefaultFragment
-  NotificationsDefaultFragment: NotificationsDefaultFragment
+  SessionsDefaultFragment: SessionsDefaultFragment
   ModeratorActionsDefaultFragment: ModeratorActionsDefaultFragment
   PostsMinimumInfo: PostsMinimumInfo
   PostsBase: PostsBase
@@ -3733,13 +3736,11 @@ interface FragmentTypes {
   DigestPostsMinimumInfo: DigestPostsMinimumInfo
   DigestsDefaultFragment: DigestsDefaultFragment
   DigestsMinimumInfo: DigestsMinimumInfo
-  SubscriptionsDefaultFragment: SubscriptionsDefaultFragment
   SubscriptionState: SubscriptionState
   PodcastsDefaultFragment: PodcastsDefaultFragment
   PodcastSelect: PodcastSelect
   PodcastEpisodesDefaultFragment: PodcastEpisodesDefaultFragment
   PodcastEpisodeFull: PodcastEpisodeFull
-  RevisionsDefaultFragment: RevisionsDefaultFragment
   UsersMinimumInfo: UsersMinimumInfo
   UsersProfile: UsersProfile
   UsersCurrent: UsersCurrent
@@ -3787,7 +3788,6 @@ interface FragmentTypes {
   ElicitQuestionsDefaultFragment: ElicitQuestionsDefaultFragment
   ElicitQuestionPredictionsDefaultFragment: ElicitQuestionPredictionsDefaultFragment
   DialogueCheckInfo: DialogueCheckInfo
-  DialogueMatchPreferencesDefaultFragment: DialogueMatchPreferencesDefaultFragment
   DialogueMatchPreferenceInfo: DialogueMatchPreferenceInfo
   CkEditorUserSessionsDefaultFragment: CkEditorUserSessionsDefaultFragment
   CkEditorUserSessionInfo: CkEditorUserSessionInfo
@@ -3814,14 +3814,16 @@ interface FragmentTypesByCollection {
   Posts: "PostsDefaultFragment"|"PostsMinimumInfo"|"PostsBase"|"PostsWithVotes"|"PostsListWithVotes"|"PostsListWithVotesAndSequence"|"PostsReviewVotingList"|"PostsAuthors"|"PostsListBase"|"PostsList"|"PostsListTag"|"PostsListTagWithVotes"|"PostsDetails"|"PostsExpandedHighlight"|"PostsPlaintextDescription"|"PostsRevision"|"PostsRevisionEdit"|"PostsWithNavigationAndRevision"|"PostsWithNavigation"|"PostSequenceNavigation"|"PostsPage"|"PostsEdit"|"PostsEditQueryFragment"|"PostsEditMutationFragment"|"PostsRevisionsList"|"PostsRecentDiscussion"|"ShortformRecentDiscussion"|"UsersBannedFromPostsModerationLog"|"SunshinePostsList"|"WithVotePost"|"HighlightWithHash"|"PostWithDialogueMessage"|"PostSideComments"|"PostWithGeneratedSummary"|"PostsEditCriticismTips"|"PostsBestOfList"|"SuggestAlignmentPost"
   TypingIndicators: "TypingIndicatorsDefaultFragment"|"TypingIndicatorInfo"
   Votes: "VotesDefaultFragment"|"TagRelVotes"|"TagVotingActivity"|"UserVotes"|"UserVotesWithDocument"
+  Revisions: "RevisionsDefaultFragment"|"RevisionDisplay"|"RevisionEdit"|"RevisionMetadata"|"RevisionMetadataWithChangeMetrics"|"RevisionHistoryEntry"|"RevisionTagFragment"|"RecentDiscussionRevisionTagFragment"|"WithVoteRevision"
   LWEvents: "LWEventsDefaultFragment"|"newEventFragment"|"lastEventFragment"|"lwEventsAdminPageFragment"|"emailHistoryFragment"
-  ClientIds: "ClientIdsDefaultFragment"|"ModeratorClientIDInfo"
-  Sessions: "SessionsDefaultFragment"
-  CronHistories: "CronHistoriesDefaultFragment"
-  Messages: "MessagesDefaultFragment"|"messageListFragment"
   Notifications: "NotificationsDefaultFragment"|"NotificationsList"
+  Subscriptions: "SubscriptionsDefaultFragment"|"SubscriptionState"
+  Messages: "MessagesDefaultFragment"|"messageListFragment"
+  DialogueMatchPreferences: "DialogueMatchPreferencesDefaultFragment"|"DialogueMatchPreferenceInfo"
+  ClientIds: "ClientIdsDefaultFragment"|"ModeratorClientIDInfo"
+  CronHistories: "CronHistoriesDefaultFragment"
+  Sessions: "SessionsDefaultFragment"
   ModeratorActions: "ModeratorActionsDefaultFragment"|"ModeratorActionDisplay"
-  Revisions: "RevisionDisplay"|"RevisionEdit"|"RevisionMetadata"|"RevisionMetadataWithChangeMetrics"|"RevisionHistoryEntry"|"RevisionTagFragment"|"RecentDiscussionRevisionTagFragment"|"WithVoteRevision"|"RevisionsDefaultFragment"
   RSSFeeds: "RSSFeedsDefaultFragment"|"RSSFeedMinimumInfo"|"newRSSFeedFragment"|"RSSFeedMutationFragment"
   Reports: "ReportsDefaultFragment"|"unclaimedReportsList"
   TagFlags: "TagFlagFragment"|"TagFlagEditFragment"|"TagFlagsDefaultFragment"
@@ -3833,7 +3835,6 @@ interface FragmentTypesByCollection {
   UserMostValuablePosts: "UserMostValuablePostsDefaultFragment"|"UserMostValuablePostInfo"
   DigestPosts: "DigestPostsDefaultFragment"|"DigestPostsMinimumInfo"
   Digests: "DigestsDefaultFragment"|"DigestsMinimumInfo"
-  Subscriptions: "SubscriptionsDefaultFragment"|"SubscriptionState"
   Podcasts: "PodcastsDefaultFragment"|"PodcastSelect"
   PodcastEpisodes: "PodcastEpisodesDefaultFragment"|"PodcastEpisodeFull"
   PetrovDayLaunchs: "PetrovDayLaunchsDefaultFragment"|"PetrovDayLaunch"
@@ -3844,7 +3845,6 @@ interface FragmentTypesByCollection {
   UserRateLimits: "UserRateLimitsDefaultFragment"|"UserRateLimitDisplay"
   ElicitQuestions: "ElicitQuestionsDefaultFragment"
   ElicitQuestionPredictions: "ElicitQuestionPredictionsDefaultFragment"
-  DialogueMatchPreferences: "DialogueMatchPreferencesDefaultFragment"|"DialogueMatchPreferenceInfo"
   CkEditorUserSessions: "CkEditorUserSessionsDefaultFragment"|"CkEditorUserSessionInfo"
 }
 
@@ -3868,17 +3868,20 @@ interface CollectionNamesByFragmentName {
   PostsDefaultFragment: "Posts"
   TypingIndicatorsDefaultFragment: "TypingIndicators"
   VotesDefaultFragment: "Votes"
+  RevisionsDefaultFragment: "Revisions"
   LWEventsDefaultFragment: "LWEvents"
+  NotificationsDefaultFragment: "Notifications"
+  SubscriptionsDefaultFragment: "Subscriptions"
+  MessagesDefaultFragment: "Messages"
+  DialogueMatchPreferencesDefaultFragment: "DialogueMatchPreferences"
   newEventFragment: "LWEvents"
   lastEventFragment: "LWEvents"
   lwEventsAdminPageFragment: "LWEvents"
   emailHistoryFragment: "LWEvents"
   ClientIdsDefaultFragment: "ClientIds"
   ModeratorClientIDInfo: "ClientIds"
-  SessionsDefaultFragment: "Sessions"
   CronHistoriesDefaultFragment: "CronHistories"
-  MessagesDefaultFragment: "Messages"
-  NotificationsDefaultFragment: "Notifications"
+  SessionsDefaultFragment: "Sessions"
   ModeratorActionsDefaultFragment: "ModeratorActions"
   PostsMinimumInfo: "Posts"
   PostsBase: "Posts"
@@ -4015,13 +4018,11 @@ interface CollectionNamesByFragmentName {
   DigestPostsMinimumInfo: "DigestPosts"
   DigestsDefaultFragment: "Digests"
   DigestsMinimumInfo: "Digests"
-  SubscriptionsDefaultFragment: "Subscriptions"
   SubscriptionState: "Subscriptions"
   PodcastsDefaultFragment: "Podcasts"
   PodcastSelect: "Podcasts"
   PodcastEpisodesDefaultFragment: "PodcastEpisodes"
   PodcastEpisodeFull: "PodcastEpisodes"
-  RevisionsDefaultFragment: "Revisions"
   UsersMinimumInfo: "Users"
   UsersProfile: "Users"
   UsersCurrent: "Users"
@@ -4069,7 +4070,6 @@ interface CollectionNamesByFragmentName {
   ElicitQuestionsDefaultFragment: "ElicitQuestions"
   ElicitQuestionPredictionsDefaultFragment: "ElicitQuestionPredictions"
   DialogueCheckInfo: "DialogueChecks"
-  DialogueMatchPreferencesDefaultFragment: "DialogueMatchPreferences"
   DialogueMatchPreferenceInfo: "DialogueMatchPreferences"
   CkEditorUserSessionsDefaultFragment: "CkEditorUserSessions"
   CkEditorUserSessionInfo: "CkEditorUserSessions"

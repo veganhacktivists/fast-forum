@@ -793,7 +793,7 @@ interface DbPost extends DbObject {
   groupId: string | null
   eventType: string | null
   isEvent: boolean
-  reviewedByUserId: string | null
+  reviewedByUserId: string
   reviewForCuratedUserId: string | null
   startTime: Date | null
   localStartTime: Date | null
