@@ -80,7 +80,6 @@ void (async () => {
       "fsevents",
       "chokidar",
       "auth0",
-      "dd-trace",
       "pg-formatter",
       "gpt-3-encoder",
       "@elastic/elasticsearch",
