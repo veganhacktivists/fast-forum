@@ -460,11 +460,19 @@ export function googleLocationToMongoLocation(gmaps: AnyBecauseTodo) {
     coordinates: [gmaps.geometry.location.lng, gmaps.geometry.location.lat],
   };
 }
+
 export function schemaDefaultValue<N extends CollectionNameString>(
-  defaultValue: PublicInstanceSetting<unknown> | DatabasePublicSetting<unknown> | unknown,
+  defaultValue:
+    | DeferredForumSelect<unknown>
+    | PublicInstanceSetting<unknown>
+    | DatabasePublicSetting<unknown>
+    | unknown,
 ): Partial<CollectionFieldSpecification<N>> {
   const isFn = typeof defaultValue === "function";
-  const isGetter = defaultValue instanceof PublicInstanceSetting || defaultValue instanceof DatabasePublicSetting;
+  const isGetter =
+    defaultValue instanceof PublicInstanceSetting ||
+    defaultValue instanceof DatabasePublicSetting ||
+    defaultValue instanceof DeferredForumSelect;
 
   const getValue = () => {
     if (isGetter) {
