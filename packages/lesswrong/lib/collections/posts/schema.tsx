@@ -2513,7 +2513,7 @@ const schema: SchemaType<"Posts"> = {
     type: Boolean,
     optional: true,
     nullable: true,
-    hidden: ({ document }) => isEAForum || !!document?.collabEditorDialogue,
+    hidden: ({ document }) => !!document?.collabEditorDialogue,
     tooltip: "Allow rate-limited users to comment freely on this post",
     group: formGroups.moderationGroup,
     canRead: ["guests"],
