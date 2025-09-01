@@ -365,7 +365,7 @@
     "micromatch": "^4.0.8"
   },
   "engines": {
-    "node": "24.x",
+    "node": "24",
     "pnpm": "9.1.2"
   },
   "optionalDependencies": {
