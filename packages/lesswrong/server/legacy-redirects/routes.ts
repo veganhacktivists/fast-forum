@@ -242,7 +242,7 @@ addStaticRoute("/daily", (params, req, res, next) => {
 });
 
 // Route for old general RSS (all posts)
-addStaticRoute("/:section?/:subreddit?/:new?/.rss", (params, req, res, next) => {
+addStaticRoute("/:section?/:subreddit?/:new?\\.rss", (params, req, res, next) => {
   return makeRedirect(res, "/feed.xml");
 });
 
@@ -259,8 +259,9 @@ addStaticRoute("/promoted/.rss", (params, req, res, next) => {
 addStaticRoute("/item", async (params, req, res, next) => {
   const context = await createAnonymousContext();
 
-  if (params.query.id) {
-    const id = parseInt(params.query.id);
+  const itemId = req.url?.includes('?id=') ? new URL(req.url, 'http://localhost').searchParams.get('id') : null;
+  if (itemId) {
+    const id = parseInt(itemId);
     try {
       const post = await findPostByLegacyAFId(id);
 
@@ -275,7 +276,7 @@ addStaticRoute("/item", async (params, req, res, next) => {
           //eslint-disable-next-line no-console
           console.log("// Missing legacy af item", params);
           res.statusCode = 404;
-          res.end(`No af legacy item found with: id=${params.query.id}`);
+          res.end(`No af legacy item found with: id=${itemId}`);
         }
       }
     } catch (error) {
@@ -314,15 +315,18 @@ if (isAF) {
   });
 
   addStaticRoute("/submitted", (params, req, res, next) => {
-    return makeRedirect(res, `/users/${params.query?.id}`);
+    const userId = req.url?.includes('?id=') ? new URL(req.url, 'http://localhost').searchParams.get('id') : null;
+    return makeRedirect(res, `/users/${userId || ''}`);
   });
 
   addStaticRoute("/threads", (params, req, res, next) => {
-    return makeRedirect(res, `/users/${params.query?.id}`);
+    const userId = req.url?.includes('?id=') ? new URL(req.url, 'http://localhost').searchParams.get('id') : null;
+    return makeRedirect(res, `/users/${userId || ''}`);
   });
 
   addStaticRoute("/user", (params, req, res, next) => {
-    return makeRedirect(res, `/users/${params.query?.id}`);
+    const userId = req.url?.includes('?id=') ? new URL(req.url, 'http://localhost').searchParams.get('id') : null;
+    return makeRedirect(res, `/users/${userId || ''}`);
   });
 
   addStaticRoute("/submit", (params, req, res, next) => {

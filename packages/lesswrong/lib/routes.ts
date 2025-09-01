@@ -573,7 +573,7 @@ onStartup(() => {
     // Note that there are also server-side-only routes in server/legacy-redirects/routes.js.
     {
       name: "post.legacy",
-      path: `/:section?/:subreddit(all|discussion|lesswrong)?/${legacyRouteAcronym}/:id/:slug?`,
+      path: `/:section(r)?/:subreddit(all|discussion|lesswrong)?/${legacyRouteAcronym}/:id/:slug?`,
       componentName: "LegacyPostRedirect",
       previewComponentName: "PostLinkPreviewLegacy",
       getPingback: (parsedUrl) => getPostPingbackByLegacyId(parsedUrl, parsedUrl.params.id),
