@@ -5,6 +5,7 @@
  * These migrations assume you have a tag with the slug "community", and an
  * admin with the slug "jpaddison"
  */
+<<<<<<< HEAD
 import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
 import { FilterTag, getDefaultFilterSettings } from "../../lib/filterSettings";
 import Users from "../../lib/collections/users/collection";
@@ -13,6 +14,16 @@ import Posts from "../../lib/collections/posts/collection";
 import { postStatuses } from "../../lib/collections/posts/constants";
 import TagRels from "../../lib/collections/tagRels/collection";
 import { createMutator } from "../vulcan-lib/mutators";
+=======
+import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils'
+import { FilterTag, getDefaultFilterSettings } from '../../lib/filterSettings'
+import Users from '../../server/collections/users/collection'
+import Tags from '../../server/collections/tags/collection'
+import Posts from '../../server/collections/posts/collection';
+import { postStatuses } from '../../lib/collections/posts/constants';
+import { createTagRel } from '../collections/tagRels/mutations';
+import { createAnonymousContext } from '../vulcan-lib/createContexts';
+>>>>>>> base/master
 
 // Your frontpage settings are shaped like:
 // ```
@@ -31,9 +42,15 @@ import { createMutator } from "../vulcan-lib/mutators";
 // community section on the EA Forum. We'll now move that weight into the tags
 // section.
 // Also reset personalBlog filtering back to 'Default'
+<<<<<<< HEAD
 registerMigration({
   name: "metaToCommunityUserSettings",
   dateWritten: "2020-08-11",
+=======
+export const metaToCommunityUserSettings = registerMigration({
+  name: 'metaToCommunityUserSettings',
+  dateWritten: '2020-08-11',
+>>>>>>> base/master
   idempotent: true,
   action: async () => {
     const communityTagId = (await Tags.find({ slug: "community" }).fetch())[0]._id;
@@ -43,9 +60,15 @@ registerMigration({
       batchSize: 100,
       callback: async (users: Array<DbUser>) => {
         // eslint-disable-next-line no-console
+<<<<<<< HEAD
         console.log("Migrating user batch");
 
         const changes: Array<MongoModifier<DbUser>> = users.flatMap((user) => {
+=======
+        console.log("Migrating user batch")
+        
+        const changes = users.flatMap(user => {
+>>>>>>> base/master
           // If a user already has a filter for the community tag, they've
           // already been migrated. Don't migrate them again or you'll overwrite
           // that setting with the personalBlogpost setting that now might
@@ -80,6 +103,7 @@ registerMigration({
             {
               updateOne: {
                 filter: { _id: user._id },
+<<<<<<< HEAD
                 update: {
                   $set: {
                     "frontpageFilterSettings.personalBlog": getDefaultFilterSettings().personalBlog,
@@ -95,14 +119,35 @@ registerMigration({
     });
   },
 });
+=======
+                update: {$set: {
+                  'frontpageFilterSettings.personalBlog': getDefaultFilterSettings().personalBlog
+                }}
+              }
+            }
+          ]
+        })
+        
+        if (changes.length) await Users.rawCollection().bulkWrite(changes, { ordered: false })
+      }
+    })
+  }
+})
+>>>>>>> base/master
 
 // Someone's gotta put their name on all those tagRels
 const DEFAULT_ADMIN_USER_SLUG = "jpaddison";
 
 // Tag all posts with the meta flag as community posts
+<<<<<<< HEAD
 registerMigration({
   name: "metaToCommunityPosts",
   dateWritten: "2020-08-12",
+=======
+export const metaToCommunityPosts = registerMigration({
+  name: 'metaToCommunityPosts',
+  dateWritten: '2020-08-12',
+>>>>>>> base/master
   idempotent: true,
   action: async () => {
     const communityTagId = (await Tags.find({ slug: "community" }).fetch())[0]._id;
@@ -123,6 +168,7 @@ registerMigration({
           // Oh man, I refactored this migration to use this method, and it
           // changed my life. 10/10 would use again in future migrations.
           // bulkwrite is faster, but callbacks are often important
+<<<<<<< HEAD
           await createMutator({
             collection: TagRels,
             document: {
@@ -134,6 +180,9 @@ registerMigration({
             // things like currentUser that aren't applicable.
             validate: false,
           });
+=======
+          await createTagRel({ data: { tagId: communityTagId, postId: post._id, userId: post.reviewedByUserId || defaultAdminUserId }}, createAnonymousContext());
+>>>>>>> base/master
         }
       },
     });
@@ -142,9 +191,15 @@ registerMigration({
 
 // Once we've deployed, run this migration to mark all community posts as
 // frontpage, and remove the meta flag
+<<<<<<< HEAD
 registerMigration({
   name: "moveMetaToFrontpage",
   dateWritten: "2020-08-14",
+=======
+export const moveMetaToFrontpage = registerMigration({
+  name: 'moveMetaToFrontpage',
+  dateWritten: '2020-08-14',
+>>>>>>> base/master
   idempotent: true,
   action: async () => {
     await forEachDocumentBatchInCollection({
@@ -166,9 +221,13 @@ registerMigration({
           },
         }));
         if (changes.length) {
+<<<<<<< HEAD
           const result = await Posts.rawCollection().bulkWrite(changes, { ordered: false });
           // eslint-disable-next-line no-console
           console.log(`updated ${result.result.nModified} posts`);
+=======
+          await Posts.rawCollection().bulkWrite(changes, { ordered: false });
+>>>>>>> base/master
         }
       },
     });

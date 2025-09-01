@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 import { registerMigration, forEachBucketRangeInCollection } from "./migrationUtils";
 import { Revisions } from "../../lib/collections/revisions/collection";
+=======
+import { registerMigration, forEachBucketRangeInCollection } from './migrationUtils';
+import { Revisions } from '../../server/collections/revisions/collection';
 
-registerMigration({
+>>>>>>> base/master
+
+export default registerMigration({
   name: "fillRevisionDraftsField",
   dateWritten: "2021-10-05",
   idempotent: true,

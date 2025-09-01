@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import * as _ from "underscore";
 import { isCollaborative } from "../../components/editor/EditorFormComponent";
 import { Posts } from "../../lib/collections/posts/collection";
@@ -86,6 +87,34 @@ defineQuery({
     { postId, linkSharingKey }: { postId: string; linkSharingKey: string },
     context: ResolverContext,
   ) => {
+=======
+import * as _ from 'underscore';
+import { isCollaborative } from '../../components/editor/EditorFormComponent';
+import { Posts } from '../../server/collections/posts/collection';
+import { canUserEditPostMetadata } from '../../lib/collections/posts/helpers';
+import { Revisions } from '../../server/collections/revisions/collection';
+import { constantTimeCompare } from '../../lib/helpers';
+import { randomSecret } from '../../lib/random';
+import { accessFilterSingle } from '../../lib/utils/schemaUtils';
+import { restrictViewableFields, userCanDo } from '../../lib/vulcan-users/permissions';
+import { revisionIsChange } from '../editor/make_editable_callbacks';
+import { ckEditorApiHelpers } from './ckEditorApi';
+import gql from 'graphql-tag';
+import { updatePost } from '../collections/posts/mutations';
+
+export const ckEditorCallbacksGraphQLTypeDefs = gql`
+  extend type Query {
+    getLinkSharedPost(postId: String!, linkSharingKey: String!): Post
+  }
+  extend type Mutation {
+    unlockPost(postId: String!, linkSharingKey: String!): Post
+    revertPostToRevision(postId: String!, revisionId: String!): Post
+  }
+`
+
+export const getLinkSharedPostGraphQLQueries = {
+  getLinkSharedPost: async (root: void, {postId, linkSharingKey}: {postId: string, linkSharingKey: string}, context: ResolverContext) => {
+>>>>>>> base/master
     // Must be logged in
     const { currentUser } = context;
 
@@ -128,11 +157,12 @@ defineQuery({
       }
 
       // Return the post
-      const filteredPost = restrictViewableFields(currentUser, Posts, post);
+      const filteredPost = restrictViewableFields(currentUser, 'Posts', post);
       return filteredPost;
     } else {
       throw new Error("Invalid postId or not shared with you");
     }
+<<<<<<< HEAD
   },
 });
 
@@ -149,6 +179,40 @@ defineMutation({
     { postId, revisionId }: { postId: string; revisionId: string },
     context: ResolverContext,
   ): Promise<Partial<DbPost>> => {
+=======
+  }
+}
+
+export const ckEditorCallbacksGraphQLMutations = {
+  unlockPost: async (root: void, {postId, linkSharingKey}: {postId: string, linkSharingKey: string}, context: ResolverContext) => {
+    // Must be logged in
+    const { currentUser } = context;
+    if (!currentUser) {
+      throw new Error("Must be logged in");
+    }
+    
+    // Post must exist and have link-sharing
+    const post = await Posts.findOne({_id: postId});
+    if (!post?.sharingSettings?.anyoneWithLinkCan || post.sharingSettings.anyoneWithLinkCan==="none") {
+      throw new Error("Invalid postId");
+    }
+    
+    // Provided link-sharing key must be correct
+    if (post.linkSharingKey !== linkSharingKey) {
+      throw new Error("Incorrect link-sharing key");
+    }
+    
+    if (post.linkSharingKeyUsedBy && !(post.linkSharingKeyUsedBy?.includes(currentUser._id))) {
+      await Posts.rawUpdateOne(
+        {_id: postId},
+        {$set: {
+          linkSharingKeyUsedBy: [...post.linkSharingKeyUsedBy, currentUser._id]
+        }}
+      );
+    }
+  },
+  revertPostToRevision: async (root: void, {postId, revisionId}: {postId: string, revisionId: string}, context: ResolverContext) => {
+>>>>>>> base/master
     // Check permissions
     const { currentUser } = context;
     if (!currentUser) {
@@ -181,28 +245,38 @@ defineMutation({
     } else {
       // eslint-disable-next-line no-console
       console.log("Reverting to a non-collaborative revision");
-      if (await revisionIsChange(revision, "contents")) {
+      if (await revisionIsChange(revision, "contents", context)) {
         // Edit the document to set contents to match this revision. Edit callbacks
         // take care of the rest.
-        await updateMutator({
-          collection: Posts,
-          context,
-          documentId: post._id,
+        await updatePost({
           data: {
+            // Contents is a resolver only field, but there is handling for it
+            // in `createMutator`/`updateMutator`
             contents: {
               originalContents: revision.originalContents,
             },
           },
-          currentUser,
-          validate: false,
-        });
+          selector: { _id: post._id }
+        }, context);
       } else {
         // eslint-disable-next-line no-console
         console.log("Not creating a new revision (it already matches the head revision");
       }
     }
+<<<<<<< HEAD
 
     const filteredPost = await accessFilterSingle(currentUser, Posts, post, context);
     return filteredPost!;
   },
 });
+=======
+    
+    const filteredPost = await accessFilterSingle(currentUser, 'Posts', post, context);
+    return filteredPost!;
+  }
+}
+
+function linkSharingEnabled(post: DbPost) {
+  return post.sharingSettings?.anyoneWithLinkCan && post.sharingSettings.anyoneWithLinkCan!=="none";
+}
+>>>>>>> base/master

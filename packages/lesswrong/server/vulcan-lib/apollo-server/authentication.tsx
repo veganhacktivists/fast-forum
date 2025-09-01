@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from "react";
 import { createMutator, updateMutator } from "../mutators";
 import passport from "passport";
@@ -40,6 +41,33 @@ async function createPasswordHash(password: string) {
 async function comparePasswords(password: string, hash: string) {
   return await bcrypt.compare(createMeteorClientSideHash(password), hash);
 }
+=======
+import React from 'react'
+import passport from 'passport'
+import { randomBytes } from "crypto";
+import GraphQLLocalStrategy from "./graphQLLocalStrategy";
+import sha1 from 'crypto-js/sha1';
+import { getClientIP } from '@/server/utils/getClientIP';
+import Users from "../../../server/collections/users/collection";
+import { hashLoginToken, userIsBanned } from "../../loginTokens";
+import { LegacyData } from '../../../server/collections/legacyData/collection';
+import { emailTokenTypesByName } from "../../emails/emailTokens";
+import { wrapAndSendEmail } from '../../emails/renderEmail';
+import SimpleSchema from 'simpl-schema';
+import { clearCookie } from '../../utils/httpUtil';
+import { DatabaseServerSetting } from "../../databaseSettings";
+import request from 'request';
+import { forumTitleSetting } from '../../../lib/instanceSettings';
+import {userFindOneByEmail} from "../../commonQueries";
+import UsersRepo from '../../repos/UsersRepo';
+import gql from 'graphql-tag';
+import { createLWEvent } from '@/server/collections/lwevents/mutations';
+import { computeContextFromUser } from './context';
+import { createUser } from '@/server/collections/users/mutations';
+import { createDisplayName } from '@/lib/collections/users/newSchema';
+import { comparePasswords, createPasswordHash, validatePassword } from './passwordHelpers';
+import { backgroundTask } from '@/server/utils/backgroundTask';
+>>>>>>> base/master
 
 const passwordAuthStrategy = new GraphQLLocalStrategy(async function getUserPassport(username, password, done) {
   const user = await new UsersRepo().getUserByUsernameOrEmail(username);
@@ -77,6 +105,7 @@ const passwordAuthStrategy = new GraphQLLocalStrategy(async function getUserPass
 
 passport.use(passwordAuthStrategy);
 
+<<<<<<< HEAD
 function validatePassword(password: string): { validPassword: true } | { validPassword: false; reason: string } {
   if (password.length < 6)
     return { validPassword: false, reason: "Your password needs to be at least 6 characters long" };
@@ -84,6 +113,10 @@ function validatePassword(password: string): { validPassword: true } | { validPa
 }
 
 function validateUsername(username: string): { validUsername: true } | { validUsername: false; reason: string } {
+=======
+
+function validateUsername(username: string): {validUsername: true} | {validUsername: false, reason: string} {
+>>>>>>> base/master
   if (username.length < 2) {
     return { validUsername: false, reason: "Your username must be at least 2 characters" };
   }
@@ -121,11 +154,14 @@ function isValidCharInUsername(ch: string): boolean {
   return !restrictedChars.includes(ch);
 }
 
+<<<<<<< HEAD
 const loginData = `type LoginReturnData {
   token: String
 }`;
 
 addGraphQLSchema(loginData);
+=======
+>>>>>>> base/master
 
 type PassportAuthenticateCallback = Exclude<Parameters<typeof passport.authenticate>[2], undefined>;
 // `options` should be `passport.AuthenticateOptions`, but those don't contain `username` and `password` in the type definition.
@@ -164,6 +200,7 @@ export async function createAndSetToken(req: AnyBecauseTodo, res: AnyBecauseTodo
   return token;
 }
 
+<<<<<<< HEAD
 const VerifyEmailToken = new EmailTokenType({
   name: "verifyEmail",
   onUseAction: async (user) => {
@@ -173,11 +210,18 @@ const VerifyEmailToken = new EmailTokenType({
   },
   resultComponentName: "EmailTokenResult",
 });
+=======
+
+>>>>>>> base/master
 
 export async function sendVerificationEmail(user: DbUser) {
-  const verifyEmailLink = await VerifyEmailToken.generateLink(user._id);
+  const verifyEmailLink = await emailTokenTypesByName.verifyEmail.generateLink(user._id);
   await wrapAndSendEmail({
     user,
+<<<<<<< HEAD
+=======
+    force: true,
+>>>>>>> base/master
     subject: `Verify your ${forumTitleSetting.get()} email`,
     body: (
       <div>
@@ -190,6 +234,7 @@ export async function sendVerificationEmail(user: DbUser) {
   });
 }
 
+<<<<<<< HEAD
 const ResetPasswordToken = new EmailTokenType({
   name: "resetPassword",
   onUseAction: async (user, params, args) => {
@@ -340,6 +385,138 @@ addGraphQLMutation(
 addGraphQLMutation("logout: LoginReturnData");
 addGraphQLMutation("resetPassword(email: String): String");
 addGraphQLMutation("verifyEmail(userId: String): String");
+=======
+export const loginDataGraphQLTypeDefs = gql`
+  type LoginReturnData {
+    token: String
+  }
+  extend type Mutation {
+    login(username: String, password: String): LoginReturnData
+    signup(username: String, email: String, password: String, subscribeToCurated: Boolean, reCaptchaToken: String, abTestKey: String): LoginReturnData
+    logout: LoginReturnData
+    resetPassword(email: String): String
+  }
+`
+
+export const loginDataGraphQLMutations = {
+  async login(root: void, { username, password }: {username: string, password: string}, { req, res }: ResolverContext) {
+    let token: string | null = null
+
+    await promisifiedAuthenticate(req, res, 'graphql-local', { username, password }, (err, user, info) => {
+      return new Promise((resolve, reject) => {
+        if (err) throw Error(err)
+        if (!user) throw new Error("Invalid username/password")
+        if (userIsBanned(user)) throw new Error("This user is banned")
+
+        req!.logIn(user, async (err: AnyBecauseTodo) => {
+          if (err) throw new Error(err)
+          token = await createAndSetToken(req, res, user)
+          resolve(token)
+        })
+      })
+    })
+    return { token }
+  },
+  async logout(root: void, args: {}, { req, res }: ResolverContext) {
+    if (req) {
+      req.logOut()
+      clearCookie(req, res, "loginToken");
+      clearCookie(req, res, "meteor_login_token");  
+    }
+    return {
+      token: null
+    }
+  },
+  async signup(root: void, args: AnyBecauseTodo, context: ResolverContext) {
+    const { email, username, password, subscribeToCurated, reCaptchaToken, abTestKey } = args;
+    
+    if (!email || !username || !password) throw Error("Email, Username and Password are all required for signup")
+    if (!SimpleSchema.RegEx.Email.test(email)) throw Error("Invalid email address")
+    const validatePasswordResponse = validatePassword(password)
+    if (!validatePasswordResponse.validPassword) throw Error(validatePasswordResponse.reason)
+    const validateUsernameResponse = validateUsername(username);
+    if (!validateUsernameResponse.validUsername) throw Error(validateUsernameResponse.reason)
+    
+    if (await userFindOneByEmail(email)) {
+      throw Error("Email address is already taken");
+    }
+    if (await context.Users.findOne({ username })) {
+      throw Error("Username is already taken");
+    }
+
+    const reCaptchaResponse = await getCaptchaRating(reCaptchaToken)
+    let recaptchaScore: number | undefined = undefined
+    if (reCaptchaResponse) {
+      const reCaptchaData = JSON.parse(reCaptchaResponse)
+      if (reCaptchaData.success && reCaptchaData.action === "login/signup") {
+        recaptchaScore = reCaptchaData.score
+      } else {
+        // eslint-disable-next-line no-console
+        console.log("reCaptcha check failed:", reCaptchaData)
+      }
+    }
+
+    const { req, res } = context
+
+    const userData = {
+      email,
+      services: {
+        password: {
+          bcrypt: await createPasswordHash(password)
+        },
+        resume: {
+          loginTokens: []
+        }
+      },
+      emails: [{
+        address: email, verified: false
+      }],
+      username: username,
+      emailSubscribedToCurated: subscribeToCurated,
+      signUpReCaptchaRating: recaptchaScore,
+      abTestKey,
+    };
+
+    const displayName = createDisplayName(userData);
+    
+    const user = await createUser({
+      data: {
+        ...userData,
+        displayName,
+      },
+    }, context);
+
+    const token = await createAndSetToken(req, res, user)
+    return { 
+      token
+    }
+  },
+  async resetPassword(root: void, { email }: {email: string}, context: ResolverContext) {
+    if (!email) throw Error("Email is required for resetting passwords")
+    const user = await userFindOneByEmail(email)
+    if (!user) throw Error("Can't find user with given email address")
+    const tokenLink = await emailTokenTypesByName.resetPassword.generateLink(user._id)
+    const emailSucceeded = await wrapAndSendEmail({
+      user,
+      force: true,
+      subject: "Password Reset Request",
+      body: <div>
+        <p>
+          You requested a password reset. Follow the following link to reset your password: 
+        </p>
+        <p>
+          <a href={tokenLink}>{tokenLink}</a>
+        </p>
+      </div>
+    });  
+    if (emailSucceeded)
+      return `Successfully sent password reset email to ${email}`; //FIXME: Is this revealing user emails that would otherwise be hidden?
+    else
+      return `Failed to send password reset email. The account might not have a valid email address configured.`;
+  },
+}
+
+>>>>>>> base/master
 
 async function insertHashedLoginToken(userId: string, hashedToken: string) {
   const tokenWithMetadata = {
@@ -363,6 +540,7 @@ function registerLoginEvent(user: DbUser, req: AnyBecauseTodo) {
     important: false,
     userId: user._id,
     properties: {
+<<<<<<< HEAD
       type: "passport-login",
       ip: getForwardedWhitelist().getClientIP(req),
       userAgent: req.headers["user-agent"],
@@ -397,6 +575,17 @@ async function recordAssociationBetweenUserAndClientID(clientId: string, user: D
       );
     }
   }
+=======
+      type: 'passport-login',
+      ip: getClientIP(req),
+      userAgent: req.headers['user-agent'],
+      referrer: req.headers['referer']
+    }
+  }
+  backgroundTask(computeContextFromUser({ user, isSSR: false }).then(userContext => {
+    backgroundTask(createLWEvent({ data: document }, userContext));
+  }));
+>>>>>>> base/master
 }
 
 const reCaptchaSecretSetting = new DatabaseServerSetting<string | null>("reCaptcha.secret", null); // ReCaptcha Secret

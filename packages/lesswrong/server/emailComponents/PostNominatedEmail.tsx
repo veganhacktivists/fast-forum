@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from "react";
 import { postGetPageUrl } from "../../lib/collections/posts/helpers";
 import { registerComponent } from "../../lib/vulcan-lib/components";
@@ -21,9 +22,39 @@ const PostNominatedEmail = ({ documentId, reason }: { documentId: string; reason
     extraVariables: {
       version: "String",
     },
+=======
+import React from 'react';
+import { postGetPageUrl } from '../../lib/collections/posts/helpers';
+import { getNominationPhaseEnd, REVIEW_NAME_IN_SITU, REVIEW_YEAR } from '../../lib/reviewUtils';
+import { getSiteUrl } from '../../lib/vulcan-lib/utils';
+import { useQuery } from "@/lib/crud/useQuery";
+import { gql } from "@/lib/generated/gql-codegen";
+
+const PostsRevisionQuery = gql(`
+  query PostNominatedEmail($documentId: String, $version: String) {
+    post(input: { selector: { documentId: $documentId } }) {
+      result {
+        ...PostsRevision
+      }
+    }
+  }
+`);
+
+export const PostNominatedEmail = ({documentId, reason}: {
+  documentId: string,
+  reason?: string,
+}) => {
+  const { data } = useQuery(PostsRevisionQuery, {
+    variables: { documentId: documentId },
+>>>>>>> base/master
   });
+  const post = data?.post?.result;
   if (!post) return null;
+<<<<<<< HEAD
   const nominationEndDate = moment.utc(annualReviewNominationPhaseEnd.get());
+=======
+  const nominationEndDate = getNominationPhaseEnd(REVIEW_YEAR)
+>>>>>>> base/master
 
   return (
     <React.Fragment>
@@ -53,6 +84,7 @@ const PostNominatedEmail = ({ documentId, reason }: { documentId: string; reason
   );
 };
 
+<<<<<<< HEAD
 const PostNominatedEmailComponent = registerComponent("PostNominatedEmail", PostNominatedEmail);
 
 declare global {
@@ -60,3 +92,5 @@ declare global {
     PostNominatedEmail: typeof PostNominatedEmailComponent;
   }
 }
+=======
+>>>>>>> base/master

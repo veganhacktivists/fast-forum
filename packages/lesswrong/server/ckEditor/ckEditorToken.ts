@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { computeContextFromUser, getUserFromReq } from "../vulcan-lib/apollo-server/context";
 import { Posts } from "../../lib/collections/posts";
 import {
@@ -9,6 +10,16 @@ import { userGetDisplayName } from "../../lib/collections/users/helpers";
 import { getCkEditorEnvironmentId, getCkEditorSecretKey } from "./ckEditorServerConfig";
 import jwt from "jsonwebtoken";
 import { randomId } from "../../lib/random";
+=======
+import { computeContextFromUser, getUserFromReq } from '../vulcan-lib/apollo-server/context';
+import { Posts } from '../../server/collections/posts/collection'
+import { getCollaborativeEditorAccess, CollaborativeEditingAccessLevel } from '../../lib/collections/posts/collabEditingPermissions';
+import { getCKEditorDocumentId } from '../../lib/ckEditorUtils'
+import { userGetDisplayName } from '../../lib/collections/users/helpers';
+import { getCkEditorEnvironmentId, getCkEditorSecretKey } from './ckEditorServerConfig';
+import jwt from 'jsonwebtoken'
+import { randomId } from '../../lib/random';
+>>>>>>> base/master
 
 function permissionsLevelToCkEditorRole(access: CollaborativeEditingAccessLevel): string {
   switch (access) {
@@ -37,12 +48,20 @@ export async function ckEditorTokenHandler(req: AnyBecauseTodo, res: AnyBecauseT
   if (Array.isArray(documentId)) throw new Error("Multiple documentId headers");
   if (Array.isArray(userId)) throw new Error("Multiple userId headers");
   if (Array.isArray(formType)) throw new Error("Multiple formType headers");
+<<<<<<< HEAD
 
   const user = await getUserFromReq(req);
   const requestWithKey = { ...req, query: { ...req?.query, key: linkSharingKey } };
   const context = await computeContextFromUser(user, requestWithKey, res);
   const contextWithKey: ResolverContext = { ...context, req: context.req };
 
+=======
+  
+  const user = getUserFromReq(req);
+  const requestWithKey = {...req, query: {...req?.query, key: linkSharingKey}}
+  const contextWithKey = await computeContextFromUser({user, req: requestWithKey, res, isSSR: false});
+  
+>>>>>>> base/master
   if (collectionName === "Posts") {
     const ckEditorId = getCKEditorDocumentId(documentId, userId, formType);
     const post = documentId && (await Posts.findOne(documentId));
@@ -57,7 +76,8 @@ export async function ckEditorTokenHandler(req: AnyBecauseTodo, res: AnyBecauseT
     }
 
     const payload = {
-      iss: environmentId,
+      aud: environmentId,
+      iat: Math.floor(new Date().getTime()/1000.0), //seconds since epoch
       user: {
         id: user ? user._id : randomId(),
         name: user ? userGetDisplayName(user) : "Anonymous",
@@ -77,6 +97,7 @@ export async function ckEditorTokenHandler(req: AnyBecauseTodo, res: AnyBecauseT
     res.end(result);
   } else {
     const payload = {
+<<<<<<< HEAD
       iss: environmentId,
       user: user
         ? {
@@ -84,6 +105,14 @@ export async function ckEditorTokenHandler(req: AnyBecauseTodo, res: AnyBecauseT
             name: userGetDisplayName(user),
           }
         : null,
+=======
+      aud: environmentId,
+      iat: Math.floor(new Date().getTime()/1000.0), //seconds since epoch
+      user: user ? {
+        id: user._id,
+        name: userGetDisplayName(user)
+      } : null,
+>>>>>>> base/master
     };
 
     const result = jwt.sign(payload, secretKey, { algorithm: "HS256" });

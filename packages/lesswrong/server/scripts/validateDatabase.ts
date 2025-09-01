@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Vulcan, Collections, getCollection } from "../vulcan-lib";
 import { forEachDocumentBatchInCollection } from "../manualMigrations/migrationUtils";
 import { getSchema, getSimpleSchema } from "../../lib/utils/getSchema";
@@ -6,6 +7,13 @@ type CollectionCustomValidatorFunction<T extends DbObject> = (
   documents: T[],
   recordError: (field: string, message: string) => void,
 ) => Promise<void>;
+=======
+import { forEachDocumentBatchInCollection } from '../manualMigrations/migrationUtils';
+import { getSchema, getSimpleSchema } from '@/lib/schema/allSchemas';
+import { getAllCollections, getCollection } from "../collections/allCollections";
+
+type CollectionCustomValidatorFunction<T extends DbObject> = (documents: T[], recordError: (field: string, message: string) => void) => Promise<void>;
+>>>>>>> base/master
 type CollectionCustomValidator<T extends DbObject> = {
   name: string;
   validateBatch: CollectionCustomValidatorFunction<T>;
@@ -44,7 +52,12 @@ export function registerCollectionValidator<N extends CollectionNameString>({
 //
 // Outputs a summary of any problems found through console.log, and returns
 // nothing.
+<<<<<<< HEAD
 export async function validateCollection(collection: AnyBecauseTodo) {
+=======
+export async function validateCollection(collection: CollectionBase<any>)
+{
+>>>>>>> base/master
   const collectionName = collection.collectionName;
   console.log(`Checking ${collectionName}`); // eslint-disable-line no-console
   const numRows = await collection.find({}).count();
@@ -61,14 +74,20 @@ export async function validateCollection(collection: AnyBecauseTodo) {
   }
 
   // Validate rows
-  const schema = getSchema(collection);
+  const schema = getSchema(collection.collectionName);
   if (!schema) {
     console.log(`    Collection does not have a schema`); // eslint-disable-line no-console
     return;
   }
+<<<<<<< HEAD
 
   const validationContext = getSimpleSchema(collection).newContext();
 
+=======
+  
+  const validationContext = getSimpleSchema(collection.collectionName).newContext();
+  
+>>>>>>> base/master
   // Dictionary field=>type=>count
   const errorsByField: AnyBecauseTodo = {};
 
@@ -113,12 +132,20 @@ export async function validateCollection(collection: AnyBecauseTodo) {
       // Iterate through fields checking for the foreignKey property (which
       // simpl-schema doesn't handle), and verifying that the keys actually
       // exist
-      for (let fieldName in schema._schema) {
+      for (let fieldName in schema) {
         // TODO: Nested-field foreign key constraints aren't yet supported
+<<<<<<< HEAD
         if (fieldName.indexOf("$") >= 0) continue;
 
         const foreignKeySpec = (schema as AnyBecauseTodo)._schema[fieldName].foreignKey;
 
+=======
+        if (fieldName.indexOf("$") >= 0)
+          continue;
+        
+        const foreignKeySpec = schema[fieldName].database?.foreignKey;
+        
+>>>>>>> base/master
         if (foreignKeySpec) {
           // Get a list of foreign values to check for
           let foreignValuesDict: AnyBecauseTodo = {};
@@ -188,11 +215,15 @@ export async function validateCollection(collection: AnyBecauseTodo) {
 
 // Validate each collection in the database against their attached schemas.
 // Outputs a summary of the results through console.log, and returns nothing.
+<<<<<<< HEAD
 export async function validateDatabase() {
   for (let collection of Collections) {
+=======
+export async function validateDatabase()
+{
+  for (let collection of getAllCollections())
+  {
+>>>>>>> base/master
     await validateCollection(collection);
   }
 }
-
-Vulcan.validateCollection = validateCollection;
-Vulcan.validateDatabase = validateDatabase;

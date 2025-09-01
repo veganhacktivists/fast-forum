@@ -1,9 +1,18 @@
+<<<<<<< HEAD
 import { createMutator, addGraphQLMutation, addGraphQLResolvers } from "../vulcan-lib";
 import { Tags } from "../../lib/collections/tags/collection";
 import { TagRels } from "../../lib/collections/tagRels/collection";
 import { Posts } from "../../lib/collections/posts/collection";
 import { performVoteServer } from "../voteServer";
 import { accessFilterSingle } from "../../lib/utils/schemaUtils";
+=======
+import gql from 'graphql-tag';
+import { Tags } from '../../server/collections/tags/collection';
+import { TagRels } from '../../server/collections/tagRels/collection';
+import { Posts } from '../../server/collections/posts/collection';
+import { accessFilterSingle } from '../../lib/utils/schemaUtils';
+import { createTagRel } from '../collections/tagRels/mutations';
+>>>>>>> base/master
 
 export const addOrUpvoteTag = async ({
   tagId,
@@ -22,16 +31,25 @@ export const addOrUpvoteTag = async ({
 }): Promise<DbTagRel> => {
   // Validate that tagId and postId refer to valid non-deleted documents
   // and that this user can see both.
+<<<<<<< HEAD
   const post = await Posts.findOne({ _id: postId });
   const tag = await Tags.findOne({ _id: tagId });
   if (!(await accessFilterSingle(currentUser, Posts, post, context)))
     throw new Error(`Invalid postId ${postId}, either this post does not exist, or you do not have access`);
   if (!(await accessFilterSingle(currentUser, Tags, tag, context)))
+=======
+  const post = await Posts.findOne({_id: postId});
+  const tag = await Tags.findOne({_id: tagId});
+  if (!await accessFilterSingle(currentUser, 'Posts', post, context))
+    throw new Error(`Invalid postId ${postId}, either this post does not exist, or you do not have access`);
+  if (!await accessFilterSingle(currentUser, 'Tags', tag, context))
+>>>>>>> base/master
     throw new Error(`Invalid tagId ${tagId}, either this tag does not exist, or you do not have access`);
 
   // Check whether this document already has this tag applied
-  const existingTagRel = await TagRels.findOne({ tagId, postId });
+  const existingTagRel = await TagRels.findOne({ tagId, postId, deleted: false });
   if (!existingTagRel) {
+<<<<<<< HEAD
     const tagRel = await createMutator({
       collection: TagRels,
       document: { tagId, postId, userId: currentUser._id },
@@ -40,15 +58,24 @@ export const addOrUpvoteTag = async ({
       context,
     });
 
+=======
+    const tagRel = await createTagRel({ data: { tagId, postId, userId: currentUser._id } }, context);
+    
+>>>>>>> base/master
     // If the tag has a parent which has not been applied to this post, apply it
     if (!ignoreParent && tag?.parentTagId && !(await TagRels.findOne({ tagId: tag.parentTagId, postId }))) {
       // RECURSIVE CALL, should only ever go one level deep because we disallow chaining of parent tags (see packages/lesswrong/lib/collections/tags/schema.ts)
       await addOrUpvoteTag({ tagId: tag?.parentTagId, postId, currentUser, context, selfVote: true });
     }
-    return tagRel.data;
+    return tagRel;
   } else {
     // Upvote the tag
+<<<<<<< HEAD
     const { modifiedDocument: votedTagRel } = await performVoteServer({
+=======
+    const { performVoteServer } = require("../voteServer");
+    const {modifiedDocument: votedTagRel} = await performVoteServer({
+>>>>>>> base/master
       document: existingTagRel,
       voteType: "smallUpvote",
       collection: TagRels,
@@ -62,6 +89,7 @@ export const addOrUpvoteTag = async ({
   }
 };
 
+<<<<<<< HEAD
 addGraphQLResolvers({
   Mutation: {
     addOrUpvoteTag: async (
@@ -95,3 +123,35 @@ addGraphQLResolvers({
 });
 addGraphQLMutation("addOrUpvoteTag(tagId: String, postId: String): TagRel");
 addGraphQLMutation("addTags(postId: String, tagIds: [String]): Boolean");
+=======
+export const tagsGqlTypeDefs = gql`
+  extend type Mutation {
+    addOrUpvoteTag(tagId: String, postId: String): TagRel
+    addTags(postId: String, tagIds: [String]): Boolean
+  }
+`
+
+export const tagsGqlMutations = {
+  addOrUpvoteTag: async (root: void, {tagId, postId}: {tagId: string, postId: string}, context: ResolverContext) => {
+    const { currentUser } = context;
+    if (!currentUser) throw new Error("You must be logged in to tag");
+    if (!postId) throw new Error("Missing argument: postId");
+    if (!tagId) throw new Error("Missing argument: tagId");
+    
+    return addOrUpvoteTag({tagId, postId, currentUser, context});
+  },
+  
+  addTags: async (root: void, {postId, tagIds}: {postId: string, tagIds: Array<string>}, context: ResolverContext) => {
+    const { currentUser } = context;
+    if (!currentUser) throw new Error("You must be logged in to tag");
+    if (!postId) throw new Error("Missing argument: postId");
+    if (!tagIds) throw new Error("Missing argument: tagIds");
+    
+    await Promise.all(tagIds.map(tagId =>
+      addOrUpvoteTag({ tagId, postId, currentUser, context })
+    ));
+    
+    return true;
+  },
+}
+>>>>>>> base/master

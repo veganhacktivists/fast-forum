@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import TypingIndicators from "../../lib/collections/typingIndicators/collection";
 import { randomId } from "../../lib/random";
+=======
+import TypingIndicators from "../../server/collections/typingIndicators/collection";
+import {randomId} from "../../lib/random";
+>>>>>>> base/master
 import AbstractRepo from "./AbstractRepo";
 
 interface TypingIndicatorPostInfo extends DbTypingIndicator {

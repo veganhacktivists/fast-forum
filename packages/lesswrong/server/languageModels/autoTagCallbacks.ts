@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   LanguageModelTemplate,
   getOpenAI,
@@ -16,6 +17,13 @@ import { cheerioParse } from "../utils/htmlUtil";
 import { isAnyTest, isProduction } from "../../lib/executionEnvironment";
 import { isEAForum } from "../../lib/instanceSettings";
 import type { PostIsCriticismRequest } from "../resolvers/postResolvers";
+=======
+import { LanguageModelTemplate, wikiSlugToTemplate, substituteIntoTemplate } from './languageModelIntegration';
+import { dataToMarkdown } from '../editor/conversionUtils';
+import type OpenAI from "openai";
+import { autoFrontpageModelSetting, autoFrontpagePromptSetting, tagBotAccountSlug } from '../databaseSettings';
+import { cheerioParse } from '../utils/htmlUtil';
+>>>>>>> base/master
 
 /**
  * To set up automatic tagging:
@@ -62,12 +70,12 @@ import type { PostIsCriticismRequest } from "../resolvers/postResolvers";
  *    and consider whether you want to customize the date range, minimum karma,
  *    and other filters. Then make sure you have a locally running server connected
  *    to a database with suitable training data, and run the script with
- *        scripts/serverShellCommand.sh 'Globals.generateCandidateSetsForTagClassification()'
+ *        yarn repl prod packages/lesswrong/server/scripts/generativeModels/generateTaggingPostSets.ts "generateCandidateSetsForTagClassification()"
  *    This will generate two files, ml/tagClassificationPostIds.{train,test}.json
  *    each of which is a list of post IDs.
  *
  * 6. Prepare data for the training and test sets. Run
- *        scripts/serverShellCommand.sh 'Globals.generateTagClassifierData()'
+ *        yarn repl prod packages/lesswrong/server/scripts/generativeModels/generateTaggingPostSets.ts "generateTagClassifierData()"
  *    This step is memory-intensive (currently it just loads the whole data set
  *    into memory at once). If it runs out of memory, you may need to configure
  *    node to have a heap-size limit larger than the default of 4GB. To do this,
@@ -77,21 +85,22 @@ import type { PostIsCriticismRequest } from "../resolvers/postResolvers";
  *        named ml/tagClassification.TAG.{train,test}.jsonl
  *    Take a look at a few of these and make sure they look right.
  *
-   7. Install the OpenAI command-line API (if it isn't already installed.) with:
-           pip install --upgrade openai
-      (Depending on your system this might be `pip3` instead. If this succeeds
-      you should be able to run `openai` from the command line in any directory.)
+ * 7. Install the OpenAI command-line API (if it isn't already installed.) with:
+ *         pip install --upgrade openai
+ *    (Depending on your system this might be `pip3` instead. If this succeeds
+ *    you should be able to run `openai` from the command line in any directory.)
+ *    Check the version number with
+ *         pip show openai
+ *    This should be 1.7.1 or later.
  *
- * 8. Run fine-tuning jobs. First put the API key into your environment, then start the fine-tuning job using the OpenAI CLI.
+ * 8. Run fine-tuning jobs. First put the API key into your environment, then start the fine-tuning job with
           export OPENAI_API_KEY=YOURAPIKEYHERE
-          openai api fine_tunes.create \
-            -m babbage --compute_classification_metrics --classification_positive_class " yes" \
-            -t ml/tagClassification.${TAG}.train.jsonl \
-            -v ml/tagClassification.${TAG}.test.jsonl
-      Substituting in ${TAG}, and repeat for each tag.
-      You can check each job with:
-          openai api fine_tunes.follow -i ${id}
-      Update on 2023-11-27: You can now just do this all via their web UI, see https://platform.openai.com/docs/guides/fine-tuning
+          scripts/fineTuneTagClassifiers.py \
+            --train ml/tagClassification.${TAG}.train.jsonl \
+            --test ml/tagClassification.${TAG}.test.jsonl \
+ *    Substituting in ${TAG}, and repeat for each tag.
+ *    You can also do this with their web UI; see see
+ *        https://platform.openai.com/docs/guides/fine-tuning
  *
  * 9. Retrieve the fine-tuned model IDs. Run
  *        openai api fine_tunes.list
@@ -103,17 +112,20 @@ import type { PostIsCriticismRequest } from "../resolvers/postResolvers";
  *
  * 10. Generate a comparison list between human-applied and auto-applied tags for
  *     the test set.
- *        scripts/serverShellCommand.sh 'Globals.evaluateTagModels("ml/tagClassificationPostIds.test.json", "ml/tagClassificationTestSetResults.txt")'
+ *        yarn repl prod packages/lesswrong/server/scripts/generativeModels/generateTaggingPostSets.ts 'evaluateTagModels("ml/tagClassificationPostIds.test.json", "ml/tagClassificationTestSetResults.txt")'
  *     This produces a text file ml/tagClassificationTestSetResults.txt with a
  *     list of post titles/links, how humans tagged them, and how the trained
  *     models tagged them. Make sure this looks reasonable.
  */
 
 const bodyWordCountLimit = 1500;
+<<<<<<< HEAD
 const tagBotAccountSlug = new DatabaseServerSetting<string | null>(
   "languageModels.autoTagging.taggerAccountSlug",
   null,
 );
+=======
+>>>>>>> base/master
 
 /**
  * Preprocess HTML before converting to markdown to be then converted into a
@@ -131,6 +143,7 @@ function preprocessHtml(html: string): string {
   return $.html();
 }
 
+<<<<<<< HEAD
 export async function postToPrompt({
   template,
   post,
@@ -155,6 +168,21 @@ export async function postToPrompt({
   const linkpostMeta = "url" in post && post.url ? `\nThis is a linkpost for ${post.url}` : "";
 
   return substituteIntoTemplate({
+=======
+export async function postToPrompt({template, post, promptSuffix, postBodyCache}: {
+  template: LanguageModelTemplate,
+  post: PostsHTML & DbPost,
+  promptSuffix: string
+  // Optional mapping from post ID to markdown body, to avoid redoing the html-to-markdown conversions
+  postBodyCache?: PostBodyCache,
+}): Promise<string> {
+  const {header, body} = template;
+  
+  const markdownPostBody = postBodyCache?.preprocessedBody?.[post._id] ?? preprocessPostHtml(post.contents?.html ?? '');
+  const linkpostMeta = ('url' in post && post.url) ? `\nThis is a linkpost for ${post.url}` : '';
+  
+  const withTemplate = substituteIntoTemplate({
+>>>>>>> base/master
     template,
     maxLengthTokens: parseInt(header["max-length-tokens"]),
     truncatableVariable: "text",
@@ -165,6 +193,11 @@ export async function postToPrompt({
       tagPrompt: promptSuffix,
     },
   });
+  
+  // Replace the string <|endoftext|> with __endoftext__ because the former is
+  // special to the tokenizer (and will cause input-validation to fail), and it
+  // tends to appear in posts that talk about LLMs.
+  return withTemplate.replace(/<\|endoftext\|>/g, "__endoftext__");
 }
 
 function preprocessPostHtml(postHtml: string): string {
@@ -172,15 +205,22 @@ function preprocessPostHtml(postHtml: string): string {
   return markdownPostBody;
 }
 
+<<<<<<< HEAD
 export type PostBodyCache = { preprocessedBody: Record<string, string> };
 export function generatePostBodyCache(posts: DbPost[]): PostBodyCache {
   const result: PostBodyCache = { preprocessedBody: {} };
+=======
+export type PostBodyCache = {preprocessedBody: Record<string,string>}
+export function generatePostBodyCache(posts: (PostsHTML & DbPost)[]): PostBodyCache {
+  const result: PostBodyCache = {preprocessedBody: {}};
+>>>>>>> base/master
   for (let post of posts) {
-    result.preprocessedBody[post._id] = preprocessPostHtml(post.contents?.html);
+    result.preprocessedBody[post._id] = preprocessPostHtml(post.contents?.html ?? "");
   }
   return result;
 }
 
+<<<<<<< HEAD
 export async function checkTags(post: DbPost, tags: DbTag[], openAIApi: OpenAI) {
   const template = await wikiSlugToTemplate("lm-config-autotag");
 
@@ -196,12 +236,102 @@ export async function checkTags(post: DbPost, tags: DbTag[], openAIApi: OpenAI) 
     const completion = languageModelResult.choices[0].text!;
     const hasTag = completion.trim().toLowerCase() === "yes";
     tagsApplied[tag.slug] = hasTag;
+=======
+const CHAT_MODEL_BASENAMES = [
+  'gpt-4', // gpt-4o or gpt-4o-mini currently (2024-08-20) recommended
+  'gpt-3.5-turbo'
+]
+
+async function booleanLLMCheck(
+  model: string,
+  prompt: string,
+  openAIApi: OpenAI
+): Promise<boolean> {
+  let completion = "";
+
+  if (CHAT_MODEL_BASENAMES.some(name => model.includes(name))) {
+    const chatCompletion = await openAIApi.chat.completions.create({
+      model,
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    });
+    completion = chatCompletion.choices[0].message.content?.trim().toLowerCase() ?? "no";
+  } else {
+    const languageModelResult = await openAIApi.completions.create({
+      model,
+      prompt,
+      max_tokens: 1,
+    });
+    completion = languageModelResult.choices[0].text!;
+  }
+
+  const finalWord = completion.trim().toLowerCase().split(/[\n\s]+/).pop();
+  return finalWord === "yes";
+}
+
+export async function checkTags(
+  post: PostsHTML & DbPost,
+  tags: DbTag[],
+  openAIApi: OpenAI,
+  context: ResolverContext,
+) {
+  const template = await wikiSlugToTemplate("lm-config-autotag", context);
+  
+  let tagsApplied: Record<string,boolean> = {};
+  
+  for (let tag of tags) {
+    if (!tag.autoTagPrompt || !tag.autoTagModel)
+      continue;
+
+    try {
+      const userPrompt = await postToPrompt({template, post, promptSuffix: tag.autoTagPrompt});
+      tagsApplied[tag.slug] = await booleanLLMCheck(tag.autoTagModel, userPrompt, openAIApi);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      continue;
+    }
+>>>>>>> base/master
   }
 
   return tagsApplied;
 }
 
+<<<<<<< HEAD
 async function getTagBotAccount(context: ResolverContext): Promise<DbUser | null> {
+=======
+export async function checkFrontpage(
+  post: PostsHTML & DbPost,
+  openAIApi: OpenAI,
+  context: ResolverContext,
+) {
+  const template = await wikiSlugToTemplate("lm-config-autotag", context);
+
+  const autoFrontpageModel = autoFrontpageModelSetting.get()
+  const autoFrontpagePrompt = autoFrontpagePromptSetting.get()
+
+  if (!autoFrontpageModel || !autoFrontpagePrompt) {
+    return false;
+  }
+
+  try {
+    const userPrompt = await postToPrompt({template, post, promptSuffix: autoFrontpagePrompt});
+    return await booleanLLMCheck(autoFrontpageModel, userPrompt, openAIApi);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    return false;
+  }
+}
+
+
+export async function getTagBotAccount(context: ResolverContext): Promise<DbUser|null> {
+  const { Users } = context;
+>>>>>>> base/master
   const accountSlug = tagBotAccountSlug.get();
   if (!accountSlug) return null;
   const account = await Users.findOne({ slug: accountSlug });
@@ -209,6 +339,7 @@ async function getTagBotAccount(context: ResolverContext): Promise<DbUser | null
   return account;
 }
 
+<<<<<<< HEAD
 let tagBotUserIdCache: Promise<{ id: string | null }> | null = null;
 export async function getTagBotUserId(context: ResolverContext): Promise<string | null> {
   if (!tagBotUserIdCache) {
@@ -257,22 +388,20 @@ async function autoApplyTagsTo(post: DbPost, context: ResolverContext): Promise<
     }
   }
 }
+=======
+let tagBotUserIdPromise: Promise<void>|null = null;
+// If undefined, hasn't been fetched yet; if null, the account doesn't exist.
+let tagBotUserId: string|null|undefined = undefined;
+>>>>>>> base/master
 
 /**
- * On the EA Forum, we're using some of the auto-tagging system to check if posts
- * could be categorized as "criticism of work in effective altruism". We check while
- * the editor is open, because if this returns true, then we want to show the author
- * a little card with tips on how to make it more likely to go well
- * (see PostsEditBotTips).
- *
- * The fine-tuned model is not super accurate, but that's partly because our dataset
- * does not cleanly represent the behavior we want from it. The "criticism of work in EA"
- * tag has a wider variety of posts than would benefit from the tips in the card, such as
- * posts announcing criticism contests and posts criticizing EA orgs broadly.
- *
- * So it will miss ~half of posts that a human would categorize as "criticism"
- * (i.e. it has a high false negative rate), but it has a low false positive rate (~2%).
+ * Get the ID of the tag-bot account, with caching. The first call to this will
+ * fetch the tagger account (using the tagBotAccountSlug config setting); all
+ * subsequent calls will return a cached value. If called while that first
+ * fetch is in-flight, waits for that request to finish, rather than starting a
+ * duplicate (this affects server-startup performance during development).
  */
+<<<<<<< HEAD
 export async function postIsCriticism(post: PostIsCriticismRequest): Promise<boolean> {
   // Only run this on the EA Forum on production, since it costs money.
   // (In particular, this model will only work if run with EA Forum prod credentials.)
@@ -319,3 +448,37 @@ getCollectionHooks("Posts").createAsync.add(async ({ document, context }) => {
     void autoApplyTagsTo(document, context);
   }
 });
+=======
+export async function getTagBotUserId(context: ResolverContext): Promise<string|null> {
+  if (tagBotUserId === undefined) {
+    if (!tagBotUserIdPromise) {
+      tagBotUserIdPromise = new Promise((resolve) => {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        void (async () => {
+          const tagBotAccount = await getTagBotAccount(context);
+          tagBotUserId = tagBotAccount?._id ?? null;
+          
+          // Discard the promise after we're done with it. Previously we didn't
+          // do this, and kept the promise in a global variable forever after it
+          // was resolved. That made this function simpler, but caused a memory
+          // leak: the promise captures its context, including the
+          // ResolverContext we got passed, which retains everything from the
+          // whole pageload.
+          tagBotUserIdPromise = null;
+          resolve();
+        })();
+      });
+    }
+    await tagBotUserIdPromise
+  }
+  return tagBotUserId ?? null;
+}
+
+export async function getAutoAppliedTags(context: ResolverContext): Promise<DbTag[]> {
+  const { Tags } = context;
+  return await Tags.find({
+    autoTagPrompt: {$exists: true, $ne: ""},
+    deleted: false,
+  }).fetch();
+}
+>>>>>>> base/master

@@ -8,7 +8,15 @@ let intercomClient: IntercomClient | null = null;
 export const getIntercomClient = () => {
   const intercomToken = intercomTokenSetting.get();
   if (!intercomClient && intercomToken) {
+<<<<<<< HEAD
     intercomClient = new IntercomClient({ token: intercomToken });
+=======
+    intercomClient =  new IntercomClient({
+      tokenAuth: {
+        token: intercomToken
+      },
+    })
+>>>>>>> base/master
   }
   return intercomClient;
 };

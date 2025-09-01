@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 /* See lib/collections/useractivities/collection.ts for a high-level overview */
+<<<<<<< HEAD
 import chunk from "lodash/fp/chunk";
 import max from "lodash/fp/max";
 import { isEAForum } from "../../lib/instanceSettings";
@@ -8,6 +9,16 @@ import { getSqlClientOrThrow } from "../../lib/sql/sqlClient";
 import { addCronJob } from "../cronUtil";
 import { Vulcan } from "../vulcan-lib";
 import { ActivityWindowData, getUserActivityData } from "./getUserActivityData";
+=======
+import chunk from 'lodash/fp/chunk';
+import max from 'lodash/fp/max';
+import { isEAForum, isLW } from '../../lib/instanceSettings';
+import { randomId } from '../../lib/random';
+import { getSqlClientOrThrow } from '@/server/sql/sqlClient';
+import { addCronJob } from '../cron/cronUtil';
+import { ActivityWindowData, getUserActivityData } from './getUserActivityData';
+import { isAnyTest } from '../../lib/executionEnvironment';
+>>>>>>> base/master
 
 const ACTIVITY_WINDOW_HOURS = 21 * 24; // 3 weeks
 
@@ -29,7 +40,6 @@ async function assertTableIntegrity(dataDb: SqlClient) {
 
   // Check if there is more than one combination
   if (dateCombinations.length > 1) {
-    // eslint-disable-next-line no-console
     console.error(`UserActivities table has rows with different start and end dates. Dropping rows to fix this.`);
     console.error("Date combinations and their counts:");
     for (let i = 0; i < dateCombinations.length; i++) {
@@ -176,7 +186,12 @@ interface ConcatNewActivityParams {
   prevStartDate: Date;
   updateStartDate: Date;
   updateEndDate: Date;
+<<<<<<< HEAD
   visitorIdType: "userId" | "clientId";
+=======
+  visitorIdType: 'userId' | 'clientId';
+  log: (...args: any[]) => void,
+>>>>>>> base/master
 }
 
 /**
@@ -195,10 +210,17 @@ async function concatNewActivity({
   updateStartDate,
   updateEndDate,
   visitorIdType,
+<<<<<<< HEAD
 }: ConcatNewActivityParams) {
   if (updateEndDate.getTime() <= updateStartDate.getTime()) {
     // eslint-disable-next-line no-console
     console.log("No new activity data to update");
+=======
+  log,
+}: ConcatNewActivityParams) {
+  if (updateEndDate.getTime() <= updateStartDate.getTime()) {
+    log('No new activity data to update');
+>>>>>>> base/master
     return;
   }
   // validate against SQL injection attacks (userId and clientId are inserted verbatim from the analytics event)
@@ -235,11 +257,17 @@ async function concatNewActivity({
 
   // Insert data for users we haven't seen before
   if (newUsersData.length > 0) {
+<<<<<<< HEAD
     const newUsersDataChunked = chunk(1000, newUsersData);
     console.log(
       `Inserting ${newUsersData.length} new rows into UserActivities table, in ${newUsersDataChunked.length} chunks`,
     );
 
+=======
+    const newUsersDataChunked = chunk(1000, newUsersData)
+    log(`Inserting ${newUsersData.length} new rows into UserActivities table, in ${newUsersDataChunked.length} chunks`)
+    
+>>>>>>> base/master
     for (const dataChunk of newUsersDataChunked) {
       const placeholders = dataChunk
         .map(
@@ -264,11 +292,17 @@ async function concatNewActivity({
     existingUserIds.includes(userOrClientId),
   );
   if (existingUsersData.length > 0) {
+<<<<<<< HEAD
     const existingUsersDataChunked = chunk(1000, existingUsersData);
     console.log(
       `Updating ${existingUsersData.length} existing rows for which there is new activity, in ${existingUsersDataChunked.length} chunks`,
     );
 
+=======
+    const existingUsersDataChunked = chunk(1000, existingUsersData)
+    log(`Updating ${existingUsersData.length} existing rows for which there is new activity, in ${existingUsersDataChunked.length} chunks`)
+    
+>>>>>>> base/master
     for (const dataChunk of existingUsersDataChunked) {
       const tempTableValues = dataChunk
         .map(
@@ -301,10 +335,15 @@ async function concatNewActivity({
   );
   if (inactiveExistingUserIds.length > 0) {
     const newActivityHours = Math.round((updateEndDate.getTime() - updateStartDate.getTime()) / (1000 * 60 * 60));
+<<<<<<< HEAD
     const inactiveExistingUserIdsChunked = chunk(1000, inactiveExistingUserIds);
     console.log(
       `Adding zero-padding to ${inactiveExistingUserIds.length} existing rows for which there is no new activity, in ${inactiveExistingUserIdsChunked.length} chunks`,
     );
+=======
+    const inactiveExistingUserIdsChunked = chunk(1000, inactiveExistingUserIds)
+    log(`Adding zero-padding to ${inactiveExistingUserIds.length} existing rows for which there is no new activity, in ${inactiveExistingUserIdsChunked.length} chunks`)
+>>>>>>> base/master
 
     for (const userIdsChunk of inactiveExistingUserIdsChunked) {
       const updateQuery = `
@@ -337,7 +376,11 @@ async function concatNewActivity({
       AND array_position("UserActivities"."activityArray", 1) IS NULL; -- no "1" in the array
   `;
   const count = (await dataDb.one(countQuery)).delete_count;
+<<<<<<< HEAD
   console.log(`Deleting ${count} rows for users who have no activity in the last ${ACTIVITY_WINDOW_HOURS} hours`);
+=======
+  log(`Deleting ${count} rows for users who have no activity in the last ${ACTIVITY_WINDOW_HOURS} hours`)
+>>>>>>> base/master
   await dataDb.none(deleteQuery);
 }
 
@@ -353,21 +396,37 @@ async function concatNewActivity({
  *    will have a complete array representing their activity in each hour.
  *    All of these arrays will be the same length (i.e. we zero-pad as necessary)
  *  - Rows from inactive users will be deleted
+ *
+ * Exported to allow running manually with "yarn repl"
  */
 export async function updateUserActivities(props?: {
+<<<<<<< HEAD
   updateStartDate?: Date;
   updateEndDate?: Date;
   randomWait?: boolean;
 }) {
+=======
+  updateStartDate?: Date,
+  updateEndDate?: Date,
+  randomWait?: boolean,
+  silent?: boolean,
+}) {
+  const log = props?.silent || isAnyTest ? console.log : () => {};
+
+>>>>>>> base/master
   const dataDb = getSqlClientOrThrow();
 
   if (props?.randomWait) {
     // sleep for random amount of time up to 10 seconds
     // FIXME remove once we have a better solution for not running this function twice
     const sleepTime = Math.random() * 10000;
+<<<<<<< HEAD
     console.log(
       `Sleeping for ${sleepTime.toFixed(0)}ms before updating user activity to avoid multiple jobs running at the same time`,
     );
+=======
+    log(`Sleeping for ${sleepTime.toFixed(0)}ms before updating user activity to avoid multiple jobs running at the same time`)
+>>>>>>> base/master
     await new Promise((resolve) => setTimeout(resolve, sleepTime));
   }
 
@@ -377,9 +436,13 @@ export async function updateUserActivities(props?: {
   // Get the most recent activity data from the analytics database
   const newActivityData = await getUserActivityData(updateStartDate, updateEndDate);
 
+<<<<<<< HEAD
   console.log(
     `Updating user activity for ${newActivityData.length} users between ${updateStartDate} and ${updateEndDate}`,
   );
+=======
+  log(`Updating user activity for ${newActivityData.length} users between ${updateStartDate} and ${updateEndDate}`);
+>>>>>>> base/master
 
   const userActivityData = newActivityData
     .filter((factor) => factor.userOrClientId?.startsWith("u:"))
@@ -389,6 +452,7 @@ export async function updateUserActivities(props?: {
     .map((factor) => ({ ...factor, userOrClientId: factor.userOrClientId.slice(2) }));
 
   // Update the UserActivities table with the new activity data
+<<<<<<< HEAD
   await concatNewActivity({
     dataDb,
     newActivityData: userActivityData,
@@ -405,11 +469,16 @@ export async function updateUserActivities(props?: {
     updateEndDate,
     visitorIdType: "clientId",
   });
+=======
+  await concatNewActivity({dataDb, newActivityData: userActivityData, prevStartDate: prevStartDate ?? updateStartDate, updateStartDate, updateEndDate, visitorIdType: 'userId', log});
+  await concatNewActivity({dataDb, newActivityData: clientActivityData, prevStartDate: prevStartDate ?? updateStartDate, updateStartDate, updateEndDate, visitorIdType: 'clientId', log});
+>>>>>>> base/master
 }
 
 /**
  * Clear all UserActivity data and backfill it all the way back to ACTIVITY_WINDOW_HOURS ago.
  * This takes about 10 minutes on prod (EA Forum)
+ * Exported to allow running manually with "yarn repl"
  */
 export async function backfillUserActivities() {
   const dataDb = getSqlClientOrThrow();
@@ -441,6 +510,7 @@ export async function backfillUserActivities() {
   }
 }
 
+<<<<<<< HEAD
 if (isEAForum) {
   addCronJob({
     name: "updateUserActivitiesCron",
@@ -453,3 +523,14 @@ if (isEAForum) {
 
 Vulcan.updateUserActivities = updateUserActivities;
 Vulcan.backfillUserActivities = backfillUserActivities;
+=======
+
+export const updateUserActivitiesCron = addCronJob({
+  name: 'updateUserActivitiesCron',
+  interval: 'every 3 hours',
+  disabled: !isEAForum && !isLW,
+  async job() {
+    await updateUserActivities({randomWait: true});
+  }
+});
+>>>>>>> base/master

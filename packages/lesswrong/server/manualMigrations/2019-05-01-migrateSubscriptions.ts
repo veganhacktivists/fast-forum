@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { createMutator } from "../vulcan-lib";
 import { forEachDocumentBatchInCollection, registerMigration } from "./migrationUtils";
 import Users from "../../lib/collections/users/collection";
@@ -5,8 +6,17 @@ import { Comments } from "../../lib/collections/comments/collection";
 import { Posts } from "../../lib/collections/posts/collection";
 import { Subscriptions } from "../../lib/collections/subscriptions/collection";
 import * as _ from "underscore";
+=======
+import { forEachDocumentBatchInCollection, registerMigration } from './migrationUtils';
+import Users from '../../server/collections/users/collection';
+import { Comments } from '../../server/collections/comments/collection';
+import { Posts } from '../../server/collections/posts/collection';
+import * as _ from 'underscore';
+import { createSubscription } from '../collections/subscriptions/mutations';
+import { computeContextFromUser } from '../vulcan-lib/apollo-server/context';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "migrateSubscriptions",
   dateWritten: "2019-05-01",
   idempotent: true,
@@ -30,8 +40,13 @@ registerMigration({
           // to someone else's post/comment is migrated to the Subscriptions
           // table.
           if (oldSubscriptions?.Comments) {
+<<<<<<< HEAD
             const commentIDs = _.map(oldSubscriptions.Comments, (s: any) => s.itemId);
             const comments = await Comments.find({ _id: { $in: commentIDs } }).fetch();
+=======
+            const commentIDs = _.map(oldSubscriptions.Comments, (s: any)=>s.itemId);
+            const comments = await Comments.find({_id: {$in: commentIDs}}).fetch();
+>>>>>>> base/master
             for (let comment of comments) {
               if (comment.userId !== user._id) {
                 newSubscriptions.push({
@@ -46,8 +61,13 @@ registerMigration({
             }
           }
           if (oldSubscriptions?.Posts) {
+<<<<<<< HEAD
             const postIDs = _.map(oldSubscriptions.Posts, (s: any) => s.itemId);
             const posts = await Posts.find({ _id: { $in: postIDs } }).fetch();
+=======
+            const postIDs = _.map(oldSubscriptions.Posts, (s: any)=>s.itemId);
+            const posts = await Posts.find({_id: {$in: postIDs}}).fetch();
+>>>>>>> base/master
             for (let post of posts) {
               if (post.userId !== user._id) {
                 newSubscriptions.push({
@@ -93,6 +113,7 @@ registerMigration({
           // Save the resulting subscriptions in the Subscriptions table
           if (newSubscriptions.length > 0) {
             numTotalSubscriptions += newSubscriptions.length;
+<<<<<<< HEAD
             await Promise.all(
               _.map(newSubscriptions, async (sub) => {
                 await createMutator({
@@ -103,6 +124,11 @@ registerMigration({
                 });
               }),
             );
+=======
+            await Promise.all(_.map(newSubscriptions, async sub => {
+              await createSubscription({ data: sub }, await computeContextFromUser({ user, isSSR: false }));
+            }));
+>>>>>>> base/master
           }
 
           // Remove subscribedItems from the user

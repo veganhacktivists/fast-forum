@@ -1,9 +1,16 @@
+<<<<<<< HEAD
 import { registerMigration, forEachDocumentInCollection } from "./migrationUtils";
 import { Revisions } from "../../lib/collections/revisions/collection";
 import { Users } from "../../lib/collections/users/collection";
 import { performVoteServer } from "../voteServer";
+=======
+import { registerMigration, forEachDocumentInCollection } from './migrationUtils';
+import { Revisions } from '../../server/collections/revisions/collection';
+import { Users } from '../../server/collections/users/collection';
+import { performVoteServer } from '../voteServer';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "selfVoteOnTagRevisions",
   dateWritten: "2021-05-09",
   idempotent: true,

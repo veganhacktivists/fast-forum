@@ -1,8 +1,14 @@
+<<<<<<< HEAD
 import { registerMigration, migrateDocuments } from "./migrationUtils";
 import Users from "../../lib/collections/users/collection";
 import * as _ from "underscore";
+=======
+import { registerMigration, migrateDocuments } from './migrationUtils'
+import Users from '../../server/collections/users/collection'
+import * as _ from 'underscore';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "renameAllPostsSorting",
   dateWritten: "2019-06-13",
   idempotent: true,

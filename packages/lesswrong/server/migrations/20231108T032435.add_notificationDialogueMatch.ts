@@ -33,8 +33,13 @@
  */
 export const acceptsSchemaHash = "0d5156717800f18b4407edd0caa14def";
 
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { addField, dropField } from "./meta/utils";
+=======
+import Users from "../../server/collections/users/collection";
+import {addField, dropField} from "./meta/utils";
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   await addField(db, Users, "notificationDialogueMatch");

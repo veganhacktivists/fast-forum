@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { diff } from "./vendor/node-htmldiff/htmldiff";
 import { Revisions } from "../lib/collections/revisions/collection";
 import { compareVersionNumbers } from "../lib/editor/utils";
@@ -7,10 +8,21 @@ import orderBy from "lodash/orderBy";
 import times from "lodash/times";
 import filter from "lodash/filter";
 import * as _ from "underscore";
+=======
+import { diff } from './vendor/node-htmldiff/htmldiff';
+import { compareVersionNumbers } from '../lib/editor/utils';
+import cheerio from 'cheerio';
+import { cheerioParse } from './utils/htmlUtil';
+import orderBy from 'lodash/orderBy';
+import times from 'lodash/times';
+import filter from 'lodash/filter';
+import * as _ from 'underscore';
+>>>>>>> base/master
 
 type EditAttributions = (string | null)[];
 type InsDelUnc = "ins" | "del" | "unchanged";
 
+<<<<<<< HEAD
 export async function annotateAuthors(
   documentId: string,
   collectionName: string,
@@ -26,6 +38,37 @@ export async function annotateAuthors(
 
   let filteredRevs = orderBy(revs, (r) => r.editedAt);
 
+=======
+export async function annotateAuthors(documentId: string, collectionName: string, fieldName: string, context: ResolverContext, upToVersion?: string | null): Promise<string> {
+  const { finalHtml, attributions } = await computeAttributions(
+    documentId,
+    collectionName,
+    fieldName,
+    context,
+    upToVersion
+  );
+
+  return attributionsToSpans(finalHtml, attributions);
+}
+
+export async function computeAttributions(
+  documentId: string,
+  collectionName: string,
+  fieldName: string,
+  context: ResolverContext,
+  upToVersion?: string | null
+): Promise<{ finalHtml: string; attributions: EditAttributions }> {
+  const { Revisions } = context;
+
+  const revs = await Revisions.find({
+    documentId, collectionName, fieldName,
+    skipAttributions: false,
+  }).fetch();
+  if (!revs.length) return { finalHtml: "", attributions: [] };
+
+  let filteredRevs = orderBy(revs, r=>r.editedAt);
+  
+>>>>>>> base/master
   // If upToVersion is provided, ignore revs after that
   if (upToVersion) {
     filteredRevs = filter(filteredRevs, (r) => compareVersionNumbers(upToVersion, r.version) >= 0);
@@ -66,7 +109,11 @@ export async function annotateAuthors(
     attributions = attributeEdits(prevHtml, newHtml, rev.userId!, attributions);
   }
 
+<<<<<<< HEAD
   return attributionsToSpans(finalRev.html!, attributions);
+=======
+  return { finalHtml: finalRev.html || "", attributions };
+>>>>>>> base/master
 }
 
 function annotateInsDel(root: cheerio.Root): InsDelUnc[] {
@@ -107,6 +154,7 @@ function isSpace(s: string): boolean {
   return s.trim() === "";
 }
 
+<<<<<<< HEAD
 export const attributeEdits = (
   oldHtml: string,
   newHtml: string,
@@ -119,6 +167,32 @@ export const attributeEdits = (
   const newText = treeToText(parsedNewHtml);
 
   const diffHtml = diff(oldHtml, newHtml);
+=======
+function replaceDelTag($: cheerio.Root) {
+  $('del').each((_, element) => {
+    const $del = $(element);
+    const attributes = $del.attr();
+    const content = $del.html();
+  
+    // Create a new <s> element with the same attributes and content
+    const $s = $('<s>').attr(attributes).html(content!);
+  
+    // Replace the <del> element with the new <s> element
+    $del.replaceWith($s);
+  });
+  return $;
+}
+
+export const attributeEdits = (oldHtml: string, newHtml: string, userId: string, oldAttributions: EditAttributions): EditAttributions => {
+  // Parse the before/after HTML
+  const parsedOldHtml = replaceDelTag(cheerioParse(oldHtml));
+  const parsedNewHtml = replaceDelTag(cheerioParse(newHtml));
+  
+  const oldText = treeToText(parsedOldHtml);
+  const newText = treeToText(parsedNewHtml);
+  
+  const diffHtml = diff(parsedOldHtml.html(), parsedNewHtml.html());
+>>>>>>> base/master
   const parsedDiffs = cheerioParse(diffHtml);
   // @ts-ignore
   const insDelAnnotations = annotateInsDel(parsedDiffs.root()[0]);
@@ -174,10 +248,13 @@ export const attributeEdits = (
     }
   }
 
+<<<<<<< HEAD
   if (newAttributions.length !== newText.length) throw new Error("Result text length mismatch");
   return newAttributions;
 };
 
+=======
+>>>>>>> base/master
 function walkHtmlPreorder<T>(node: cheerio.Element, props: T, callback: (node: cheerio.Element, props: T) => T) {
   const childProps: T = callback(node, props);
   //@ts-ignore
@@ -188,11 +265,15 @@ function walkHtmlPreorder<T>(node: cheerio.Element, props: T, callback: (node: c
   }
 }
 
+<<<<<<< HEAD
 function mapHtmlPostorder(
   $: cheerio.Root,
   node: cheerio.Element,
   callback: (node: cheerio.Cheerio) => cheerio.Cheerio,
 ): cheerio.Cheerio {
+=======
+function mapHtmlPostorder($: cheerio.Root, node: cheerio.Element, callback: (node: cheerio.Cheerio) => cheerio.Cheerio): cheerio.Cheerio {
+>>>>>>> base/master
   //@ts-ignore
   if (node.type === "tag" || node.type === "root") {
     const $copiedNode = $(node).clone();

@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import { Podcasts } from "../../lib/collections/podcasts/collection";
 import { PodcastEpisodes } from "../../lib/collections/podcastEpisodes/collection";
 import { Posts } from "../../lib/collections/posts/collection";
+=======
+import { registerMigration } from './migrationUtils';
+import { Podcasts } from '../../server/collections/podcasts/collection';
+import { PodcastEpisodes } from '../../server/collections/podcastEpisodes/collection';
+import { Posts } from '../../server/collections/posts/collection';
+>>>>>>> base/master
 
 import razPostToBuzzsproutMappings from "./resources/razPostToBuzzsproutMappings.json";
 import curatedPostToBuzzsproutMappings from "./resources/curatedPostToBuzzsproutMappings.json";
@@ -39,9 +46,15 @@ const convertEpisodeData = (
   externalEpisodeId: episodeData.externalEpisodeId.toString(),
 });
 
+<<<<<<< HEAD
 registerMigration({
   name: "CreatePodcastsForPosts",
   dateWritten: "2022-08-19",
+=======
+export default registerMigration({
+  name: 'CreatePodcastsForPosts',
+  dateWritten: '2022-08-19',
+>>>>>>> base/master
   idempotent: true,
   action: async () => {
     const [razPodcastId, curatedPodcastId] = await Promise.all([

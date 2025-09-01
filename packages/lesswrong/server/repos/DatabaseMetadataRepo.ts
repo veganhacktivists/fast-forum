@@ -1,8 +1,9 @@
 import AbstractRepo from "./AbstractRepo";
-import { DatabaseMetadata } from "../../lib/collections/databaseMetadata/collection";
+import { DatabaseMetadata } from "../../server/collections/databaseMetadata/collection";
 import type { TimeSeries } from "../../lib/collections/posts/karmaInflation";
-import type { GivingSeasonHeart } from "../../lib/eaGivingSeason";
 import { randomId } from "../../lib/random";
+import type { GivingSeasonHeart } from "../../components/review/ReviewVotingCanvas";
+import keyBy from "lodash/keyBy";
 
 export default class DatabaseMetadataRepo extends AbstractRepo<"DatabaseMetadata"> {
   constructor() {
@@ -21,6 +22,7 @@ export default class DatabaseMetadataRepo extends AbstractRepo<"DatabaseMetadata
       `DatabaseMetadata.${name}`,
     );
   }
+<<<<<<< HEAD
 
   getServerSettings(): Promise<DbDatabaseMetadata | null> {
     return this.getByName("serverSettings");
@@ -59,6 +61,17 @@ export default class DatabaseMetadataRepo extends AbstractRepo<"DatabaseMetadata
         createdAt: new Date(),
       },
     );
+=======
+  
+  async getByNames(names: string[]): Promise<Array<DbDatabaseMetadata|null>> {
+    const results = (await this.any(`
+      -- DatabaseMetadataRepo.getByName
+      SELECT * from "DatabaseMetadata" WHERE "name" IN ($1:csv)
+    `, [names])) as DbDatabaseMetadata[];
+    
+    const resultsByName = keyBy(results, r=>r.name);
+    return names.map(n => resultsByName[n] ?? null);
+>>>>>>> base/master
   }
 
   private electionNameToMetadataName(electionName: string): string {
@@ -118,5 +131,41 @@ export default class DatabaseMetadataRepo extends AbstractRepo<"DatabaseMetadata
       [userId, metadataName],
     );
     return this.getGivingSeasonHearts(electionName);
+  }
+
+  getServerSettings(): Promise<DbDatabaseMetadata | null> {
+    return this.getByName("serverSettings");
+  }
+
+  getPublicSettings(): Promise<DbDatabaseMetadata | null> {
+    return this.getByName("publicSettings");
+  }
+
+  getDatabaseId(): Promise<DbDatabaseMetadata | null> {
+    return this.getByName("databaseId");
+  }
+
+  upsertKarmaInflationSeries(karmaInflationSeries: TimeSeries): Promise<null> {
+    return this.none(`
+      INSERT INTO "DatabaseMetadata" (
+        "_id",
+        "name",
+        "value",
+        "schemaVersion",
+        "createdAt"
+      ) VALUES (
+        $(_id), $(name), $(value), $(schemaVersion), $(createdAt)
+      ) ON CONFLICT (
+        "name"
+      )
+      DO UPDATE SET
+        "value" = $(value)
+      `, {
+      _id: randomId(),
+      name: "karmaInflationSeries",
+      value: {...karmaInflationSeries},
+      schemaVersion: 1,
+      createdAt: new Date(),
+    });
   }
 }

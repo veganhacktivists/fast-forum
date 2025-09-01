@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { onStartup } from "../../lib/executionEnvironment";
 import { DatabaseMetadata } from "../../lib/collections/databaseMetadata/collection";
 import {
@@ -9,9 +10,18 @@ import { addCronJob } from "../cronUtil";
 import { Vulcan } from "../vulcan-lib";
 import PostsRepo from "../repos/PostsRepo";
 import DatabaseMetadataRepo from "../repos/DatabaseMetadataRepo";
+=======
+import { DatabaseMetadata } from "../../server/collections/databaseMetadata/collection";
+import { nullKarmaInflationSeries, setKarmaInflationSeries, TimeSeries } from '../../lib/collections/posts/karmaInflation';
+import { addCronJob } from '../cron/cronUtil';
+import PostsRepo from '../repos/PostsRepo';
+import DatabaseMetadataRepo from '../repos/DatabaseMetadataRepo';
+import { backgroundTask } from "../utils/backgroundTask";
+>>>>>>> base/master
 
 const AVERAGING_WINDOW_MS = 1000 * 60 * 60 * 24 * 28; // 28 days
 
+// Exported to allow running manually with "yarn repl"
 export async function refreshKarmaInflation() {
   // eslint-disable-next-line no-console
   console.log("Refreshing karma inflation");
@@ -66,6 +76,7 @@ export async function refreshKarmaInflationCache() {
   setKarmaInflationSeries(karmaInflationSeries?.value || nullKarmaInflationSeries);
 }
 
+<<<<<<< HEAD
 onStartup(async () => {
   await refreshKarmaInflationCache();
 });
@@ -76,6 +87,12 @@ addCronJob({
   job() {
     void refreshKarmaInflation();
   },
+=======
+export const refreshKarmaInflationCron = addCronJob({
+  name: 'refreshKarmaInflationCron',
+  interval: 'every 24 hours',
+  job() {
+    backgroundTask(refreshKarmaInflation());
+  }
+>>>>>>> base/master
 });
-
-Vulcan.refreshKarmaInflation = refreshKarmaInflation;

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { captureException } from "@sentry/core";
 import { DebouncerEvents } from "../lib/collections/debouncerEvents/collection";
 import { isAF, testServerSetting } from "../lib/instanceSettings";
@@ -6,6 +7,16 @@ import { addCronJob } from "./cronUtil";
 import { Vulcan } from "../lib/vulcan-lib/config";
 import { DebouncerEventsRepo } from "./repos";
 import { isAnyTest } from "../lib/executionEnvironment";
+=======
+import { captureException } from '@sentry/core';
+import { DebouncerEvents } from '../server/collections/debouncerEvents/collection';
+import { isAF, testServerSetting } from '../lib/instanceSettings';
+import moment from '../lib/moment-timezone';
+import { addCronJob } from './cron/cronUtil';
+import DebouncerEventsRepo from './repos/DebouncerEventsRepo';
+import { isAnyTest } from '../lib/executionEnvironment';
+import { backgroundTask } from './utils/backgroundTask';
+>>>>>>> base/master
 
 let eventDebouncersByName: Partial<Record<string, EventDebouncer<any>>> = {};
 
@@ -265,6 +276,7 @@ export const dispatchPendingEvents = async () => {
  * before then. If no date is given, dispatch any pending events, regardless of
  * their timer. You would do this interactively if you're testing and don't
  * want to wait.
+ * Exported to allow running manually with "yarn repl"
  */
 export const forcePendingEvents = async ({
   upToDate,
@@ -277,7 +289,11 @@ export const forcePendingEvents = async ({
   let eventToHandle = null;
   let countHandled = 0;
   // Default time condition is nothing
+<<<<<<< HEAD
   let timeCondition: MongoFindOneOptions<DbDebouncerEvents> = {};
+=======
+  let timeCondition: MongoSelector<DbDebouncerEvents> = {}
+>>>>>>> base/master
   if (upToDate) {
     const upToDateTime = new Date(upToDate);
     timeCondition = {
@@ -311,6 +327,7 @@ export const forcePendingEvents = async ({
   console.log(`Forced ${countHandled} pending event${countHandled === 1 ? "" : "s"}`);
 };
 
+<<<<<<< HEAD
 Vulcan.forcePendingEvents = forcePendingEvents;
 
 if (!testServerSetting.get()) {
@@ -323,6 +340,17 @@ if (!testServerSetting.get()) {
     },
   });
 }
+=======
+export const cronDebouncedEventHandler = addCronJob({
+  name: "Debounced event handler",
+  // Once per minute, on the minute
+  cronStyleSchedule: '* * * * *',
+  disabled: testServerSetting.get(),
+  job() {
+    backgroundTask(dispatchPendingEvents());
+  }
+});
+>>>>>>> base/master
 
 function sleepWithVariance(ms: number) {
   const variance = Math.sqrt(ms);

@@ -1,6 +1,6 @@
 /*
 
-    # Vulcan.exportPostDetails({ selector, outputDir })
+    # exportPostDetails({ selector, outputDir })
 
       Script to export a list of post details to a CSV file.
 
@@ -11,7 +11,7 @@
       outputFile (String, optional):
         Filename for your CSV file. Defaults to 'post_details'
 
-    # Vulcan.exportPostDetailsByMonth({ month, outputDir, outputFile })
+    # exportPostDetailsByMonth({ month, outputDir, outputFile })
 
       Export details for a whole month
 
@@ -21,6 +21,7 @@
 
 */
 
+<<<<<<< HEAD
 import moment from "moment";
 import fs from "mz/fs";
 import Papa from "papaparse";
@@ -33,6 +34,19 @@ import { siteUrlSetting } from "../../lib/instanceSettings";
 import { Vulcan } from "../vulcan-lib";
 import { wrapVulcanAsyncScript } from "./utils";
 import { makeLowKarmaSelector, LOW_KARMA_THRESHOLD } from "../manualMigrations/2020-05-13-noIndexLowKarma";
+=======
+import moment from 'moment';
+import fs from 'fs';
+import Papa from 'papaparse';
+import path from 'path';
+import { Posts } from '../../server/collections/posts/collection';
+import { postStatuses } from '../../lib/collections/posts/constants';
+import Users from '../../server/collections/users/collection';
+import Tags from '../../server/collections/tags/collection';
+import { siteUrlSetting } from '../../lib/instanceSettings';
+import { wrapVulcanAsyncScript } from './utils';
+import { makeLowKarmaSelector, LOW_KARMA_THRESHOLD } from '../manualMigrations/2020-05-13-noIndexLowKarma';
+>>>>>>> base/master
 
 function getPosts(selector: MongoSelector<DbPost>) {
   const defaultSelector = {
@@ -64,6 +78,7 @@ function getPosts(selector: MongoSelector<DbPost>) {
   return Posts.find(finalSelector, { projection, sort: { createdAt: 1 } });
 }
 
+<<<<<<< HEAD
 Vulcan.exportPostDetails = wrapVulcanAsyncScript(
   "exportPostDetails",
   async ({
@@ -74,6 +89,12 @@ Vulcan.exportPostDetails = wrapVulcanAsyncScript(
     selector: MongoSelector<DbPost>;
     outputDir: string;
     outputFile?: string;
+=======
+export const exportPostDetails = wrapVulcanAsyncScript(
+  'exportPostDetails',
+  async ({selector, outputDir, outputFile = 'post_details.csv'}: {
+    selector: MongoSelector<DbPost>, outputDir: string, outputFile?: string
+>>>>>>> base/master
   }) => {
     if (!outputDir) throw new Error("you must specify an output directory (hint: {outputDir})");
     const documents = getPosts(selector);
@@ -82,9 +103,15 @@ Vulcan.exportPostDetails = wrapVulcanAsyncScript(
     const rows: Array<any> = [];
     for (let post of await documents.fetch()) {
       // SD: this makes things horribly slow, but no idea how to do a more efficient join query in Mongo
+<<<<<<< HEAD
       const user = await Users.findOne(post.userId, { fields: { displayName: 1, email: 1 } });
       if (!user) throw Error(`Can't find user for post: ${post._id}`);
       let tags = [] as Array<string>;
+=======
+      const user = await Users.findOne(post.userId, {}, { displayName: 1, email: 1 })
+      if (!user) throw Error(`Can't find user for post: ${post._id}`)
+      let tags = [] as Array<string>
+>>>>>>> base/master
       if (post.tagRelevance) {
         const tagIds = (Object.entries(post.tagRelevance) as Array<[string, number]>)
           .filter(([_, relevanceScore]) => relevanceScore > 0)
@@ -112,14 +139,21 @@ Vulcan.exportPostDetails = wrapVulcanAsyncScript(
       //eslint-disable-next-line no-console
       if (c % 20 === 0) console.log(`Post Details: Processed ${c}/${count} posts (${Math.round((c / count) * 100)}%)`);
     }
+<<<<<<< HEAD
     const csvFile = Papa.unparse(rows);
     const filePath = path.join(outputDir, `${path.basename(outputFile)}.csv`);
     await fs.writeFile(filePath, csvFile);
+=======
+    const csvFile = Papa.unparse(rows)
+    const filePath = path.join(outputDir,`${path.basename(outputFile)}.csv`)
+    fs.writeFileSync(filePath, csvFile, "utf-8")
+>>>>>>> base/master
     //eslint-disable-next-line no-console
     console.log(`Wrote details for ${rows.length} posts to ${filePath}`);
   },
 );
 
+<<<<<<< HEAD
 Vulcan.exportLowKarma = ({
   outputFilepath,
   karma = LOW_KARMA_THRESHOLD,
@@ -128,18 +162,33 @@ Vulcan.exportLowKarma = ({
   karma?: number;
 }) => {
   Vulcan.exportPostDetails({
+=======
+export const exportLowKarma = async (
+  {outputFilepath, karma = LOW_KARMA_THRESHOLD}: {outputFilepath: string, karma?: number}
+) => {
+  await exportPostDetails({
+>>>>>>> base/master
     selector: makeLowKarmaSelector(karma),
     outputFile: path.basename(outputFilepath),
     outputDir: path.dirname(outputFilepath),
   });
 };
 
+<<<<<<< HEAD
 Vulcan.exportPostDetailsByMonth = ({ month, outputDir, outputFile }: AnyBecauseTodo) => {
   const lastMonth = moment.utc(month, "YYYY-MM").startOf("month");
   outputFile = outputFile || `post_details_${lastMonth.format("YYYY-MM")}`;
   //eslint-disable-next-line no-console
   console.log(`Exporting all posts from ${lastMonth.format("MMM YYYY")}`);
   return Vulcan.exportPostDetails({
+=======
+export const exportPostDetailsByMonth = async ({month, outputDir, outputFile}: AnyBecauseTodo) => {
+  const lastMonth = moment.utc(month, 'YYYY-MM').startOf('month')
+  outputFile = outputFile || `post_details_${lastMonth.format('YYYY-MM')}`
+  //eslint-disable-next-line no-console
+  console.log(`Exporting all posts from ${lastMonth.format('MMM YYYY')}`)
+  return await exportPostDetails({
+>>>>>>> base/master
     selector: {
       createdAt: {
         $gte: lastMonth.toDate(), // first of prev month

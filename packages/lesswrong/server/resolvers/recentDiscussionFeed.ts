@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { mergeFeedQueries, defineFeedResolver, viewBasedSubquery, fixedIndexSubquery } from "../utils/feedUtil";
 import { Posts } from "../../lib/collections/posts/collection";
 import {
@@ -9,6 +10,16 @@ import { Revisions } from "../../lib/collections/revisions/collection";
 import { isEAForum } from "../../lib/instanceSettings";
 import { viewFieldAllowAny } from "../vulcan-lib";
 import ElectionVotes from "../../lib/collections/electionVotes/collection";
+=======
+import { mergeFeedQueries, viewBasedSubquery, fixedIndexSubquery } from '../utils/feedUtil';
+import { Posts } from '../../server/collections/posts/collection';
+import { Tags } from '../../server/collections/tags/collection';
+import { Revisions } from '../../server/collections/revisions/collection';
+import { isEAForum } from '../../lib/instanceSettings';
+import { viewFieldAllowAny } from '@/lib/utils/viewConstants';
+import { EA_FORUM_COMMUNITY_TOPIC_ID, EA_FORUM_TRANSLATION_TOPIC_ID } from '@/lib/collections/tags/helpers';
+import gql from 'graphql-tag';
+>>>>>>> base/master
 
 const communityFilters = {
   none: {
@@ -29,15 +40,28 @@ const communityFilters = {
 
 type CommunityFilter = (typeof communityFilters)[keyof typeof communityFilters];
 
-defineFeedResolver<Date>({
-  name: "RecentDiscussionFeed",
-  args: "af: Boolean",
-  cutoffTypeGraphQL: "Date",
-  resultTypesGraphQL: `
+export const recentDiscussionFeedGraphQLTypeDefs = gql`
+  type RecentDiscussionFeedQueryResults {
+    cutoff: Date
+    endOffset: Int!
+    results: [RecentDiscussionFeedEntry!]
+    sessionId: String
+  }
+  enum RecentDiscussionFeedEntryType {
+    postCommented
+    shortformCommented
+    tagDiscussed
+    tagRevised
+    subscribeReminder
+    meetupsPoke
+  }
+  type RecentDiscussionFeedEntry {
+    type: RecentDiscussionFeedEntryType!
     postCommented: Post
     shortformCommented: Post
     tagDiscussed: Tag
     tagRevised: Revision
+<<<<<<< HEAD
     electionVoted: ElectionVote
   `,
   resolver: async ({
@@ -56,6 +80,24 @@ defineFeedResolver<Date>({
     type SortKeyType = Date;
     const { af } = args;
     const { currentUser } = context;
+=======
+  }
+  extend type Query {
+    RecentDiscussionFeed(
+      limit: Int,
+      cutoff: Date,
+      offset: Int,
+      af: Boolean,
+    ): RecentDiscussionFeedQueryResults!
+  }
+`
+
+export const recentDiscussionFeedGraphQLQueries = {
+  RecentDiscussionFeed: async (_root: void, args: any, context: ResolverContext) => {
+    const {limit, cutoff, offset, af, sessionId, ...rest} = args;
+    type SortKeyType = Date;
+    const {currentUser} = context;
+>>>>>>> base/master
 
     const shouldSuggestMeetupSubscription =
       currentUser && !currentUser.nearbyEventsNotifications && !currentUser.hideMeetupsPoke; //TODO: Check some more fields
@@ -81,8 +123,13 @@ defineFeedResolver<Date>({
       ],
     };
 
+<<<<<<< HEAD
     const postSelector = {
       baseScore: { $gt: 0 },
+=======
+    const postSelector: MongoSelector<DbPost> = {
+      baseScore: {$gt:0},
+>>>>>>> base/master
       hideFrontpageComments: false,
       lastCommentedAt: { $exists: true },
       hideFromRecentDiscussions: { $ne: true },
@@ -94,10 +141,15 @@ defineFeedResolver<Date>({
         : postCommentedEventsCriteria),
     };
 
+<<<<<<< HEAD
     return await mergeFeedQueries<SortKeyType>({
       limit,
       cutoff,
       offset,
+=======
+    const result = await mergeFeedQueries<SortKeyType>({
+      limit, cutoff, offset,
+>>>>>>> base/master
       subqueries: [
         // Post commented
         viewBasedSubquery({
@@ -105,6 +157,7 @@ defineFeedResolver<Date>({
           collection: Posts,
           sortField: "lastCommentedAt",
           context,
+          includeDefaultSelector: false,
           selector: {
             ...postSelector,
             $or: [{ shortform: { $exists: false } }, { shortform: { $eq: false } }],
@@ -116,6 +169,7 @@ defineFeedResolver<Date>({
           collection: Posts,
           sortField: "lastCommentedAt",
           context,
+          includeDefaultSelector: false,
           selector: {
             ...postSelector,
             shortform: { $eq: true },
@@ -127,9 +181,16 @@ defineFeedResolver<Date>({
           collection: Tags,
           sortField: "lastCommentedAt",
           context,
+          includeDefaultSelector: true,
           selector: {
+<<<<<<< HEAD
             lastCommentedAt: { $exists: true },
             ...(af ? { af: true } : undefined),
+=======
+            wikiOnly: viewFieldAllowAny,
+            lastCommentedAt: {$exists: true},
+            ...(af ? {af: true} : undefined),
+>>>>>>> base/master
           },
         }),
         // Large revision to tag
@@ -138,6 +199,7 @@ defineFeedResolver<Date>({
           collection: Revisions,
           sortField: "editedAt",
           context,
+          includeDefaultSelector: true,
           selector: {
             collectionName: "Tags",
             fieldName: "description",
@@ -145,6 +207,7 @@ defineFeedResolver<Date>({
             editedAt: { $exists: true },
           },
         }),
+<<<<<<< HEAD
         // Election votes
         viewBasedSubquery({
           type: "electionVoted",
@@ -155,6 +218,8 @@ defineFeedResolver<Date>({
             submittedAt: { $exists: true },
           },
         }),
+=======
+>>>>>>> base/master
         // Suggestion to subscribe to curated
         fixedIndexSubquery({
           type: "subscribeReminder",
@@ -173,5 +238,16 @@ defineFeedResolver<Date>({
           : []),
       ],
     });
+<<<<<<< HEAD
   },
 });
+=======
+    
+    return {
+      __typename: "RecentDiscussionFeedQueryResults",
+      ...result,
+      sessionId
+    }
+  }
+}
+>>>>>>> base/master

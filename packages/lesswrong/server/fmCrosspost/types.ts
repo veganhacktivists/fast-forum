@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 import * as t from "io-ts";
+=======
+import * as t from 'io-ts';
+import { crosspostFragments } from '../../components/hooks/useForeignCrosspost';
+>>>>>>> base/master
 
 /**
  */
@@ -156,7 +161,15 @@ export const CrosspostPayloadValidator = t.intersection([
 export type CrosspostResponse = t.TypeOf<typeof CrosspostResponseValidator>;
 export type CrosspostPayload = t.TypeOf<typeof CrosspostPayloadValidator>;
 
-export type Crosspost = Pick<DbPost, "_id" | "userId" | "fmCrosspost"> & DenormalizedCrosspostData;
+export type Crosspost = Pick<DbPost, "_id" | "userId" | "fmCrosspost" | "contents_latest"> & DenormalizedCrosspostData;
+
+const getCrosspostFragmentsType = () => {
+  const result: Partial<Record<typeof crosspostFragments[number], null>> = {};
+  for (const fragmentName of crosspostFragments) {
+    result[fragmentName] = null;
+  }
+  return t.keyof(result as Record<typeof crosspostFragments[number], null>);
+}
 
 /**
  * Intersesction creates an intersection of types (i.e. type A & type B)
@@ -164,9 +177,14 @@ export type Crosspost = Pick<DbPost, "_id" | "userId" | "fmCrosspost"> & Denorma
 export const GetCrosspostRequestValidator = t.intersection([
   t.strict({
     documentId: t.string,
+<<<<<<< HEAD
     collectionName: t.literal("Posts"),
     // This is a more performant way of representing a union of string literals
     fragmentName: t.keyof({ PostsWithNavigation: null, PostsWithNavigationAndRevision: null, PostsList: null }),
+=======
+    collectionName: t.literal('Posts'),
+    fragmentName: getCrosspostFragmentsType(),
+>>>>>>> base/master
   }),
   t.partial({
     extraVariables: t.strict({
@@ -212,7 +230,6 @@ export type GetCrosspostRequest = t.TypeOf<typeof GetCrosspostRequestValidator>;
 //     myEditorAccess: t.keyof({ none: null, read: null, comment: null, edit: null }),
 //     noIndex: t.boolean,
 //     socialPreviewImageUrl: t.string,
-//     showModerationGuidelines: t.boolean,
 //     activateRSVPs: t.boolean,
 //     fmCrosspost: t.partial({
 //       isCrosspost: t.boolean,

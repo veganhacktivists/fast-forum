@@ -24,13 +24,25 @@
  */
 export const acceptsSchemaHash = "5d840ee3f919bdbf70df33e470b65666";
 
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { addRemovedField, dropRemovedField } from "./meta/utils";
+=======
+import Users from "../../server/collections/users/collection"
+import { BoolType } from "../../server/sql/Type";
+import { addRemovedField, dropRemovedField } from "./meta/utils"
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   await dropRemovedField(db, Users, "noComicSans");
 };
 
+<<<<<<< HEAD
 export const down = async ({ db }: MigrationContext) => {
   await addRemovedField(db, Users, "noComicSans");
 };
+=======
+export const down = async ({db}: MigrationContext) => {
+  await addRemovedField(db, Users, "noComicSans", new BoolType())
+}
+>>>>>>> base/master

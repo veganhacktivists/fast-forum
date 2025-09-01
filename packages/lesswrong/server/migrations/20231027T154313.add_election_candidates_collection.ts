@@ -1,6 +1,10 @@
 export const acceptsSchemaHash = "5e28a08c9be1ba704a99a94dab5c4fae";
 
+<<<<<<< HEAD
 import ElectionCandidates from "../../lib/collections/electionCandidates/collection";
+=======
+import ElectionCandidates from "../../server/collections/electionCandidates/collection"
+>>>>>>> base/master
 import { createTable, dropTable } from "./meta/utils";
 
 export const up = async ({ db }: MigrationContext) => {

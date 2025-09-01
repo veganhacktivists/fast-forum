@@ -1,7 +1,8 @@
 import { registerMigration } from "./migrationUtils";
-import { createAdminContext } from "../vulcan-lib";
+import { createAdminContext } from "../vulcan-lib/createContexts";
 import { createNotification } from "../notificationCallbacksHelpers";
-import { getSqlClientOrThrow } from "../../lib/sql/sqlClient";
+import { getSqlClientOrThrow } from "../../server/sql/sqlClient";
+import { backgroundTask } from "../utils/backgroundTask";
 
 interface DialogueCheckWithExtraData extends DbDialogueCheck {
   targetUserMatchPreferenceId: string;
@@ -31,22 +32,36 @@ const getMatchFormYourTurn = async (): Promise<DialogueCheckWithExtraData[]> => 
   return result;
 };
 
-registerMigration({
+export default registerMigration({
   name: "sendYourTurnNotifications",
   dateWritten: "2023-12-22",
   idempotent: true,
   action: async () => {
     const context = createAdminContext();
+<<<<<<< HEAD
     const checksYourTurn = await getMatchFormYourTurn();
     checksYourTurn.forEach((check) => {
       void createNotification({
+=======
+    const checksYourTurn = await getMatchFormYourTurn()
+    checksYourTurn.forEach(check => {
+      backgroundTask(createNotification({
+>>>>>>> base/master
         userId: check.userId,
         notificationType: "yourTurnMatchForm",
         documentType: "dialogueMatchPreference",
         documentId: check.targetUserMatchPreferenceId,
         context,
+<<<<<<< HEAD
         extraData: { checkId: check._id },
       });
     });
   },
 });
+=======
+        extraData: {checkId: check._id}
+      }));
+    })
+  }
+})
+>>>>>>> base/master

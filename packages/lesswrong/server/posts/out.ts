@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { addStaticRoute } from "../vulcan-lib";
 import { Posts } from "../../lib/collections/posts";
 import { ensureIndex } from "../../lib/collectionIndexUtils";
@@ -9,6 +10,17 @@ const redirect = (res: ServerResponse, url: string, post: DbPost | null) => {
   if (post) {
     void Posts.rawUpdateOne({ _id: post._id }, { $inc: { clickCount: 1 } });
     res.writeHead(301, { Location: url });
+=======
+import { addStaticRoute } from '../vulcan-lib/staticRoutes';
+import { Posts } from '../../server/collections/posts/collection';
+import type { ServerResponse } from 'http';
+import { backgroundTask } from '../utils/backgroundTask';
+
+const redirect = (res: ServerResponse, url: string, post: DbPost | null) => {
+  if (post) {
+    backgroundTask(Posts.rawUpdateOne({_id: post._id}, { $inc: { clickCount: 1 } }));
+    res.writeHead(301, {'Location': url});
+>>>>>>> base/master
     res.end();
   } else {
     // Don't redirect if we can't find a post for that link
@@ -17,6 +29,7 @@ const redirect = (res: ServerResponse, url: string, post: DbPost | null) => {
 };
 
 // Click-tracking redirector for outgoing links in linkposts
+<<<<<<< HEAD
 addStaticRoute("/out", async ({ query }, _req, res, _next) => {
   const { url, foreignId } = query;
   if (url) {
@@ -52,6 +65,14 @@ addStaticRoute("/out", async ({ query }, _req, res, _next) => {
         const post = await Posts.findOne({ url }, { sort: { postedAt: -1, createdAt: -1 } });
         redirect(res, url, post);
       }
+=======
+addStaticRoute('/out', async ({ query }, _req, res, _next) => {
+  const {url} = query;
+  if (url) {
+    try {
+      const post = await Posts.findOne({url}, {sort: {postedAt: -1, createdAt: -1}});
+      redirect(res, url, post);
+>>>>>>> base/master
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("// /out error");
@@ -65,6 +86,9 @@ addStaticRoute("/out", async ({ query }, _req, res, _next) => {
     res.end("Please provide a URL");
   }
 });
+<<<<<<< HEAD
 
 ensureIndex(Posts, { url: 1, postedAt: -1 });
 ensureIndex(Posts, { "fmCrosspost.foreignPostId": 1, postedAt: -1 });
+=======
+>>>>>>> base/master

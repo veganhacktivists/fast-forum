@@ -1,7 +1,14 @@
 import { StrategySettings, StrategySpecification } from "../../lib/collections/users/recommendationSettings";
-import { getSqlClientOrThrow } from "../../lib/sql/sqlClient";
+import { getSqlClientOrThrow } from "../sql/sqlClient";
 import { postStatuses } from "../../lib/collections/posts/constants";
+<<<<<<< HEAD
 import { EA_FORUM_COMMUNITY_TOPIC_ID, EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID } from "../../lib/collections/tags/collection";
+=======
+import {
+  EA_FORUM_COMMUNITY_TOPIC_ID,
+  EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID,
+} from "../../lib/collections/tags/helpers";
+>>>>>>> base/master
 
 export type RecommendationStrategyConfig = {
   maxRecommendationCount: number;

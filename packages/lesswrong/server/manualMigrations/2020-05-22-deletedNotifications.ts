@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 import { registerMigration, fillDefaultValues } from "./migrationUtils";
 
 import { Notifications } from "../../lib/collections/notifications/collection";
 
 registerMigration({
+=======
+import { registerMigration, fillDefaultValues } from './migrationUtils';
+import { Notifications } from '../../server/collections/notifications/collection';
+
+export default registerMigration({
+>>>>>>> base/master
   name: "deletedNotifications",
   dateWritten: "2020-05-22",
   idempotent: true,

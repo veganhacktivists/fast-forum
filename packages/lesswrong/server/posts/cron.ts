@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { addCronJob } from "../cronUtil";
 import { Posts } from "../../lib/collections/posts";
 import * as _ from "underscore";
@@ -5,6 +6,16 @@ import * as _ from "underscore";
 addCronJob({
   name: "checkScheduledPosts",
   interval: "every 10 minutes",
+=======
+import { addCronJob } from '../cron/cronUtil';
+import { Posts } from '../../server/collections/posts/collection';
+import * as _ from 'underscore';
+
+
+export const checkScheduledPostsCron = addCronJob({
+  name: 'checkScheduledPosts',
+  interval: 'every 10 minutes',
+>>>>>>> base/master
   async job() {
     // fetch all posts tagged as future
     const scheduledPosts = await Posts.find(

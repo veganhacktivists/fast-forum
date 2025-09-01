@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import LWEvents from "../lib/collections/lwevents/collection";
 import { Posts } from "../lib/collections/posts/collection";
 import { postGetPageUrl } from "../lib/collections/posts/helpers";
@@ -15,6 +16,14 @@ const SPAM_KARMA_THRESHOLD = 10; //Threshold after which you are no longer affec
 // Akismet API integration
 const akismetKeySetting = new DatabaseServerSetting<string | null>("akismet.apiKey", null);
 const akismetURLSetting = new DatabaseServerSetting<string | null>("akismet.url", null);
+=======
+import { postGetPageUrl } from '../lib/collections/posts/helpers'
+import akismet from 'akismet-api'
+import { isDevelopment } from '../lib/executionEnvironment';
+import { akismetKeySetting, akismetURLSetting } from './databaseSettings';
+import { getLatestContentsRevision } from '@/server/collections/revisions/helpers';
+
+>>>>>>> base/master
 
 let akismetClient: any = null;
 const getAkismetClient = () => {
@@ -68,15 +77,59 @@ async function constructAkismetReport({ document, type = "post" }: { document: A
   };
 }
 
+<<<<<<< HEAD
 async function checkForAkismetSpam({ document, type }: AnyBecauseTodo) {
+=======
+async function constructAkismetReport({document, type="post", context}: {
+  document: AnyBecauseTodo
+  type: string
+  context: ResolverContext
+}) {
+  const { Users, Posts, LWEvents } = context;
+  const author = await Users.findOne(document.userId)
+  if (!author) throw Error("Couldn't find author for Akismet report")
+  let post = document
+  if (type !== "post") {
+    post = await Posts.findOne(document.postId)
+  }
+  const link = (post && postGetPageUrl(post)) || ""  // Don't get link if we create a comment without a post
+  const events = await LWEvents.find({userId: author._id, name: 'login'}, {sort: {createdAt: -1}, limit: 1}).fetch()
+  const ip = events && events[0] && events[0].properties && events[0].properties.ip
+  const userAgent = events && events[0] && events[0].properties && events[0].properties.userAgent
+  const referrer = events && events[0] && events[0].properties && events[0].properties.referrer
+
+  const content = type === "post"
+    ? (await getLatestContentsRevision(document, context))?.html
+    : document.contents?.html
+
+  return {
+    user_ip : ip,              // Required!
+    user_agent : userAgent,    // Required!
+    referer: referrer,
+    permalink : akismetURLSetting.get() + link,
+    comment_type : (type === "post") ? 'blog-post' : 'comment',
+    comment_author : author.displayName,
+    comment_author_email : author.email,
+    comment_content : content,
+    is_test: isDevelopment
+  }
+}
+
+export async function checkForAkismetSpam({document, type, context}: AnyBecauseTodo) {
+>>>>>>> base/master
   try {
     if (document?.contents?.html?.indexOf("spam-test-string-123") >= 0) {
       // eslint-disable-next-line no-console
       console.log(`${type} contained Akismet spam filter test string; marking as spam.`);
       return true;
     }
+<<<<<<< HEAD
     const akismetReport = await constructAkismetReport({ document, type });
     const spam = await getAkismetClient().checkSpam(akismetReport);
+=======
+    const akismetReport = await constructAkismetReport({document, type, context})
+    const spam = await getAkismetClient().checkSpam(akismetReport)
+>>>>>>> base/master
     // eslint-disable-next-line no-console
     console.log("Checked document for spam: ", akismetReport, "result is spam: ", spam);
     return spam;
@@ -87,6 +140,7 @@ async function checkForAkismetSpam({ document, type }: AnyBecauseTodo) {
   }
 }
 
+<<<<<<< HEAD
 getCollectionHooks("Comments").newAfter.add(async function checkCommentForSpamWithAkismet(
   comment: DbComment,
   currentUser: DbUser | null,
@@ -134,6 +188,13 @@ getCollectionHooks("Comments").newAfter.add(async function checkCommentForSpamWi
   }
   return comment;
 });
+=======
+export async function maybeSendAkismetReport(newReport: DbReport, oldReport: DbReport, context: ResolverContext) {
+  if (newReport.closedAt && !oldReport.closedAt) {
+    await akismetReportSpamHam(newReport, context);
+  }
+}
+>>>>>>> base/master
 
 getCollectionHooks("Reports").editAsync.add(async function runReportCloseCallbacks(
   newReport: DbReport,
@@ -144,7 +205,8 @@ getCollectionHooks("Reports").editAsync.add(async function runReportCloseCallbac
   }
 });
 
-async function akismetReportSpamHam(report: DbReport) {
+async function akismetReportSpamHam(report: DbReport, context: ResolverContext) {
+  const { Posts, Comments } = context;
   if (report.reportedAsSpam) {
     let comment;
     const post = await Posts.findOne(report.postId);
@@ -153,9 +215,16 @@ async function akismetReportSpamHam(report: DbReport) {
     }
     if (!report.markedAsSpam) {
       const akismetReportArguments = report.commentId
+<<<<<<< HEAD
         ? { document: comment, type: "comment" }
         : { document: post, type: "post" };
       const akismetReport = await constructAkismetReport(akismetReportArguments);
+=======
+        ? {document: comment, type: "comment", context}
+        : {document: post, type: "post", context};
+
+      const akismetReport = await constructAkismetReport(akismetReportArguments)
+>>>>>>> base/master
       getAkismetClient().submitHam(akismetReport, (err: AnyBecauseTodo) => {
         // eslint-disable-next-line no-console
         if (!err) {
@@ -166,8 +235,14 @@ async function akismetReportSpamHam(report: DbReport) {
   }
 }
 
+<<<<<<< HEAD
 export async function postReportPurgeAsSpam(post: DbPost) {
   const akismetReport = await constructAkismetReport({ document: post, type: "post" });
+=======
+
+export async function postReportPurgeAsSpam(post: DbPost, context: ResolverContext) {
+  const akismetReport = await constructAkismetReport({document: post, type: "post", context})
+>>>>>>> base/master
   getAkismetClient().submitSpam(akismetReport, (err: AnyBecauseTodo) => {
     // eslint-disable-next-line no-console
     if (!err) {
@@ -176,8 +251,13 @@ export async function postReportPurgeAsSpam(post: DbPost) {
   });
 }
 
+<<<<<<< HEAD
 export async function commentReportPurgeAsSpam(comment: DbComment) {
   const akismetReport = await constructAkismetReport({ document: comment, type: "comment" });
+=======
+export async function commentReportPurgeAsSpam(comment: DbComment, context: ResolverContext) {
+  const akismetReport = await constructAkismetReport({document: comment, type: "comment", context})
+>>>>>>> base/master
   getAkismetClient().submitSpam(akismetReport, (err: AnyBecauseTodo) => {
     // eslint-disable-next-line no-console
     if (!err) {

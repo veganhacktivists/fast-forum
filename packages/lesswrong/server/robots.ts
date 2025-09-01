@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import { addStaticRoute } from "./vulcan-lib";
 import { DatabaseServerSetting } from "./databaseSettings";
 import { PublicInstanceSetting } from "../lib/instanceSettings";
+=======
+import { addStaticRoute } from './vulcan-lib/staticRoutes';
+import { DatabaseServerSetting } from './databaseSettings';
+import { PublicInstanceSetting } from '../lib/instanceSettings';
+>>>>>>> base/master
 
 // disallowCrawlers: If set, robots.txt will request that no crawlers touch the
 // site at all. Use for test and staging servers like lessestwrong.com and
@@ -30,14 +36,26 @@ addStaticRoute("/robots.txt", ({ query }, req, res, next) => {
     res.end(
       `User-agent: *
 Disallow: /allPosts?*
+Disallow: /allPosts
+Disallow: /allposts
+Disallow: /allposts?*
 Disallow: /graphiql
 Disallow: /debug
 Disallow: /admin
 Disallow: /compare
 Disallow: /emailToken
 Disallow: /*?commentId=*
+<<<<<<< HEAD
 Crawl-Delay: 2
 `,
     );
+=======
+Disallow: /users/*/replies
+Crawl-Delay: 3
+
+User-Agent: SemrushBot
+Disallow: /
+`);
+>>>>>>> base/master
   }
 });

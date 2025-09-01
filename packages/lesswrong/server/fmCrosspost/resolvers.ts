@@ -1,6 +1,7 @@
 import type { Request } from "express";
 import { isLeft } from "fp-ts/Either";
 import { crosspostUserAgent } from "../../lib/apollo/links";
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { addGraphQLMutation, addGraphQLQuery, addGraphQLResolvers } from "../../lib/vulcan-lib";
 import { ApiError, UnauthorizedError } from "./errors";
@@ -24,6 +25,30 @@ const fmCrosspostTimeoutMsSetting = new DatabaseServerSetting<number>("fmCrosspo
 export const TOS_NOT_ACCEPTED_ERROR = "You must accept the terms of use before you can publish this post";
 const TOS_NOT_ACCEPTED_REMOTE_ERROR =
   "You must read and accept the Terms of Use on the FAST Forum in order to crosspost.  To do so, go to https://forum.fastcommunity.org/newPost and accept the Terms of Use presented above the draft post.";
+=======
+import {
+  ApiError,
+  UnauthorizedError,
+  TOS_NOT_ACCEPTED_ERROR,
+  TOS_NOT_ACCEPTED_REMOTE_ERROR,
+} from "./errors";
+import {
+  assertCrosspostingKarmaThreshold,
+  fmCrosspostTimeoutMsSetting,
+} from "./helpers";
+import { makeApiUrl, PostRequestTypes, PostResponseTypes, ValidatedPostRouteName, validatedPostRoutes, ValidatedPostRoutes } from "./routes";
+import { ConnectCrossposterArgs, GetCrosspostRequest } from "./types";
+import stringify from "json-stringify-deterministic";
+import LRU from "lru-cache";
+import { isE2E } from "@/lib/executionEnvironment";
+import { connectCrossposterToken } from "../crossposting/tokens";
+import { makeV2CrossSiteRequest } from "../crossposting/crossSiteRequest";
+import {
+  connectCrossposterRoute,
+  unlinkCrossposterRoute,
+} from "@/lib/fmCrosspost/routes";
+import gql from "graphql-tag";
+>>>>>>> base/master
 
 const getUserId = (req?: Request) => {
   const userId = req?.user?._id;
@@ -39,6 +64,12 @@ const foreignPostCache = new LRU<string, Promise<AnyBecauseHard>>({
   max: 100,
 });
 
+/**
+ * @deprecated
+ * Old version of `makeCrossSiteRequest` - use `makeV2CrossSiteRequest` instead.
+ * This is still here to support the `getCrosspost` graphql query, which will be
+ * removed once crosspost bodies are denormalized across sites.
+ */
 export const makeCrossSiteRequest = async <RouteName extends ValidatedPostRouteName>(
   routeName: RouteName,
   body: PostRequestTypes<RouteName>,
@@ -96,6 +127,7 @@ export const makeCrossSiteRequest = async <RouteName extends ValidatedPostRouteN
   return validatedResponse.right;
 };
 
+<<<<<<< HEAD
 const crosspostResolvers = {
   Mutation: {
     connectCrossposter: async (
@@ -150,8 +182,69 @@ const crosspostResolvers = {
     },
   },
 };
+=======
+export const fmCrosspostGraphQLTypeDefs = gql`
+  extend type Mutation {
+    connectCrossposter(token: String): String
+    unlinkCrossposter: String
+  }
+  extend type Query {
+    getCrosspost(args: JSON): JSON
+  }
+`
 
-addGraphQLResolvers(crosspostResolvers);
-addGraphQLMutation("connectCrossposter(token: String): String");
-addGraphQLMutation("unlinkCrossposter: String");
-addGraphQLQuery("getCrosspost(args: JSON): JSON");
+export const fmCrosspostGraphQLMutations = {
+  connectCrossposter: async (
+    _root: void,
+    {token}: ConnectCrossposterArgs,
+    {req, currentUser, Users}: ResolverContext,
+  ) => {
+    const localUserId = getUserId(req);
+    assertCrosspostingKarmaThreshold(currentUser);
+    const {foreignUserId} = await makeV2CrossSiteRequest(
+      connectCrossposterRoute,
+      {token, localUserId},
+      "Failed to connect accounts for crossposting",
+    );
+    await Users.rawUpdateOne({_id: localUserId}, {
+      $set: {fmCrosspostUserId: foreignUserId},
+    });
+    return "success";
+  },
+  unlinkCrossposter: async (_root: void, _args: {}, {req, Users}: ResolverContext) => {
+    const localUserId = getUserId(req);
+    const foreignUserId = req?.user?.fmCrosspostUserId;
+    if (foreignUserId) {
+      const token = await connectCrossposterToken.create({
+        userId: foreignUserId,
+      });
+      await makeV2CrossSiteRequest(
+        unlinkCrossposterRoute,
+        {token},
+        "Failed to unlink crossposting accounts",
+      );
+      await Users.rawUpdateOne({_id: localUserId}, {
+        $unset: {fmCrosspostUserId: ""},
+      });
+      return "success";
+    }
+  },
+}
+>>>>>>> base/master
+
+export const fmCrosspostGraphQLQueries = {
+  getCrosspost: async (_root: void, {args}: {args: GetCrosspostRequest}) => {
+    const key = stringify(args);
+    let promise = isE2E ? null : foreignPostCache.get(key);
+    if (!promise) {
+      promise = makeCrossSiteRequest(
+        'getCrosspost',
+        args,
+        'Failed to get crosspost'
+      );
+      foreignPostCache.set(key, promise);
+    }
+    const {document} = await promise;
+    return document;
+  }
+}

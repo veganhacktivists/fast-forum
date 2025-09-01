@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { createMutator, runQuery, setOnGraphQLError, waitUntilCallbacksFinished } from "../server/vulcan-lib";
 import Users from "../lib/collections/users/collection";
 import { Posts } from "../lib/collections/posts";
@@ -13,6 +14,29 @@ import type { PartialDeep } from "type-fest";
 import { asyncForeachSequential } from "../lib/utils/asyncUtils";
 import Localgroups from "../lib/collections/localgroups/collection";
 import { UserRateLimits } from "../lib/collections/userRateLimits";
+=======
+import Users from '../server/collections/users/collection';
+import { Posts } from '../server/collections/posts/collection'
+import { Comments } from '../server/collections/comments/collection'
+import { Votes } from '../server/collections/votes/collection'
+import { randomId } from '../lib/random';
+import type { PartialDeep } from 'type-fest'
+import { asyncForeachSequential } from '../lib/utils/asyncUtils';
+import { isAnyQueryPending as isAnyPostgresQueryPending } from "@/server/sql/PgCollection";
+import { runQuery, setOnGraphQLError } from "../server/vulcan-lib/query";
+import { createPost } from '../server/collections/posts/mutations';
+import { createUser } from '../server/collections/users/mutations';
+import { createComment } from '../server/collections/comments/mutations';
+import { createConversation } from '../server/collections/conversations/mutations';
+import { createMessage } from '../server/collections/messages/mutations';
+import { createLocalgroup } from '../server/collections/localgroups/mutations';
+import { createVote } from '../server/collections/votes/mutations';
+import { createTag } from '../server/collections/tags/mutations';
+import { createRevision } from '../server/collections/revisions/mutations';
+import { createUserRateLimit } from '../server/collections/userRateLimits/mutations';
+import { computeContextFromUser } from '../server/vulcan-lib/apollo-server/context';
+import { createAnonymousContext } from '@/server/vulcan-lib/createContexts';
+>>>>>>> base/master
 
 // Hooks Vulcan's runGraphQL to handle errors differently. By default, Vulcan
 // would dump errors to stderr; instead, we want to (a) suppress that output,
@@ -157,14 +181,41 @@ export const createDefaultUser = async () => {
 };
 
 // Posts can be created pretty flexibly
+<<<<<<< HEAD
 type TestPost = Omit<PartialDeep<DbPost>, "postedAt"> & { postedAt?: Date | number };
 
 export const createDummyPost = async (user?: AtLeast<DbUser, "_id"> | null, data?: TestPost) => {
   let user_ = user || (await createDefaultUser());
   const defaultData = {
+=======
+type TestPost = Omit<PartialDeep<DbPost>, 'postedAt'> & {
+  postedAt?: Date,
+  contents?: Partial<EditableFieldContents> | null,
+}
+
+export const createDummyPost = async (user?: AtLeast<DbUser, '_id'> | null, data?: TestPost) => {
+  user ||= await createDefaultUser()
+  const postId = data?._id ?? randomId();
+  const postContents = data?.contents ?? { originalContents: { type: 'ckEditorMarkup', data: 'This is a test post' } };
+  const revision = await createDummyRevision(user as DbUser, {
+>>>>>>> base/master
     _id: randomId(),
-    userId: user_._id,
+    collectionName: "Posts",
+    documentId: postId,
+    fieldName: "contents",
+    editedAt: new Date(),
+    updateType: "initial",
+    version: "1.0.0",
+    commitMessage: "",
+    userId: user!._id,
+    draft: false,
+    ...postContents,
+  });
+  const defaultData = {
+    _id: postId,
+    userId: user!._id,
     title: randomId(),
+<<<<<<< HEAD
     contents_latest: randomId(),
     moderationGuidelines_latest: randomId(),
     fmCrosspost: { isCrosspost: false },
@@ -182,6 +233,19 @@ export const createDummyPost = async (user?: AtLeast<DbUser, "_id"> | null, data
   });
   return newPostResponse.data;
 };
+=======
+    "contents_latest": revision._id,
+    fmCrosspost: {isCrosspost: false},
+    createdAt: new Date(),
+  }
+  const postData = {...defaultData, ...data};
+  const userContext = await computeContextFromUser({user: user as DbUser, isSSR: false});
+  const newPost = await createPost({
+    data: postData as CreatePostDataInput
+  }, userContext);
+  return newPost
+}
+>>>>>>> base/master
 
 export const createDummyUser = async (data?: any) => {
   const testUsername = randomId();
@@ -192,6 +256,7 @@ export const createDummyUser = async (data?: any) => {
     reviewedByUserId: "fakeuserid", // TODO: make this user_id correspond to something real that would hold up if we had proper validation
     previousDisplayName: randomId(),
     acceptedTos: true,
+<<<<<<< HEAD
   };
   const userData = { ...defaultData, ...data };
   const newUserResponse = await createMutator({
@@ -201,6 +266,16 @@ export const createDummyUser = async (data?: any) => {
   });
   return newUserResponse.data;
 };
+=======
+  }
+  const userData = {...defaultData, ...data};
+  const newUser = await createUser({
+    data: userData
+  }, createAnonymousContext());
+  return newUser;
+}
+
+>>>>>>> base/master
 export const createDummyComment = async (user: any, data?: any) => {
   const defaultUser = await createDefaultUser();
   let defaultData: any = {
@@ -214,6 +289,7 @@ export const createDummyComment = async (user: any, data?: any) => {
     },
   };
   if (!data.postId) {
+<<<<<<< HEAD
     const randomPost = await Posts.findOne();
     if (!randomPost) throw Error("Can't find any post to generate random comment for");
     defaultData.postId = randomPost._id; // By default, just grab ID from a random post
@@ -227,12 +303,26 @@ export const createDummyComment = async (user: any, data?: any) => {
   });
   return newCommentResponse.data;
 };
+=======
+    const randomPost = await Posts.findOneArbitrary()
+    if (!randomPost) throw Error("Can't find any post to generate random comment for")
+    defaultData.postId = randomPost._id; // By default, just grab ID from a random post
+  }
+  const commentData = {...defaultData, ...data};
+  const userContext = await computeContextFromUser({user: user || defaultUser, isSSR: false});
+  const newComment = await createComment({
+    data: commentData
+  }, userContext);
+  return newComment
+}
+>>>>>>> base/master
 
 export const createDummyConversation = async (user: any, data?: any) => {
   let defaultData = {
     _id: randomId(),
     title: user.displayName,
     participantIds: [user._id],
+<<<<<<< HEAD
   };
   const conversationData = { ...defaultData, ...data };
   const newConversationResponse = await createMutator({
@@ -243,10 +333,21 @@ export const createDummyConversation = async (user: any, data?: any) => {
   });
   return newConversationResponse.data;
 };
+=======
+  }
+  const conversationData = {...defaultData, ...data};
+  const userContext = await computeContextFromUser({user, isSSR: false});
+  const newConversation = await createConversation({
+    data: conversationData
+  }, userContext);
+  return newConversation
+}
+>>>>>>> base/master
 
 export const createDummyMessage = async (user: any, data?: any) => {
   let defaultData = {
     _id: randomId(),
+<<<<<<< HEAD
     contents: convertToRaw(ContentState.createFromText("Dummy Message Content")),
     userId: user._id,
   };
@@ -259,12 +360,25 @@ export const createDummyMessage = async (user: any, data?: any) => {
   });
   return newMessageResponse.data;
 };
+=======
+    contents: '<p>Dummy Message Content</p>',
+    userId: user._id,
+  }
+  const messageData = {...defaultData, ...data};
+  const userContext = await computeContextFromUser({user, isSSR: false});
+  const newMessage = await createMessage({
+    data: messageData
+  }, userContext);
+  return newMessage
+}
+>>>>>>> base/master
 
 export const createDummyLocalgroup = async (data?: any) => {
   let defaultData = {
     _id: randomId(),
     name: randomId(),
     organizerIds: [],
+<<<<<<< HEAD
   };
   const groupData = { ...defaultData, ...data };
   const groupResponse = await createMutator({
@@ -274,13 +388,23 @@ export const createDummyLocalgroup = async (data?: any) => {
   });
   return groupResponse.data;
 };
+=======
+    isOnline: true,
+  }
+  const groupData = {...defaultData, ...data};
+  const newLocalgroup = await createLocalgroup({
+    data: groupData
+  }, createAnonymousContext());
+  return newLocalgroup
+}
+>>>>>>> base/master
 
-const generateDummyVoteData = (user: DbUser, data?: Partial<DbVote>) => {
+const generateDummyVoteData = (user: DbUser, data?: Partial<DbVote>): DbVote => {
   const defaultData = {
     _id: randomId(),
     documentId: randomId(),
     collectionName: "Posts" as const,
-    voteType: "smallUpvote",
+    voteType: "smallUpvote" as const,
     userId: user._id,
     authorIds: [],
     power: 1,
@@ -288,12 +412,19 @@ const generateDummyVoteData = (user: DbUser, data?: Partial<DbVote>) => {
     isUnvote: false,
     votedAt: new Date(),
     silenceNotification: false,
+    documentIsAf: false,
+    createdAt: new Date(),
+    schemaVersion: 1,
+    extendedVoteType: null,
+    afPower: null,
+    legacyData: null,
   };
   return { ...defaultData, ...data };
 };
 
 export const createDummyVote = async (user: DbUser, data?: Partial<DbVote>) => {
   const voteData = generateDummyVoteData(user, data);
+<<<<<<< HEAD
   const newVoteResponse = await createMutator({
     collection: Votes,
     document: voteData,
@@ -302,6 +433,14 @@ export const createDummyVote = async (user: DbUser, data?: Partial<DbVote>) => {
   });
   return newVoteResponse.data;
 };
+=======
+  const userContext = await computeContextFromUser({user, isSSR: false});
+  const newVote = await createVote({
+    data: voteData
+  }, userContext);
+  return newVote;
+}
+>>>>>>> base/master
 
 export const createManyDummyVotes = async (count: number, user: DbUser, data?: Partial<DbVote>) => {
   const thirtyMinsAgo = Date.now() - 30 * 60 * 1000;
@@ -316,7 +455,7 @@ export const createManyDummyVotes = async (count: number, user: DbUser, data?: P
   return votes;
 };
 
-export const createDummyTag = async (user: DbUser, data?: Partial<DbTag>) => {
+export const createDummyTag = async (user: DbUser, data?: Partial<DbInsertion<DbTag>>) => {
   const defaultData = {
     _id: randomId(),
     name: "Test Tag",
@@ -326,6 +465,7 @@ export const createDummyTag = async (user: DbUser, data?: Partial<DbTag>) => {
     postCount: 0,
     createdAt: new Date(Date.now()),
   };
+<<<<<<< HEAD
   const tagData = { ...defaultData, ...data };
   const newTagResponse = await createMutator({
     collection: Tags,
@@ -335,14 +475,23 @@ export const createDummyTag = async (user: DbUser, data?: Partial<DbTag>) => {
   });
   return newTagResponse.data;
 };
+=======
+  const tagData = {...defaultData, ...data};
+  const userContext = await computeContextFromUser({user, isSSR: false});
+  const newTag = await createTag({
+    data: tagData
+  }, userContext);
+  return newTag;
+}
+>>>>>>> base/master
 
 export const createDummyRevision = async (user: DbUser, data?: Partial<DbRevision>) => {
   const defaultData = {
     _id: randomId(),
     userId: user._id,
-    inactive: false,
     editedAt: new Date(Date.now()),
     version: "1.0.0",
+<<<<<<< HEAD
     changeMetrics: {}, // not nullable field
   };
   const revisionData = { ...defaultData, ...data };
@@ -364,6 +513,30 @@ export const createDummyUserRateLimit = async (user: DbUser, data: Partial<DbUse
   });
   return { ...userRateLimit };
 };
+=======
+    wordCount: 0,
+    changeMetrics: {}, // not nullable field
+    originalContents: {
+      type: 'ckEditorMarkup',
+      data: 'This is a test revision'
+    },
+  };
+  const revisionData = {...defaultData, ...data};
+  const userContext = await computeContextFromUser({user, isSSR: false});
+  const newRevision = await createRevision({
+    data: revisionData
+  }, userContext);
+  return newRevision;
+}
+
+export const createDummyUserRateLimit = async (user: DbUser, data: CreateUserRateLimitDataInput) => {
+  const userContext = await computeContextFromUser({user, isSSR: false});
+  const userRateLimit = await createUserRateLimit({
+    data
+  }, userContext);
+  return userRateLimit;
+}
+>>>>>>> base/master
 
 export const clearDatabase = async () => {
   await asyncForeachSequential(await Users.find().fetch(), async (i) => {
@@ -462,9 +635,35 @@ export const withNoLogs = async (fn: () => Promise<void>) => {
   //eslint-disable-next-line no-console
   console.log = console.warn = console.error = console.info = () => {};
   await fn();
-  await waitUntilCallbacksFinished();
+  await waitUntilPgQueriesFinished();
   console.log = log; //eslint-disable-line no-console
   console.warn = warn; //eslint-disable-line no-console
   console.error = error; //eslint-disable-line no-console
   console.info = info; //eslint-disable-line no-console
+<<<<<<< HEAD
 };
+=======
+}
+
+/**
+ * Wait (in 20ms incremements) until there are no Postgres queries
+ * in progress. Many operations trigger asynchronous queries which might
+ * get voided; if you have a unit test that depends on the results of these
+ * queries, writing them the naive way would create a race condition. But if
+ * you insert an `await waitUntilPgQueriesFinished()`, it will wait for all the
+ * background processing to finish before proceeding with the rest of the test.
+ */
+export const waitUntilPgQueriesFinished = () => {
+  return new Promise<void>(resolve => {
+    function finishOrWait() {
+      if (isAnyPostgresQueryPending()) {
+        setTimeout(finishOrWait, 20);
+      } else {
+        resolve();
+      }
+    }
+    
+    finishOrWait();
+  });
+}
+>>>>>>> base/master

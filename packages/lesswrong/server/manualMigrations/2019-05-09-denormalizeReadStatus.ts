@@ -1,8 +1,14 @@
+<<<<<<< HEAD
 import { forEachDocumentBatchInCollection, registerMigration } from "./migrationUtils";
 import { LWEvents } from "../../lib/collections/lwevents";
 import { ReadStatuses } from "../../lib/collections/readStatus/collection";
+=======
+import { forEachDocumentBatchInCollection, registerMigration } from './migrationUtils';
+import { LWEvents } from '../../server/collections/lwevents/collection'
+import { ReadStatuses } from '../../server/collections/readStatus/collection'
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "denormalizeReadStatus",
   dateWritten: "2019-05-09",
   idempotent: true,

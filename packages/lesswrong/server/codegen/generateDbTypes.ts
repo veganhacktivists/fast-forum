@@ -1,7 +1,17 @@
+<<<<<<< HEAD
 import { getAllCollections } from "../../lib/vulcan-lib";
 import { generatedFileHeader, simplSchemaTypeToTypescript } from "./typeGenerationUtils";
 import { isUniversalField } from "../../lib/collectionUtils";
 import { getSchema } from "../../lib/utils/getSchema";
+=======
+import { getAllCollections } from '@/server/collections/allCollections';
+import { generateAllowedValuesTypeString, generatedFileHeader, graphqlTypeToTypescript, isFieldNullable, simplSchemaTypeToTypescript } from './typeGenerationUtils';
+import { isUniversalField } from '../../lib/utils/schemaUtils';
+import { getSchema, getSimpleSchema } from '@/lib/schema/allSchemas';
+import orderBy from 'lodash/orderBy';
+import { isArrayTypeString, isVarcharTypeString } from '../sql/Type';
+import SimpleSchema from 'simpl-schema';
+>>>>>>> base/master
 
 const dbTypesFileHeader =
   generatedFileHeader +
@@ -10,6 +20,112 @@ const dbTypesFileHeader =
 // server/codegen/generateDbTypes.ts.
 //
 `;
+
+type GeneratedBaseTypescriptType = 'string' | 'boolean' | 'number' | 'any' | 'Date';
+type GeneratedArrayTypescriptType = `Array<${GeneratedBaseTypescriptType}>`;
+
+function databaseTypeToTypescriptType(databaseType: DatabaseBaseType | `${DatabaseBaseType}[]`): GeneratedBaseTypescriptType | GeneratedArrayTypescriptType {
+  if (isArrayTypeString(databaseType)) {
+    const baseTypeString = databaseType.slice(0, -2) as DatabaseBaseType;
+    const convertedBaseType = databaseTypeToTypescriptType(baseTypeString);
+    return `Array<${convertedBaseType}>` as GeneratedArrayTypescriptType;
+  }
+
+  if (isVarcharTypeString(databaseType)) {
+    return 'string';
+  }
+
+  switch (databaseType) {
+    case 'TEXT':
+      return 'string';
+    case 'BOOL':
+      return 'boolean';
+    case 'DOUBLE PRECISION':
+      return 'number';
+    case 'INTEGER':
+      return 'number';
+    case 'JSONB':
+      return 'any';
+    case 'TIMESTAMPTZ':
+      return 'Date';
+    case 'VECTOR(1536)':
+      return 'Array<number>';
+  }
+}
+
+function stripRequired(typeString: string) {
+  const required = typeString.endsWith('!');
+  return {
+    typeString: required ? typeString.slice(0, -1) : typeString,
+    required,
+  };
+}
+
+function stripArray(typeString: string) {
+  const array = typeString.startsWith('[') && typeString.endsWith(']');
+  return {
+    typeString: array ? typeString.slice(1, -1) : typeString,
+    array,
+  };
+}
+
+function getGraphqlType(graphqlSpec?: GraphQLFieldSpecification<any>) {
+  if (!graphqlSpec) {
+    return;
+  }
+
+  if ('inputType' in graphqlSpec) {
+    return graphqlSpec.inputType;
+  }
+
+  return graphqlSpec.outputType;
+}
+
+/**
+ * Ignores graphql required annotations, since the database nullability field is the source of truth in this context.
+ */
+function graphqlTypeStringToTypescriptTypeString(graphqlType: string): string {
+  const { typeString } = stripRequired(graphqlType);
+  const { typeString: typeStringWithoutArray, array } = stripArray(typeString);
+
+  if (array) {
+    return `Array<${typeStringWithoutArray}>`;
+  }
+
+  return typeString;
+}
+
+function databaseSpecToTypescriptType(databaseSpec: DatabaseFieldSpecification<any>, graphqlSpec?: GraphQLFieldSpecification<any>): string {
+  const { type, typescriptType } = databaseSpec;
+  const nullable = isFieldNullable({ database: databaseSpec, graphql: graphqlSpec }, true);
+  const nullableString = nullable ? " | null" : "";
+  if (typescriptType) {
+    return typescriptType + nullableString;
+  }
+
+  if (graphqlSpec?.validation?.allowedValues) {
+    return generateAllowedValuesTypeString(graphqlSpec.validation.allowedValues, { database: databaseSpec, graphql: graphqlSpec });
+  }
+
+
+  const rawTypescriptType = databaseTypeToTypescriptType(type);
+
+  if (rawTypescriptType === 'any' || rawTypescriptType === 'Array<any>') {
+    const graphqlType = getGraphqlType(graphqlSpec);
+    if (graphqlType) {
+      if (typeof graphqlType === 'string' && !graphqlType.startsWith('JSON')) {
+        return graphqlTypeStringToTypescriptTypeString(graphqlType) + nullableString;
+      }
+
+      // The only remaining case is GraphQLJSON or explicitly-typed JSON
+      return 'any' + nullableString;
+    }
+
+    return rawTypescriptType;
+  }
+
+  return rawTypescriptType + nullableString;
+}
 
 export function generateDbTypes(): string {
   const sb: Array<string> = [];
@@ -28,40 +144,74 @@ function generateCollectionType(collection: any): string {
   return `type ${collectionName}Collection = CollectionBase<"${collectionName}">;\n\n`;
 }
 
+function isNonTrivialSimpleSchemaType(fieldSimpleSchemaType: DerivedSimpleSchemaType<SchemaType<CollectionNameString>>[string]['type'], fieldSchema: CollectionFieldSpecification<any>): boolean {
+  return (typeof fieldSimpleSchemaType.singleType !== 'function')
+    || fieldSimpleSchemaType.singleType === Object
+    || (fieldSimpleSchemaType.singleType === Array && !!fieldSchema.graphql?.validation?.simpleSchema)
+    || fieldSimpleSchemaType.singleType instanceof SimpleSchema;
+}
+
 function generateCollectionDbType(collection: CollectionBase<any>): string {
   let sb: Array<string> = [];
   const typeName = collection.typeName;
+<<<<<<< HEAD
   const schema = getSchema(collection);
 
   sb.push(`interface Db${typeName} extends DbObject {\n`);
   sb.push(`  __collectionName?: "${collection.collectionName}"\n`);
 
   for (let fieldName of Object.keys(schema)) {
+=======
+  const schema = getSchema(collection.collectionName);
+  
+  sb.push(`interface Db${typeName} extends DbObject {\n`);
+  sb.push(`  __collectionName?: "${collection.collectionName}"\n`);
+  
+  for (let fieldName of orderBy(Object.keys(schema), f=>f)) {
+>>>>>>> base/master
     const fieldSchema = schema[fieldName];
-    // Resolver-only field?
-    if (fieldSchema.resolveAs && !fieldSchema.resolveAs.addOriginalField) {
-      // HACK: Special case for make_editable
-      // We also need to generate for the originalContents field on the actual Revision schema, which has type ContentType.
-      // That one has a custom resolver to manage a permissions issue which would otherwise require refactoring permission functions to be async...
-      // ...but it's not actually a resolver-only field.
-      // And we can't use addOriginalField because it gets added twice by `getFields` in initGraphQL, which causes a runtime error.
-      if (fieldSchema.resolveAs.type !== "Revision" && fieldSchema.resolveAs.type !== "ContentType") {
-        continue;
-      }
+
+    const databaseSpec = fieldSchema.database;
+    if (!databaseSpec) {
+      continue;
     }
+
     // Universal field (therefore in base type)?
     if (isUniversalField(fieldName)) {
       continue;
     }
-    // Subtype?
-    if (fieldName.indexOf(".$") >= 0) {
-      continue;
+
+    let typeName: string;
+    const simpleSchema = getSimpleSchema(collection.collectionName);
+    const fieldSimpleSchemaType = simpleSchema._schema[fieldName]?.type;
+
+    const isStringOrStringArrayField = databaseSpec.type.startsWith('TEXT') || databaseSpec.type.startsWith('VARCHAR');
+    const hasTypescriptType = !!databaseSpec.typescriptType;
+    const hasSimpleSchemaType = !!fieldSimpleSchemaType;
+
+    const hasAllowedValues = !!fieldSchema.graphql?.validation?.allowedValues;
+
+    const useSimpleSchemaTypeGen =
+      !isStringOrStringArrayField
+      && !hasTypescriptType
+      && hasSimpleSchemaType
+      && isNonTrivialSimpleSchemaType(fieldSimpleSchemaType, fieldSchema)
+      && !hasAllowedValues
+      && fieldSchema.graphql?.validation?.simpleSchema;
+
+    if (useSimpleSchemaTypeGen) {
+      typeName = simplSchemaTypeToTypescript(simpleSchema._schema, fieldName, fieldSimpleSchemaType, 2, true);
+    } else {
+      typeName = databaseSpecToTypescriptType(databaseSpec, fieldSchema.graphql);
     }
 
+<<<<<<< HEAD
     const typeName =
       schema[fieldName].typescriptType ||
       simplSchemaTypeToTypescript(schema, fieldName, schema[fieldName].type, 2, true);
 
+=======
+>>>>>>> base/master
     sb.push(`  ${fieldName}: ${typeName}\n`);
   }
 

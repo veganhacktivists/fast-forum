@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { Votes } from "../../lib/collections/votes";
 import { Vulcan, getCollection } from "../vulcan-lib";
@@ -5,6 +6,15 @@ import { asyncForeachSequential } from "../../lib/utils/asyncUtils";
 
 Vulcan.rerunAFVotes = async () => {
   await Users.rawUpdateMany({}, { $set: { afKarma: 0 } }, { multi: true });
+=======
+import Users from '../../server/collections/users/collection';
+import { Votes } from '../../server/collections/votes/collection';
+import { asyncForeachSequential } from '../../lib/utils/asyncUtils';
+import { getCollection } from "../collections/allCollections";
+
+export const rerunAFVotes = async () => {
+  await Users.rawUpdateMany({}, {$set:{afKarma:0}}, {multi:true})
+>>>>>>> base/master
   const afVotes = await Votes.find({
     afPower: { $exists: true },
     cancelled: false,

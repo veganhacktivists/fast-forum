@@ -1,19 +1,33 @@
+<<<<<<< HEAD
 import React from "react";
 import { siteNameWithArticleSetting } from "../../lib/instanceSettings";
 import { registerComponent } from "../../lib/vulcan-lib";
 import { getSiteUrl } from "../../lib/vulcan-lib/utils";
+=======
+import React from 'react';
+import { siteNameWithArticleSetting } from '../../lib/instanceSettings';
+import { getSiteUrl } from '../../lib/vulcan-lib/utils';
+import { isFriendlyUI } from '@/themes/forumTheme';
+import { defineStyles, useStyles } from '@/components/hooks/useStyles';
+>>>>>>> base/master
 
-const styles = (theme: ThemeType): JssStyles => ({
+const styles = defineStyles("EmailWrapper", (theme: ThemeType) => ({
   root: {
+    ...(isFriendlyUI ? {...theme.typography.smallText} : {}),
     "& img": {
       maxWidth: "100%",
     },
   },
+<<<<<<< HEAD
 });
+=======
+}))
+>>>>>>> base/master
 
 // Wrapper for top-level formatting of emails, eg controling width and
 // background color. See also the global CSS in renderEmail.js. Derived from
 // wrapper.handlebars in Vulcan-Starter.
+<<<<<<< HEAD
 const EmailWrapper = ({
   unsubscribeAllLink,
   children,
@@ -26,6 +40,16 @@ const EmailWrapper = ({
   const accountLink = `${getSiteUrl()}account`;
   const siteNameWithArticle = siteNameWithArticleSetting.get();
 
+=======
+export const EmailWrapper = ({unsubscribeAllLink, children}: {
+  unsubscribeAllLink: string | null,
+  children: React.ReactNode,
+}) => {
+  const classes = useStyles(styles);
+  const accountLink = `${getSiteUrl()}account`
+  const siteNameWithArticle = siteNameWithArticleSetting.get()
+  
+>>>>>>> base/master
   // Put props for some HTML elements in any-typed objects, because emails use
   // non-HTML5 attributes which the typechecker will complain about
   const bodyProps: any = {
@@ -104,6 +128,7 @@ const EmailWrapper = ({
   );
 };
 
+<<<<<<< HEAD
 const EmailWrapperComponent = registerComponent("EmailWrapper", EmailWrapper, { styles });
 
 declare global {
@@ -111,3 +136,5 @@ declare global {
     EmailWrapper: typeof EmailWrapperComponent;
   }
 }
+=======
+>>>>>>> base/master

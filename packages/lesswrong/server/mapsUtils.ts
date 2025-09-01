@@ -1,10 +1,21 @@
+<<<<<<< HEAD
 import { Client, LatLng } from "@googlemaps/google-maps-services-js";
 import { DatabaseServerSetting } from "./databaseSettings";
+=======
+import { Client, LatLng } from '@googlemaps/google-maps-services-js'
+import { DatabaseServerSetting } from './databaseSettings';
+import { captureException } from '@sentry/core';
+>>>>>>> base/master
 
 const googleMapsApiKeySetting = new DatabaseServerSetting<string | null>("googleMaps.serverApiKey", null);
 
+<<<<<<< HEAD
 export async function getLocalTime(time: AnyBecauseTodo, googleLocation: AnyBecauseTodo) {
   const googleMapsApiKey = googleMapsApiKeySetting.get();
+=======
+export async function getLocalTime(time: AnyBecauseTodo, googleLocation: AnyBecauseTodo): Promise<Date|null> {
+  const googleMapsApiKey = googleMapsApiKeySetting.get()
+>>>>>>> base/master
   if (!googleMapsApiKey) {
     // eslint-disable-next-line no-console
     console.log("No Server-side Google Maps API key provided, can't resolve local time");
@@ -40,7 +51,13 @@ export async function getLocalTime(time: AnyBecauseTodo, googleLocation: AnyBeca
     return new Date(localTimestamp);
   } catch (err) {
     // eslint-disable-next-line no-console
+<<<<<<< HEAD
     console.error("Error in getting local time:", err);
     throw err;
+=======
+    console.error("Error in getting local time fromGoogle Maps API:", err?.message)
+    captureException(err);
+    return null;
+>>>>>>> base/master
   }
 }

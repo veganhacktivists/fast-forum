@@ -1,45 +1,20 @@
-# Node 18.x is LTS
-FROM node:18 AS base
-ENV CI=true
+# Node 22.x is LTS
+FROM node:22.12.0
 ENV IS_DOCKER=true
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-WORKDIR /app
-
-RUN corepack enable
-
-ENV NODE_ENV="production"
-ENV NODE_OPTIONS="--max_old_space_size=2560 --heapsnapshot-signal=SIGUSR2"
-
-COPY pnpm-lock.yaml package.json ./
-
-FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile --shamefully-hoist --no-optional
-
-FROM base AS dev-deps
-COPY public/lesswrong-editor public/lesswrong-editor
+# Transcrypt dependency
+RUN apt-get update && apt-get install -y bsdmainutils
+# Install transcrypt for EA Forum
+RUN curl -sSLo /usr/local/bin/transcrypt https://raw.githubusercontent.com/elasticdog/transcrypt/2f905dce485114fec10fb747443027c0f9119caa/transcrypt && chmod +x /usr/local/bin/transcrypt
+WORKDIR /usr/src/app
+# Copy only files necessary for yarn install, to avoid spurious changes
+# triggering re-install
+COPY package.json package.json
+COPY yarn.lock yarn.lock
+COPY ckEditor ckEditor
+COPY scripts/postinstall.sh scripts/postinstall.sh
+# clear the cache -- it's not useful and it adds to the time docker takes to
+# save the layer diff
+RUN yarn install && yarn cache clean
 COPY . .
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod=false --shamefully-hoist --no-optional
-
-FROM dev-deps AS build
-ARG PORT=3000
-ENV PORT=${PORT}
-ARG BUILD_ARGS=""
-RUN pnpm run build ${BUILD_ARGS}
-
-FROM base
-COPY ./packages ./packages
-COPY ./migrate.ts ./migrate.ts
-COPY ./scripts ./scripts 
-COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/build /app/build
-COPY public /app/public
-
-ARG PORT=3000
-ENV PORT=${PORT}
-ENV SETTINGS_FILE="settings.json"
-EXPOSE $PORT
-
-COPY settings.json .
-
-CMD ["sh", "-c", "pnpm run migrate up && exec node ./build/server/js/serverBundle.js"]
+EXPOSE 8080
+CMD [ "yarn", "run", "production" ]

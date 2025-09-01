@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Users from "../../../lib/collections/users/collection";
 import { userCanDo } from "../../../lib/vulcan-users/permissions";
 import { Votes } from "../../../lib/collections/votes";
@@ -8,6 +9,14 @@ import { getCollectionHooks } from "../../mutationCallbacks";
 import { voteCallbacks, VoteDocTuple } from "../../../lib/voting/vote";
 import { ensureIndex } from "../../../lib/collectionIndexUtils";
 import { UsersRepo } from "../../repos";
+=======
+import Users from "../../../server/collections/users/collection";
+import { userCanDo } from '../../../lib/vulcan-users/permissions';
+import { Votes } from '../../../server/collections/votes/collection';
+import { calculateVotePower } from '../../../lib/voting/voteTypes'
+import type { VoteDocTuple } from '../../../lib/voting/vote';
+import UsersRepo from "../../repos/UsersRepo";
+>>>>>>> base/master
 
 export const recalculateAFBaseScore = async (document: VoteableType): Promise<number> => {
   let votes = await Votes.find({
@@ -22,6 +31,7 @@ export const recalculateAFBaseScore = async (document: VoteableType): Promise<nu
     : 0;
 };
 
+<<<<<<< HEAD
 async function updateAlignmentKarmaServer(newDocument: DbVoteableType, vote: DbVote): Promise<VoteDocTuple> {
   // Update a
   const voter = await Users.findOne(vote.userId);
@@ -52,9 +62,20 @@ async function updateAlignmentKarmaServer(newDocument: DbVoteableType, vote: DbV
       newDocument,
       vote,
     };
+=======
+export function getVoteAFPower({user, voteType, document}: {
+  user: DbUser|UsersCurrent,
+  voteType: string,
+  document: VoteableType,
+}) {
+  if (!userCanDo(user, "votes.alignment")) {
+    return 0;
+>>>>>>> base/master
   }
+  return calculateVotePower(user.afKarma, voteType);
 }
 
+<<<<<<< HEAD
 async function updateAlignmentKarmaServerCallback({ newDocument, vote }: VoteDocTuple) {
   return await updateAlignmentKarmaServer(newDocument, vote);
 }
@@ -75,6 +96,20 @@ async function updateAlignmentUserServer(newDocument: DbVoteableType, vote: DbVo
           $addToSet: { groups: "alignmentVoters" },
         },
       );
+=======
+
+async function updateUserAFKarmaForVote (newDocument: DbVoteableType, vote: DbVote, multiplier: number) {
+  if (newDocument.af && (newDocument.userId !== vote.userId)) {
+    const documentUser = await Users.findOne({_id:newDocument.userId})
+    if (!documentUser) throw Error("Can't find user to update Alignment Karma")
+    const karmaUpdate = (vote.afPower || 0) * multiplier;
+    const newAfKarma = (documentUser.afKarma || 0) + karmaUpdate;
+    if (newAfKarma > 0) {
+      await Users.rawUpdateOne({_id:newDocument.userId}, {
+        $inc: {afKarma: karmaUpdate},
+        $addToSet: {groups: 'alignmentVoters'}
+      })
+>>>>>>> base/master
     } else {
       // Need to use Math.abs since the multiplier is -1 for downvotes (which is almost certainly what's triggering this)
       await new UsersRepo().removeAlignmentGroupAndKarma(newDocument.userId!, Math.abs(karmaUpdate));
@@ -82,6 +117,7 @@ async function updateAlignmentUserServer(newDocument: DbVoteableType, vote: DbVo
   }
 }
 
+<<<<<<< HEAD
 async function updateAlignmentUserServerCallback({ newDocument, vote }: VoteDocTuple) {
   await updateAlignmentUserServer(newDocument, vote, 1);
 }
@@ -99,6 +135,18 @@ voteCallbacks.cancelSync.add(function cancelAlignmentKarmaServerCallback({ newDo
 });
 
 async function MoveToAFUpdatesUserAFKarma(document: DbPost | DbComment, oldDocument: DbPost | DbComment) {
+=======
+export async function grantUserAFKarmaForVote ({newDocument, vote}: VoteDocTuple) {
+  await updateUserAFKarmaForVote(newDocument, vote, 1)
+}
+
+export async function revokeUserAFKarmaForCancelledVote ({newDocument, vote}: VoteDocTuple) {
+  await updateUserAFKarmaForVote(newDocument, vote, -1)
+
+}
+
+export async function moveToAFUpdatesUserAFKarma (document: Pick<DbPost|DbComment, 'af' | 'afBaseScore' | 'userId' | '_id'>, oldDocument: Pick<DbPost|DbComment, 'af' | 'afBaseScore' | 'userId' | '_id'>) {
+>>>>>>> base/master
   if (document.af && !oldDocument.af) {
     await Users.rawUpdateOne(
       { _id: document.userId },
@@ -134,8 +182,14 @@ async function MoveToAFUpdatesUserAFKarma(document: DbPost | DbComment, oldDocum
     );
   }
 }
+<<<<<<< HEAD
 ensureIndex(Votes, { documentId: 1 });
+=======
+>>>>>>> base/master
 
-commentsAlignmentAsync.add(MoveToAFUpdatesUserAFKarma);
-getCollectionHooks("Posts").editAsync.add(MoveToAFUpdatesUserAFKarma);
-postsAlignmentAsync.add(MoveToAFUpdatesUserAFKarma);
+
+export async function postsMoveToAFAddsAlignmentVoting (post: DbPost, oldPost: DbPost) {
+  if (post.af && !oldPost.af) {
+    await Users.rawUpdateOne({_id:post.userId}, {$addToSet: {groups: 'alignmentVoters'}})
+  }
+}

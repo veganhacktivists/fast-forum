@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import * as _ from "underscore";
 import { Posts } from "../lib/collections/posts/collection";
 import { Sequences } from "../lib/collections/sequences/collection";
@@ -7,10 +8,20 @@ import { accessFilterSingle, accessFilterMultiple } from "../lib/utils/schemaUti
 import { setUserPartiallyReadSequences } from "./partiallyReadSequences";
 import { addGraphQLMutation, addGraphQLQuery, addGraphQLResolvers, addGraphQLSchema } from "./vulcan-lib";
 import { WeightedList } from "./weightedList";
+=======
+import * as _ from 'underscore';
+import { Posts } from '../server/collections/posts/collection';
+import { Sequences } from '../server/collections/sequences/collection';
+import { Collections } from '../server/collections/collections/collection';
+import { accessFilterSingle, accessFilterMultiple } from '../lib/utils/schemaUtils';
+import { setUserPartiallyReadSequences } from './partiallyReadSequences';
+import { WeightedList } from './weightedList';
+>>>>>>> base/master
 import {
   DefaultRecommendationsAlgorithm,
   RecommendationsAlgorithm,
   recommendationsAlgorithmHasStrategy,
+<<<<<<< HEAD
 } from "../lib/collections/users/recommendationSettings";
 import { isEAForum } from "../lib/instanceSettings";
 import SelectQuery from "../lib/sql/SelectQuery";
@@ -19,13 +30,30 @@ import { getDefaultViewSelector } from "../lib/utils/viewUtils";
 import { EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID } from "../lib/collections/tags/collection";
 import RecommendationService from "./recommendations/RecommendationService";
 import PgCollection from "../lib/sql/PgCollection";
+=======
+} from '../lib/collections/users/recommendationSettings';
+import { isEAForum } from '../lib/instanceSettings';
+import SelectQuery from "./sql/SelectQuery";
+import { getPositiveVoteThreshold } from '../lib/reviewUtils';
+import { getDefaultViewSelector } from '../lib/utils/viewUtils';
+import { EA_FORUM_APRIL_FOOLS_DAY_TOPIC_ID } from '../lib/collections/tags/helpers';
+import RecommendationService from './recommendations/RecommendationService';
+import PgCollection from './sql/PgCollection';
+import gql from 'graphql-tag';
+import { PostsViews } from '@/lib/collections/posts/views';
+>>>>>>> base/master
 
 const MINIMUM_BASE_SCORE = 50;
 
 // The set of fields on Posts which are used for deciding which posts to
 // recommend. Fields other than these will be projected out before downloading
 // from the database.
+<<<<<<< HEAD
 const scoreRelevantFields = { _id: 1, baseScore: 1, curatedDate: 1, frontpageDate: 1, defaultRecommendation: 1 };
+=======
+const scoreRelevantFields: MongoProjection<DbPost> = {_id:1, baseScore:1, curatedDate:1, frontpageDate:1, defaultRecommendation: 1};
+
+>>>>>>> base/master
 
 // Returns part of a mongodb aggregate pipeline, which will join against the
 // ReadStatuses collection and filter out any posts which have been read by the
@@ -150,7 +178,7 @@ const recommendablePostFilter = (algorithm: DefaultRecommendationsAlgorithm) => 
   let recommendationFilter = {
     // Gets the selector from the default Posts view, which includes things like
     // excluding drafts and deleted posts
-    ...getDefaultViewSelector("Posts"),
+    ...getDefaultViewSelector(PostsViews),
 
     // Only consider recommending posts if they hit the minimum base score. This has a big
     // effect on the size of the recommendable-post set, which needs to not be
@@ -184,7 +212,7 @@ const recommendablePostFilter = (algorithm: DefaultRecommendationsAlgorithm) => 
       $or: [
         recommendationFilter,
         {
-          ...getDefaultViewSelector("Posts"), // Ensure drafts are still excluded
+          ...getDefaultViewSelector(PostsViews), // Ensure drafts are still excluded
           defaultRecommendation: true,
         },
       ],
@@ -192,8 +220,11 @@ const recommendablePostFilter = (algorithm: DefaultRecommendationsAlgorithm) => 
   }
 };
 
+<<<<<<< HEAD
 ensureIndex(Posts, { defaultRecommendation: 1 });
 
+=======
+>>>>>>> base/master
 // Return the set of all posts that are eligible for being recommended, with
 // scoreRelevantFields included (but other fields projected away). If
 // onlyUnread is true and currentUser is nonnull, posts that the user has
@@ -229,6 +260,7 @@ const allRecommendablePosts = async ({
 //   scoreFn: Function which takes a post (with at least scoreRelevantFields
 //     included), and returns a number. The posts with the highest scoreFn
 //     return value will be the ones returned.
+<<<<<<< HEAD
 const topPosts = async ({
   count,
   currentUser,
@@ -239,6 +271,13 @@ const topPosts = async ({
   currentUser: DbUser | null;
   algorithm: DefaultRecommendationsAlgorithm;
   scoreFn: (post: DbPost) => number;
+=======
+const topPosts = async ({count, currentUser, algorithm, scoreFn}: {
+  count: number,
+  currentUser: DbUser|null,
+  algorithm: DefaultRecommendationsAlgorithm,
+  scoreFn: (post: DbPost) => number,
+>>>>>>> base/master
 }) => {
   const recommendablePostsMetadata = await allRecommendablePosts({ currentUser, algorithm });
 
@@ -267,6 +306,7 @@ const topPosts = async ({
 //   sampleWeightFn: Function which takes a post (with at least
 //     scoreRelevantFields included), and returns a number. Higher numbers are
 //     more likely to be recommended.
+<<<<<<< HEAD
 const samplePosts = async ({
   count,
   currentUser,
@@ -277,6 +317,13 @@ const samplePosts = async ({
   currentUser: DbUser | null;
   algorithm: DefaultRecommendationsAlgorithm;
   sampleWeightFn: (post: DbPost) => number;
+=======
+const samplePosts = async ({count, currentUser, algorithm, sampleWeightFn}: {
+  count: number,
+  currentUser: DbUser|null,
+  algorithm: DefaultRecommendationsAlgorithm,
+  sampleWeightFn: (post: DbPost) => number,
+>>>>>>> base/master
 }) => {
   const recommendablePostsMetadata = await allRecommendablePosts({ currentUser, algorithm });
 
@@ -376,9 +423,9 @@ const getResumeSequences = async (currentUser: DbUser | null, context: ResolverC
       ]);
 
       return {
-        sequence: await accessFilterSingle(currentUser, Sequences, sequence, context),
-        collection: await accessFilterSingle(currentUser, Collections, collection, context),
-        nextPost: await accessFilterSingle(currentUser, Posts, nextPost, context),
+        sequence: await accessFilterSingle(currentUser, 'Sequences', sequence, context),
+        collection: await accessFilterSingle(currentUser, 'Collections', collection, context),
+        nextPost: await accessFilterSingle(currentUser, 'Posts', nextPost, context),
         numRead: numRead,
         numTotal: numTotal,
         lastReadTime: lastReadTime,
@@ -389,12 +436,20 @@ const getResumeSequences = async (currentUser: DbUser | null, context: ResolverC
   // Filter out results where nextPost is null. (Specifically, this filters out
   // the default sequences on dev databases, which would otherwise cause a crash
   // down the line.)
+<<<<<<< HEAD
   return _.filter(results, (result) => !!result.nextPost);
 };
 
 addGraphQLResolvers({
   Query: {
     async ContinueReading(root: void, args: void, context: ResolverContext) {
+=======
+  return _.filter(results, result=>!!result.nextPost);
+}
+
+export const graphqlQueries = {
+  async ContinueReading(root: void, args: void, context: ResolverContext) {
+>>>>>>> base/master
       const { currentUser } = context;
 
       return await getResumeSequences(currentUser, context);
@@ -412,18 +467,32 @@ addGraphQLResolvers({
         return service.recommend(currentUser, clientId, count, algorithm.strategy, algorithm.disableFallbacks);
       }
 
+<<<<<<< HEAD
       const recommendedPosts = await getRecommendedPosts({ count, algorithm, currentUser });
       const accessFilteredPosts = await accessFilterMultiple(currentUser, Posts, recommendedPosts, context);
+=======
+      const recommendedPosts = await getRecommendedPosts({count, algorithm, currentUser})
+      const accessFilteredPosts = await accessFilterMultiple(currentUser, 'Posts', recommendedPosts, context);
+>>>>>>> base/master
       if (recommendedPosts.length !== accessFilteredPosts.length) {
         // eslint-disable-next-line no-console
         console.error("Recommendation engine returned a post which permissions filtered out as inaccessible");
       }
       return accessFilteredPosts;
+<<<<<<< HEAD
     },
   },
   Mutation: {
     async dismissRecommendation(root: void, { postId }: { postId: string }, context: ResolverContext) {
       const { currentUser } = context;
+=======
+  },
+}
+
+export const graphqlMutations = {
+  async dismissRecommendation(root: void, {postId}: {postId: string}, context: ResolverContext) {
+    const { currentUser } = context;
+>>>>>>> base/master
       if (!currentUser) return false;
 
       if (currentUser.partiallyReadSequences?.some((s) => s.nextPostId === postId)) {
@@ -432,11 +501,16 @@ addGraphQLResolvers({
         return true;
       }
       return false;
+<<<<<<< HEAD
     },
   },
 });
+=======
+  }
+}
+>>>>>>> base/master
 
-addGraphQLSchema(`
+export const graphqlTypeDefs = gql`
   type RecommendResumeSequence {
     sequence: Sequence
     collection: Collection
@@ -445,8 +519,11 @@ addGraphQLSchema(`
     numTotal: Int
     lastReadTime: Date
   }
-`);
-
-addGraphQLQuery("ContinueReading: [RecommendResumeSequence!]");
-addGraphQLQuery("Recommendations(count: Int, algorithm: JSON): [Post!]");
-addGraphQLMutation("dismissRecommendation(postId: String): Boolean");
+  extend type Query {
+    ContinueReading: [RecommendResumeSequence!]
+    Recommendations(count: Int, algorithm: JSON): [Post!]
+  }
+  extend type Mutation {
+    dismissRecommendation(postId: String): Boolean
+  }
+`;

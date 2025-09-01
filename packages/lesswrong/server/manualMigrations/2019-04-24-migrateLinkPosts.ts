@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import { Posts } from "../../lib/collections/posts";
 import * as _ from "underscore";
+=======
+import { registerMigration } from './migrationUtils';
+import { Posts } from '../../server/collections/posts/collection'
+import * as _ from 'underscore';
+import { backgroundTask } from '../utils/backgroundTask';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "migrateLinkPosts",
   dateWritten: "2019-04-24",
   idempotent: true,
@@ -41,7 +48,7 @@ registerMigration({
     }));
 
     if (updates.length > 0) {
-      Posts.rawCollection().bulkWrite(updates, { ordered: false });
+      backgroundTask(Posts.rawCollection().bulkWrite(updates, { ordered: false }));
     }
   },
 });

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { CallbackHook, CallbackChainHook, CallbackPropertiesBase } from "../lib/vulcan-lib/callbacks";
 import { getCollection } from "../lib/vulcan-lib/getCollection";
 
@@ -5,10 +6,24 @@ type CallbackValidationErrors = Array<any>;
 
 export interface CreateCallbackProperties<N extends CollectionNameString> extends CallbackPropertiesBase<N> {
   document: ObjectsByCollectionName[N];
+=======
+interface CallbackPropertiesBase<N extends CollectionNameString> {
+  // TODO: Many of these are empirically optional, but setting them to optional
+  // causes a bajillion type errors, so we will not be fixing today
+  currentUser: DbUser|null
+  collection: CollectionBase<N>
+  context: ResolverContext
+  schema: SchemaType<N>
+}
+
+export interface CreateCallbackProperties<N extends CollectionNameString, D = CreateInputsByCollectionName[N]['data']> extends CallbackPropertiesBase<N> {
+  document: D,
+>>>>>>> base/master
   /**
    * BE CAREFUL USING THIS - IT'S NOT THE INSERTED RECORD, BUT THE DATA PASSED IN TO `createMutator`
    * Correspondingly, it won't have fields like `_id`
    */
+<<<<<<< HEAD
   newDocument: ObjectsByCollectionName[N];
 }
 
@@ -19,9 +34,23 @@ export interface UpdateCallbackProperties<N extends CollectionNameString> extend
    * @deprecated Is a "preview" of the new document. Use newDocument instead
    */
   document: ObjectsByCollectionName[N];
+=======
+  newDocument: D,
+}
+
+export interface AfterCreateCallbackProperties<N extends CollectionNameString> extends CallbackPropertiesBase<N> {
+  document: ObjectsByCollectionName[N],
+  newDocument: ObjectsByCollectionName[N],
+}
+
+export interface UpdateCallbackProperties<N extends CollectionNameString, D extends {} = UpdateInputsByCollectionName[N]['data']> extends CallbackPropertiesBase<N> {
+  data: D,
+  oldDocument: ObjectsByCollectionName[N],
+>>>>>>> base/master
   /** Is a "preview" of the new document */
   newDocument: ObjectsByCollectionName[N];
 }
+<<<<<<< HEAD
 
 export interface DeleteCallbackProperties<N extends CollectionNameString> extends CallbackPropertiesBase<N> {
   document: ObjectsByCollectionName[N];
@@ -160,3 +189,5 @@ export const getCollectionHooks = <N extends CollectionNameString>(
   }
   return collectionHooks[collectionName];
 };
+=======
+>>>>>>> base/master

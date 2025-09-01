@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { addCronJob } from "../cronUtil";
 import Users from "../../lib/collections/users/collection";
 import { ModeratorActions } from "../../lib/collections/moderatorActions";
@@ -11,6 +12,22 @@ import moment from "moment";
 addCronJob({
   name: "expiredRateLimitsReturnToReviewQueue",
   interval: "every 24 hours",
+=======
+import { addCronJob } from '../cron/cronUtil';
+import Users from "../../server/collections/users/collection";
+import { ModeratorActions } from "../../server/collections/moderatorActions/collection";
+import { allRateLimits } from "@/lib/collections/moderatorActions/constants";
+import { appendToSunshineNotes } from "../../lib/collections/users/helpers";
+import { triggerReview } from "../callbacks/helpers";
+import { createAdminContext } from "../vulcan-lib/createContexts";
+import * as _ from 'underscore';
+import moment from 'moment';
+
+
+export const expiredRateLimitsReturnToReviewQueueCron = addCronJob({
+  name: 'expiredRateLimitsReturnToReviewQueue',
+  interval: 'every 24 hours',
+>>>>>>> base/master
   async job() {
     const context = createAdminContext();
     const endOfDay = new Date();
@@ -24,16 +41,26 @@ addCronJob({
     const usersWithExpiringRateLimits = await Users.find({ _id: { $in: userIdsWithExpiringRateLimits } }).fetch();
 
     if (!_.isEmpty(usersWithExpiringRateLimits)) {
+<<<<<<< HEAD
       usersWithExpiringRateLimits.map(async (user) => {
+=======
+      await Promise.all(usersWithExpiringRateLimits.map(async user => {
+>>>>>>> base/master
         await appendToSunshineNotes({
           moderatedUserId: user._id,
           adminName: "Automod",
           text: "Rate limit expired",
           context,
         });
+<<<<<<< HEAD
         await triggerReview(user._id);
       });
 
+=======
+        await triggerReview(user._id, context);
+      }));
+      
+>>>>>>> base/master
       // log the action
       // eslint-disable-next-line no-console
       console.log('// Users with expired rate limits:', userIdsWithExpiringRateLimits); // eslint-disable-line

@@ -1,12 +1,12 @@
-import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
-import Posts from "../../lib/collections/posts/collection";
-import { convertImagesInObject } from "../scripts/convertImagesToCloudinary";
+import { rehostImagesInAllPosts } from "../scripts/convertImagesToCloudinary";
+import { registerMigration } from "./migrationUtils";
 
-registerMigration({
+export default registerMigration({
   name: "rehostPostImages",
   dateWritten: "2022-11-08",
   idempotent: true,
   action: async () => {
+<<<<<<< HEAD
     let postCount = 0;
     let uploadCount = 0;
     await forEachDocumentBatchInCollection({
@@ -26,5 +26,9 @@ registerMigration({
         console.log(`Converted ${uploadCount} images in ${postCount} posts`);
       },
     });
+=======
+    // To save cloudinary credits, only convert google docs images since those are the only ones with known problems
+    await rehostImagesInAllPosts({}, (url) => url.includes("googleusercontent"));
+>>>>>>> base/master
   },
 });

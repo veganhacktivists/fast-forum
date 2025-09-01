@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { getOpenAI } from "./languageModelIntegration";
 import { getCollectionHooks } from "../mutationCallbacks";
 import { isAnyTest } from "../../lib/executionEnvironment";
@@ -59,6 +60,65 @@ export const modGPTPrompt = `
 const getModGPTAnalysis = async (api: OpenAI, text: string) => {
   return await api.chat.completions.create({
     model: "gpt-4",
+=======
+import { getOpenAI } from './languageModelIntegration';
+import { isAnyTest } from '../../lib/executionEnvironment';
+import sanitizeHtml from 'sanitize-html';
+import { sanitizeAllowedTags } from '../../lib/vulcan-lib/utils';
+import Comments from '../../server/collections/comments/collection';
+import { dataToHTML } from '../editor/conversionUtils';
+import OpenAI from 'openai';
+import { captureEvent } from '../../lib/analyticsEvents';
+import difference from 'lodash/difference';
+import { truncatise } from '../../lib/truncatise';
+import { FetchedFragment } from '../fetchFragment';
+import { updateComment } from '../collections/comments/mutations';
+
+export const modGPTPrompt = `
+  You are an advisor to the moderation team for the EA Forum. Your job is to make recommendations to the moderation team about whether they should intervene and moderate a comment.
+
+  The three primary norms on the Forum are:
+  * Be kind. Stay civil, at the minimum. Don't sneer or be snarky. In general, assume good faith. Substantive disagreements are fine and expected. Disagreements help us find the truth and are part of healthy communication.
+  * Stay on topic. No spam. The Forum is for discussions about improving the world, not the promotion of services. Don't derail conversations in irrelevant directions.
+  * Be honest. Don't mislead or manipulate. Communicate your uncertainty and the true reasons behind your beliefs as much as you can. Be willing to change your mind.
+
+  The following is a list of behaviors we discourage. Moderators should intervene if the comment contains any of these:
+  * Unnecessary rudeness or offensiveness
+  * Advocating major harm or illegal activities
+  * Information hazards
+  * Deliberate misinformation or manipulation
+  * Spam and any commercial messaging not related to effective altruism
+  * Deliberate flamebait or trolling
+  * Hate speech or content that promotes hate based on identity
+  * Harassment or threats of violence
+  * Misgendering deliberately and/or deadnaming gratuitously, although mistakes are expected and fine
+
+  The user input will include some previous text as context (with the post title and an excerpt inside of <post> tags and the parent comment inside of <parent> tags) and the comment to be reviewed (inside <comment> tags). Review the comment you're given by making an overall assessment of how well the comment meets the norms. Make a recommendation as to whether the moderation team should intervene. Flag if the comment contains any specific discouraged behaviors from the list above.
+
+  Your three recommendation options are:
+  * Intervene
+  * Consider reviewing
+  * Don't intervene
+
+  Please be generous to commenters and give them the benefit of the doubt, especially around topics related to harm or illegal actions. Remember to keep the context in mind, and do not select "Intervene" if the commenter is not the originator of the discouraged behavior. Only select "Intervene" if you are sure that the comment should be removed. If you are unsure, err on the side of selecting "Consider reviewing".  Explain your decision in 3 sentences or less.
+
+  Finally, make a suggestion of how the comment could be improved.
+
+  Here is an example response:
+  <example>
+  Recommendation: Intervene
+  Flag: Unnecessary rudeness or offensiveness
+
+  This comment contains strong language, personal attacks, and a confrontational tone, which violates the forum rules on unnecessary rudeness. The moderation team should consider reviewing this comment and may need to intervene to ensure that the discussion remains civil and respectful.
+
+  Suggestions for improvement: The comment could be improved by focusing on specific points of disagreement and addressing those points in a more respectful and constructive manner. The user should avoid personal attacks and strong language, and instead engage in a productive conversation about their concerns with the response they received.
+  </example>
+  `
+
+const getModGPTAnalysis = async (api: OpenAI, text: string) => {
+  return await api.chat.completions.create({
+    model: 'gpt-4o',
+>>>>>>> base/master
     messages: [
       { role: "system", content: modGPTPrompt },
       { role: "user", content: text },
@@ -89,10 +149,15 @@ const getMessageToCommenter = (user: DbUser, commentLink: string, flag?: string)
   `;
 };
 
+export const sanitizeHtmlOptions = {
+  allowedTags: difference(sanitizeAllowedTags, ['img', 'iframe', 'audio', 'figure']),
+  nonTextTags: [ 'style', 'script', 'textarea', 'option', 'img', 'figure' ]
+}
+
 /**
  * Ask GPT-4 to help moderate the given comment. It will respond with a "recommendation", as per the prompt above.
  */
-async function checkModGPT(comment: DbComment): Promise<void> {
+export async function checkModGPT(comment: DbComment, post: FetchedFragment<PostsOriginalContents, 'Posts'>, context: ResolverContext): Promise<void> {
   const api = await getOpenAI();
   if (!api) {
     if (!isAnyTest) {
@@ -102,7 +167,14 @@ async function checkModGPT(comment: DbComment): Promise<void> {
     return;
   }
 
+<<<<<<< HEAD
   if (!comment.contents?.originalContents?.data) {
+=======
+  const commentOriginalContents = comment.contents?.originalContents
+  const postOriginalContents = post.contents?.originalContents
+  
+  if (!commentOriginalContents?.data || !postOriginalContents?.data) {
+>>>>>>> base/master
     if (!isAnyTest) {
       //eslint-disable-next-line no-console
       console.log("Skipping ModGPT (no contents on this comment!)");
@@ -110,6 +182,7 @@ async function checkModGPT(comment: DbComment): Promise<void> {
     return;
   }
 
+<<<<<<< HEAD
   const data = await dataToHTML(comment.contents.originalContents.data, comment.contents.originalContents.type, true);
   const html = sanitizeHtml(data, {
     allowedTags: sanitizeAllowedTags.filter((tag) => !["img", "iframe"].includes(tag)),
@@ -117,12 +190,43 @@ async function checkModGPT(comment: DbComment): Promise<void> {
   });
   const text = htmlToText(html);
 
+=======
+  const commentHtml = await dataToHTML(commentOriginalContents.data, commentOriginalContents.type, context, {sanitize: false})
+  const postHtml = await dataToHTML(postOriginalContents.data, postOriginalContents.type ?? "no type found", context, {sanitize: false})
+  const commentText = sanitizeHtml(commentHtml ?? "", sanitizeHtmlOptions)
+  const postText = sanitizeHtml(postHtml ?? "", sanitizeHtmlOptions)
+  const postExcerpt = truncatise(postText, {TruncateBy: 'characters', TruncateLength: 300, Strict: true, Suffix: ''})
+  
+  // Build the message that will be attributed to the user
+  let userText = `<post>
+    Title: ${post.title}
+    Excerpt: ${postExcerpt}
+    </post>`
+  if (comment.parentCommentId) {
+    // If this comment has a parent, include that as well
+    const parentComment = await Comments.findOne({_id: comment.parentCommentId})
+    if (parentComment && parentComment.contents?.originalContents?.data) {
+      const parentCommentHtml = await dataToHTML(
+        parentComment.contents.originalContents.data,
+        parentComment.contents.originalContents.type,
+        context,
+        {sanitize: false}
+      )
+      const parentCommentText = sanitizeHtml(parentCommentHtml ?? "", sanitizeHtmlOptions)
+      userText += `<parent>${parentCommentText}</parent>`
+    }
+  }
+
+  userText += `<comment>${commentText}</comment>`
+  
+>>>>>>> base/master
   const analyticsData = {
     userId: comment.userId,
     commentId: comment._id,
   };
 
   try {
+<<<<<<< HEAD
     let response = await getModGPTAnalysis(api, text);
     const topResult = response.choices[0].message?.content;
     if (!topResult) return;
@@ -133,19 +237,36 @@ async function checkModGPT(comment: DbComment): Promise<void> {
       collection: Comments,
       documentId: comment._id,
       set: {
+=======
+    let response = await getModGPTAnalysis(api, userText)
+    const topResult = response.choices[0].message?.content
+    if (!topResult) return
+    
+    const matches = topResult.match(/^Recommendation: (.+)/)
+    const rec = (matches?.length && matches.length > 1) ? matches[1] : undefined
+    await updateComment({
+      data: {
+>>>>>>> base/master
         modGPTAnalysis: topResult,
         modGPTRecommendation: rec,
       },
+<<<<<<< HEAD
       validate: false,
     });
+=======
+      selector: { _id: comment._id }
+    }, context)
+>>>>>>> base/master
     captureEvent("modGPTResponse", {
       ...analyticsData,
-      comment: text,
+      comment: commentText,
+      fullMessage: userText,
       analysis: topResult,
       recommendation: rec,
     });
 
     // if ModGPT recommends intervening, we collapse the comment and PM the comment author
+<<<<<<< HEAD
     if (rec === "Intervene") {
       const user = await Users.findOne(comment.userId);
       if (!user) throw new Error(`Could not find ${comment.userId}`);
@@ -199,6 +320,64 @@ async function checkModGPT(comment: DbComment): Promise<void> {
         context,
       });
     }
+=======
+    // 2024-01-18: We've temporarily disabled the user-facing components of ModGPT
+    // while we attempt reduce its false positive rate
+    // if (rec === 'Intervene') {
+    //   const user = await Users.findOne(comment.userId)
+    //   if (!user) throw new Error(`Could not find ${comment.userId}`)
+
+    //   const commentLink = commentGetPageUrlFromIds({
+    //     postId: comment.postId,
+    //     commentId: comment._id,
+    //     permalink: true,
+    //     isAbsolute: true
+    //   })
+    //   const flagMatches = topResult.match(/^Flag: (.+)/m)
+    //   const flag = (flagMatches?.length && flagMatches.length > 1) ? flagMatches[1] : undefined
+      
+    //   // create a new conversation between the commenter and the admin team account
+    //   const adminsAccount = await getAdminTeamAccount()
+    //   if (!adminsAccount) throw new Error("Could not find admin account")
+    //   const conversationData = {
+    //     participantIds: [user._id, adminsAccount._id],
+    //     title: 'Your comment was auto-flagged'
+    //   }
+    //   const conversation = await createMutator({
+    //     collection: Conversations,
+    //     document: conversationData,
+    //     currentUser: adminsAccount,
+    //     validate: false
+    //   })
+      
+    //   const messageDocument = {
+    //     userId: adminsAccount._id,
+    //     contents: {
+    //       originalContents: {
+    //         type: "html",
+    //         data: getMessageToCommenter(user, commentLink, flag)
+    //       }
+    //     },
+    //     conversationId: conversation.data._id,
+    //   }
+    //   await createMutator({
+    //     collection: Messages,
+    //     document: messageDocument,
+    //     currentUser: adminsAccount,
+    //     validate: false
+    //   })
+      
+    //   // also add a note for mods
+    //   const context = createAdminContext();
+    //   await appendToSunshineNotes({
+    //     moderatedUserId: comment.userId,
+    //     adminName: "ModGPT",
+    //     text: `Intervened on comment ID=${comment._id}`,
+    //     context,
+    //   });
+    // }
+    
+>>>>>>> base/master
   } catch (error) {
     if (error instanceof OpenAI.APIError) {
       captureEvent("modGPTError", {
@@ -207,6 +386,7 @@ async function checkModGPT(comment: DbComment): Promise<void> {
         error: error.message,
       });
       // If we can't reach ModGPT, then make sure to clear out any previous ModGPT-related data on the comment.
+<<<<<<< HEAD
       await updateMutator({
         collection: Comments,
         documentId: comment._id,
@@ -216,6 +396,9 @@ async function checkModGPT(comment: DbComment): Promise<void> {
         },
         validate: false,
       });
+=======
+      await updateComment({ data: { modGPTAnalysis: null, modGPTRecommendation: null }, selector: { _id: comment._id } }, context)
+>>>>>>> base/master
     } else {
       //eslint-disable-next-line no-console
       console.error(error);
@@ -223,6 +406,7 @@ async function checkModGPT(comment: DbComment): Promise<void> {
     return;
   }
 }
+<<<<<<< HEAD
 
 getCollectionHooks("Comments").updateAsync.add(async ({ oldDocument, newDocument }) => {
   if (!isEAForum || !newDocument.postId || newDocument.deleted) return;
@@ -245,3 +429,5 @@ getCollectionHooks("Comments").createAsync.add(async ({ document }) => {
 
   void checkModGPT(document);
 });
+=======
+>>>>>>> base/master

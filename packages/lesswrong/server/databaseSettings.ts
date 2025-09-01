@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { DatabaseMetadata } from "../lib/collections/databaseMetadata/collection";
 import { isDevelopment } from "../lib/executionEnvironment";
 import { initializeSetting } from "../lib/publicSettings";
@@ -10,9 +11,23 @@ import {
 import groupBy from "lodash/groupBy";
 import get from "lodash/get";
 import { ensureIndex } from "../lib/collectionIndexUtils";
+=======
+import { isDevelopment } from '../lib/executionEnvironment';
+import {
+    getPublicSettings,
+    getServerSettingsCache,
+    getServerSettingsLoaded,
+    initializeSetting,
+    registeredSettings,
+} from '../lib/settingsCache'
+import groupBy from 'lodash/groupBy';
+import get from 'lodash/get'
+import { forumSelect } from '@/lib/forumTypeUtils';
+>>>>>>> base/master
 
 const runValidateSettings = false;
 
+<<<<<<< HEAD
 ensureIndex(
   DatabaseMetadata,
   {
@@ -23,6 +38,8 @@ ensureIndex(
   },
 );
 
+=======
+>>>>>>> base/master
 if (isDevelopment && runValidateSettings) {
   // On development we validate the settings files, but wait 30 seconds to make sure that everything has really been loaded
   setTimeout(() => validateSettings(registeredSettings, getPublicSettings(), getServerSettingsCache()), 30000);
@@ -61,11 +78,15 @@ export class DatabaseServerSetting<SettingValueType> {
   }
 }
 
+<<<<<<< HEAD
 function validateSettings(
   registeredSettings: Record<string, "server" | "public" | "instance">,
   publicSettings: Record<string, any>,
   serverSettings: Record<string, any>,
 ) {
+=======
+function validateSettings(registeredSettings: Record<string, "server" | "public" | "instance">, publicSettings: Record<string, any>, serverSettings: Record<string, any>) {
+>>>>>>> base/master
   Object.entries(registeredSettings).forEach(([key, value]) => {
     if (value === "server" && typeof get(serverSettings, key) === "undefined") {
       // eslint-disable-next-line no-console
@@ -112,3 +133,32 @@ function validateSettings(
   // eslint-disable-next-line no-console
   console.log(groupBy(Object.keys(registeredSettings), (key) => registeredSettings[key]));
 }
+
+export const openAIApiKey = new DatabaseServerSetting<string|null>('languageModels.openai.apiKey', null);
+export const openAIOrganizationId = new DatabaseServerSetting<string|null>('languageModels.openai.organizationId', null);
+
+export const vertexDocumentServiceParentPathSetting = new DatabaseServerSetting<string | null>('googleVertex.documentServiceParentPath', null);
+export const vertexUserEventServiceParentPathSetting = new DatabaseServerSetting<string | null>('googleVertex.userEventServiceParentPath', null);
+export const vertexRecommendationServingConfigPathSetting = new DatabaseServerSetting<string | null>('googleVertex.recommendationServingConfigPath', null);
+
+export const tagBotAccountSlug = new DatabaseServerSetting<string|null>('languageModels.autoTagging.taggerAccountSlug', null);
+export const tagBotActiveTimeSetting = new DatabaseServerSetting<"always" | "weekends">('languageModels.autoTagging.activeTime', "always");
+
+export const autoFrontpageSetting = new DatabaseServerSetting<boolean>('languageModels.autoTagging.autoFrontpage', false);
+export const autoFrontpageModelSetting = new DatabaseServerSetting<string|null>('languageModels.autoTagging.autoFrontpageModel', "gpt-4o-mini");
+export const autoFrontpagePromptSetting = new DatabaseServerSetting<string | null>("languageModels.autoTagging.autoFrontpagePrompt", null);
+
+// Akismet API integration
+export const akismetKeySetting = new DatabaseServerSetting<string | null>('akismet.apiKey', null)
+export const akismetURLSetting = new DatabaseServerSetting<string | null>('akismet.url', null)
+
+export const commentAncestorsToNotifySetting = new DatabaseServerSetting<number>('commentAncestorsToNotifySetting', forumSelect({EAForum: 5, default: 1}));
+
+export const changesAllowedSetting = new DatabaseServerSetting<number>('displayNameRateLimit.changesAllowed', 1);
+export const sinceDaysAgoSetting = new DatabaseServerSetting<number>('displayNameRateLimit.sinceDaysAgo', 60);
+
+export const welcomeEmailPostId = new DatabaseServerSetting<string|null>("welcomeEmailPostId", null);
+export const forumTeamUserId = new DatabaseServerSetting<string|null>("forumTeamUserId", null);
+
+// Anti-DDoS measure
+export const botProtectionCommentRedirectSetting = new DatabaseServerSetting<boolean>("botProtectionCommentRedirect", forumSelect({EAForum: true, default: false}));

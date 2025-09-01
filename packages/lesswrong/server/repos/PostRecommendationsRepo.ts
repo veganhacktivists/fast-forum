@@ -1,5 +1,5 @@
 import AbstractRepo from "./AbstractRepo";
-import PostRecommendations from "../../lib/collections/postRecommendations/collection";
+import PostRecommendations from "../../server/collections/postRecommendations/collection";
 import { randomId } from "../../lib/random";
 import type { RecommendationStrategyName, StrategySettings } from "../../lib/collections/users/recommendationSettings";
 import { recordPerfMetrics } from "./perfMetricWrapper";

@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import Users from "../../lib/collections/users/collection";
+=======
+import { registerMigration } from './migrationUtils';
+import Users from '../../server/collections/users/collection';
+
+>>>>>>> base/master
 
 // this list was produced using the query and then spreadsheet logic
 // located in https://docs.google.com/spreadsheets/d/1bkC3MpPE9WcC54JFNcw1jiA4m5v_Dwysk_1sPL0m9RA/edit#gid=1727558334
@@ -157,7 +163,7 @@ const targetUserIds = [
   "ZzC2bFGnA5hiGPPCf",
 ];
 
-registerMigration({
+export default registerMigration({
   name: "fillOptInValues",
   dateWritten: "2023-11-06",
   idempotent: true,

@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+<<<<<<< HEAD
 // import './datadog/tracer';
 import { createSqlConnection } from "./sqlConnection";
 import { getSqlClientOrThrow, replaceDbNameInPgConnectionString, setSqlClient } from "../lib/sql/sqlClient";
@@ -23,6 +24,24 @@ import { ensurePostgresViewsExist } from "./postgresView";
 import cluster from "node:cluster";
 import { cpus } from "node:os";
 import { panic } from "./utils/errorUtil";
+=======
+import './datadog/tracer';
+import { createSqlConnection } from './sqlConnection';
+import { replaceDbNameInPgConnectionString, setSqlClient } from './sql/sqlClient';
+import PgCollection, { DbTarget } from './sql/PgCollection';
+import { getAllCollections } from './collections/allCollections';
+import { isAnyTest } from '../lib/executionEnvironment';
+import { PublicInstanceSetting } from "../lib/instanceSettings";
+import { refreshSettingsCaches } from './loadDatabaseSettings';
+import { CommandLineArguments, getCommandLineArguments } from './commandLine';
+import { getBranchDbName } from "./branchDb";
+import { dropAndCreatePg } from './testingSqlClient';
+import process from 'process';
+import { filterConsoleLogSpam, wrapConsoleLogFunctions } from '../lib/consoleFilters';
+import cluster from 'node:cluster';
+import { cpus } from 'node:os';
+import { panic } from './utils/errorUtil';
+>>>>>>> base/master
 
 const numCPUs = cpus().length;
 
@@ -30,11 +49,17 @@ const numCPUs = cpus().length;
  * Whether to run multiple node processes in a cluster.
  * The main reason this is a PublicInstanceSetting because it would be annoying and disruptive for other devs to change this while you're running the server.
  */
+<<<<<<< HEAD
 export const clusterSetting = new PublicInstanceSetting<boolean>("cluster.enabled", false, "optional");
 export const numWorkersSetting = new PublicInstanceSetting<number>("cluster.numWorkers", numCPUs, "optional");
 
 // Do this here to avoid a dependency cycle
 Globals.dropAndCreatePg = dropAndCreatePg;
+=======
+export const clusterSetting = new PublicInstanceSetting<boolean>('cluster.enabled', false, 'optional')
+export const numWorkersSetting = new PublicInstanceSetting<number>('cluster.numWorkers', numCPUs, 'optional')
+const processRestartDelay = 5000;
+>>>>>>> base/master
 
 const initConsole = () => {
   const isTTY = process.stdout.isTTY;
@@ -85,6 +110,7 @@ export const initSettings = () => {
   return refreshSettingsCaches();
 };
 
+<<<<<<< HEAD
 export const initPostgres = async () => {
   Collections.filter((collection) => collection instanceof PgCollection).map((collection: PgCollection) => {
     collection.buildPostgresTable();
@@ -126,32 +152,70 @@ const executeServerWithArgs = async ({ shellMode, command }: CommandLineArgument
 };
 
 export const initServer = async (commandLineArguments?: CommandLineArguments) => {
+=======
+const initPostgres = async () => {
+  if (getAllCollections().some(collection => collection instanceof PgCollection)) {
+    for (const collection of getAllCollections()) {
+      if (collection instanceof PgCollection) {
+        collection.buildPostgresTable();
+      }
+    }
+  }
+}
+
+export const initServer = async (commandLineArguments: CommandLineArguments) => {
+>>>>>>> base/master
   initConsole();
-  const args = commandLineArguments ?? getCommandLineArguments();
-  if (!args.postgresUrl) {
+  if (!commandLineArguments.postgresUrl) {
     panic("Missing postgresUrl");
   }
-  await initDatabases(args);
+  await initDatabases(commandLineArguments);
   await initSettings();
+<<<<<<< HEAD
   require("../server.ts");
   await initPostgres();
   return args;
 };
+=======
+  importAllServerFiles();
+  await initPostgres();
+}
+
+function importAllServerFiles() {
+  require('../server.ts');
+}
+
+function getClusterRole(): "standalone"|"primary"|"worker" {
+  if (!clusterSetting.get()) {
+    return "standalone";
+  }
+  if (cluster.isPrimary) {
+    return "primary";
+  } else {
+    return "worker";
+  }
+}
+>>>>>>> base/master
 
 export const serverStartup = async () => {
-  // Run server directly if not in cluster mode
-  if (!clusterSetting.get()) {
-    await serverStartupWorker();
-    return;
-  }
+  const commandLineArguments = getCommandLineArguments();
+  const clusterRole = getClusterRole();
 
   // Use OS load balancing (as opposed to round-robin)
   // In principle, this should give better performance because it is aware of resource (cpu) usage
+<<<<<<< HEAD
   cluster.schedulingPolicy = cluster.SCHED_NONE;
   if (cluster.isPrimary) {
+=======
+  if (clusterRole !== "standalone") {
+    cluster.schedulingPolicy = cluster.SCHED_NONE
+  }
+
+  if (clusterRole === "primary") {
+>>>>>>> base/master
     // Initialize db connection and a few other things such as settings, but don't start a webserver.
     console.log("Initializing primary process");
-    await initServer();
+    await initServer(commandLineArguments);
 
     const numWorkers = numWorkersSetting.get();
 
@@ -163,10 +227,16 @@ export const serverStartup = async () => {
       cluster.fork();
     }
 
+<<<<<<< HEAD
     cluster.on("exit", (worker, code, signal) => {
+=======
+    cluster.on('exit', (worker, _code, _signal) => {
+>>>>>>> base/master
       console.log(`Worker ${worker.process.pid} died`);
+      setTimeout(() => cluster.fork(), processRestartDelay);
     });
   } else {
+<<<<<<< HEAD
     console.log(`Starting worker ${process.pid}`);
     await serverStartupWorker();
     console.log(`Worker ${process.pid} started`);
@@ -254,3 +324,18 @@ const watchForShellCommands = () => {
     }
   });
 };
+=======
+    if (clusterRole !== "standalone") {
+      console.log(`Starting worker ${process.pid}`);
+    }
+    
+    await initServer(commandLineArguments);
+    const { serverMain } = require('./serverMain');
+    await serverMain(commandLineArguments);
+
+    if (clusterRole !== "standalone") {
+      console.log(`Worker ${process.pid} started`);
+    }
+  }
+}
+>>>>>>> base/master

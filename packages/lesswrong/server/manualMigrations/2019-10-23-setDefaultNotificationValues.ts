@@ -1,8 +1,12 @@
 import { registerMigration, fillDefaultValues } from "./migrationUtils";
 
+<<<<<<< HEAD
 import { Notifications } from "../../lib/collections/notifications/collection";
+=======
+import { Notifications } from '../../server/collections/notifications/collection';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "setDefaultNotificationValues",
   dateWritten: "2019-10-23",
   idempotent: true,

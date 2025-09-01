@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import sanitizeHtml from "sanitize-html";
 import { Utils } from "../../lib/vulcan-lib/utils";
 import { throwError } from "./errors";
@@ -7,6 +8,15 @@ Utils.performCheck = async <T extends DbObject>(
   user: DbUser | null,
   checkedObject: T,
 
+=======
+import { throwError } from './errors';
+
+export const performCheck = async <T extends DbObject, O extends Partial<T> | Partial<DbInsertion<T>>>(
+  operation: <I extends O>(user: DbUser|null, obj: I, context: any) => Promise<boolean>,
+  user: DbUser|null,
+  checkedObject: O,
+  
+>>>>>>> base/master
   context: ResolverContext,
   documentId: string,
   operationName: string,
@@ -21,4 +31,3 @@ Utils.performCheck = async <T extends DbObject>(
   }
 };
 
-export { Utils };

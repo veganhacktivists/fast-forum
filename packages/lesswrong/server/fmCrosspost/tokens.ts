@@ -2,7 +2,11 @@ import jwt, { VerifyErrors } from "jsonwebtoken";
 import { DatabaseServerSetting } from "../databaseSettings";
 import { InvalidPayloadError, MissingSecretError } from "./errors";
 
+<<<<<<< HEAD
 const crosspostSigningKeySetting = new DatabaseServerSetting<string | null>("fmCrosspostSigningKey", null);
+=======
+export const crosspostSigningKeySetting = new DatabaseServerSetting<string|null>("fmCrosspostSigningKey", null);
+>>>>>>> base/master
 
 const getSecret = () => {
   const secret = crosspostSigningKeySetting.get();
@@ -11,22 +15,6 @@ const getSecret = () => {
   }
   return secret;
 };
-
-const jwtSigningOptions = {
-  algorithm: "HS256",
-  expiresIn: "30m",
-} as const;
-
-export const signToken = <T extends {}>(payload: T): Promise<string> =>
-  new Promise((resolve, reject) => {
-    jwt.sign(payload, getSecret(), jwtSigningOptions, (err, token) => {
-      if (token) {
-        resolve(token);
-      } else {
-        reject(err);
-      }
-    });
-  });
 
 export const verifyToken = <T extends {}>(token: string, validator: (payload: unknown) => payload is T): Promise<T> =>
   new Promise((resolve, reject) => {

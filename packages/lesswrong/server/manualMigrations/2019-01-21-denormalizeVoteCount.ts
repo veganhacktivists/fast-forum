@@ -1,15 +1,28 @@
+<<<<<<< HEAD
 import Votes from "../../lib/collections/votes/collection";
 import { VoteableCollections } from "../../lib/make_voteable";
 import { registerMigration, migrateDocuments } from "./migrationUtils";
 import mapValues from "lodash/mapValues";
 import * as _ from "underscore";
+=======
+import Votes from '../../server/collections/votes/collection';
+import { getVoteableCollections } from '@/server/collections/allCollections';
+import { registerMigration, migrateDocuments } from './migrationUtils';
+import mapValues from 'lodash/mapValues';
+import * as _ from 'underscore';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "denormalizeVoteCount",
   dateWritten: "2019-01-21",
   idempotent: true,
   action: async () => {
+<<<<<<< HEAD
     for (let collection of VoteableCollections) {
+=======
+    for (let collection of getVoteableCollections())
+    {
+>>>>>>> base/master
       await migrateDocuments({
         description: `Fill in voteCount field on ${collection.collectionName}`,
         collection: collection,

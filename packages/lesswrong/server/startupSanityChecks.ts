@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 import { onStartup, isAnyTest } from "../lib/executionEnvironment";
 import process from "process";
 import { DatabaseMetadata } from "../lib/collections/databaseMetadata/collection";
 import { PublicInstanceSetting } from "../lib/instanceSettings";
 import { getPreloadedDatabaseId } from "./loadDatabaseSettings";
+=======
+import { isAnyTest } from '../lib/executionEnvironment';
+import process from 'process';
+import { DatabaseMetadata } from '../server/collections/databaseMetadata/collection';
+import { PublicInstanceSetting } from '../lib/instanceSettings';
+import { getPreloadedDatabaseId } from './loadDatabaseSettings';
+>>>>>>> base/master
 
 // Database ID string that this config file should match with
 const expectedDatabaseIdSetting = new PublicInstanceSetting<string | null>("expectedDatabaseId", null, "warning");
@@ -12,7 +20,7 @@ const loadDatabaseId = async () => {
   return databaseIdObject?.value || null;
 };
 
-onStartup(async () => {
+export async function startupSanityChecks() {
   if (isAnyTest) return;
   const expectedDatabaseId = expectedDatabaseIdSetting.get();
   const preload = getPreloadedDatabaseId();
@@ -31,4 +39,9 @@ onStartup(async () => {
       process.exit(1);
     }
   }
+<<<<<<< HEAD
 });
+=======
+}
+
+>>>>>>> base/master

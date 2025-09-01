@@ -1,6 +1,7 @@
 /* See lib/collections/useractivities/collection.ts for a high-level overview */
+import { forumSelect } from "../../lib/forumTypeUtils";
 import { getAnalyticsConnection } from "../analytics/postgresConnection";
-import { environmentDescriptionSetting } from "../analyticsWriter";
+import { environmentDescriptionSetting } from "../analytics/serverAnalyticsWriter";
 
 export interface ActivityWindowData {
   userOrClientId: string;
@@ -10,6 +11,7 @@ export interface ActivityWindowData {
 /*
  * When running this script locally we want it to use the real analytics events
  */
+<<<<<<< HEAD
 const liveEnvDescriptions: Record<string, string> = {
   production: "production",
   staging: "staging",
@@ -17,6 +19,31 @@ const liveEnvDescriptions: Record<string, string> = {
   "local-dev-prod-db": "production", // prod running locally
   "local-dev-staging-db": "staging", // staging running locally
 };
+=======
+const liveEnvDescriptions = forumSelect<Record<string, string>>({
+  EAForum: {
+    "production": 'production',
+    "staging": 'staging',
+    "dev": 'development',
+    "local-dev-prod-db": 'production', // prod running locally
+    "local-dev-staging-db": 'staging', // staging running locally
+  },
+  LessWrong: {
+    "lesswrong.com": 'lesswrong.com',
+    "dev": 'development',
+    // this setting applies to localhost running against prod db – set to 'lesswrong.com' to use analytics events produced in prod, 
+    // or 'development' to use events produced when a server is running locally
+    "local-dev-prod-db": 'lesswrong.com', 
+  },
+  default: {
+    "production": 'production',
+    "staging": 'staging',
+    "dev": 'development',
+    "local-dev-prod-db": 'production', // prod running locally
+    "local-dev-staging-db": 'staging', // staging running locally
+  }
+})
+>>>>>>> base/master
 
 /**
  * Get an array of ActivityWindowData, one for each user or client that was active between startDate and endDate.

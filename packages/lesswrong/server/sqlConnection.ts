@@ -1,12 +1,18 @@
 import pgp, { IDatabase, IEventContext } from "pg-promise";
 import type { IClient, IResult } from "pg-promise/typescript/pg-subset";
-import Query from "../lib/sql/Query";
-import { isAnyTest } from "../lib/executionEnvironment";
+import Query from "@/server/sql/Query";
+import { isAnyTest, isDevelopment } from "../lib/executionEnvironment";
 import { PublicInstanceSetting } from "../lib/instanceSettings";
 import omit from "lodash/omit";
-import { logAllQueries } from "../lib/sql/sqlClient";
+import { logAllQueries, logQueryArguments, measureSqlBytesDownloaded } from "@/server/sql/sqlClient";
+import { recordSqlQueryPerfMetric } from "./perfMetrics";
 
-const SLOW_QUERY_REPORT_CUTOFF_MS = 2000;
+let sqlBytesDownloaded = 0;
+
+// Setting this to -1 disables slow query logging
+const SLOW_QUERY_REPORT_CUTOFF_MS = parseInt(process.env.SLOW_QUERY_REPORT_CUTOFF_MS ?? '') >= -1
+  ? parseInt(process.env.SLOW_QUERY_REPORT_CUTOFF_MS ?? '')
+  : isDevelopment ? 3000 : 2000;
 
 const pgConnIdleTimeoutMsSetting = new PublicInstanceSetting<number>("pg.idleTimeoutMs", 10000, "optional");
 
@@ -50,6 +56,14 @@ export const pgPromiseLib = pgp({
   // console.log("SQL:", context.query);
   // },
 });
+
+export const concat = (queries: Query<any>[]): string => {
+  const compiled = queries.map((query) => {
+    const {sql, args} = query.compile();
+    return {query: sql, values: args};
+  });
+  return pgPromiseLib.helpers.concat(compiled);
+}
 
 /**
  * The postgres default for max_connections is 100 - you can view the current setting
@@ -116,6 +130,7 @@ declare global {
 
 let queriesExecuted = 0;
 
+<<<<<<< HEAD
 const logIfSlow = async <T>(execute: () => Promise<T>, describe: SqlDescription, quiet?: boolean) => {
   const getDescription = (): string => {
     const describeString = typeof describe === "string" ? describe : describe();
@@ -123,6 +138,20 @@ const logIfSlow = async <T>(execute: () => Promise<T>, describe: SqlDescription,
     // entire rendered pages
     return describeString.slice(0, 5000);
   };
+=======
+const logIfSlow = async <T>(
+  execute: () => Promise<T>,
+  describe: SqlDescription,
+  originalQuery: string,
+  quiet?: boolean,
+) => {
+  const getDescription = (truncateLength?: number): string => {
+    const describeString = typeof describe === "string" ? describe : describe();
+    // Truncate this at a pretty high limit, just to avoid logging things like
+    // entire rendered pages
+    return describeString.slice(0, truncateLength ?? 5000)
+  }
+>>>>>>> base/master
 
   const queryID = ++queriesExecuted;
   if (logAllQueries) {
@@ -134,13 +163,20 @@ const logIfSlow = async <T>(execute: () => Promise<T>, describe: SqlDescription,
   const result = await execute();
   const endTime = new Date().getTime();
 
+  recordSqlQueryPerfMetric(originalQuery, startTime, endTime);
+
   const milliseconds = endTime - startTime;
+  if (measureSqlBytesDownloaded || logAllQueries) {
+    sqlBytesDownloaded += JSON.stringify(result).length;
+  }
   if (logAllQueries) {
     // eslint-disable-next-line no-console
     console.log(`Finished query #${queryID} (${milliseconds} ms) (${JSON.stringify(result).length}b)`);
-  } else if (milliseconds > SLOW_QUERY_REPORT_CUTOFF_MS && !quiet && !isAnyTest) {
-    // eslint-disable-next-line no-console
-    console.trace(`Slow Postgres query detected (${milliseconds} ms): ${getDescription()}`);
+  } else if (SLOW_QUERY_REPORT_CUTOFF_MS >= 0 && milliseconds > SLOW_QUERY_REPORT_CUTOFF_MS && !quiet && !isAnyTest) {
+    const description = isDevelopment ? getDescription(50) : getDescription(5000);
+    const message = `Slow Postgres query detected (${milliseconds} ms): ${description}`;
+        // eslint-disable-next-line no-console
+    isDevelopment ? console.error(message) : console.trace(message);
   }
 
   return result;
@@ -154,9 +190,31 @@ const wrapQueryMethod = <T>(
   describe?: SqlDescription,
   quiet?: boolean,
 ) => ReturnType<typeof queryMethod>) => {
+<<<<<<< HEAD
   return (query: string, values?: SqlQueryArgs, describe?: SqlDescription, quiet?: boolean) =>
     logIfSlow(() => queryMethod(query, values), describe ?? query, quiet) as ReturnType<typeof queryMethod>;
 };
+=======
+  return (
+    query: string,
+    values?: SqlQueryArgs,
+    describe?: SqlDescription,
+    quiet?: boolean,
+  ) => {
+    const description = describe
+      ?? (logQueryArguments
+        ? `${query}: ${JSON.stringify(values)}`
+        : query
+      )
+    return logIfSlow(
+      () => queryMethod(query, values),
+      description,
+      query,
+      quiet,
+    ) as ReturnType<typeof queryMethod>;
+  }
+}
+>>>>>>> base/master
 
 export const createSqlConnection = async (url?: string, isTestingClient = false): Promise<SqlClient> => {
   url = url ?? process.env.PG_URL;
@@ -180,6 +238,7 @@ export const createSqlConnection = async (url?: string, isTestingClient = false)
     any: wrapQueryMethod(db.any),
     multi: wrapQueryMethod(db.multi),
     $pool: db.$pool, // $pool is accessed with magic and isn't copied by spreading
+<<<<<<< HEAD
     concat: (queries: Query<any>[]): string => {
       const compiled = queries.map((query) => {
         const { sql, args } = query.compile();
@@ -187,8 +246,19 @@ export const createSqlConnection = async (url?: string, isTestingClient = false)
       });
       return pgPromiseLib.helpers.concat(compiled);
     },
+=======
+    concat,
+>>>>>>> base/master
     isTestingClient,
   };
 
   return client;
+<<<<<<< HEAD
 };
+=======
+}
+
+export const getSqlBytesDownloaded = (): number => {
+  return sqlBytesDownloaded;
+}
+>>>>>>> base/master

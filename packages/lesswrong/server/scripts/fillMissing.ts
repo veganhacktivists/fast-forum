@@ -1,16 +1,29 @@
+<<<<<<< HEAD
 import { Vulcan, Collections } from "../vulcan-lib";
 import { getFieldsWithAttribute } from "./utils";
 import { migrateDocuments, registerMigration } from "../manualMigrations/migrationUtils";
 import { getSchema } from "../../lib/utils/getSchema";
 import * as _ from "underscore";
+=======
+import { getFieldsWithAttribute } from './utils';
+import { migrateDocuments, registerMigration } from '../manualMigrations/migrationUtils'
+import { getSchema } from '@/lib/schema/allSchemas';
+import * as _ from 'underscore';
+import { getAllCollections } from "@/server/collections/allCollections";
+>>>>>>> base/master
 
 registerMigration({
   name: "fillMissingValues",
   dateWritten: "2018-12-26",
   idempotent: true,
   action: async () => {
+<<<<<<< HEAD
     for (let collection of Collections) {
       const schema = getSchema(collection);
+=======
+    for(let collection of getAllCollections()) {
+      const schema = getSchema(collection.collectionName);
+>>>>>>> base/master
       if (!schema) continue;
 
       const fieldsWithAutofill = getFieldsWithAttribute(schema, "canAutofillDefault");
@@ -20,7 +33,11 @@ registerMigration({
       console.log(`Filling in missing values on ${collection.collectionName} in fields: ${fieldsWithAutofill}`);
 
       for (let fieldName of fieldsWithAutofill) {
+<<<<<<< HEAD
         const defaultValue = schema[fieldName].defaultValue;
+=======
+        const defaultValue = schema[fieldName].database?.defaultValue
+>>>>>>> base/master
         await migrateDocuments({
           description: `Filling in missing values for ${collection.collectionName} in field: ${fieldName} (default value: ${defaultValue})`,
           collection,
@@ -47,9 +64,16 @@ registerMigration({
   },
 });
 
+<<<<<<< HEAD
 Vulcan.checkForMissingValues = async () => {
   for (let collection of Collections) {
     const schema = getSchema(collection);
+=======
+// Exported to allow running manually with "yarn repl"
+export const checkForMissingValues = async () => {
+  for(let collection of getAllCollections()) {
+    const schema = getSchema(collection.collectionName);
+>>>>>>> base/master
     if (!schema) continue;
 
     const fieldsWithAutofill = getFieldsWithAttribute(schema, "canAutofillDefault");

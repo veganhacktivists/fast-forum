@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import Users from "../../lib/collections/users/collection";
 import { createMutator, Utils } from "../vulcan-lib";
@@ -5,6 +6,18 @@ import { Posts } from "../../lib/collections/posts";
 import { mapsAPIKeySetting } from "../../components/form-components/LocationFormComponent";
 import { getLocalTime } from "../mapsUtils";
 import { userFindOneByEmail } from "../commonQueries";
+=======
+import { registerMigration } from './migrationUtils';
+import { Posts } from '../../server/collections/posts/collection';
+import { mapsAPIKeySetting } from '@/lib/publicSettings';
+import { getLocalTime } from '../mapsUtils';
+import {userFindOneByEmail} from "../commonQueries";
+import { getUnusedSlugByCollectionName } from '../utils/slugUtil';
+import { createUser } from '../collections/users/mutations';
+import { createPost } from '../collections/posts/mutations';
+import { createAnonymousContext } from '../vulcan-lib/createContexts';
+import { computeContextFromUser } from '../vulcan-lib/apollo-server/context';
+>>>>>>> base/master
 
 const what3WordsAPIKey = "FM5HBWEL";
 
@@ -38,7 +51,7 @@ async function coordinatesToGoogleLocation({ lat, lng }: { lat: string; lng: str
   return responseData.results[0];
 }
 
-registerMigration({
+export default registerMigration({
   name: "importACXMeetups",
   dateWritten: "2021-08-22",
   idempotent: true,
@@ -51,6 +64,7 @@ registerMigration({
       if (existingUser) {
         eventOrganizer = existingUser;
       } else {
+<<<<<<< HEAD
         const { data: newUser } = await createMutator({
           collection: Users,
           document: {
@@ -64,6 +78,17 @@ registerMigration({
           currentUser: null,
         });
         eventOrganizer = newUser;
+=======
+        const userDoc = {
+          username: await getUnusedSlugByCollectionName("Users", row["Name/initials/handle"].toLowerCase()),
+          displayName: row["Name/initials/handle"],
+          email: row["Email address"],
+          reviewedByUserId: "XtphY3uYHwruKqDyG",
+          reviewedAt: new Date()
+        };
+        const newUser = await createUser({ data: userDoc }, createAnonymousContext());
+        eventOrganizer = newUser
+>>>>>>> base/master
       }
       // Call the what3words API to get the location
       const coordinates = await what3WordsToCoordinates(row["Coordinates"]);
@@ -109,12 +134,16 @@ registerMigration({
           authorIsUnreviewed: false,
           types: ["SSC"],
         };
+<<<<<<< HEAD
         const { data: newPost } = await createMutator({
           collection: Posts,
           document: newPostData,
           currentUser: eventOrganizer,
           validate: false,
         });
+=======
+        const newPost = await createPost({ data: newPostData }, await computeContextFromUser({ user: eventOrganizer, isSSR: false }));
+>>>>>>> base/master
         // eslint-disable-next-line no-console
         console.log("Created new ACX Meetup: ", newPost.title);
       } else {

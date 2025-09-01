@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Spotlights from "../lib/collections/spotlights/collection";
 import { addCronJob } from "./cronUtil";
 
@@ -5,6 +6,15 @@ const MS_IN_DAY = 1000 * 60 * 60 * 24;
 
 addCronJob({
   name: "updatePromotedSpotlightItem",
+=======
+import Spotlights from '../server/collections/spotlights/collection';
+import { addCronJob } from './cron/cronUtil';
+
+const MS_IN_DAY = 1000 * 60 * 60 * 24;
+
+export const updatePromotedSpotlightItemCron = addCronJob({
+  name: 'updatePromotedSpotlightItem',
+>>>>>>> base/master
   interval: `every 30 minutes`,
   async job() {
     const spotlights = await Spotlights.find({ draft: false }).fetch();

@@ -33,8 +33,13 @@
  */
 export const acceptsSchemaHash = "c3e1e47f98b00ea1ff4f2dfe2e646604";
 
+<<<<<<< HEAD
 import { Posts } from "../../lib/collections/posts/collection";
 import { addField, dropField } from "./meta/utils";
+=======
+import { Posts } from "../../server/collections/posts/collection"
+import { addField, dropField } from "./meta/utils"
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   await addField(db, Posts, "mostRecentPublishedDialogueResponseDate");

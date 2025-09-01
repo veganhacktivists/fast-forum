@@ -34,8 +34,13 @@
  */
 export const acceptsSchemaHash = "559874dae2627ec571ac2748d5cf6bc2";
 
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { dropDefaultValue, updateDefaultValue } from "./meta/utils";
+=======
+import Users from "../../server/collections/users/collection"
+import { dropDefaultValue, updateDefaultValue } from "./meta/utils"
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   await updateDefaultValue(db, Users, "karma");

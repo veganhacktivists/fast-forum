@@ -1,12 +1,24 @@
+<<<<<<< HEAD
 import { camelCaseify, pluralize } from "../../../lib/vulcan-lib";
 import type { SchemaGraphQLFieldDescription, SchemaGraphQLFieldArgument } from "./initGraphQL";
+=======
+import type { SchemaGraphQLFieldDescription, SchemaGraphQLFieldArgument } from './initGraphQL';
+>>>>>>> base/master
+
+// version that does not make any fields required
+const fieldTemplate = ({ name, type, args, directive, description, required }: SchemaGraphQLFieldDescription, indentation = '') =>
+  `${description ?  `${indentation}# ${description}\n` : ''}${indentation}${name}${getArguments(args)}: ${type} ${directive ? directive : ''}`;
 
 const convertToGraphQL = (fields: SchemaGraphQLFieldDescription[], indentation: string) => {
   return fields.length > 0 ? fields.map((f) => fieldTemplate(f, indentation)).join("\n") : "";
 };
 
+<<<<<<< HEAD
 export const arrayToGraphQL = (fields: SchemaGraphQLFieldArgument[]) =>
   fields.map((f) => `${f.name}: ${f.type}`).join(", ");
+=======
+const arrayToGraphQL = (fields: SchemaGraphQLFieldArgument[]) => fields.map(f => `${f.name}: ${f.type}`).join(', ');
+>>>>>>> base/master
 
 /*
 
@@ -23,6 +35,7 @@ const getArguments = (args: string | SchemaGraphQLFieldArgument[] | null | undef
   }
 };
 
+<<<<<<< HEAD
 /* ------------------------------------- Generic Field Template ------------------------------------- */
 
 // export const fieldTemplate = ({ name, type, args, directive, description, required }, indentation = '') =>
@@ -65,28 +78,28 @@ export const mainTypeTemplate = ({
   ${convertToGraphQL(fields, "  ")}
   }
 `;
+=======
+// get GraphQL type for a given schema and field name
+const getGraphQLType = <N extends CollectionNameString>(
+  graphql: GraphQLFieldSpecification<N>,
+  isInput = false,
+) => {
+  if (isInput && 'inputType' in graphql && graphql.inputType) {
+    return graphql.inputType;
+  }
+>>>>>>> base/master
 
-/* ------------------------------------- Selector Types ------------------------------------- */
+  return graphql.outputType;
+};
 
-/*
+export function isGraphQLField(field: [string, GraphQLFieldSpecification<CollectionNameString> | undefined]): field is [string, GraphQLFieldSpecification<CollectionNameString>] {
+  const [_, graphql] = field;
+  if (!graphql) return false;
 
-The selector type is used to query for one or more documents
-
-type MovieSelectorInput {
-  AND: [MovieSelectorInput]
-  OR: [MovieSelectorInput]
-  id: String
-  id_not: String
-  id_in: [String!]
-  id_not_in: [String!]
-  ...
-  name: String
-  name_not: String
-  name_in: [String!]
-  name_not_in: [String!]
-  ...
+  return !!graphql.canRead?.length || !!graphql.canCreate?.length || !!graphql.canUpdate?.length || !!graphql.forceIncludeInExecutableSchema;
 }
 
+<<<<<<< HEAD
 see https://www.opencrud.org/#sec-Data-types
 
 */
@@ -126,9 +139,28 @@ export const selectorUniqueInputTemplate = ({
   slug: String
 ${convertToGraphQL(fields, "  ")}
 }`;
+=======
+export function getAllGraphQLFields(schema: SchemaType<CollectionNameString>, padding = '    ') {
+  return `{\n${getAllGraphQLFieldsWithoutBraces(schema, padding)}\n}`;
+}
 
-/*
+export function getAllGraphQLFieldsWithoutBraces(schema: SchemaType<CollectionNameString>, padding = '    ') {
+  const fieldDescriptions = Object.entries(schema)
+    .map(([fieldName, fieldSpec]) => [fieldName, fieldSpec.graphql] as const)
+    .filter(isGraphQLField)
+    .map(([fieldName, fieldGraphql]) => {
+      const fieldType = getGraphQLType(fieldGraphql);
+>>>>>>> base/master
 
+      return {
+        description: '',
+        name: fieldName,
+        type: fieldType,
+        args: fieldGraphql.arguments ?? [],
+      };
+    });
+
+<<<<<<< HEAD
 The orderBy type defines which fields a query can be ordered by
 
 enum MovieOrderByInput {
@@ -182,10 +214,16 @@ type SingleMovieInput {
     documentId: String
     # or `_id: String`
     # or `slug: String`
+=======
+  if (fieldDescriptions.length === 0) {
+    throw new Error('No graphql fields found');
+>>>>>>> base/master
   }
-  enableCache: Boolean
+
+  return convertToGraphQL(fieldDescriptions, padding);
 }
 
+<<<<<<< HEAD
 */
 export const singleInputTemplate = ({ typeName }: { typeName: string }) =>
   `input Single${typeName}Input {
@@ -231,9 +269,26 @@ export const multiInputTemplate = ({ typeName }: { typeName: string }) =>
   first: Int
   last: Int
 }`;
+=======
+export function getCreatableGraphQLFields(schema: SchemaType<CollectionNameString>, padding = '    ') {
+  return `{\n${getCreatableGraphQLFieldsWithoutBraces(schema, padding)}\n}`;
+}
 
-/* ------------------------------------- Query Output Types ------------------------------------- */
+export function getCreatableGraphQLFieldsWithoutBraces(schema: SchemaType<CollectionNameString>, padding = '    ') {
+  const fieldDescriptions = Object.entries(schema)
+    .map(([fieldName, fieldSpec]) => [fieldName, fieldSpec.graphql] as const)
+    .filter((field): field is [string, GraphQLFieldSpecification<CollectionNameString>] => !!field[1]?.canCreate?.length)
+    .map(([fieldName, fieldGraphql]) => {
+      const inputFieldType = getGraphQLType(fieldGraphql, true);
+>>>>>>> base/master
 
+      return {
+        name: fieldName,
+        type: inputFieldType,
+      };
+    });
+
+<<<<<<< HEAD
 /*
 
 The type for the return value when querying for a single document
@@ -444,9 +499,15 @@ mutation upsertMovie($selector: MovieSelectorUniqueInput!, $data: UpdateMovieDat
       __typename
     }
     __typename
+=======
+  if (fieldDescriptions.length === 0) {
+    throw new Error('No creatable fields found');
+>>>>>>> base/master
   }
+  return convertToGraphQL(fieldDescriptions, padding);
 }
 
+<<<<<<< HEAD
 */
 export const upsertClientTemplate = ({
   typeName,
@@ -464,3 +525,32 @@ export const upsertClientTemplate = ({
     }
   }
 }`;
+=======
+export function getUpdatableGraphQLFields(schema: SchemaType<CollectionNameString>, padding = '    ') {
+  return `{\n${getUpdatableGraphQLFieldsWithoutBraces(schema, padding)}\n}`;
+}
+
+export function getUpdatableGraphQLFieldsWithoutBraces(schema: SchemaType<CollectionNameString>, padding = '    ') {
+  const fieldDescriptions = Object.entries(schema)
+    .map(([fieldName, fieldSpec]) => [fieldName, fieldSpec.graphql] as const)
+    .filter((field): field is [string, GraphQLFieldSpecification<CollectionNameString>] => !!field[1]?.canUpdate?.length)
+    .map(([fieldName, fieldGraphql]) => {
+      const inputFieldType = getGraphQLType(fieldGraphql, true);
+
+      // Fields should not be required for updates
+      const updateFieldType = (typeof inputFieldType === 'string' && inputFieldType.endsWith('!'))
+        ? inputFieldType.slice(0, -1)
+        : inputFieldType;
+
+      return {
+        name: fieldName,
+        type: updateFieldType,
+      };
+    });
+
+  if (fieldDescriptions.length === 0) {
+    throw new Error('No updatable fields found');
+  }
+  return convertToGraphQL(fieldDescriptions, padding);
+}
+>>>>>>> base/master

@@ -33,7 +33,11 @@
  */
 export const acceptsSchemaHash = "ee9f40a8166012becef3bf0f5a9726b0";
 
+<<<<<<< HEAD
 import Users from "../../lib/vulcan-users";
+=======
+import Users from "../../server/collections/users/collection"
+>>>>>>> base/master
 import { addField, dropField } from "./meta/utils";
 
 export const up = async ({ db }: MigrationContext) => {

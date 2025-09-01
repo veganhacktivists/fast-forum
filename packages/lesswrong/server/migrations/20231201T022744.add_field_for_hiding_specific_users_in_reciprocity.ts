@@ -37,8 +37,13 @@
  */
 export const acceptsSchemaHash = "2d5747e2acdbe83c754cbbda258623ed";
 
+<<<<<<< HEAD
 import DialogueChecks from "../../lib/collections/dialogueChecks/collection";
 import { addField, dropField } from "./meta/utils";
+=======
+import DialogueChecks from "../../server/collections/dialogueChecks/collection"
+import { addField, dropField } from "./meta/utils"
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   await addField(db, DialogueChecks, "hideInRecommendations");

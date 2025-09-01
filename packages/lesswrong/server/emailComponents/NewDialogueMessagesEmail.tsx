@@ -1,14 +1,44 @@
+<<<<<<< HEAD
 import React from "react";
 import { getConfirmedCoauthorIds, postGetEditUrl, postGetPageUrl } from "../../lib/collections/posts/helpers";
 import { Components, registerComponent } from "../../lib/vulcan-lib/components";
 import { useSingle } from "../../lib/crud/withSingle";
 import { userGetDisplayName } from "../../lib/collections/users/helpers";
+=======
+import React from 'react';
+import { getConfirmedCoauthorIds, postGetEditUrl, postGetPageUrl } from '../../lib/collections/posts/helpers';
+import { userGetDisplayName } from '../../lib/collections/users/helpers';
+import { EmailContentItemBody } from './EmailContentItemBody';
+import { useQuery } from "@/lib/crud/useQuery";
+import { gql } from "@/lib/generated/gql-codegen";
+
+const UsersMinimumInfoQuery = gql(`
+  query NewDialogueMessagesEmail1($documentId: String) {
+    user(input: { selector: { documentId: $documentId } }) {
+      result {
+        ...UsersMinimumInfo
+      }
+    }
+  }
+`);
+
+const PostsRevisionQuery = gql(`
+  query NewDialogueMessagesEmail($documentId: String, $version: String) {
+    post(input: { selector: { documentId: $documentId } }) {
+      result {
+        ...PostsRevision
+      }
+    }
+  }
+`);
+>>>>>>> base/master
 
 export interface DialogueMessageEmailInfo {
   messageContents: string;
   messageAuthorId: string;
 }
 
+<<<<<<< HEAD
 const NewDialogueMessagesEmail = ({
   documentId,
   userId,
@@ -35,6 +65,23 @@ const NewDialogueMessagesEmail = ({
     fragmentName: "UsersMinimumInfo",
     skip: !dialogueMessageEmailInfo,
   });
+=======
+export const NewDialogueMessagesEmail = ({documentId, userId, dialogueMessageEmailInfo}: {
+  documentId: string,
+  userId: string,
+  dialogueMessageEmailInfo?: DialogueMessageEmailInfo
+}) => {
+  const { data: dataPost } = useQuery(PostsRevisionQuery, {
+    variables: { documentId: documentId },
+  });
+  const post = dataPost?.post?.result;
+      
+  const { data: dataUser } = useQuery(UsersMinimumInfoQuery, {
+    variables: { documentId: dialogueMessageEmailInfo?.messageAuthorId },
+    skip: !dialogueMessageEmailInfo,
+  });
+  const author = dataUser?.user?.result;
+>>>>>>> base/master
 
   if (!post) return null;
   if (!post.collabEditorDialogue) return null;
@@ -80,6 +127,7 @@ const NewDialogueMessagesEmail = ({
       </>
     );
   }
+<<<<<<< HEAD
 };
 
 const NewDialogueMessagesEmailComponent = registerComponent("NewDialogueMessagesEmail", NewDialogueMessagesEmail);
@@ -87,5 +135,12 @@ const NewDialogueMessagesEmailComponent = registerComponent("NewDialogueMessages
 declare global {
   interface ComponentTypes {
     NewDialogueMessagesEmail: typeof NewDialogueMessagesEmailComponent;
+=======
+  else {
+    return <>
+      <p>There are new responses in the dialogue you are subscribed to, <a href={postGetPageUrl(post)}>{post.title}</a>.
+      </p>
+    </>;
+>>>>>>> base/master
   }
 }

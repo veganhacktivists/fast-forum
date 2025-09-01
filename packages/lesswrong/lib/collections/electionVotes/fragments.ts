@@ -1,6 +1,6 @@
-import { registerFragment } from "../../vulcan-lib";
+import { gql } from "@/lib/generated/gql-codegen";
 
-registerFragment(`
+export const ElectionVoteInfo = gql(`
   fragment ElectionVoteInfo on ElectionVote {
     _id
     electionName
@@ -12,12 +12,12 @@ registerFragment(`
     userExplanation
     userOtherComments
   }
-`);
+`)
 
-registerFragment(`
+export const ElectionVoteRecentDiscussion = gql(`
   fragment ElectionVoteRecentDiscussion on ElectionVote {
     _id
     electionName
     submittedAt
   }
-`);
+`)

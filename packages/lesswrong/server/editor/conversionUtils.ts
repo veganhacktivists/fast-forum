@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { trimLatexAndAddCSS, preProcessLatex } from "./utils";
 import { randomId } from "../../lib/random";
 import { convertFromRaw } from "draft-js";
@@ -48,6 +49,85 @@ export function mjPagePromise(
   html: string,
   beforeSerializationCallback: (dom: any, css: string) => any,
 ): Promise<string> {
+=======
+import { trimLatexAndAddCSS, preProcessLatex } from './latexUtils';
+import { randomId } from '../../lib/random';
+import { convertFromRaw } from 'draft-js';
+import { draftToHTML } from '../draftConvert';
+import { captureException } from '@sentry/core';
+import type TurndownService from 'turndown';
+import { isAnyTest } from '../../lib/executionEnvironment';
+import { cheerioParse } from '../utils/htmlUtil';
+import { sanitize } from '../../lib/vulcan-lib/utils';
+import { filterWhereFieldsNotNull } from '../../lib/utils/typeGuardUtils';
+import escape from 'lodash/escape';
+import { getMarkdownIt } from '@/lib/utils/markdownItPlugins';
+
+let _turndownService: TurndownService|null = null;
+function getTurndown(): TurndownService {
+  if (!_turndownService) {
+    const TurndownService = require('turndown');
+    const {gfm} = require('turndown-plugin-gfm');
+
+    const turndownService: TurndownService = new TurndownService()
+    turndownService.use(gfm); // Add support for strikethrough and tables
+    turndownService.remove('style') // Make sure we don't add the content of style tags to the markdown
+    turndownService.addRule('footnote-ref', {
+      filter: (node, options) => node.classList?.contains('footnote-reference'),
+      replacement: (content, node) => {
+        // Use the data-footnote-id attribute to get the footnote id
+        const id = (node as Element).getAttribute('data-footnote-id') || 'MISSING-ID'
+        return `[^${id}]`
+      }
+    })
+    
+    turndownService.addRule('footnote', {
+      filter: (node, options) => node.classList?.contains('footnote-item'),
+      replacement: (content, node) => {
+        // Use the data-footnote-id attribute to get the footnote id
+        const id = (node as Element).getAttribute('data-footnote-id') || 'MISSING-ID'
+    
+        // Get the content of the footnote by getting the content of the footnote-content div
+        const text = (node as Element).querySelector('.footnote-content')?.textContent || ''
+        return `[^${id}]: ${text} \n\n`
+      }
+    })
+    turndownService.addRule('subscript', {
+      filter: ['sub'],
+      replacement: (content) => `~${content}~`
+    })
+    turndownService.addRule('supscript', {
+      filter: ['sup'],
+      replacement: (content) => `^${content}^`
+    })
+    turndownService.addRule('italic', {
+      filter: ['i'],
+      replacement: (content) => `*${content}*`
+    })
+    //If we have a math-tex block, we want to leave it as is without escaping it
+    turndownService.addRule('latex-spans', {
+      filter: (node, options) => node.classList?.contains('math-tex'),
+      replacement: (content) => {
+        // Leave the first three and last three characters alone, and then replace every escaped markdown control character with its unescaped version
+        return content.slice(0, 3) + content.slice(3, -3).replace(/\\([ \\!"#$%&'()*+,./:;<=>?@[\]^_`{|}~-])/g, '$1') + content.slice(-3)
+      }
+    })
+    
+    turndownService.addRule('collapsible-section-start', {
+      filter: (node, options) => node.classList?.contains('detailsBlockTitle'),
+      replacement: (content) => `+++ ${content.trim()}\n`
+    });
+    turndownService.addRule('collapsible-section-end', {
+      filter: (node, options) => node.classList?.contains('detailsBlock'),
+      replacement: (content) => `${content}\n+++`
+    });
+    _turndownService = turndownService;
+  }
+  return _turndownService;
+}
+
+export function mjPagePromise(html: string, beforeSerializationCallback: (dom: any, css: string) => any): Promise<string> {
+>>>>>>> base/master
   // Takes in HTML and replaces LaTeX with CommonHTML snippets
   // https://github.com/pkra/mathjax-node-page
   return new Promise((resolve, reject) => {
@@ -66,6 +146,7 @@ export function mjPagePromise(
       }, 10000);
     }
 
+<<<<<<< HEAD
     const errorHandler = (
       id: AnyBecauseTodo,
       wrapperNode: AnyBecauseTodo,
@@ -77,17 +158,41 @@ export function mjPagePromise(
       console.log("Error in Mathjax handling: ", id, wrapperNode, sourceFormula, sourceFormat, errors);
       reject(`Error in $${sourceFormula}$: ${errors}`);
     };
+=======
+    const errorHandler = (id: AnyBecauseTodo, wrapperNode: AnyBecauseTodo, sourceFormula: AnyBecauseTodo, sourceFormat: AnyBecauseTodo, errors: AnyBecauseTodo) => {
+      // This error handler runs for each LaTeX formula with an error in the
+      // document, and provides a JSDOM node for the element that wraps the
+      // formula. We handle this by making a (text) error message, and adding
+      // it as text in the DOM under wrapperNode.
+      // We use innerHTML and escape with `lodash/escape` rather than using
+      // innerText (which would normally be safer) because JSDOM doesn't seem
+      // to have innerText as a writeable prop.
+
+      // eslint-disable-next-line no-console
+      console.log("Error in Mathjax handling: ", id, wrapperNode, sourceFormula, sourceFormat, errors)
+
+      const errorMessage = "Invalid LaTeX $"+sourceFormula+": "+errors;
+      wrapperNode.innerHTML = escape(errorMessage);
+    }
+>>>>>>> base/master
 
     const callbackAndMarkFinished = (dom: any, css: string) => {
       finished = true;
       return beforeSerializationCallback(dom, css);
     };
 
+<<<<<<< HEAD
     mjpage(html, { fragment: true, errorHandler, format: ["MathML", "TeX"] }, { html: true, css: true }, resolve).on(
       "beforeSerialization",
       callbackAndMarkFinished,
     );
   });
+=======
+    const { mjpage } = require('mathjax-node-page')
+    mjpage(html, { fragment: true, errorHandler, format: ["MathML", "TeX"] } , {html: true, css: true}, resolve)
+      .on('beforeSerialization', callbackAndMarkFinished);
+  })
+>>>>>>> base/master
 }
 
 // Adapted from: https://github.com/cheeriojs/cheerio/issues/748
@@ -150,7 +255,8 @@ function wrapSpoilerTags(html: string): string {
   return $.html();
 }
 
-export const handleDialogueHtml = async (html: string): Promise<string> => {
+export const handleDialogueHtml = async (html: string, context: ResolverContext): Promise<string> => {
+  const { Users } = context;
   const $ = cheerioParse(html);
 
   $(".dialogue-message-input-wrapper").remove();
@@ -162,7 +268,7 @@ export const handleDialogueHtml = async (html: string): Promise<string> => {
     if (userId) userIds.push(userId);
   });
 
-  const rawUsers = await Users.find({ _id: { $in: userIds } }, { projection: { _id: 1, displayName: 1 } }).fetch();
+  const rawUsers = await Users.find({ _id: { $in: userIds } }, {}, { _id: 1, displayName: 1 }).fetch();
 
   if (rawUsers.some((user) => !user.displayName)) throw new Error("Some users in dialogue have no display name"); //should never happen, better than filtering out users with no display name
   const users = filterWhereFieldsNotNull(rawUsers, "displayName"); //shouldn't get to this point if missing displayname, but need to make types happy
@@ -184,6 +290,7 @@ export const handleDialogueHtml = async (html: string): Promise<string> => {
   return $.html();
 };
 
+<<<<<<< HEAD
 interface UserIdAndDisplayName {
   userId: string;
   displayName: string;
@@ -241,6 +348,8 @@ export const backfillDialogueMessageInputAttributes = async (html: string, postI
 
   return $.html();
 };
+=======
+>>>>>>> base/master
 
 const trimLeadingAndTrailingWhiteSpace = (html: string): string => {
   const $ = cheerioParse(`<div id="root">${html}</div>`);
@@ -281,11 +390,16 @@ export async function draftJSToHtmlWithLatex(draftJS: AnyBecauseTodo) {
 }
 
 export function htmlToMarkdown(html: string): string {
+<<<<<<< HEAD
   return turndownService.turndown(html);
+=======
+  return getTurndown().turndown(html)
+>>>>>>> base/master
 }
 
 export function ckEditorMarkupToMarkdown(markup: string): string {
   // Sanitized CKEditor markup is just html
+<<<<<<< HEAD
   return turndownService.turndown(sanitize(markup));
 }
 
@@ -298,20 +412,58 @@ export function markdownToHtmlNoLaTeX(markdown: string): string {
 export async function markdownToHtml(markdown: string): Promise<string> {
   const html = markdownToHtmlNoLaTeX(markdown);
   return await mjPagePromise(html, trimLatexAndAddCSS);
+=======
+  return getTurndown().turndown(sanitize(markup))
 }
 
-export async function ckEditorMarkupToHtml(markup: string): Promise<string> {
+export function markdownToHtmlNoLaTeX(markdown: string): string {
+  const id = randomId()
+  const renderedMarkdown = getMarkdownIt().render(markdown, {docId: id})
+  return trimLeadingAndTrailingWhiteSpace(renderedMarkdown)
+}
+
+export async function markdownToHtml(markdown: string, options?: {
+  skipMathjax?: boolean
+}): Promise<string> {
+  const html = markdownToHtmlNoLaTeX(markdown)
+  if (options?.skipMathjax) {
+    return html;
+  } else {
+    return await mjPagePromise(html, trimLatexAndAddCSS)
+  }
+>>>>>>> base/master
+}
+
+async function ckEditorMarkupToHtml(markup: string, context: ResolverContext, skipMathjax?: boolean): Promise<string> {
   // Sanitized CKEditor markup is just html
+<<<<<<< HEAD
   const html = sanitize(markup);
   const trimmedHtml = trimLeadingAndTrailingWhiteSpace(html);
   const hydratedHtml = await handleDialogueHtml(trimmedHtml);
   // Render any LaTeX tags we might have in the HTML
   return await mjPagePromise(hydratedHtml, trimLatexAndAddCSS);
+=======
+  const html = sanitize(markup)
+  const trimmedHtml = trimLeadingAndTrailingWhiteSpace(html)
+  const hydratedHtml = await handleDialogueHtml(trimmedHtml, context)
+  // Render any LaTeX tags we might have in the HTML
+  if (skipMathjax) {
+    return hydratedHtml;
+  } else {
+    return await mjPagePromise(hydratedHtml, trimLatexAndAddCSS)
+  }
+>>>>>>> base/master
 }
 
-export async function dataToHTML(data: AnyBecauseTodo, type: string, sanitizeData = false) {
+interface DataToHTMLOptions {
+  sanitize?: boolean,
+  skipMathjax?: boolean,
+}
+
+export async function dataToHTML(data: AnyBecauseTodo, type: string, context: ResolverContext, options?: DataToHTMLOptions) {
   switch (type) {
     case "html":
+<<<<<<< HEAD
       return await mjPagePromise(sanitizeData ? sanitize(data) : data, trimLatexAndAddCSS);
     case "ckEditorMarkup":
       return await ckEditorMarkupToHtml(data);
@@ -321,6 +473,21 @@ export async function dataToHTML(data: AnyBecauseTodo, type: string, sanitizeDat
       return await markdownToHtml(data);
     default:
       throw new Error(`Unrecognized format: ${type}`);
+=======
+      const maybeSanitized = options?.sanitize ? sanitize(data) : data;
+      if (options?.skipMathjax) {
+        return maybeSanitized;
+      } else {
+        return await mjPagePromise(maybeSanitized, trimLatexAndAddCSS)
+      }
+    case "ckEditorMarkup":
+      return await ckEditorMarkupToHtml(data, context, !!options?.skipMathjax)
+    case "draftJS":
+      return await draftJSToHtmlWithLatex(data);
+    case "markdown":
+      return await markdownToHtml(data, { skipMathjax: options?.skipMathjax })
+    default: throw new Error(`Unrecognized format: ${type}`);
+>>>>>>> base/master
   }
 }
 
@@ -403,7 +570,7 @@ export async function dataToCkEditor(data: AnyBecauseTodo, type: string) {
  * steps to run into. Our strategy for this is to keep a running best estimate, to be
  * returned if any step fails.
  */
-export async function dataToWordCount(data: AnyBecauseTodo, type: string) {
+export async function dataToWordCount(data: AnyBecauseTodo, type: string, context: ResolverContext) {
   let bestWordCount = 0;
 
   try {
@@ -423,8 +590,14 @@ export async function dataToWordCount(data: AnyBecauseTodo, type: string) {
     bestWordCount = wordCountWithoutFootnotes;
 
     // Convert to HTML and try removing appendixes
+<<<<<<< HEAD
     const htmlWithoutFootnotes = (await dataToHTML(withoutFootnotes, "markdown")) ?? "";
     const htmlWithoutFootnotesAndAppendices = htmlWithoutFootnotes.split(/<h[1-6]>.*(appendix).*<\/h[1-6]>/i)[0];
+=======
+    const htmlWithoutFootnotes = await dataToHTML(withoutFootnotes, "markdown", context, { skipMathjax: true }) ?? "";
+    const htmlWithoutFootnotesAndAppendices = htmlWithoutFootnotes
+      .split(/<h[1-6]>.*(appendix).*<\/h[1-6]>/i)[0];
+>>>>>>> base/master
     const markdownWithoutFootnotesAndAppendices = dataToMarkdown(htmlWithoutFootnotesAndAppendices, "html");
     bestWordCount = markdownWithoutFootnotesAndAppendices.trim().split(/[\s]+/g).length;
   } catch (err) {
@@ -433,4 +606,25 @@ export async function dataToWordCount(data: AnyBecauseTodo, type: string) {
   }
 
   return bestWordCount;
+}
+
+export async function buildRevision({ originalContents, currentUser, dataWithDiscardedSuggestions, context }: {
+  originalContents: DbRevision["originalContents"],
+  currentUser: DbUser,
+  dataWithDiscardedSuggestions?: string,
+  context: ResolverContext,
+}) {
+
+  if (!originalContents) throw new Error ("Can't build revision without originalContents")
+
+  const { data, type } = originalContents;
+  const readerVisibleData = dataWithDiscardedSuggestions ?? data
+  const html = await dataToHTML(readerVisibleData, type, context, { sanitize: !currentUser.isAdmin })
+  const wordCount = await dataToWordCount(readerVisibleData, type, context)
+
+  return {
+    html, wordCount, originalContents,
+    editedAt: new Date(),
+    userId: currentUser._id,
+  };
 }

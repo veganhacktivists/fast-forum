@@ -1,9 +1,8 @@
 /* eslint-disable no-console */
-import { ClientIds } from "../../lib/collections/clientIds/collection";
-import { Comments } from "../../lib/collections/comments";
-import LWEvents from "../../lib/collections/lwevents/collection";
-import Votes from "../../lib/collections/votes/collection";
-import { Vulcan } from "../vulcan-lib";
+import { ClientIds } from "../../server/collections/clientIds/collection";
+import { Comments } from "../../server/collections/comments/collection";
+import LWEvents from "../../server/collections/lwevents/collection";
+import Votes from "../../server/collections/votes/collection";
 import uniq from "lodash/uniq";
 import intersection from "lodash/intersection";
 import { wrapVulcanAsyncScript } from "./utils";
@@ -91,10 +90,18 @@ const checkForDuplicateIPs = async (voterIds: string[]): Promise<Record<string, 
  *
  * It will also report if multiple users who voted on the post share a recent IP address. This part is still WIP, and most of
  * these cases are false positives since there are many legit reasons for users to be associated with the same IP.
+ *
+ * Exported to allow running manually with "yarn repl"
  */
+<<<<<<< HEAD
 const checkPostForSockpuppetVoting = async (postId: string, voteDirection: "up" | "down" = "down", verbose = false) => {
   const voteTypes = voteDirection === "up" ? ["smallUpvote", "bigUpvote"] : ["smallDownvote", "bigDownvote"];
 
+=======
+export const checkPostForSockpuppetVoting = async (postId: string, voteDirection: 'up'|'down' = 'down', verbose = false) => {
+  const voteTypes = voteDirection === 'up' ? ['smallUpvote', 'bigUpvote'] : ['smallDownvote', 'bigDownvote']
+  
+>>>>>>> base/master
   // Get a list of userIds for users who voted on the post (in the given direction)
   const postVotes = await Votes.find(
     {
@@ -180,6 +187,7 @@ const checkPostForSockpuppetVoting = async (postId: string, voteDirection: "up" 
   } else {
     console.log(`Found no IPs associated with multiple post ${voteDirection}voters.`);
   }
+<<<<<<< HEAD
 
   console.log(
     `Comments where we found client IDs associated with multiple ${voteDirection}voters (with the relevant client IDs):`,
@@ -191,3 +199,8 @@ Vulcan.checkPostForSockpuppetVoting = wrapVulcanAsyncScript(
   "checkPostForSockpuppetVoting",
   checkPostForSockpuppetVoting,
 );
+=======
+  
+  console.log(`Comments where we found client IDs associated with multiple ${voteDirection}voters (with the relevant client IDs):`, commentsSuspiciousClientIds)
+}
+>>>>>>> base/master

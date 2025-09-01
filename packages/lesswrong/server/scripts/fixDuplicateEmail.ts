@@ -41,7 +41,11 @@ export function classifyDuplicateUser(user: DuplicateUser): ClassifiedUser {
 }
 
 export function mergeSingleUser(userList: Array<DuplicateUser>): MergeAction {
+<<<<<<< HEAD
   const classifications = userList.map(classifyDuplicateUser);
+=======
+  const classifications = userList.map(classifyDuplicateUser)
+>>>>>>> base/master
 
   // If we only want to keep one user, we are done
   if (classifications.filter((x) => x.classification === MergeType.KeepAccount).length === 1) {

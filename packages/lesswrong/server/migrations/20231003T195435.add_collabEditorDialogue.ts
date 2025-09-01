@@ -38,8 +38,13 @@
  */
 export const acceptsSchemaHash = "2e10471e3641d01fe309198fb9ecff32";
 
+<<<<<<< HEAD
 import { Posts } from "../../lib/collections/posts/collection";
 import { updateDefaultValue, addField, dropField } from "./meta/utils";
+=======
+import { Posts } from "../../server/collections/posts/collection"
+import { updateDefaultValue, addField, dropField } from "./meta/utils"
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   await addField(db, Posts, "collabEditorDialogue");

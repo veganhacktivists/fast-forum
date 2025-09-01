@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
 import {
   editableCollections,
@@ -6,16 +7,23 @@ import {
 } from "../../lib/editor/make_editable";
 import { getCollection } from "../../lib/vulcan-lib";
 import { htmlToPingbacks } from "../pingbacks";
+=======
+import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
+import { getEditableFieldsByCollection } from '@/server/editor/editableSchemaFieldHelpers';
+import { getCollection } from '../collections/allCollections';
+import { htmlToPingbacks } from '../pingbacks';
+import Revisions from '@/server/collections/revisions/collection';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "generatePingbacksAgain",
   dateWritten: "2019-12-05",
   idempotent: true,
   action: async () => {
-    for (let collectionName of editableCollections) {
-      for (let editableField of editableCollectionsFields[collectionName]!) {
-        if (editableCollectionsFieldOptions[collectionName][editableField].pingbacks) {
-          await updatePingbacks(collectionName, editableField);
+    for (let [collectionName, editableFields] of Object.entries(getEditableFieldsByCollection())) {
+      for (let [fieldName, editableField] of Object.entries(editableFields)) {
+        if (editableField.graphql.editableFieldOptions.pingbacks) {
+          await updatePingbacks(collectionName as CollectionNameString, fieldName);
         }
       }
     }
@@ -34,9 +42,19 @@ const updatePingbacks = async (collectionName: CollectionNameString, fieldName: 
       let updates: Array<any> = [];
 
       for (let document of documents) {
-        const html = document[fieldName]?.html;
+        const latestRevId = document[`${fieldName}_latest`];
+        if (!latestRevId) {
+          continue;
+        }
+        const rev = await Revisions.findOne({
+          _id: latestRevId,
+        });
+        if (!rev) {
+          continue;
+        }
+        const html = rev.html;
         if (html) {
-          const pingbacks = await htmlToPingbacks(html);
+          const pingbacks = await htmlToPingbacks(html, null);
           if (JSON.stringify(document.pingbacks) !== JSON.stringify(pingbacks)) {
             updates.push({
               updateOne: {

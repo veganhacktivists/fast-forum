@@ -13,10 +13,17 @@
  */
 export const acceptsSchemaHash = "ea71916ffaa87ae0a21302ce831261e6";
 
+<<<<<<< HEAD
 import Spotlights from "../../lib/collections/spotlights/collection";
 import Tags from "../../lib/collections/tags/collection";
 import Users from "../../lib/vulcan-users";
 import { addField } from "./meta/utils";
+=======
+import Spotlights from "../../server/collections/spotlights/collection"
+import Tags from "../../server/collections/tags/collection"
+import Users from "../../server/collections/users/collection"
+import { addField } from "./meta/utils"
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   const collectionsAndFieldsToMigrate = [

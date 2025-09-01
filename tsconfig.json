@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "compilerOptions": {
     "lib": ["es2019", "dom"],
     "noImplicitAny": true,
@@ -27,4 +28,7 @@
   ],
   "files": ["./build.ts", "./migrate.ts"],
   "exclude": ["**/node_modules", "**/.*/", "build"]
+=======
+  "extends": "./tsconfig-shared.json"
+>>>>>>> base/master
 }

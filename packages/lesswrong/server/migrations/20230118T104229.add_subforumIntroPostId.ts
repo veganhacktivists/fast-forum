@@ -33,8 +33,13 @@
  */
 export const acceptsSchemaHash = "d92682d72d3bee6deb63b3b6419e027c";
 
+<<<<<<< HEAD
 import Tags from "../../lib/collections/tags/collection";
 import UserTagRels from "../../lib/collections/userTagRels/collection";
+=======
+import Tags from "../../server/collections/tags/collection"
+import UserTagRels from "../../server/collections/userTagRels/collection";
+>>>>>>> base/master
 import { addField, dropField } from "./meta/utils";
 
 export const up = async ({ db }: MigrationContext) => {

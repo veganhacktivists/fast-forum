@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Notifications from "../lib/collections/notifications/collection";
 import Conversations from "../lib/collections/conversations/collection";
 import { subscriptionTypes } from "../lib/collections/subscriptions/schema";
@@ -286,6 +287,16 @@ getCollectionHooks("Posts").updateAsync.add(async function eventUpdatedNotificat
     }
   }
 });
+=======
+import Notifications from '../server/collections/notifications/collection';
+import Users from '../server/collections/users/collection';
+import { getConfirmedCoauthorIds } from '../lib/collections/posts/helpers';
+import * as _ from 'underscore';
+import type { RSVPType } from "@/lib/collections/posts/helpers";
+import { createNotifications } from './notificationCallbacksHelpers'
+import moment from 'moment';
+import type { DialogueMessageInfo } from '../components/posts/PostsPreviewTooltip/PostsPreviewTooltip';
+>>>>>>> base/master
 
 interface NotifyDialogueParticipantProps {
   participant: DbUser;
@@ -392,6 +403,7 @@ export async function notifyDialogueParticipantsNewMessage(
   await Promise.all(notificationPromises);
 }
 
+<<<<<<< HEAD
 getCollectionHooks("Posts").editAsync.add(async function newPublishedDialogueMessageNotification(
   newPost: DbPost,
   oldPost: DbPost,
@@ -536,6 +548,9 @@ getCollectionHooks("TagRels").newAsync.add(async function TaggedPostNewNotificat
 });
 
 async function getEmailFromRsvp({ email, userId }: RSVPType): Promise<string | undefined> {
+=======
+async function getEmailFromRsvp({email, userId}: RSVPType): Promise<string | undefined> {
+>>>>>>> base/master
   if (email) {
     // Email is free text
     // eslint-disable-next-line no-useless-escape
@@ -555,9 +570,14 @@ async function getEmailFromRsvp({ email, userId }: RSVPType): Promise<string | u
   }
 }
 
+<<<<<<< HEAD
 export async function getUsersToNotifyAboutEvent(
   post: DbPost,
 ): Promise<{ rsvp: RSVPType; userId: string | null; email: string | undefined }[]> {
+=======
+
+export async function getUsersToNotifyAboutEvent(post: DbPost | DbInsertion<DbPost>): Promise<{rsvp: RSVPType, userId: string|null, email: string|undefined}[]> {
+>>>>>>> base/master
   if (!post.rsvps || !post.rsvps.length) {
     return [];
   }
@@ -573,6 +593,7 @@ export async function getUsersToNotifyAboutEvent(
   );
 }
 
+<<<<<<< HEAD
 async function notifyRsvps(comment: DbComment, post: DbPost) {
   if (!post.rsvps || !post.rsvps.length) {
     return;
@@ -987,3 +1008,8 @@ async function newSubforumMemberNotifyMods(user: DbUser, oldUser: DbUser) {
 }
 
 getCollectionHooks("Users").editAsync.add(newSubforumMemberNotifyMods);
+=======
+export async function bellNotifyEmailVerificationRequired (user: DbUser) {
+  await createNotifications({userIds: [user._id], notificationType: 'emailVerificationRequired', documentType: null, documentId: null});
+}
+>>>>>>> base/master

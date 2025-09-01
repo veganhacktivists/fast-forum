@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   getAllFragmentNames,
   getFragment,
@@ -14,6 +15,16 @@ import {
 } from "./typeGenerationUtils";
 import { getSchema } from "../../lib/utils/getSchema";
 import groupBy from "lodash/groupBy";
+=======
+import { generatedFileHeader, assert, simplSchemaTypeToTypescript, graphqlTypeToTypescript, generateAllowedValuesTypeString, autoUnindent } from './typeGenerationUtils';
+import { allSchemas, getSchema, getSimpleSchema } from '@/lib/schema/allSchemas';
+import groupBy from 'lodash/groupBy';
+import { graphqlTypeToCollectionName } from "../../lib/vulcan-lib/collections";
+import { getAllCollections, getCollection, isValidCollectionName } from "@/server/collections/allCollections";
+import orderBy from 'lodash/orderBy';
+import type { FieldNode, FragmentDefinitionNode } from 'graphql';
+import { FragmentFromSource, FragmentsFromSource, findFragmentsInSource } from './findGraphql';
+>>>>>>> base/master
 
 const fragmentFileHeader =
   generatedFileHeader +
@@ -23,6 +34,7 @@ const fragmentFileHeader =
 //
 `;
 
+<<<<<<< HEAD
 export function generateFragmentTypes(): string {
   const fragmentNames: Array<FragmentName> = getAllFragmentNames();
   const sb: Array<string> = [];
@@ -33,6 +45,14 @@ export function generateFragmentTypes(): string {
 
   sb.push(generateFragmentsIndexType());
   sb.push(generateCollectionNamesByFragmentNameType());
+=======
+export function generateFragmentTypes(collectionNameToTypeName: Record<string, string>, typeNameToCollectionName: Record<string, string>): string {
+  const allFragments = findFragmentsInSource(collectionNameToTypeName);
+
+  const sb: Array<string> = [];
+  sb.push(generateFragmentsIndexType(allFragments));
+  sb.push(generateCollectionNamesByFragmentNameType(allFragments, typeNameToCollectionName));
+>>>>>>> base/master
   sb.push(generateCollectionNamesIndexType());
   sb.push(generateCollectionNamesWithCreatedAtIndexType());
   sb.push(generateCollectionNamesWithSlugIndexType());
@@ -40,8 +60,12 @@ export function generateFragmentTypes(): string {
   return fragmentFileHeader + sb.join("");
 }
 
-type ParsedFragmentType = ReturnType<typeof getParsedFragment>;
+export function generateFragmentsGqlFile(collectionNameToTypeName: Record<string, string>) {
+  const allFragments = findFragmentsInSource(collectionNameToTypeName);
+  const fragmentNames = Object.keys(allFragments);
+  const sortedFragmentNames: Array<string> = orderBy(fragmentNames, f=>f);
 
+<<<<<<< HEAD
 function getParsedFragment(fragmentName: FragmentName) {
   const fragmentDefinitions = getFragment(fragmentName);
 
@@ -57,20 +81,24 @@ function getParsedFragment(fragmentName: FragmentName) {
     parsedFragment?.name?.value !== fragmentName
   ) {
     throw new Error("Retrieved parsed fragment with wrong name");
+=======
+  const sb: Array<string> = [];
+  for (let fragmentName of sortedFragmentNames) {
+    const fragmentText = allFragments[fragmentName].fragmentText
+    sb.push(autoUnindent(fragmentText));
+>>>>>>> base/master
   }
-  return parsedFragment;
+  
+  return sb.join("\n\n");
 }
 
-function fragmentNameToCollectionName(fragmentName: FragmentName): CollectionNameString {
-  const parsedFragment = getParsedFragment(fragmentName);
-  if (!parsedFragment || !("typeCondition" in parsedFragment)) {
-    throw new Error("Not a type node");
-  }
-  const typeName = parsedFragment.typeCondition.name?.value;
-  const collectionName = getCollectionName(typeName!);
+function fragmentNameToCollectionName(fragment: FragmentFromSource): CollectionNameString {
+  const typeName = fragment.graphqlType;
+  const collectionName = graphqlTypeToCollectionName(typeName);
   return collectionName;
 }
 
+<<<<<<< HEAD
 function generateFragmentTypeDefinition(fragmentName: FragmentName): string {
   const parsedFragment = getParsedFragment(fragmentName);
   const collectionName = fragmentNameToCollectionName(fragmentName);
@@ -78,24 +106,37 @@ function generateFragmentTypeDefinition(fragmentName: FragmentName): string {
   assert(!!collection);
 
   return fragmentToInterface(fragmentName, parsedFragment, collection);
+=======
+function generateFragmentTypeDefinition(fragment: FragmentFromSource, typeNameToCollectionName: Record<string, string>): string {
+  const collectionName = typeNameToCollectionName[fragment.graphqlType] as CollectionNameString;
+  const collection = isValidCollectionName(collectionName) ? getCollection(collectionName) : null;
+  
+  return fragmentToInterface(fragment.fragmentName, fragment.parsedFragment, collection);
+>>>>>>> base/master
 }
 
-function generateFragmentsIndexType(): string {
-  const fragmentNames: Array<FragmentName> = getAllFragmentNames();
+function generateFragmentsIndexType(allFragments: FragmentsFromSource): string {
+  const fragmentNames: string[] = orderBy(Object.keys(allFragments), f=>f);
   const sb: Array<string> = [];
 
   sb.push("interface FragmentTypes {\n");
   for (let fragmentName of fragmentNames) {
     sb.push(`  ${fragmentName}: ${fragmentName}\n`);
   }
+<<<<<<< HEAD
   sb.push("}\n\n");
 
   const fragmentNamesByCollection = groupBy(
     fragmentNames,
     (f: FragmentName): CollectionNameString => fragmentNameToCollectionName(f),
   );
+=======
+  sb.push('}\n\n');
+  
+  const fragmentNamesByCollection = groupBy(fragmentNames, (f: FragmentName): CollectionNameString => fragmentNameToCollectionName(allFragments[f]));
+>>>>>>> base/master
   sb.push(`interface FragmentTypesByCollection {\n`);
-  for (const collectionName of Object.keys(fragmentNamesByCollection)) {
+  for (const collectionName of orderBy(Object.keys(fragmentNamesByCollection), c=>c)) {
     sb.push(`  ${collectionName}: `);
     sb.push(fragmentNamesByCollection[collectionName].map((f) => `"${f}"`).join("|"));
     sb.push("\n");
@@ -105,45 +146,66 @@ function generateFragmentsIndexType(): string {
   return sb.join("");
 }
 
-function generateCollectionNamesByFragmentNameType(): string {
-  const fragmentNames: Array<FragmentName> = getAllFragmentNames();
+function generateCollectionNamesByFragmentNameType(fragments: FragmentsFromSource, typeNameToCollectionName: Record<string, string>): string {
+  const fragmentNames: string[] = orderBy(Object.keys(fragments), f=>f);
   const sb: Array<string> = [];
 
   sb.push(`interface CollectionNamesByFragmentName {\n`);
   for (let fragmentName of fragmentNames) {
-    const collectionName = fragmentNameToCollectionName(fragmentName);
-    sb.push(`  ${fragmentName}: "${collectionName}"\n`);
+    const graphqlType = fragments[fragmentName].graphqlType;
+    const collectionName = (typeNameToCollectionName as any)[graphqlType];
+    if (isValidCollectionName(collectionName)) {
+      sb.push(`  ${fragmentName}: "${collectionName}"\n`);
+    } else {
+      sb.push(`  ${fragmentName}: never\n`);
+    }
   }
   sb.push("}\n\n");
 
   return sb.join("");
 }
 
+<<<<<<< HEAD
 const generateCollectionNameList = (name: string, collections: CollectionBase<CollectionNameString>[]): string =>
   `type ${name} = ${collections.map((c) => `"${c.collectionName}"`).join("|")}\n\n`;
 
 const generateCollectionNamesIndexType = () => generateCollectionNameList("CollectionNameString", getAllCollections());
+=======
+const generateCollectionNameList = (
+  name: string,
+  collectionNames: CollectionNameString[],
+): string =>
+  `type ${name} = ${collectionNames.map(c => `"${c}"`).join('|')}\n\n`;
+
+const generateCollectionNamesIndexType = () =>
+  generateCollectionNameList("CollectionNameString", getAllCollections().map(c => c.collectionName));
+>>>>>>> base/master
 
 const generateCollectionNamesWithCreatedAtIndexType = () =>
   generateCollectionNameList(
     "CollectionNameWithCreatedAt",
-    getAllCollections().filter((c) => !!c._schemaFields.createdAt),
+    Object.entries(allSchemas).filter(([_, schema]) => 'createdAt' in schema).map(([collectionName]) => collectionName as CollectionNameString),
   );
 
 const generateCollectionNamesWithSlugIndexType = () =>
   generateCollectionNameList(
     "CollectionNameWithSlug",
-    getAllCollections().filter((c) => !!c._schemaFields.slug),
+    Object.entries(allSchemas).filter(([_, schema]) => 'slug' in schema).map(([collectionName]) => collectionName as CollectionNameString),
   );
 
+<<<<<<< HEAD
 function fragmentToInterface(
   interfaceName: string,
   parsedFragment: ParsedFragmentType,
   collection: AnyBecauseTodo,
 ): string {
+=======
+function fragmentToInterface(interfaceName: string, parsedFragment: FragmentDefinitionNode|FieldNode, collection: CollectionBase<CollectionNameString> | null): string {
+>>>>>>> base/master
   const sb: Array<string> = [];
 
   const spreadFragments = getSpreadFragments(parsedFragment);
+<<<<<<< HEAD
   const inheritanceStr = spreadFragments.length > 0 ? ` extends ${spreadFragments.join(", ")}` : "";
 
   sb.push(`interface ${interfaceName}${inheritanceStr} { // fragment on ${collection.collectionName}\n`);
@@ -151,6 +213,15 @@ function fragmentToInterface(
   const allSubfragments: Array<string> = [];
   for (let selection of parsedFragment.selectionSet.selections) {
     switch (selection.kind) {
+=======
+  const inheritanceStr = spreadFragments.length>0 ? ` extends ${spreadFragments.join(', ')}` : "";
+  
+  sb.push(`interface ${interfaceName}${inheritanceStr} { // fragment on ${collection?.collectionName ?? "non-collection type"}\n`);
+  
+  const allSubfragments: Array<string> = [];
+  for (let selection of parsedFragment.selectionSet?.selections ?? []) {
+    switch(selection.kind) {
+>>>>>>> base/master
       case "Field":
         const { fieldType, subfragment } = getFragmentFieldType(interfaceName, selection, collection);
         sb.push(`  readonly ${selection.name.value}: ${fieldType},\n`);
@@ -179,17 +250,37 @@ function getSpreadFragments(parsedFragment: AnyBecauseTodo): Array<string> {
   return spreadFragmentNames;
 }
 
+<<<<<<< HEAD
 function getFragmentFieldType(
   fragmentName: string,
   parsedFragmentField: AnyBecauseTodo,
   collection: AnyBecauseTodo,
 ): { fieldType: string; subfragment: string | null } {
+=======
+function getFragmentFieldType(fragmentName: string, parsedFragmentField: FieldNode, collection: AnyBecauseTodo):
+  { fieldType: string, subfragment: string|null }
+{
+  if (collection === null) {
+    // Fragments may not correspond to a collection, if eg they're on a graphql
+    // type defined with addGraphQLSchema. In that case, emit a type with the
+    // right set of fields but with every field having type `any` because sadly
+    // we aren't yet tracking down the schema definition.
+    return { fieldType: "any", subfragment: null };
+  }
+
+>>>>>>> base/master
   const fieldName: string = parsedFragmentField.name.value;
   if (fieldName === "__typename") {
     return { fieldType: "string", subfragment: null };
   }
+<<<<<<< HEAD
   const schema = getSchema(collection);
 
+=======
+  const schema = getSchema(collection.collectionName);
+  const simpleSchemaWrapper = getSimpleSchema(collection.collectionName);
+  const simpleSchema = simpleSchemaWrapper._schema;
+>>>>>>> base/master
   // There are two ways a field name can appear in a schema. The first is as a
   // regular field with that name. The second is as a resolver with that name,
   // which may be attached to a field with the same name or a different name.
@@ -200,22 +291,39 @@ function getFragmentFieldType(
   // Check for a field with a resolver by this name
   for (let schemaFieldName of Object.keys(schema)) {
     const fieldWithResolver = schema[schemaFieldName];
-    if (fieldWithResolver?.resolveAs?.fieldName === fieldName) {
-      assert(!!fieldWithResolver.resolveAs.type);
-      fieldType = graphqlTypeToTypescript(fieldWithResolver.resolveAs.type);
+    if (fieldWithResolver?.graphql?.resolver && schemaFieldName === fieldName) {
+      if (fieldWithResolver.graphql.typescriptType) {
+        fieldType = fieldWithResolver.graphql.typescriptType;
+      } else if (fieldWithResolver.graphql?.validation?.allowedValues) {
+        fieldType = generateAllowedValuesTypeString(fieldWithResolver.graphql.validation.allowedValues, fieldWithResolver);
+      } else {
+        assert(!!fieldWithResolver.graphql.outputType);
+        fieldType = graphqlTypeToTypescript(fieldWithResolver.graphql.outputType);
+      }
       break;
     }
   }
 
   // Check for regular presence in the schema
   if (!fieldType) {
-    if (fieldName in schema) {
+    if (fieldName in simpleSchema) {
       const fieldSchema = schema[fieldName];
-      assert(fieldSchema?.type);
-      if (fieldSchema?.resolveAs?.type && !fieldSchema?.resolveAs?.fieldName) {
-        fieldType = graphqlTypeToTypescript(fieldSchema.resolveAs.type);
+      const fieldSimpleSchema = simpleSchema[fieldName];
+      assert(!!fieldSimpleSchema?.type && !!fieldSchema);
+      if (fieldSimpleSchema?.typescriptType && fieldSimpleSchema?.blackbox) {
+        fieldType = fieldSimpleSchema.typescriptType;
+      } else if (fieldSchema.graphql?.validation?.allowedValues) {
+        fieldType = generateAllowedValuesTypeString(fieldSchema.graphql.validation.allowedValues, fieldSchema);
+      } else if (fieldSchema.graphql?.validation?.simpleSchema) {
+        fieldType = simplSchemaTypeToTypescript(simpleSchema, fieldName, fieldSimpleSchema.type);
+      } else if (fieldSchema.graphql?.outputType) {
+        fieldType = graphqlTypeToTypescript(fieldSchema.graphql?.outputType);
+        // Optimistically try to use the input type if the output type results in "any", and we have a specific input type.
+        if (fieldType === "any" && 'inputType' in fieldSchema.graphql && fieldSchema.graphql.inputType) {
+          fieldType = graphqlTypeToTypescript(fieldSchema.graphql.inputType);
+        }
       } else {
-        fieldType = simplSchemaTypeToTypescript(schema, fieldName, schema[fieldName].type);
+        fieldType = simplSchemaTypeToTypescript(simpleSchema, fieldName, fieldSimpleSchema.type);
       }
     }
   }
@@ -227,17 +335,28 @@ function getFragmentFieldType(
     );
   }
 
+<<<<<<< HEAD
   const { collection: subfieldCollection, nullable } = subfragmentTypeToCollection(fieldType);
+=======
+  const {collection: subfieldCollection, nullable} = subfragmentTypeToCollection(fieldType);
+>>>>>>> base/master
 
   // Now check if the field has a sub-selector
-  if (parsedFragmentField.selectionSet?.selections?.length > 0) {
+  if ((parsedFragmentField.selectionSet?.selections?.length ?? 0) > 0) {
     // As a special case, if the sub-selector spreads a fragment and has no
     // other fields, use that fragment's type
+<<<<<<< HEAD
     if (
       parsedFragmentField.selectionSet.selections.length === 1 &&
       parsedFragmentField.selectionSet.selections[0].kind === "FragmentSpread"
     ) {
       const subfragmentName = parsedFragmentField.selectionSet.selections[0].name.value;
+=======
+    if (parsedFragmentField.selectionSet?.selections.length === 1
+      && parsedFragmentField.selectionSet?.selections[0].kind === "FragmentSpread")
+    {
+      const subfragmentName = parsedFragmentField.selectionSet?.selections[0].name.value;
+>>>>>>> base/master
       if (fieldType.startsWith("Array<")) {
         return {
           fieldType: nullable ? `Array<${subfragmentName}>|null` : `Array<${subfragmentName}>`,
@@ -258,8 +377,12 @@ function getFragmentFieldType(
         );
         //throw new Error(`Field ${fieldName} in fragment ${fragmentName} has type ${fieldType} which does not identify a collection`);
         return {
+<<<<<<< HEAD
           fieldType: "any",
           subfragment: null,
+=======
+          fieldType, subfragment: null
+>>>>>>> base/master
         };
       }
       const subfragmentName = `${fragmentName}_${fieldName}`;
@@ -309,7 +432,7 @@ function subfragmentTypeToCollection(fieldType: string): {
       nullable: false,
     };
   } else {
-    const collectionName = getCollectionName(fieldType);
+    const collectionName = graphqlTypeToCollectionName(fieldType);
     if (isValidCollectionName(collectionName)) {
       return {
         collection: getCollection(collectionName),

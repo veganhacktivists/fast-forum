@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
 import { Posts } from "../../lib/collections/posts/collection";
 import { postStatuses } from "../../lib/collections/posts/constants";
 import moment from "moment";
 import { ForumOptions, forumSelect } from "../../lib/forumTypeUtils";
+=======
+import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
+import { Posts } from '../../server/collections/posts/collection';
+import { postStatuses } from '../../lib/collections/posts/constants';
+import moment from 'moment'
+import { ForumOptions, forumSelect } from '../../lib/forumTypeUtils';
+>>>>>>> base/master
 
 export const LOW_KARMA_THRESHOLD = 5;
 
@@ -29,7 +37,7 @@ export function makeLowKarmaSelector(karmaThreshold: number): MongoSelector<DbPo
   };
 }
 
-registerMigration({
+export default registerMigration({
   name: "noIndexLowKarma",
   dateWritten: "2020-05-13",
   idempotent: true,

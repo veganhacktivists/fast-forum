@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { Comments } from "../../lib/collections/comments";
 import { addField, dropField } from "./meta/utils";
+=======
+import Users from '../../server/collections/users/collection'
+import { Comments } from '../../server/collections/comments/collection'
+import {addField, dropField} from './meta/utils'
+>>>>>>> base/master
 
 /**
  * Generated on 2023-01-25T22:32:59.886Z by `yarn makemigrations`

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
 
 Mutations have five steps:
@@ -65,13 +66,23 @@ const mutatorParamsToCallbackProps = <N extends CollectionNameString>(
     schema,
   };
 };
+=======
+import { convertDocumentIdToIdInSelector, UpdateSelector } from '../../lib/vulcan-lib/utils';
+import { dataToModifier } from './validation';
+import { throwError } from './errors';
+import type { CreateCallbackProperties, UpdateCallbackProperties, AfterCreateCallbackProperties } from '../mutationCallbacks';
+import isEmpty from 'lodash/isEmpty';
+import pickBy from 'lodash/pickBy';
+import clone from 'lodash/clone';
+>>>>>>> base/master
 
 /**
- * Validation logic used by {@link createMutator}.  Factored out because we also need it for debate comments.
- * Keep in mind that this doesn't just validate the document against its schema, it also runs all the validation callbacks.
- * Those may have side effects, depending on the collection!  If they do, you probably shouldn't use this.
- * (Let's please not write any more validation callbacks with side effects.)
+ * @deprecated Prefer to avoid using onCreate callbacks on fields for new collections.
+ * 
+ * If possible, either give the field a default value in the database, or assign a value
+ * to it inside of its create mutation directly.
  */
+<<<<<<< HEAD
 export const validateCreateMutation = async <N extends CollectionNameString>(mutatorParams: CreateMutatorParams<N>) => {
   let { document } = mutatorParams;
   const callbackProperties = mutatorParamsToCallbackProps(mutatorParams);
@@ -183,16 +194,25 @@ export const createMutator: CreateMutator = async <N extends CollectionNameStrin
     if (typeof autoValue !== "undefined") {
       logger(`onCreate returned a value to insert for field ${fieldName}: ${autoValue}`);
       Object.assign(document, { [fieldName]: autoValue });
+=======
+export async function runFieldOnCreateCallbacks<
+  S extends SchemaType<CollectionName>,
+  CollectionName extends CollectionNameString,
+  D extends {} = CreateInputsByCollectionName[CollectionName]['data']
+>(schema: S, data: D, properties: CreateCallbackProperties<CollectionName, D>): Promise<D> {
+  for (let fieldName in schema) {
+    let autoValue;
+    const { graphql } = schema[fieldName];
+    if (graphql && 'onCreate' in graphql && !!graphql.onCreate) {
+      autoValue = await graphql.onCreate({ ...properties, fieldName });
+    }
+    if (typeof autoValue !== 'undefined') {
+      Object.assign(data, { [fieldName]: autoValue });
+>>>>>>> base/master
     }
   }
-  const timeElapsed = Date.now() - start;
-  // Technically these aren't callbacks, but for the purpose of analytics we want to treat them the same way
-  // Temporarily disabled to investigate performance issues
-  // captureEvent('callbacksCompleted', {
-  //   callbackHookName: `${collectionName.toLowerCase()}.oncreate`,
-  //   timeElapsed
-  // }, true);
 
+<<<<<<< HEAD
   // TODO: find that info in GraphQL mutations
   // if (isServer && this.connection) {
   //   post.userIP = this.connection.clientAddress;
@@ -269,14 +289,17 @@ export const createMutator: CreateMutator = async <N extends CollectionNameStrin
 
   return { data: completedDocument };
 };
+=======
+  return data;
+}
+>>>>>>> base/master
 
 /**
- * Update mutation
- * Updates a single database entry, and runs callbacks/etc to update its
- * denormalized fields. The preferred way to do this is with a documentId;
- * in theory you can use a selector, but you should only do this if you're sure
- * there's only one matching document (eg, slug). Returns the modified document.
+ * @deprecated Prefer to avoid using onUpdate callbacks on fields for new collections.
+ * 
+ * If possible, perform any necessary updates to that field's value directly in the update mutation.
  */
+<<<<<<< HEAD
 export const updateMutator: UpdateMutator = async <N extends CollectionNameString>({
   collection,
   documentId,
@@ -306,31 +329,123 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
   // Save the original mutation (before callbacks add more changes to it) for
   // logging in LWEvents
   let origData = { ...data };
+=======
+export async function runFieldOnUpdateCallbacks<
+  S extends SchemaType<CollectionName>,
+  CollectionName extends CollectionNameString,
+  D extends {} = UpdateInputsByCollectionName[CollectionName]['data']
+>(
+  schema: S,
+  data: D,
+  properties: UpdateCallbackProperties<CollectionName, D>
+): Promise<D> {
+  const dataAsModifier = dataToModifier(clone(data));
+  for (let fieldName in schema) {
+    let autoValue;
+    const { graphql } = schema[fieldName];
+    if (graphql && 'onUpdate' in graphql && !!graphql.onUpdate) {
+      autoValue = await graphql.onUpdate({ ...properties, fieldName, modifier: dataAsModifier });
+    }
+    if (typeof autoValue !== 'undefined') {
+      Object.assign(data, { [fieldName]: autoValue });
+    }
+  }
 
-  const hooks = getCollectionHooks(collectionName);
+  return data;
+}
 
+interface CheckCreatePermissionsAndReturnArgumentsProps<N extends CollectionNameString, S extends SchemaType<N>, D = CreateInputsByCollectionName[N]['data']> {
+  context: ResolverContext;
+  data: D;
+  schema: S,
+}
+>>>>>>> base/master
+
+interface CheckUpdatePermissionsAndReturnArgumentsProps<N extends CollectionNameString, S extends SchemaType<N>, D = UpdateInputsByCollectionName[N]['data']> {
+  selector: SelectorInput;
+  context: ResolverContext;
+  data: D;
+  schema: S,
+}
+
+/**
+ * @deprecated This function returns createCallbackProperties, which
+ * is a legacy holdover from mutation callbacks.  If you're creating
+ * a new collection with default mutations, just pass in whatever
+ * arguments you need to functions you have before/after the db update.
+ */
+export async function getLegacyCreateCallbackProps<const T extends CollectionNameString, S extends SchemaType<T>, D extends {} = CreateInputsByCollectionName[T]['data']>(
+  collectionName: T,
+  { context, data, schema }: CheckCreatePermissionsAndReturnArgumentsProps<T, S, D>
+) {
+  const { currentUser } = context;
+  const collection = context[collectionName] as CollectionBase<T>;
+
+  const callbackProps: CreateCallbackProperties<T, D> = {
+    collection,
+    document: data,
+    newDocument: data,
+    currentUser,
+    context,
+    schema,
+  };
+
+  return callbackProps;
+}
+
+export function getPreviewDocument<N extends CollectionNameString, D extends {} = UpdateInputsByCollectionName[N]['data']>(data: D, oldDocument: ObjectsByCollectionName[N]): ObjectsByCollectionName[N] {
+  return pickBy({
+    ...oldDocument,
+    ...data,
+  }, (value) => value !== null) as unknown as ObjectsByCollectionName[N];
+}
+
+export async function getOldDocument<N extends CollectionNameString>(collectionName: N, selector: SelectorInput, context: ResolverContext) {
+  const { loaders } = context;
   if (isEmpty(selector)) {
     throw new Error("Selector cannot be empty");
   }
 
-  // get original document from database or arguments
-  oldDocument = oldDocument || (await Connectors.get(collection, selector));
+  const documentSelector = convertDocumentIdToIdInSelector(selector as UpdateSelector);
+  const oldDocument = await loaders[collectionName].load(documentSelector._id);
 
   if (!oldDocument) {
-    throw new Error(`Could not find document to update for selector: ${JSON.stringify(selector)}`);
+    throwError({ id: 'app.document_not_found', data: { documentId: documentSelector._id } });
   }
 
+<<<<<<< HEAD
   // get a "preview" of the new document
   let document: ObjectsByCollectionName[N] = { ...oldDocument, ...data };
   // FIXME: Filtering out null-valued fields here is a very sketchy, probably
   // wrong thing to do. This originates from Vulcan, and it's not clear why it's
   // doing it. Explicit cast to make it type-check anyways.
   document = pickBy(document, (f) => f !== null) as any;
+=======
+  return oldDocument;
+}
+>>>>>>> base/master
 
-  /*
+/**
+ * @deprecated This function returns updateCallbackProperties, which
+ * is a legacy holdover from mutation callbacks.  If you're creating
+ * a new collection with default mutations, just pass in whatever
+ * arguments you need to functions you have before/after the db update.
+ * 
+ * If you're creating a new collection, just use getOldDocument and getPreviewDocument
+ * directly and don't write logic which depends on `UpdateCallbackProperties`.
+ */
+export async function getLegacyUpdateCallbackProps<const T extends CollectionNameString, S extends SchemaType<T>, D extends {} = UpdateInputsByCollectionName[T]['data']>(
+  collectionName: T,
+  { selector, context, data, schema }: CheckUpdatePermissionsAndReturnArgumentsProps<T, S, D>
+) {
+  const { currentUser } = context;
+  const collection = context[collectionName] as CollectionBase<T>;
+  const documentSelector = convertDocumentIdToIdInSelector(selector as UpdateSelector);
+  const oldDocument = await getOldDocument(collectionName, selector, context);
 
-  Properties
+  const previewDocument = getPreviewDocument(data, oldDocument);
 
+<<<<<<< HEAD
   */
   const properties: UpdateCallbackProperties<N> = {
     data: data || {},
@@ -341,10 +456,26 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
     collection,
     context,
     schema,
+=======
+  const updateCallbackProperties: UpdateCallbackProperties<T> = {
+    data,
+    oldDocument,
+    newDocument: previewDocument,
+    currentUser,
+    collection,
+    context,
+    schema
+>>>>>>> base/master
   };
 
-  /*
+  return {
+    documentSelector,
+    previewDocument,
+    updateCallbackProperties,
+  };
+}
 
+<<<<<<< HEAD
   Validation
 
   */
@@ -379,12 +510,41 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
     }
   } else {
     logger("skipping validation");
+=======
+/**
+ * If you're writing a CRUD create mutation for a collection which has a userId field,
+ * you might want to use this function to assign the current user's userId to the document,
+ * if the userId in fact represents "ownership" or similar.
+ */
+export function assignUserIdToData(data: unknown, currentUser: DbUser | null, schema: SchemaType<CollectionNameString> & { userId: CollectionFieldSpecification<CollectionNameString> }) {
+  // You know, it occurs to me that this seems to allow users to insert arbitrary userIds
+  // for documents they're creating if they have a userId field and canCreate: member.
+  if (currentUser && schema.userId && !(data as HasUserIdType).userId) {
+    (data as unknown as HasUserIdType).userId = currentUser._id;
+>>>>>>> base/master
   }
+}
 
-  /*
+export async function insertAndReturnDocument<N extends CollectionNameString, T extends CreateInputsByCollectionName[N]['data'] | Partial<ObjectsByCollectionName[N]>>(data: T, collectionName: N, context: ResolverContext) {
+  const collection = context[collectionName] as CollectionBase<N>;
+  const insertedId = await collection.rawInsert(data);
+  const insertedDocument = (await collection.findOne(insertedId))!;
+  return insertedDocument;
+}
 
-  onUpdate
+/**
+ * @deprecated This function returns AfterCreateCallbackProperties, which
+ * is a legacy holdover from mutation callbacks.  If you're creating
+ * a new collection with CRUD mutations, just insert the document directly
+ * into the database and fetch it again if you need it with its default values,
+ * and don't write functions which depend on `AfterCreateCallbackProperties`.
+ * 
+ * Instead, use insertAndReturnDocument.
+ */
+export async function insertAndReturnCreateAfterProps<N extends CollectionNameString, T extends CreateInputsByCollectionName[N]['data'] | Partial<ObjectsByCollectionName[N]>>(data: T, collectionName: N, createCallbackProperties: CreateCallbackProperties<N, T>) {
+  const insertedDocument = await insertAndReturnDocument(data, collectionName, createCallbackProperties.context);
 
+<<<<<<< HEAD
   */
   logger("field onUpdate/onEdit callbacks");
   for (let fieldName of Object.keys(schema)) {
@@ -401,9 +561,18 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
       data![fieldName] = autoValue;
     }
   }
+=======
+  const afterCreateProperties: AfterCreateCallbackProperties<N> = {
+    ...createCallbackProperties,
+    document: insertedDocument,
+    newDocument: insertedDocument
+  };
+>>>>>>> base/master
 
-  /*
+  return afterCreateProperties;
+}
 
+<<<<<<< HEAD
   Before
 
   */
@@ -430,6 +599,21 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
   );
 
   // update connector requires a modifier, so get it from data
+=======
+/**
+ * Unlike the other helper functions, this one is not deprecated.
+ * 
+ * If you're writing a CRUD update mutation, you should use this
+ * to avoid forgetting some important boilerplate (like clearing the
+ * document from the loader cache).
+ */
+export async function updateAndReturnDocument<N extends CollectionNameString>(
+  data: UpdateInputsByCollectionName[N]['data'] | Partial<ObjectsByCollectionName[N]>,
+  collection: CollectionBase<N>,
+  selector: { _id: string },
+  context: ResolverContext
+): Promise<ObjectsByCollectionName[N]> {
+>>>>>>> base/master
   const modifier = dataToModifier(data);
 
   // remove empty modifiers
@@ -440,6 +624,7 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
     delete modifier.$unset;
   }
 
+<<<<<<< HEAD
   /*
 
   DB Operation
@@ -461,10 +646,17 @@ export const updateMutator: UpdateMutator = async <N extends CollectionNameStrin
     if (selector.documentId && context) {
       context.loaders[collectionName].clear(selector.documentId);
     }
+=======
+  // if there's nothing to update, return the original document
+  if (isEmpty(modifier)) {
+    return (await collection.findOne(selector))!;
+>>>>>>> base/master
   }
 
-  /*
+  // update document
+  await collection.rawUpdateOne(selector, modifier);
 
+<<<<<<< HEAD
   After
 
   */
@@ -526,14 +718,21 @@ export const deleteMutator: DeleteMutator = async <N extends CollectionNameStrin
 
   if (isEmpty(selector)) {
     throw new Error("Selector cannot be empty");
+=======
+  // get fresh copy of document from db
+  const updatedDocument = await collection.findOne(selector);
+  if (!updatedDocument) {
+    throw new Error("Could not find updated document after applying update");
+>>>>>>> base/master
   }
 
-  document = document || (await Connectors.get(collection, selector));
-
-  if (!document) {
-    throw new Error(`Could not find document to delete for selector: ${JSON.stringify(selector)}`);
+  // This used to be documentId, but I think the fact that it was documentId
+  // and not _id was just a bug???
+  if (selector._id && context) {
+    context.loaders[collection.collectionName].clear(selector._id);
   }
 
+<<<<<<< HEAD
   /*
 
   Properties
@@ -626,3 +825,7 @@ export const deleteMutator: DeleteMutator = async <N extends CollectionNameStrin
 Utils.createMutator = createMutator;
 Utils.updateMutator = updateMutator;
 Utils.deleteMutator = deleteMutator;
+=======
+  return updatedDocument;
+}
+>>>>>>> base/master

@@ -1,7 +1,8 @@
 import AbstractRepo from "./AbstractRepo";
-import Votes from "../../lib/collections/votes/collection";
+import Votes from "../../server/collections/votes/collection";
 import type { RecentVoteInfo } from "../../lib/rateLimits/types";
 import groupBy from "lodash/groupBy";
+<<<<<<< HEAD
 import { EAOrLWReactionsVote, UserVoteOnSingleReaction } from "../../lib/voting/namesAttachedReactions";
 import type {
   CommentKarmaChange,
@@ -13,7 +14,15 @@ import type {
 } from "../../lib/collections/users/karmaChangesGraphQL";
 import { eaAnonymousEmojiPalette, eaEmojiNames } from "../../lib/voting/eaEmojiPalette";
 import { isEAForum } from "../../lib/instanceSettings";
+=======
+import { NamesAttachedReactionsVote } from "../../lib/voting/namesAttachedReactions";
+import { eaEmojiPalette, getEAEmojisForKarmaChanges } from "../../lib/voting/eaEmojiPalette";
+>>>>>>> base/master
 import { recordPerfMetrics } from "./perfMetricWrapper";
+import type {
+  AnyKarmaChange,
+  KarmaChangesArgs,
+} from "../collections/users/karmaChangesGraphQL";
 
 export const RECENT_CONTENT_COUNT = 20;
 
@@ -32,6 +41,12 @@ export type React = {
   reactionType?: string; // should this be a specific reaction type?
 };
 
+export type LongtermScoreResult = {
+  longtermSeniorDownvoterCount: number,
+  longtermScore: number,
+  commentCount: number
+};
+
 class VotesRepo extends AbstractRepo<"Votes"> {
   constructor() {
     super(Votes);
@@ -42,6 +57,9 @@ class VotesRepo extends AbstractRepo<"Votes"> {
    * appears in the header for logged-in users). The query here starts with the
    * Votes collection, summing up net vote power for votes within a given date
    * range.
+   *
+   * Note that, for the EA Forum, this logic is handled by the completely
+   * separate `getEAKarmaChanges` function.
    *
    * Cancelled votes *are* counted when summing up vote powers here; for each
    * cancelled vote the Votes collection will have a matching "unvote", with the
@@ -70,21 +88,26 @@ class VotesRepo extends AbstractRepo<"Votes"> {
    * gets react vote data, and the net changes to reacts on each document
    * are calculated in reactionVotesToReactionChanges().
    */
+<<<<<<< HEAD
   async getKarmaChanges({ userId, startDate, endDate, af, showNegative }: KarmaChangesArgs): Promise<{
     changedComments: CommentKarmaChange[];
     changedPosts: PostKarmaChange[];
     changedTagRevisions: TagRevisionKarmaChange[];
+=======
+  async getLWKarmaChanges(
+    {userId, startDate, endDate, af, showNegative}: KarmaChangesArgs,
+  ): Promise<{
+    changedComments: CommentKarmaChange[],
+    changedPosts: PostKarmaChange[],
+    changedTagRevisions: RevisionsKarmaChange[],
+>>>>>>> base/master
   }> {
     const powerField = af ? "afPower" : "power";
 
-    const reactionConditions = [
-      // TODO should/can we exclude false votes here (e.g. {"agree": false})?
-      ...eaEmojiNames.map((field) => `"extendedVoteType"->>'${field}' IS NOT NULL`),
-      `jsonb_array_length("extendedVoteType"->'reacts') > 0`,
-    ].join(" OR ");
+    const reactionConditions = `jsonb_array_length("extendedVoteType"->'reacts') > 0`;
 
     const reactionVotesQuery = `
-        -- VotesRepo.getKarmaChanges.reactionVotesQuery
+        -- VotesRepo.getLWKarmaChanges.reactionVotesQuery
         SELECT
           v.*
         FROM
@@ -100,14 +123,22 @@ class VotesRepo extends AbstractRepo<"Votes"> {
       `;
 
     const [allScoreChanges, allReactionVotes] = await Promise.all([
+<<<<<<< HEAD
       this.getRawDb().any(
         `
         -- VotesRepo.getKarmaChanges.allScoreChanges
+=======
+      this.getRawDb().any(`
+        -- VotesRepo.getLWKarmaChanges.allScoreChanges
+>>>>>>> base/master
         SELECT
           v.*,
           comment."contents"->'html' AS "commentHtml",
           comment."postId" AS "commentPostId",
+          comment_post."title" AS "commentPostTitle",
+          comment_post."slug" AS "commentPostSlug",
           comment."tagId" AS "commentTagId",
+          comment_tag."name" AS "commentTagName",
           comment."tagCommentType" AS "commentTagCommentType",
           post."title" AS "postTitle",
           post."slug" AS "postSlug",
@@ -122,6 +153,7 @@ class VotesRepo extends AbstractRepo<"Votes"> {
           WHERE
             ${af ? '"afPower" IS NOT NULL AND' : ""}
             "authorIds" @> ARRAY[$1::CHARACTER VARYING] AND
+            NOT ("authorIds" @> ARRAY["userId"]) AND
             "votedAt" >= $2 AND
             "votedAt" <= $3 AND
             "userId" <> $1 AND
@@ -132,6 +164,10 @@ class VotesRepo extends AbstractRepo<"Votes"> {
           v."collectionName" = 'Comments'
           AND comment._id = v._id
         )
+        LEFT JOIN "Posts" comment_post ON
+          comment_post._id = comment."postId"
+        LEFT JOIN "Tags" comment_tag ON
+          comment_tag._id = comment."tagId"
         LEFT JOIN "Posts" post ON (
           v."collectionName" = 'Posts'
           AND post._id = v._id
@@ -145,12 +181,16 @@ class VotesRepo extends AbstractRepo<"Votes"> {
           OR "reactionVoteCount" > 0
         `,
         [userId, startDate, endDate],
+<<<<<<< HEAD
         `getKarmaChanges(${userId}, ${startDate}, ${endDate})`,
+=======
+        `getLWKarmaChanges(${userId}, ${startDate}, ${endDate})`
+>>>>>>> base/master
       ),
       this.getRawDb().any<DbVote>(
         reactionVotesQuery,
         [userId, startDate, endDate],
-        `getKarmaChanges_reacts(${userId}, ${startDate}, ${endDate})`,
+        `getLWKarmaChanges_reacts(${userId}, ${startDate}, ${endDate})`,
       ),
     ]);
 
@@ -158,13 +198,13 @@ class VotesRepo extends AbstractRepo<"Votes"> {
 
     let changedComments: CommentKarmaChange[] = [];
     let changedPosts: PostKarmaChange[] = [];
-    let changedTagRevisions: TagRevisionKarmaChange[] = [];
+    let changedTagRevisions: RevisionsKarmaChange[] = [];
     for (let votedContent of allScoreChanges) {
-      let change: KarmaChangeBase = {
+      let change = {
         _id: votedContent._id,
         collectionName: votedContent.collectionName,
         scoreChange: votedContent.scoreChange,
-        addedReacts: this.reactionVotesToReactionChanges(reactionVotesByDocument[votedContent._id]),
+        addedReacts: this.lwReactionVotesToReactionChanges(reactionVotesByDocument[votedContent._id]),
       };
       // If we have no karma or reacts to display for this document, skip it
       if (!change.scoreChange && !change.addedReacts.length) {
@@ -174,33 +214,49 @@ class VotesRepo extends AbstractRepo<"Votes"> {
       if (votedContent.collectionName === "Comments") {
         changedComments.push({
           ...change,
+          commentId: votedContent._id,
           description: votedContent.commentHtml,
           postId: votedContent.commentPostId,
+          postTitle: votedContent.commentPostTitle,
+          postSlug: votedContent.commentPostSlug,
           tagId: votedContent.commentTagId,
+          tagName: votedContent.commentTagName,
           tagCommentType: votedContent.commentTagCommentType,
+          tagSlug: null,
+          eaAddedReacts: null,
         });
       } else if (votedContent.collectionName === "Posts") {
         changedPosts.push({
           ...change,
+          postId: votedContent._id,
           title: votedContent.postTitle,
           slug: votedContent.postSlug,
+          eaAddedReacts: null,
         });
       } else if (votedContent.collectionName === "Revisions") {
         changedTagRevisions.push({
           ...change,
           tagId: votedContent.revisionTagId,
+          tagName: null,
+          tagSlug: null,
+          eaAddedReacts: null,
         });
       }
     }
     return { changedComments, changedPosts, changedTagRevisions };
   }
 
+<<<<<<< HEAD
   reactionVotesToReactionChanges(votes: DbVote[]): ReactionChange[] {
+=======
+  private lwReactionVotesToReactionChanges(votes: DbVote[]): ReactionChange[] {
+>>>>>>> base/master
     if (!votes?.length) return [];
     const votesByUser = groupBy(votes, (v) => v.userId);
     let reactionChanges: ReactionChange[] = [];
 
     type FlattenedReaction = {
+<<<<<<< HEAD
       reactionType: string;
       quote: string | undefined;
       count: number;
@@ -213,6 +269,15 @@ class VotesRepo extends AbstractRepo<"Votes"> {
       isCancellation?: boolean,
     ) {
       const idx = flattenedReactions.findIndex((r) => r.reactionType === reactionType && r.quote === quote);
+=======
+      reactionType: string
+      quote: string|undefined
+      count: number
+    }
+    
+    function addNormalizedReact(flattenedReactions: FlattenedReaction[], reactionType: string, quote: string|undefined, isCancellation?: boolean) {
+      const idx = flattenedReactions.findIndex(r => r.reactionType===reactionType && r.quote===quote);
+>>>>>>> base/master
       if (idx !== -1) {
         flattenedReactions[idx].count += isCancellation ? -1 : 1;
       } else {
@@ -231,6 +296,7 @@ class VotesRepo extends AbstractRepo<"Votes"> {
 
       // First pass: normalize to an array of the subset of reactions that aren't in unvotes, unmerge reactions of the same type on different quoted regions
       for (let vote of votesByUser[userId]) {
+<<<<<<< HEAD
         if (!vote.extendedVoteType) continue;
         const extendedVote = vote.extendedVoteType as EAOrLWReactionsVote;
         const eaReacts: UserVoteOnSingleReaction[] = eaEmojiNames
@@ -241,6 +307,12 @@ class VotesRepo extends AbstractRepo<"Votes"> {
             quotes: [],
           }));
         const formattedReacts = [...(extendedVote.reacts ?? []), ...eaReacts];
+=======
+        if (!vote.extendedVoteType)
+          continue;
+        const extendedVote: NamesAttachedReactionsVote = vote.extendedVoteType;
+        const formattedReacts = extendedVote.reacts ?? [];
+>>>>>>> base/master
 
         if (!vote.isUnvote && formattedReacts) {
           for (let react of formattedReacts) {
@@ -261,6 +333,7 @@ class VotesRepo extends AbstractRepo<"Votes"> {
 
       // Second pass: find reactions in unvotes, flatten them, cancel reactions that match unvotes
       for (let vote of votesByUser[userId]) {
+<<<<<<< HEAD
         if (!vote.extendedVoteType) continue;
         const extendedUnvote = vote.extendedVoteType as EAOrLWReactionsVote;
         const eaReacts: UserVoteOnSingleReaction[] = eaEmojiNames
@@ -272,6 +345,13 @@ class VotesRepo extends AbstractRepo<"Votes"> {
           }));
         const formattedReacts = [...(extendedUnvote.reacts ?? []), ...eaReacts];
 
+=======
+        if (!vote.extendedVoteType)
+          continue;
+        const extendedUnvote: NamesAttachedReactionsVote = vote.extendedVoteType;
+        const formattedReacts = extendedUnvote.reacts ?? [];
+        
+>>>>>>> base/master
         if (vote.isUnvote && formattedReacts) {
           for (let react of formattedReacts) {
             if (react.vote === "disagreed") {
@@ -298,6 +378,7 @@ class VotesRepo extends AbstractRepo<"Votes"> {
       }
     }
 
+<<<<<<< HEAD
     // On EAF, some reacts are anonymous (currently agree and disagree). For those, remove the userId.
     if (isEAForum) {
       reactionChanges = reactionChanges.map((change) => {
@@ -308,7 +389,103 @@ class VotesRepo extends AbstractRepo<"Votes"> {
       });
     }
 
+=======
+>>>>>>> base/master
     return reactionChanges;
+  }
+
+  getEAKarmaChanges({
+    userId,
+    startDate,
+    endDate,
+    af,
+    showNegative = false,
+  }: KarmaChangesArgs): Promise<AnyKarmaChange[]> {
+    const powerField = af ? "afPower" : "power";
+    const {publicEmojis, privateEmojis} = getEAEmojisForKarmaChanges(showNegative);
+    const publicSelectors = publicEmojis.map((emoji) =>
+      `'${emoji}', ARRAY_AGG(
+        DISTINCT JSONB_BUILD_OBJECT('_id', v."userId", 'displayName', u."displayName", 'slug', u."slug")
+      ) FILTER (WHERE
+        v."cancelled" IS NOT TRUE AND
+        v."isUnvote" IS NOT TRUE AND
+        fm_vote_added_emoji(v."_id", '${emoji}')
+      )`,
+    );
+    const privateSelectors = privateEmojis.map((emoji) =>
+      `'${emoji}', NULLIF(COUNT(DISTINCT "userId") FILTER (WHERE
+        v."cancelled" IS NOT TRUE AND
+        v."isUnvote" IS NOT TRUE AND
+        fm_vote_added_emoji(v."_id", '${emoji}')
+      ), 0)`,
+    );
+    return this.getRawDb().any(`
+      -- VotesRepo.getEAKarmaChanges
+      SELECT
+        q.*,
+        ARRAY[]::TEXT[] "addedReacts",
+        post."title",
+        post."slug",
+        comment._id "commentId",
+        COALESCE(comment."postId", post._id) "postId",
+        comment."tagCommentType",
+        comment."contents"->>'html' "description",
+        comment_post."title" "postTitle",
+        comment_post."slug" "postSlug",
+        COALESCE(comment_tag."_id", revision_tag."_id") "tagId",
+        COALESCE(comment_tag."name", revision_tag."name") "tagName",
+        COALESCE(comment_tag."slug", revision_tag."slug") "tagSlug"
+      FROM (
+        SELECT
+          v."documentId" "_id",
+          v."collectionName",
+          CASE
+            WHEN (
+              SELECT ("karmaChangeNotifierSettings"->'showNegativeKarma')::JSONB = TO_JSONB(TRUE)
+              FROM "Users"
+              WHERE "_id" = $1
+            )
+              THEN SUM(v."${powerField}")
+            ELSE
+              GREATEST(SUM(v."${powerField}"), 0)
+            END "scoreChange",
+          NULLIF(JSONB_STRIP_NULLS(JSONB_BUILD_OBJECT(
+            ${[...publicSelectors, ...privateSelectors].join(",\n")}
+          )), '{}'::JSONB) "eaAddedReacts"
+        FROM "Votes" v
+        JOIN "Users" u ON v."userId" = u."_id"
+        WHERE
+          ${af ? '"afPower" IS NOT NULL AND' : ''}
+          v."userId" <> $1 AND
+          v."authorIds" @> ARRAY[$1::VARCHAR] AND
+          NOT (v."authorIds" @> ARRAY[v."userId"]) AND
+          v."votedAt" >= $2 AND
+          v."votedAt" <= $3 AND
+          v."silenceNotification" IS NOT TRUE
+        GROUP BY v."documentId", v."collectionName"
+      ) q
+      LEFT JOIN "Posts" post ON
+        q."collectionName" = 'Posts' AND
+        q."_id" = post."_id"
+      LEFT JOIN "Comments" comment ON
+        q."collectionName" = 'Comments' AND
+        q."_id" = comment."_id"
+      LEFT JOIN "Posts" comment_post ON
+        comment."postId" = comment_post."_id"
+      LEFT JOIN "Tags" comment_tag ON
+        comment."tagId" = comment_tag."_id"
+      LEFT JOIN "Revisions" revision ON
+        q."collectionName" = 'Revisions' AND
+        q."_id" = revision."_id"
+      LEFT JOIN "Tags" revision_tag ON
+        revision."documentId" = revision_tag."_id"
+      WHERE
+        "scoreChange" <> 0 OR
+        "eaAddedReacts" IS NOT NULL
+    `,
+      [userId, startDate, endDate],
+      `getEAKarmaChanges(${userId}, ${startDate}, ${endDate})`,
+    );
   }
 
   getSelfVotes(tagRevisionIds: string[]): Promise<DbVote[]> {
@@ -574,6 +751,158 @@ class VotesRepo extends AbstractRepo<"Votes"> {
     `,
       [userId, postId, excludedDocumentId],
     );
+  }
+
+  getLongtermDownvoteScore(userId: string): Promise<LongtermScoreResult | null> {
+    return this.getRawDb().oneOrNone(`
+      SELECT
+        COUNT(DISTINCT senior_downvoter) AS "longtermSeniorDownvoterCount",
+        COUNT(c."userId") as "commentCount",
+        (SUM(
+            CASE WHEN c.total_vote_power < 0
+              THEN
+                GREATEST((c.total_vote_power * 20)::INT, -100)
+              ELSE
+                c.total_vote_power
+            END
+        ) / COUNT(c."userId")) AS "longtermScore"
+      FROM (
+        SELECT
+          full_c.*,
+          SUM(v.power) AS total_vote_power,
+          ARRAY_AGG(DISTINCT v."userId") FILTER (
+            WHERE v.power < 0 AND u.karma > 2000
+          ) AS senior_downvoters
+        FROM "Comments" as full_c
+        LEFT JOIN
+          "Votes" AS v
+          ON full_c._id = v."documentId"
+        LEFT JOIN
+          "Users" AS u ON v."userId" = u._id
+        WHERE
+          v.cancelled IS NOT TRUE
+          AND full_c."userId" = $1
+          AND v."userId" != $1
+          AND full_c."postedAt" > CURRENT_TIMESTAMP - INTERVAL '1 year'
+        GROUP BY full_c._id
+      ) AS c
+      LEFT JOIN LATERAL (
+        SELECT senior_downvoter
+        FROM unnest(c.senior_downvoters) AS senior_downvoter
+        WHERE c.total_vote_power < 0
+      ) AS sd ON true
+      GROUP BY c."userId"
+      ORDER BY "longtermScore" DESC
+    `, [userId]);
+  }
+
+  async getEAWrappedReactsReceived(
+    userId: string,
+    start: Date,
+    end: Date,
+  ): Promise<Record<string, number>> {
+    const fields = eaEmojiPalette.map(({name}) =>
+      `COUNT(*) FILTER (WHERE ("extendedVoteType"->'${name}')::BOOLEAN) AS "${name}"`,
+    );
+    const result = await this.getRawDb().oneOrNone(`
+      -- VotesRepo.getEAWrappedReactsReceived
+      SELECT ${fields.join(", ")}
+      FROM "Votes"
+      WHERE
+        "authorIds" @> ARRAY[$1::VARCHAR]
+        AND "votedAt" >= $2
+        AND "votedAt" < $3
+        AND "cancelled" IS NOT TRUE
+        AND "isUnvote" IS NOT TRUE
+        AND "extendedVoteType" IS NOT NULL
+    `, [userId, start, end]);
+    if (!result) {
+      return {};
+    }
+    for (const key in result) {
+      result[key] = parseInt(result[key]);
+    }
+    return result;
+  }
+
+  async getEAWrappedReactsGiven(
+    userId: string,
+    start: Date,
+    end: Date,
+  ): Promise<Record<string, number>> {
+    const fields = eaEmojiPalette.map(({name}) =>
+      `COUNT(*) FILTER (WHERE ("extendedVoteType"->'${name}')::BOOLEAN) AS "${name}"`,
+    );
+    const result = await this.getRawDb().oneOrNone(`
+      -- VotesRepo.getEAWrappedReactsGiven
+      SELECT ${fields.join(", ")}
+      FROM "Votes"
+      WHERE
+        "userId" = $1
+        AND "votedAt" >= $2
+        AND "votedAt" < $3
+        AND "cancelled" IS NOT TRUE
+        AND "isUnvote" IS NOT TRUE
+        AND "extendedVoteType" IS NOT NULL
+    `, [userId, start, end]);
+    if (!result) {
+      return {};
+    }
+    for (const key in result) {
+      result[key] = parseInt(result[key]);
+    }
+    return result;
+  }
+
+  async getEAWrappedAgreements(
+    userId: string,
+    start: Date,
+    end: Date,
+  ): Promise<Record<"agree" | "disagree", number>> {
+    const result = await this.getRawDb().oneOrNone(`
+      -- VotesRepo.getEAWrappedAgreements
+      SELECT
+        COUNT(*) FILTER
+          (WHERE ("extendedVoteType"->'agree')::BOOLEAN IS TRUE) AS "agree",
+        COUNT(*) FILTER
+          (WHERE ("extendedVoteType"->'disagree')::BOOLEAN IS TRUE) AS "disagree"
+      FROM "Votes"
+      WHERE
+        "userId" = $1
+        AND "votedAt" >= $2
+        AND "votedAt" < $3
+        AND "cancelled" IS NOT TRUE
+        AND "isUnvote" IS NOT TRUE
+        AND "extendedVoteType" IS NOT NULL
+    `, [userId, start, end]);
+    if (!result) {
+      return {agree: 0, disagree: 0};
+    }
+    for (const key in result) {
+      result[key] = parseInt(result[key]) || 0;
+    }
+    return result;
+  }
+  async getNetKarmaChangesForAuthorsOverPeriod(days: number, limit: number): Promise<Array<{ userId: string; netKarma: number }>> {
+    return this.getRawDb().any(`
+      -- VotesRepo.getNetKarmaChangesForAuthorsOverPeriod
+      SELECT
+        author_id AS "userId",
+        SUM(power) AS "netKarma"
+      FROM (
+        SELECT
+          UNNEST("authorIds") AS author_id,
+          "power"
+        FROM "Votes"
+        WHERE
+          "votedAt" >= NOW() - INTERVAL '$1 days'
+          AND "cancelled" IS NOT TRUE
+          AND "isUnvote" IS NOT TRUE
+      ) sub
+      GROUP BY author_id
+      ORDER BY "netKarma" DESC
+      LIMIT $2 
+    `, [days, limit], `getNetKarmaChangesForAuthorsOverPeriod(${days}, ${limit})`);
   }
 }
 

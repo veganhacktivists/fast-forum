@@ -1,9 +1,19 @@
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import ReviewVotes from "../../lib/collections/reviewVotes/collection";
 import { REVIEW_YEAR } from "../../lib/reviewUtils";
 import groupBy from "lodash/groupBy";
 import { Posts } from "../../lib/collections/posts";
 import Users from "../../lib/collections/users/collection";
+=======
+import { registerMigration } from './migrationUtils';
+import ReviewVotes from '../../server/collections/reviewVotes/collection';
+import { REVIEW_YEAR } from '../../lib/reviewUtils';
+import groupBy from 'lodash/groupBy';
+import { Posts } from '../../server/collections/posts/collection';
+import Users from '../../server/collections/users/collection';
+
+>>>>>>> base/master
 
 const voteMap: AnyBecauseObsolete = {
   1: {
@@ -40,7 +50,7 @@ const getCost = (vote: AnyBecauseObsolete) => voteMap[vote.qualitativeScore].cos
 const getValue = (vote: AnyBecauseObsolete) => voteMap[vote.qualitativeScore].value;
 
 // TODO: Write a better version of this migration which properly normalizes vote strength
-registerMigration({
+export default registerMigration({
   name: "updateQuadraticVotes2",
   dateWritten: "2022-01-12",
   idempotent: true,
@@ -92,6 +102,7 @@ registerMigration({
     }
 
     for (let postId in postsAllUsers) {
+<<<<<<< HEAD
       await Posts.rawUpdateOne(
         { _id: postId },
         {
@@ -123,6 +134,24 @@ registerMigration({
           },
         },
       );
+=======
+      await Posts.rawUpdateOne({_id:postId}, {$set: { 
+        reviewVotesAllKarma2: postsAllUsers[postId].sort((a: number,b: number) => b - a), 
+        reviewVoteScoreAllKarma2: postsAllUsers[postId].reduce((x: number, y: number) => x + y, 0) 
+      }})
+    }
+    for (let postId in postsHighKarmaUsers) {
+      await Posts.rawUpdateOne({_id:postId}, {$set: { 
+        reviewVotesHighKarma2: postsHighKarmaUsers[postId].sort((a: number,b: number) => b - a),
+        reviewVoteScoreHighKarma2: postsHighKarmaUsers[postId].reduce((x: number, y: number) => x + y, 0),
+      }})
+    }
+    for (let postId in postsAFUsers) {
+      await Posts.rawUpdateOne({_id:postId}, {$set: { 
+        reviewVotesAF: postsAFUsers[postId].sort((a: number,b: number) => b - a),
+        reviewVoteScoreAF: postsAFUsers[postId].reduce((x: number, y: number) => x + y, 0),
+       }})
+>>>>>>> base/master
     }
   },
 });

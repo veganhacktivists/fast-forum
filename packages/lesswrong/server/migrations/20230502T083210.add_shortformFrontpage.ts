@@ -33,8 +33,13 @@
  */
 export const acceptsSchemaHash = "a85cc326da77f34b19140ca908956227";
 
+<<<<<<< HEAD
 import Comments from "../../lib/collections/comments/collection";
 import { addField, dropField } from "./meta/utils";
+=======
+import Comments from "../../server/collections/comments/collection"
+import { addField, dropField } from "./meta/utils"
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   await addField(db, Comments, "shortformFrontpage");

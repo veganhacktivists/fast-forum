@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from "react";
 import { convertFromHTML, convertToHTML } from "draft-convert";
 
@@ -49,6 +50,10 @@ export const htmlToDraft = convertFromHTML({
     }
   },
 });
+=======
+import React from 'react';
+import { convertToHTML } from 'draft-convert';
+>>>>>>> base/master
 
 export const draftToHTML = convertToHTML({
   //eslint-disable-next-line react/display-name

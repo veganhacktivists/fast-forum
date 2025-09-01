@@ -33,8 +33,13 @@
  */
 export const acceptsSchemaHash = "592612513ed7bd3260014fe27c8ae328";
 
+<<<<<<< HEAD
 import CkEditorUserSessions from "../../lib/collections/ckEditorUserSessions/collection";
 import { addField, dropField } from "./meta/utils";
+=======
+import CkEditorUserSessions from "../../server/collections/ckEditorUserSessions/collection"
+import { addField, dropField } from "./meta/utils"
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   await addField(db, CkEditorUserSessions, "endedBy");

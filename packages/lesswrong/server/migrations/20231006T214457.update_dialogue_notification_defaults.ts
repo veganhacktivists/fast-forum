@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { updateDefaultValue } from "./meta/utils";
+=======
+import Users from "../../server/collections/users/collection";
+import {updateDefaultValue} from "./meta/utils";
+>>>>>>> base/master
 /**
  * Generated on 2023-10-06T21:44:57.384Z by `yarn makemigrations`
  * The following schema changes were detected:

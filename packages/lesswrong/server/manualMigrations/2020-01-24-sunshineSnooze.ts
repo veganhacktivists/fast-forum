@@ -1,8 +1,12 @@
 import { registerMigration, fillDefaultValues } from "./migrationUtils";
 
+<<<<<<< HEAD
 import { Users } from "../../lib/collections/users/collection";
+=======
+import { Users } from '../../server/collections/users/collection';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "setSunshineSnoozeValues",
   dateWritten: "2020-01-24",
   idempotent: true,

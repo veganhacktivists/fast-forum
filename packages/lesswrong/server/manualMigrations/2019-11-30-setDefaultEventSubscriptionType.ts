@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 import { registerMigration, fillDefaultValues } from "./migrationUtils";
 import { recomputeDenormalizedValues } from "../scripts/recomputeDenormalized";
 import Users from "../../lib/collections/users/collection";
+=======
+import { registerMigration, fillDefaultValues } from './migrationUtils';
+import { recomputeDenormalizedValues } from '../scripts/recomputeDenormalized';
+import Users from '../../server/collections/users/collection';
 
-registerMigration({
+>>>>>>> base/master
+
+export default registerMigration({
   name: "setDefaultEventSubscriptionType",
   dateWritten: "2019-11-30",
   idempotent: true,

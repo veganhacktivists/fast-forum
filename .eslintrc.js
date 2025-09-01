@@ -1,3 +1,28 @@
+
+const restrictedImportsPaths = [
+  { name: "lodash", message: "Don't import all of lodash, import a specific lodash function, eg lodash/sumBy" },
+  { name: "lodash/fp", message: "Don't import all of lodash/fp, import a specific lodash function, eg lodash/fp/capitalize" },
+  { name: "@material-ui", message: "Don't import all of material-ui/icons" },
+  { name: "@/lib/vendor/@material-ui/core/src", message: "Don't import all of material-ui/core" },
+  { name: "@/lib/vendor/@material-ui/core/src/colors", message: "Don't use material-ui/core/colors, use the theme palette" },
+  { name: "@material-ui/icons", message: "Don't import all of material-ui/icons" },
+  { name: "@/lib/vendor/@material-ui/core/src/Hidden", message: "Don't use material-UI's Hidden component, it's subtly broken; use breapoints and JSS styles instead" },
+  { name: "@/lib/vendor/@material-ui/core/src/Typography", message: "Don't use material-UI's Typography component; use Components.LWTypography or JSS styles" },
+  { name: "@/lib/vendor/@material-ui/core/src/Dialog", message: "Don't use material-UI's Dialog component directly, use LWDialog instead" },
+  { name: "@/lib/vendor/@material-ui/core/src/Popper", importNames: ["Popper"], message: "Don't use material-UI's Popper component directly, use LWPopper instead" },
+  { name: "@/lib/vendor/@material-ui/core/src/MenuItem", message: "Don't use material-UI's MenuItem component directly; use Components.MenuItem or JSS styles" },
+  { name: "@/lib/vendor/@material-ui/core/src/NoSsr", importNames: ["Popper"], message: "Don't use @/lib/vendor/@material-ui/core/src/NoSsr/NoSsr; use react-no-ssr instead" },
+  { name: "@apollo/client", importNames: ["useQuery"], message: "Don't import useQuery from Apollo directly; use the wrapper in lib/crud/useQuery" },
+  { name: "@apollo/client", importNames: ["gql"], message: "Don't import gql from Apollo; use @/lib/generated/gql-codegen" },
+  { name: "react-router", message: "Don't import react-router, use lib/reactRouterWrapper" },
+  { name: "react-router-dom", message: "Don't import react-router-dom, use lib/reactRouterWrapper" },
+  { name: "@/lib/vendor/@material-ui/core/src/ClickAwayListener", message: "Don't use material-UI's ClickAwayListener component; use LWClickAwayListener instead" },
+];
+const clientRestrictedImportPaths = [
+  { name: "cheerio", message: "Don't import cheerio on the client" },
+  { name: "url", message: "'url' is a nodejs polyfill; use getUrlClass() instead" },
+]
+
 module.exports = {
   extends: [
     "eslint:recommended",
@@ -74,6 +99,35 @@ module.exports = {
     "react/display-name": 0,
     "react/jsx-no-comment-textnodes": 1,
 
+    // A function with a name starting with an uppercase letter should only be
+    // used as a constructor
+    "babel/new-cap": [1, {
+      "capIsNewExceptions": [
+        "Optional",
+        "OneOf",
+        "Maybe",
+        "MailChimpAPI",
+        "Juice",
+        "Run",
+        "AppComposer",
+        "Query",
+        "Map",
+        "List"
+      ]
+    }],
+
+    // Warn if defining a component inside a function, which results in the
+    // component's subtree and its state being destroyed on every render
+    "react/no-unstable-nested-components": [1, {
+      // Allow it if the component is passed directly as a prop. This is still
+      // potentially a bug, but components passed directly as props are often
+      // leaf-nodes with no state, like icons, so it's annoying to have to
+      // handle them properly and these are lower-priority to fix than the ones
+      // that aren't.
+      allowAsProps: true,
+    }],
+    "react/no-unknown-property": ["error", {ignore: ["test-id"]}],
+
     // Differs from no-mixed-operators default only in that "??" is added to the first group
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
@@ -84,12 +138,38 @@ module.exports = {
     "import/no-dynamic-require": 1,
     "import/no-self-import": 1,
     "import/export": 1,
-    "import/no-named-as-default-member": 1,
-    "import/no-deprecated": 1,
+
+    // Lint rules against importing things that don't exist as exports.
+    // Disabled because Typescript already checks this, and eslint is
+    // having false-positives on imports in node_modules with a few specific
+    // libraries (underscore, hot-shots, recombee-api-client).
+    "import/default": 0,
+    "import/namespace": 0,
+    "import/named": 0,
+
+    // import/no-named-as-default-member: Would prevent importing a package
+    // with a default import and then using something as a field on it, eg
+    //     import React from 'react'
+    //     const foo = React.createContext()
+    // because some bundlers don't like this, but it seems to work fine in
+    // esbuild, and we're doing it a bunch.
+    "import/no-named-as-default-member": 0,
+
+    // Cheerio is annotated as having its default export deprecated, which is
+    // what we're using. Fixing a Typescript interaction with eslint made this
+    // lint rule start being applied where before it wasn't.
+    // TODO: Fix our usage of cheerio, and then turn this back on.
+    "import/no-deprecated": 0,
+
     "import/no-extraneous-dependencies": 0,
     "import/no-duplicates": 1,
     "import/extensions": 0,
-    "import/no-cycle": 1,
+    "import/no-cycle": 0,
+    // "import/no-cycle": ["error", {
+    //   // A dynamic cyclic import (ie,  a require() inside a function) is okay
+    //   // if you're confident it won't be called at import-time.
+    //   allowUnsafeDynamicCyclicDependency: true,
+    // }],
     "import/no-mutable-exports": 1,
     "import/no-restricted-paths": [
       "error",
@@ -118,63 +198,25 @@ module.exports = {
         ],
       },
     ],
-    "no-restricted-imports": [
-      "error",
-      {
-        paths: [
-          { name: "lodash", message: "Don't import all of lodash, import a specific lodash function, eg lodash/sumBy" },
-          {
-            name: "lodash/fp",
-            message: "Don't import all of lodash/fp, import a specific lodash function, eg lodash/fp/capitalize",
-          },
-          { name: "@material-ui", message: "Don't import all of material-ui/icons" },
-          { name: "@material-ui/core", message: "Don't import all of material-ui/core" },
-          { name: "@material-ui/core/colors", message: "Don't use material-ui/core/colors, use the theme palette" },
-          { name: "@material-ui/icons", message: "Don't import all of material-ui/icons" },
-          {
-            name: "@material-ui/core/Hidden",
-            message:
-              "Don't use material-UI's Hidden component, it's subtly broken; use breapoints and JSS styles instead",
-          },
-          {
-            name: "@material-ui/core/Typography",
-            message: "Don't use material-UI's Typography component; use Components.LWTypography or JSS styles",
-          },
-          {
-            name: "@material-ui/core/Dialog",
-            message: "Don't use material-UI's Dialog component directly, use LWDialog instead",
-          },
-          {
-            name: "@material-ui/core/Popper",
-            importNames: ["Popper"],
-            message: "Don't use material-UI's Popper component directly, use LWPopper instead",
-          },
-          {
-            name: "@material-ui/core/MenuItem",
-            message: "Don't use material-UI's MenuItem component directly; use Components.MenuItem or JSS styles",
-          },
-          {
-            name: "@material-ui/core/NoSsr",
-            importNames: ["Popper"],
-            message: "Don't use @material-ui/core/NoSsr/NoSsr; use react-no-ssr instead",
-          },
-          { name: "react-router", message: "Don't import react-router, use lib/reactRouterWrapper" },
-          { name: "react-router-dom", message: "Don't import react-router-dom, use lib/reactRouterWrapper" },
-        ],
-        patterns: ["@material-ui/core/colors/*"],
-      },
-    ],
+    "no-restricted-imports": ["error", {
+      "paths": restrictedImportsPaths,
+      patterns: [
+        "@/lib/vendor/@material-ui/core/src/colors/*"
+      ]
+    }],
 
-    // Warn on missing await
+    // Warn on missing await. We use ignoreVoid: true by default but change it
+    // to false for lib/ and server/ because you should use the
+    // `backgroundTask()` function rather than void, except in the `components`
+    // folder in which void is allowed (specified in the `overrides` section
+    // below).
     // The ignoreVoid option makes it so that
     //   void someAwaitableFunction()
     // can be used as a way of marking a function as deliberately not-awaited.
-    "@typescript-eslint/no-floating-promises": [
-      1,
-      {
-        ignoreVoid: true,
-      },
-    ],
+    "@typescript-eslint/no-floating-promises": [1, {
+      ignoreVoid: true,
+      ignoreIIFE: true,
+    }],
 
     // Like no-implicit-any, but specifically for things that are exported. Turn
     // on some day, but not yet.
@@ -214,11 +256,10 @@ module.exports = {
     // member-delimiter-style: Disabled. Would make semicolons between
     // interface members non-optional.
     "@typescript-eslint/member-delimiter-style": 0,
-
-    // type-annotation-spacing: Disabled. Would enforce spaces around => and
-    // after : in type annotations.
-    "@typescript-eslint/type-annotation-spacing": 0,
-
+    
+    // type-annotation-spacing: Enforces spaces around => and after : in type annotations.
+    "@stylistic/ts/type-annotation-spacing": 1,
+    
     // no-empty-function: Disabled. Would forbid functions with empty bodies.
     "@typescript-eslint/no-empty-function": 0,
 
@@ -237,6 +278,15 @@ module.exports = {
     // no-this-alias. Currently disabled. Would forbid 'const self=this'.
     "@typescript-eslint/no-this-alias": 0,
 
+    // no-require-imports: Disabled. Would forbit any usage of require()
+    "@typescript-eslint/no-require-imports": 0,
+
+    // consistent-type-imports: Would enforce that imports of types use "import type"
+    "@typescript-eslint/consistent-type-imports": 0,
+
+    // no-empty-object-type: Forbids using {} as a type
+    "@typescript-eslint/no-empty-object-type": 0,
+    
     // class-name-casing: Disabled. Forbids types from deviating from upper-
     // camelcase, which would forbid the naming convention we are using for
     // subfragments.
@@ -274,19 +324,79 @@ module.exports = {
     // used, if the usage is as a type rather than as a value.)
     "no-unused-vars": 0,
     "@typescript-eslint/no-unused-vars": 0,
+
+    "@typescript-eslint/no-unused-expressions": 0,
+    "@typescript-eslint/no-unsafe-function-type": 0,
+
+    "@typescript-eslint/switch-exhaustiveness-check": [1, {
+      considerDefaultExhaustiveForUnions: true
+    }],
+
+    "no-barrel-files/no-barrel-files": 1,
   },
-  env: {
-    browser: true,
-    commonjs: true,
-    es6: true,
-    node: true,
-  },
-  plugins: ["@typescript-eslint", "babel", "react", "react-hooks", "import"],
-  settings: {
-    "import/core-modules": ["sinon", "sinon-chai", "chai-enzyme"],
-    react: {
-      version: "16.4.1",
+  "overrides": [
+    {
+      "files": [
+        "packages/lesswrong/client/**/*.ts",
+        "packages/lesswrong/client/**/*.tsx",
+        "packages/lesswrong/components/**/*.ts",
+        "packages/lesswrong/components/**/*.tsx",
+        "packages/lesswrong/lib/**/*.ts",
+        "packages/lesswrong/lib/**/*.tsx",
+        "packages/lesswrong/themes/**/*.ts",
+        "packages/lesswrong/themes/**/*.tsx",
+      ],
+      "rules": {
+        "no-restricted-imports": ["error", {"paths": [
+          ...restrictedImportsPaths,
+          ...clientRestrictedImportPaths
+        ]}],
+      }
     },
+    {
+      "files": [
+        "packages/lesswrong/lib/**/*.ts",
+        "packages/lesswrong/lib/**/*.tsx",
+        "packages/lesswrong/server/**/*.ts",
+        "packages/lesswrong/server/**/*.tsx",
+      ],
+      "rules": {
+        "@typescript-eslint/no-floating-promises": [1, {
+          ignoreVoid: false,
+          ignoreIIFE: true,
+        }],
+      },
+    }
+  ],
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true,
+    "node": true
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "babel",
+    "react",
+    "react-hooks",
+    "import",
+    "no-barrel-files",
+    "@stylistic/ts",
+  ],
+  "settings": {
+    "import/core-modules": [
+      "sinon",
+      "sinon-chai",
+      "chai-enzyme",
+    ],
+    "import/resolver": {
+      typescript: {
+        project: "./tsconfig.json"
+      }
+    },
+    "react": {
+      "version": "16.4.1"
+    }
   },
   root: true,
   globals: {
@@ -299,9 +409,14 @@ module.exports = {
     beforeEach: true,
     afterEach: true,
   },
-  ignorePatterns: [
-    "build.js",
+  "ignorePatterns": [
+    "build.ts",
+    // Excluded here because it's also excluded in `tsconfig.json`, and they
+    // need to match.
+    "packages/lesswrong/viteClient",
     // You wouldn't have thought this was necessary would you
     ".eslintrc.js",
-  ],
-};
+    "packages/lesswrong/lib/vendor/@material-ui",
+    "packages/lesswrong/lib/generated/gql-codegen"
+  ]
+}

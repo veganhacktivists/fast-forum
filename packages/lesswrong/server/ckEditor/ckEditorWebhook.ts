@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import * as _ from "underscore";
 import { Posts } from "../../lib/collections/posts/collection";
 import { createNotifications } from "../notificationCallbacksHelpers";
@@ -6,6 +7,17 @@ import { ckEditorApi, ckEditorApiHelpers, documentHelpers } from "./ckEditorApi"
 import { createAdminContext, createMutator } from "../vulcan-lib";
 import CkEditorUserSessions from "../../lib/collections/ckEditorUserSessions/collection";
 import { ckEditorUserSessionsEnabled } from "../../lib/betas";
+=======
+import * as _ from 'underscore';
+import { Posts } from '../../server/collections/posts/collection';
+import { createNotifications } from '../notificationCallbacksHelpers';
+import { addStaticRoute } from '../vulcan-lib/staticRoutes';
+import { ckEditorApi, ckEditorApiHelpers, documentHelpers } from './ckEditorApi';
+import CkEditorUserSessions from '../../server/collections/ckEditorUserSessions/collection';
+import { ckEditorUserSessionsEnabled } from '../../lib/betas';
+import { createAdminContext } from "../vulcan-lib/createContexts";
+import { createCkEditorUserSession } from '../collections/ckEditorUserSessions/mutations';
+>>>>>>> base/master
 
 interface CkEditorUserConnectionChange {
   user: { id: string };
@@ -116,6 +128,7 @@ async function handleCkEditorWebhook(message: any) {
         const ckEditorDocumentId = userConnectedPayload?.document?.id;
         const documentId = documentHelpers.ckEditorDocumentIdToPostId(ckEditorDocumentId);
         if (!!userId && !!documentId) {
+<<<<<<< HEAD
           const adminContext = await createAdminContext();
           await createMutator({
             collection: CkEditorUserSessions,
@@ -126,6 +139,15 @@ async function handleCkEditorWebhook(message: any) {
             context: adminContext,
             currentUser: adminContext.currentUser,
           });
+=======
+          const adminContext = createAdminContext();
+          await createCkEditorUserSession({
+            data: {
+              userId,
+              documentId,
+            }
+          }, adminContext);
+>>>>>>> base/master
         }
       }
       break;
@@ -207,6 +229,7 @@ async function notifyCkEditorCommentAdded({
     extraData: {
       senderUserID: commenterUserId,
       commentHtml: commentHtml,
+      linkSharingKey: post.linkSharingKey,
     },
   });
 }

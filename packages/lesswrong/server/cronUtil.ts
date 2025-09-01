@@ -1,6 +1,13 @@
+<<<<<<< HEAD
 import { isAnyTest, isDevelopment, onStartup } from "../lib/executionEnvironment";
 import { SyncedCron } from "./vendor/synced-cron/synced-cron-server";
 import { getCommandLineArguments } from "./commandLine";
+=======
+import { isAnyTest, isDevelopment } from '../lib/executionEnvironment';
+import { SyncedCron } from './vendor/synced-cron/synced-cron-server';
+import { getCommandLineArguments } from './commandLine';
+import { CronHistories } from '../server/collections/cronHistories/collection';
+>>>>>>> base/master
 
 SyncedCron.options = {
   log: !isDevelopment,
@@ -9,6 +16,7 @@ SyncedCron.options = {
   collectionTTL: 172800,
 };
 
+<<<<<<< HEAD
 export function addCronJob(options: {
   name: string;
   interval?: string;
@@ -34,6 +42,36 @@ export function addCronJob(options: {
       }, 20000);
     }
   });
+=======
+export type CronJobSpec = {
+  name: string,
+  interval?: string,
+  // uses later.js parser, no seconds allowed though
+  cronStyleSchedule?: string,
+  job: () => void,
+}
+
+export function addCronJob(options: CronJobSpec) {
+  if (!isAnyTest && !getCommandLineArguments().shellMode) {
+    // Defer starting of cronjobs until 20s after server startup
+    setTimeout(() => {
+      SyncedCron.add({
+        name: options.name,
+        schedule: (parser: any) => {
+          if (options.interval)
+            return parser.text(options.interval);
+          else if (options.cronStyleSchedule) {
+            const hasSeconds = options.cronStyleSchedule.split(' ').length > 5;
+            return parser.cron(options.cronStyleSchedule, hasSeconds);
+          }
+          else
+            throw new Error("addCronJob needs a schedule specified");
+        },
+        job: options.job,
+      });
+    }, 20000);
+  }
+>>>>>>> base/master
 }
 
 export function removeCronJob(name: string) {
@@ -46,6 +84,24 @@ export function startSyncedCron() {
   }
 }
 
+<<<<<<< HEAD
 onStartup(function () {
   startSyncedCron();
+=======
+export async function clearOldCronHistories() {
+  const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
+  await CronHistories.rawRemove({
+    startedAt: {
+      $lt: new Date(new Date().getTime() - ONE_WEEK),
+    },
+  });
+}
+
+addCronJob({
+  name: "clearOldCronHistories",
+  interval: 'every 24 hours',
+  job: async () => {
+    await clearOldCronHistories();
+  }
+>>>>>>> base/master
 });

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import ReviewVotes from "../../lib/collections/reviewVotes/collection";
 import { getCostData, REVIEW_YEAR } from "../../lib/reviewUtils";
@@ -8,12 +9,24 @@ import moment from "moment";
 import { getForumTheme } from "../../themes/forumTheme";
 import { isLW } from "../../lib/instanceSettings";
 import fs from "fs";
+=======
+import { registerMigration } from './migrationUtils';
+import ReviewVotes from '../../server/collections/reviewVotes/collection';
+import { getCostData, REVIEW_YEAR } from '../../lib/reviewUtils';
+import groupBy from 'lodash/groupBy';
+import { Posts } from '../../server/collections/posts/collection';
+import Users from '../../server/collections/users/collection';
+import moment from 'moment';
+import { getForumTheme } from '../../themes/forumTheme';
+import { isLW } from '../../lib/instanceSettings';
+import fs from 'fs';
+>>>>>>> base/master
 
 const getCost = (vote: AnyBecauseTodo) => getCostData({})[vote.qualitativeScore].cost;
 const getValue = (vote: AnyBecauseTodo, total: number) =>
   getCostData({ costTotal: total })[vote.qualitativeScore].value;
 
-registerMigration({
+export default registerMigration({
   name: "updateFinal2020ReviewVotes",
   dateWritten: "2022-01-30",
   idempotent: true,
@@ -81,6 +94,7 @@ registerMigration({
     // eslint-disable-next-line no-console
     console.log("Updating high karma...");
     for (let postId in postsHighKarmaUsers) {
+<<<<<<< HEAD
       await Posts.rawUpdateOne(
         { _id: postId },
         {
@@ -90,10 +104,17 @@ registerMigration({
           },
         },
       );
+=======
+      await Posts.rawUpdateOne({_id:postId}, {$set: { 
+        finalReviewVotesHighKarma: postsHighKarmaUsers[postId].sort((a: number,b: number) => b - a),
+        finalReviewVoteScoreHighKarma: postsHighKarmaUsers[postId].reduce((x: number, y: number) => x + y, 0),
+      }})
+>>>>>>> base/master
     }
     // eslint-disable-next-line no-console
     console.log("Updating AF...");
     for (let postId in postsAFUsers) {
+<<<<<<< HEAD
       await Posts.rawUpdateOne(
         { _id: postId },
         {
@@ -103,6 +124,12 @@ registerMigration({
           },
         },
       );
+=======
+      await Posts.rawUpdateOne({_id:postId}, {$set: { 
+        finalReviewVotesAF: postsAFUsers[postId].sort((a: number,b: number) => b - a),
+        finalReviewVoteScoreAF: postsAFUsers[postId].reduce((x: number, y: number) => x + y, 0),
+       }})
+>>>>>>> base/master
     }
 
     const finalPosts: DbPost[] = isLW

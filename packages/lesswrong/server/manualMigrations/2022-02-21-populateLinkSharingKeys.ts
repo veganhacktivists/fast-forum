@@ -1,8 +1,14 @@
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import { generateLinkSharingKey } from "../ckEditor/ckEditorCallbacks";
 import { Posts } from "../../lib/collections/posts/collection";
+=======
+import { registerMigration } from './migrationUtils';
+import { generateLinkSharingKey } from '../callbacks/helpers';
+import { Posts } from '../../server/collections/posts/collection';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "populateLinkSharingKeys",
   dateWritten: "2022-02-21",
   idempotent: true,

@@ -1,6 +1,6 @@
-import { registerFragment } from "../../vulcan-lib/fragments";
+import { gql } from "@/lib/generated/gql-codegen";
 
-registerFragment(`
+export const UserTagRelDetails = gql(`
   fragment UserTagRelDetails on UserTagRel {
     _id
     userId
@@ -9,4 +9,4 @@ registerFragment(`
     subforumEmailNotifications
     subforumHideIntroPost
   }
-`);
+`)

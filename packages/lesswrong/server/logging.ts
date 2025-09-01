@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { captureException } from "@sentry/core";
 import { captureEvent } from "../lib/analyticsEvents";
 import { onStartup, isAnyTest } from "../lib/executionEnvironment";
@@ -5,6 +6,12 @@ import { DatabaseServerSetting } from "./databaseSettings";
 import { printInFlightRequests, checkForMemoryLeaks } from "./vulcan-lib/apollo-ssr/pageCache";
 import { printInProgressCallbacks } from "../lib/vulcan-lib/callbacks";
 import { Globals } from "../lib/vulcan-lib/config";
+=======
+import { captureException } from '@sentry/core';
+import { isAnyTest } from '../lib/executionEnvironment';
+import { DatabaseServerSetting } from './databaseSettings';
+import { printInFlightRequests } from '@/server/rendering/pageCache';
+>>>>>>> base/master
 
 import * as Sentry from "@sentry/node";
 import * as SentryIntegrations from "@sentry/integrations";
@@ -30,6 +37,7 @@ process.on("unhandledRejection", (r: any) => {
   }
 });
 
+<<<<<<< HEAD
 // captureEvent("serverStarted", {});
 //
 // onStartup(() => {
@@ -55,28 +63,66 @@ process.on("unhandledRejection", (r: any) => {
 //
 //   checkForCoreDumps();
 // });
+=======
+
+export function serverInitSentry() {
+  const sentryUrl = sentryUrlSetting.get()
+  const sentryEnvironment = sentryEnvironmentSetting.get()
+  const sentryRelease = sentryReleaseSetting.get()
+  
+  if (sentryUrl && sentryEnvironment && sentryRelease) {
+    Sentry.init({
+      dsn: sentryUrl,
+      environment: sentryEnvironment,
+      release: sentryRelease,
+      integrations: [
+        new SentryIntegrations.Dedupe(),
+        new SentryIntegrations.ExtraErrorData(),
+      ],
+    });
+  } else {
+    if (!isAnyTest) {
+      // eslint-disable-next-line no-console
+      console.warn("Sentry is not configured. To activate error reporting, please set the sentry.url variable in your settings file.");
+    }
+  }
+  
+  checkForCoreDumps();
+}
+>>>>>>> base/master
 
 export const addSentryMiddlewares = (addConnectHandler: AddMiddlewareType) => {
   addConnectHandler(Sentry.Handlers.requestHandler());
   addConnectHandler(Sentry.Handlers.errorHandler());
 };
 
+<<<<<<< HEAD
 const gigabytes = 1024 * 1024 * 1024;
 const consoleLogMemoryUsageThreshold = new DatabaseServerSetting<number>("consoleLogMemoryUsage", 1.5 * gigabytes);
 const sentryErrorMemoryUsageThreshold = new DatabaseServerSetting<number>("sentryErrorMemoryUsage", 2.1 * gigabytes);
 const memoryUsageCheckInterval = new DatabaseServerSetting<number>("memoryUsageCheckInterval", 2000);
+=======
+const gigabytes = 1024*1024*1024;
+const consoleLogMemoryUsageThreshold = new DatabaseServerSetting<number>("consoleLogMemoryUsage", 1.5*gigabytes);
+const sentryErrorMemoryUsageThreshold = new DatabaseServerSetting<number>("sentryErrorMemoryUsage", 2.1*gigabytes);
+const memoryUsageCheckInterval = new DatabaseServerSetting<number>("memoryUsageCheckInterval", 10000);
+>>>>>>> base/master
 
-onStartup(() => {
+export function startMemoryUsageMonitor() {
   if (!isAnyTest) {
     setInterval(() => {
       const memoryUsage = process.memoryUsage()?.heapTotal;
       if (memoryUsage > consoleLogMemoryUsageThreshold.get()) {
         // eslint-disable-next-line no-console
+<<<<<<< HEAD
         console.log(
           `Memory usage is high: ${memoryUsage} bytes (warning threshold: ${consoleLogMemoryUsageThreshold.get()})`,
         );
         checkForMemoryLeaks();
 
+=======
+        console.log(`Memory usage is high: ${memoryUsage} bytes (warning threshold: ${consoleLogMemoryUsageThreshold.get()})`);
+>>>>>>> base/master
         logInFlightStuff();
       }
       if (memoryUsage > sentryErrorMemoryUsageThreshold.get()) {
@@ -84,7 +130,7 @@ onStartup(() => {
       }
     }, memoryUsageCheckInterval.get());
   }
-});
+}
 
 function checkForCoreDumps() {
   const files = fs.readdirSync(".");
@@ -164,9 +210,7 @@ function printInFlightGraphqlQueries() {
   }
 }
 
-function logInFlightStuff() {
+export function logInFlightStuff() {
   printInFlightRequests();
   printInFlightGraphqlQueries();
-  printInProgressCallbacks();
 }
-Globals.logInFlightStuff = logInFlightStuff;

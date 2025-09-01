@@ -1,15 +1,21 @@
 import ElasticClient, { ElasticSearchHit } from "./ElasticClient";
-import type { SearchQuery } from "./SearchQuery";
 import type { SearchResult } from "./SearchResult";
 import { algoliaPrefixSetting } from "../../../lib/publicSettings";
 import { indexNameToConfig } from "./ElasticConfig";
 import { QueryFilter, QueryFilterOperator, SEARCH_ORIGIN_DATE } from "./ElasticQuery";
 import moment from "moment";
+import type { SearchOptions, SearchQuery } from "@/lib/search/NativeSearchClient";
 
 type SanitizedIndexName = {
+<<<<<<< HEAD
   index: string;
   sorting?: string;
 };
+=======
+  index: string | string[],
+  sorting?: string,
+}
+>>>>>>> base/master
 
 type NamedHighlight = {
   value?: string;
@@ -27,23 +33,46 @@ const extractNamedHighlight = (highlight: ElasticSearchHit["highlight"], name: s
 class ElasticService {
   constructor(private client = new ElasticClient()) {}
 
+<<<<<<< HEAD
   async runQuery({ indexName, params }: SearchQuery): Promise<SearchResult> {
     const start = Date.now();
 
     const { index, sorting } = this.sanitizeIndexName(indexName);
+=======
+  async runQuery({indexName, params}: SearchQuery, options: SearchOptions): Promise<SearchResult> {
+    const start = Date.now();
+
+    const {index, sorting} = this.sanitizeIndexName(indexName);
+    const search = params.query ?? "";
+>>>>>>> base/master
     const hitsPerPage = params.hitsPerPage ?? 10;
     const page = params.page ?? 0;
-    const result = await this.client.search({
-      index,
-      sorting,
-      search: params.query ?? "",
-      offset: page * hitsPerPage,
-      limit: hitsPerPage,
-      preTag: params.highlightPreTag,
-      postTag: params.highlightPostTag,
-      filters: this.parseFilters(params.facetFilters, params.numericFilters, params.existsFilters),
-      coordinates: this.parseLatLng(params.aroundLatLng),
-    });
+    const skipSearch = search==="" && options.emptyStringSearchResults==="empty";
+    const result = skipSearch
+      ? {hits: {
+          total: 0,
+          hits: [],
+        }}
+      : await (
+        Array.isArray(index)
+          ? this.client.multiSearch({
+            indexes: index,
+            search,
+            offset: page * hitsPerPage,
+            limit: hitsPerPage,
+          })
+          : this.client.search({
+            index,
+            sorting,
+            search,
+            offset: page * hitsPerPage,
+            limit: hitsPerPage,
+            preTag: params.highlightPreTag,
+            postTag: params.highlightPostTag,
+            filters: this.parseFilters(params.facetFilters, params.numericFilters, params.existsFilters),
+            coordinates: this.parseLatLng(params.aroundLatLng),
+          })
+      );
 
     const nbHits = typeof result.hits.total === "number" ? result.hits.total : result.hits.total?.value ?? 0;
 
@@ -165,14 +194,25 @@ class ElasticService {
     return result;
   }
 
-  private parseFacetValue(value: string): boolean | string {
+  private parseFacetValue(value: string): boolean | string | null {
     switch (value) {
+<<<<<<< HEAD
       case "true":
         return true;
       case "false":
         return false;
       default:
         return value;
+=======
+    case "true":
+      return true;
+    case "false":
+      return false;
+    case "null":
+        return null;
+    default:
+      return value;
+>>>>>>> base/master
     }
   }
 
@@ -211,18 +251,24 @@ class ElasticService {
 
   private sanitizeIndexName(indexName: string): SanitizedIndexName {
     const prefix = algoliaPrefixSetting.get();
+<<<<<<< HEAD
     if (prefix && indexName.indexOf(prefix) === 0) {
       indexName = indexName.slice(prefix.length);
+=======
+    if (prefix) {
+      indexName = indexName.replace(new RegExp(prefix, "g"), "");
+>>>>>>> base/master
     }
     const tokens = indexName.split("_");
-    indexName = tokens[0];
+    const indexNames = tokens[0].split(",");
     const sorting = tokens.length > 1 ? tokens.slice(1).join("_") : undefined;
     return {
-      index: indexName,
+      index: indexNames.length > 1 ? indexNames : indexNames[0],
       sorting,
     };
   }
 
+<<<<<<< HEAD
   private getHits(indexName: string, hits: ElasticSearchHit[]): SearchDocument[] {
     const config = indexNameToConfig(indexName);
     return hits.map(({ _id, _source, highlight }) => ({
@@ -234,9 +280,34 @@ class ElasticService {
       ...(config.highlight && {
         _highlightResult: {
           [config.highlight]: extractNamedHighlight(highlight, config.highlight),
+=======
+  private getHits(
+    indexName: string | string[],
+    hits: ElasticSearchHit[],
+  ): SearchDocument[] {
+    if (Array.isArray(indexName)) {
+      return hits.map(({_id, _source, _index}) => ({
+        ..._source,
+        _id,
+        _index: _index.split("_")[0],
+      }))
+    } else {
+      const config = indexNameToConfig(indexName);
+      return hits.map(({_id, _source, highlight}) => ({
+        ..._source,
+        _id,
+        _index: indexName,
+        _snippetResult: {
+          [config.snippet]: extractNamedHighlight(highlight, config.snippet),
+>>>>>>> base/master
         },
-      }),
-    }));
+        ...(config.highlight && {
+          _highlightResult: {
+            [config.highlight]: extractNamedHighlight(highlight, config.highlight),
+          },
+        }),
+      }));
+    }
   }
 }
 

@@ -39,9 +39,15 @@
  */
 export const acceptsSchemaHash = "f5e4a3d5459008e1e5f5e83555a849b1";
 
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { addField, createTable, dropField, dropTable } from "./meta/utils";
 import DialogueCheck from "../../lib/collections/dialogueChecks/collection";
+=======
+import Users from "../../server/collections/users/collection";
+import {addField, createTable, dropField, dropTable} from "./meta/utils";
+import DialogueCheck from "../../server/collections/dialogueChecks/collection";
+>>>>>>> base/master
 
 // This was originally 3 migrations from our PR, but after catching up with master, we're combining them into one
 

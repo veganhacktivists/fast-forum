@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Vulcan } from "../../lib/vulcan-lib";
 import { Posts } from "../../lib/collections/posts";
 import Users from "../../lib/collections/users/collection";
@@ -6,6 +7,16 @@ import htmlparser2 from "htmlparser2";
 import { URL } from "url";
 import fs from "fs";
 import * as _ from "underscore";
+=======
+import Users from '../../server/collections/users/collection';
+import { urlIsBroken } from './utils'
+import htmlparser2 from 'htmlparser2';
+import { URL } from 'url';
+import fs from 'fs';
+import * as _ from 'underscore';
+import { FetchedFragment, fetchFragment } from '../fetchFragment';
+import { PostsPage } from '@/lib/collections/posts/fragments';
+>>>>>>> base/master
 
 const whitelistedImageHosts = ["lesswrong.com", "www.lesswrong.com", "res.cloudinary.com"];
 const baseUrl = "http://www.lesswrong.com";
@@ -56,10 +67,18 @@ function imageIsOffsite(imageUrl: string) {
   return true;
 }
 
+<<<<<<< HEAD
 const describePost = async (post: DbPost) => {
   const author = await Users.findOne({ _id: post.userId });
   if (!author) throw Error(`Can't get author for post: ${post._id}`);
   const postLink = baseUrl + "/posts/" + post._id;
+=======
+const describePost = async (post: PostsPage) =>
+{
+  const author = await Users.findOne({_id: post.userId});
+  if(!author) throw Error(`Can't get author for post: ${post._id}`)
+  const postLink = baseUrl + "/posts/"+post._id;
+>>>>>>> base/master
   return `${post.title} by ${author.displayName} [${post.baseScore}]\n    ${postLink}`;
 };
 
@@ -68,11 +87,19 @@ const describePost = async (post: DbPost) => {
 // (nothing broken), returns the empty string; otherwise the result (which is
 // meant to be handled by a person) includes the title/author/karma of the
 // post and a list of broken things within it.
+<<<<<<< HEAD
 const checkPost = async (post: DbPost) => {
   const { html = "" } = post.contents || {};
   const images = getImagesInHtml(html);
   const links = getLinksInHtml(html);
 
+=======
+const checkPost = async (post: FetchedFragment<PostsPage, 'Posts'>) => {
+  const { html } = post.contents || {}
+  const images = getImagesInHtml(html ?? "");
+  const links = getLinksInHtml(html ?? "");
+  
+>>>>>>> base/master
   let brokenImages: Array<string> = [];
   let offsiteImages: Array<string> = [];
   let brokenLinks: Array<string> = [];
@@ -99,7 +126,15 @@ const checkPost = async (post: DbPost) => {
   }
 };
 
+<<<<<<< HEAD
 Vulcan.findBrokenLinks = async (startDate: Date, endDate: Date, output: string | ((message: string) => void)) => {
+=======
+// Exported to allow running manually with "yarn repl"
+export const findBrokenLinks = async (
+  startDate: Date, endDate: Date,
+  output: string|((message: string) => void)
+) => {
+>>>>>>> base/master
   // TODO: Subdivide date range so we don't try to load all posts at once
   // TODO: Retry "broken" links to remove false positives from the list
   let write: any = null;
@@ -126,10 +161,24 @@ Vulcan.findBrokenLinks = async (startDate: Date, endDate: Date, output: string |
       },
     };
   }
+<<<<<<< HEAD
   const postsToCheck = await Posts.find(filter).fetch();
 
   write("Checking " + postsToCheck.length + " post for broken links and images.\n");
   for (let i = 0; i < postsToCheck.length; i++) {
+=======
+  const postsToCheck = await fetchFragment({
+    collectionName: "Posts",
+    fragmentDoc: PostsPage,
+    selector: filter,
+    currentUser: null,
+    skipFiltering: true,
+  });
+
+  write("Checking "+postsToCheck.length+" post for broken links and images.\n");
+  for(let i=0; i<postsToCheck.length; i++)
+  {
+>>>>>>> base/master
     let post = postsToCheck[i];
     let result = await checkPost(post);
     if (result) {

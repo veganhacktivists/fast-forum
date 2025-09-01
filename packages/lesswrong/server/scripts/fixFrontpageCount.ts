@@ -1,9 +1,16 @@
+<<<<<<< HEAD
 import { Posts } from "../../lib/collections/posts";
 import Users from "../../lib/collections/users/collection";
 
 const fixFrontpageCounts = false;
 
 async function fixFrontpagePostCount() {
+=======
+import { Posts } from '../../server/collections/posts/collection';
+import Users from '../../server/collections/users/collection';
+
+export async function fixFrontpagePostCount() {
+>>>>>>> base/master
   try {
     let frontpageCountsPromise = Posts.aggregate([
       { $match: { frontpage: true } },
@@ -29,7 +36,10 @@ async function fixFrontpagePostCount() {
     console.error(e);
   }
 }
+<<<<<<< HEAD
 
 if (fixFrontpageCounts) {
   void fixFrontpagePostCount();
 }
+=======
+>>>>>>> base/master

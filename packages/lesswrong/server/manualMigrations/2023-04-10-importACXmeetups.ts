@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import Users from "../../lib/collections/users/collection";
 import { createMutator, Utils } from "../vulcan-lib";
@@ -6,6 +7,19 @@ import { mapsAPIKeySetting } from "../../components/form-components/LocationForm
 import { getLocalTime } from "../mapsUtils";
 import { userFindOneByEmail } from "../commonQueries";
 import { writeFile } from "fs/promises";
+=======
+import { registerMigration } from './migrationUtils';
+import { Posts } from '../../server/collections/posts/collection';
+import { mapsAPIKeySetting } from '@/lib/publicSettings';
+import { getLocalTime } from '../mapsUtils';
+import {userFindOneByEmail} from "../commonQueries";
+import { writeFile } from 'fs/promises';
+import { getUnusedSlugByCollectionName } from '../utils/slugUtil';
+import { createUser } from '../collections/users/mutations';
+import { createPost } from '../collections/posts/mutations';
+import { createAnonymousContext } from '../vulcan-lib/createContexts';
+import { computeContextFromUser } from '../vulcan-lib/apollo-server/context';
+>>>>>>> base/master
 
 async function coordinatesToGoogleLocation({ lat, lng }: { lat: string; lng: string }) {
   const requestOptions: any = {
@@ -22,7 +36,7 @@ async function coordinatesToGoogleLocation({ lat, lng }: { lat: string; lng: str
   return responseData.results[0];
 }
 
-registerMigration({
+export default registerMigration({
   name: "importACXMeetupsSpring23",
   dateWritten: "2023-04-10",
   idempotent: true,
@@ -42,8 +56,9 @@ registerMigration({
       if (existingUser) {
         eventOrganizer = existingUser;
       } else {
-        const username = await Utils.getUnusedSlugByCollectionName("Users", row["Name/initials/handle"].toLowerCase());
+        const username = await getUnusedSlugByCollectionName("Users", row["Name/initials/handle"].toLowerCase());
         try {
+<<<<<<< HEAD
           const { data: newUser } = await createMutator({
             collection: Users,
             document: {
@@ -75,6 +90,29 @@ registerMigration({
           });
 
           eventOrganizer = newUser;
+=======
+          const userDoc = {
+            username,
+            displayName: row["Name/initials/handle"],
+            email: email,
+            reviewedByUserId: "XtphY3uYHwruKqDyG", //This looks like a hardcoded user who supposedly reviewed something. Who is that user?
+            reviewedAt: new Date()
+          };
+          const newUser = await createUser({ data: userDoc }, createAnonymousContext());
+          eventOrganizer = newUser
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.log({ err, email, row }, 'Error when creating a new user, using a different username');
+          const userDoc = {
+            username: `${username}-acx-23`,
+            displayName: row["Name/initials/handle"],
+            email: email,
+            reviewedByUserId: "XtphY3uYHwruKqDyG", //This looks like a hardcoded user who supposedly reviewed something. Who is that user?
+            reviewedAt: new Date()
+          };
+          const newUser = await createUser({ data: userDoc }, createAnonymousContext());
+          eventOrganizer = newUser
+>>>>>>> base/master
         }
       }
 
@@ -141,12 +179,16 @@ registerMigration({
           authorIsUnreviewed: false,
           types: ["SSC"],
         };
+<<<<<<< HEAD
         const { data: newPost } = await createMutator({
           collection: Posts,
           document: newPostData,
           currentUser: eventOrganizer,
           validate: false,
         });
+=======
+        const newPost = await createPost({ data: newPostData }, await computeContextFromUser({ user: eventOrganizer, isSSR: false }));
+>>>>>>> base/master
         // eslint-disable-next-line no-console
         console.log("Created new ACX Meetup: ", newPost.title);
         const googleLocationInfo = newPost.googleLocation?.geometry?.location;

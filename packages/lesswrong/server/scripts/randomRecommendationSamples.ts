@@ -1,10 +1,10 @@
-import { Globals } from "../vulcan-lib";
-import { getSqlClientOrThrow } from "../../lib/sql/sqlClient";
+import { getSqlClientOrThrow } from "@/server/sql/sqlClient";
 import RecommendationService from "../recommendations/RecommendationService";
 import { postGetPageUrl } from "../../lib/collections/posts/helpers";
 import type { StrategySpecification } from "../../lib/collections/users/recommendationSettings";
 
-const randomRecommendationSamples = async () => {
+// Exported to allow use in "yarn repl"
+export const randomRecommendationSamples = async () => {
   let cutoff = new Date();
   cutoff = new Date(cutoff.setFullYear(cutoff.getFullYear() - 1));
 
@@ -63,6 +63,10 @@ const randomRecommendationSamples = async () => {
     // eslint-disable-next-line no-console
     console.log(result, "\n\n");
   }
+<<<<<<< HEAD
 };
 
 Globals.randomRecommendationSamples = randomRecommendationSamples;
+=======
+}
+>>>>>>> base/master

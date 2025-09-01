@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Globals } from "../../../lib/vulcan-lib/config";
 import { Posts } from "../../../lib/collections/posts/collection";
 import { Tags } from "../../../lib/collections/tags/collection";
@@ -20,6 +21,24 @@ import keyBy from "lodash/keyBy";
 import filter from "lodash/filter";
 import fs from "fs";
 import { getSiteUrl } from "../../vulcan-lib";
+=======
+import { Posts } from '../../../server/collections/posts/collection';
+import { Tags } from '../../../server/collections/tags/collection';
+import { postStatuses } from '../../../lib/collections/posts/constants';
+import { getOpenAI, wikiSlugToTemplate } from '../../languageModels/languageModelIntegration';
+import { postToPrompt, checkTags, getAutoAppliedTags, generatePostBodyCache, PostBodyCache } from '../../languageModels/autoTagCallbacks';
+import shuffle from 'lodash/shuffle';
+import take from 'lodash/take';
+import drop from 'lodash/drop';
+import sum from 'lodash/sum';
+import keyBy from 'lodash/keyBy';
+import filter from 'lodash/filter';
+import fs from 'fs';
+import { getSiteUrl } from '../../../lib/vulcan-lib/utils';
+import { FetchedFragment, fetchFragment } from '../../fetchFragment';
+import { createAnonymousContext } from '@/server/vulcan-lib/createContexts';
+import { PostsHTML } from '@/lib/collections/posts/fragments';
+>>>>>>> base/master
 
 const postEndMarker = "===TAGS===";
 
@@ -27,8 +46,14 @@ const postEndMarker = "===TAGS===";
  * Given a list of items and a list of weights, shuffle and partition the items
  * into disjoint sets with size proportional to weight. Used for dividing data
  * into train and test.
+ * Exported to allow running with "yarn repl"
  */
+<<<<<<< HEAD
 function weightedPartition<T>(list: T[], weights: number[]): T[][] {
+=======
+export function weightedPartition<T>(list: T[], weights: number[]): T[][]
+{
+>>>>>>> base/master
   const totalWeight = sum(weights);
 
   // First calculate group sizes with everything rounded down.
@@ -52,12 +77,14 @@ function weightedPartition<T>(list: T[], weights: number[]): T[][] {
   return result;
 }
 
-async function generateCandidateSetsForTagClassification(): Promise<void> {
+// Exported to allow running with "yarn repl"
+export async function generateCandidateSetsForTagClassification(): Promise<void> {
   const startDate = new Date("2022-11-01");
   const endDate = new Date("2023-11-01");
 
   console.log(`Finding posts from ${startDate} to ${endDate}`); //eslint-disable-line no-console
   const posts = await Posts.find({
+<<<<<<< HEAD
     draft: false,
     status: postStatuses.STATUS_APPROVED,
     isFuture: false,
@@ -70,6 +97,16 @@ async function generateCandidateSetsForTagClassification(): Promise<void> {
     baseScore: { $gte: 10 },
     tagRelevance: { $exists: true },
     postedAt: { $gte: startDate, $lte: endDate },
+=======
+    draft: false, status: postStatuses.STATUS_APPROVED,
+    isFuture: false, unlisted: false, shortform: false, authorIsUnreviewed: false,
+    question: false, isEvent: false,
+    // FIXME `contents: {$ne: null}` now throws an error due to contents being normalized
+    contents: {$ne: null},
+    baseScore: {$gte: 10},
+    tagRelevance: {$exists: true},
+    postedAt: {$gte: startDate, $lte: endDate},
+>>>>>>> base/master
   }).fetch();
   console.log(`Found ${posts.length} posts`); //eslint-disable-line no-console
 
@@ -91,6 +128,7 @@ const frontpageModel = "babbage:ft-personal-2022-12-08-22-23-33";
 const frontpagePrompt =
   "Is this post of broad relevance, timeless, apolitical, and aiming to explain rather than persuade?";
 
+<<<<<<< HEAD
 async function generateClassifierTuningFile({
   description,
   posts,
@@ -110,6 +148,21 @@ async function generateClassifierTuningFile({
   const result: string[] = [];
   const template = await wikiSlugToTemplate("lm-config-autotag");
 
+=======
+async function generateClassifierTuningFile({description, posts, postBodyCache, outputFilename, promptSuffix, classifyPost}: {
+  description: string,
+  posts: FetchedFragment<PostsHTML, "Posts">[],
+  outputFilename: string,
+  promptSuffix: string,
+  classifyPost: (post: DbPost) => boolean,
+  postBodyCache?: PostBodyCache
+}) {
+  const context = createAnonymousContext();
+  const postsById = keyBy(posts, post=>post._id);
+  const result: string[] = [];
+  const template = await wikiSlugToTemplate("lm-config-autotag", context);
+  
+>>>>>>> base/master
   let postsWritten = 0;
 
   for (let post of posts) {
@@ -134,6 +187,7 @@ async function generateClassifierTuningFile({
   fs.writeFileSync(outputFilename, result.join("\n"));
 }
 
+<<<<<<< HEAD
 Globals.generateTagClassifierData = async (args: {
   tagSlug?: string;
   trainingSetFilename?: string;
@@ -156,6 +210,42 @@ Globals.generateTagClassifierData = async (args: {
   const tags: DbTag[] = tagSlug ? [singleTag!] : await getAutoAppliedTags();
 
   console.log(`Will generate training and test sets for ${tags.length} tags: ${tags.map((t) => t.slug).join(", ")}`); //eslint-disable-line no-console
+=======
+// Exported to allow running with "yarn repl"
+export const generateTagClassifierData = async (args: {
+  tagSlug?: string
+  trainingSetFilename?: string,
+  testSetFilename?: string,
+}) => {
+  const context = createAnonymousContext();
+  const {tagSlug, trainingSetFilename="ml/tagClassificationPostIds.train.json", testSetFilename="ml/tagClassificationPostIds.test.json"} = args||{};
+  const trainingSetPostIds = JSON.parse(fs.readFileSync(trainingSetFilename, 'utf-8'));
+  const testSetPostIds = JSON.parse(fs.readFileSync(testSetFilename, 'utf-8'));
+
+  const trainingSet = await fetchFragment({
+    collectionName: "Posts",
+    fragmentDoc: PostsHTML,
+    selector: {_id: {$in: trainingSetPostIds}},
+    currentUser: null,
+    skipFiltering: true,
+  });
+  const testSet = await fetchFragment({
+    collectionName: "Posts",
+    fragmentDoc: PostsHTML,
+    selector: {_id: {$in: testSetPostIds}},
+    currentUser: null,
+    skipFiltering: true,
+  });
+
+  const singleTag = tagSlug ? await Tags.findOne({slug: tagSlug}) : null;
+  if (tagSlug && !singleTag) throw new Error(`Missing tag: ${tagSlug}`);
+  
+  const tags: DbTag[] = tagSlug
+    ? [singleTag!]
+    : await getAutoAppliedTags(context);
+  
+  console.log(`Will generate training and test sets for ${tags.length} tags: ${tags.map(t=>t.slug).join(', ')}`); //eslint-disable-line no-console
+>>>>>>> base/master
   console.log(`Preprocessing post body for ${trainingSet.length} posts in training set`); //eslint-disable-line no-console
   const postBodyCacheTrain = generatePostBodyCache(trainingSet);
   console.log(`Preprocessing post body for ${testSet.length} posts in test set`); //eslint-disable-line no-console
@@ -188,15 +278,37 @@ Globals.generateTagClassifierData = async (args: {
   }
 };
 
-Globals.generateIsFrontpageClassifierData = async () => {
+// Exported to allow running with "yarn repl"
+export const generateIsFrontpageClassifierData = async () => {
   const trainingSetFilename = "ml/tagClassificationPostIds.train.json";
   const testSetFilename = "ml/tagClassificationPostIds.test.json";
+<<<<<<< HEAD
 
   const trainingSetPostIds = JSON.parse(fs.readFileSync(trainingSetFilename, "utf-8"));
   const testSetPostIds = JSON.parse(fs.readFileSync(testSetFilename, "utf-8"));
 
   const trainingSet: DbPost[] = await Posts.find({ _id: { $in: trainingSetPostIds } }).fetch();
   const testSet: DbPost[] = await Posts.find({ _id: { $in: testSetPostIds } }).fetch();
+=======
+  
+  const trainingSetPostIds = JSON.parse(fs.readFileSync(trainingSetFilename, 'utf-8'));
+  const testSetPostIds = JSON.parse(fs.readFileSync(testSetFilename, 'utf-8'));
+
+  const trainingSet = await fetchFragment({
+    collectionName: "Posts",
+    fragmentDoc: PostsHTML,
+    selector: {_id: {$in: trainingSetPostIds}},
+    currentUser: null,
+    skipFiltering: true,
+  });
+  const testSet = await fetchFragment({
+    collectionName: "Posts",
+    fragmentDoc: PostsHTML,
+    selector: {_id: {$in: testSetPostIds}},
+    currentUser: null,
+    skipFiltering: true,
+  });
+>>>>>>> base/master
 
   await generateClassifierTuningFile({
     description: `Train is-front-page`,
@@ -214,10 +326,25 @@ Globals.generateIsFrontpageClassifierData = async () => {
   });
 };
 
+<<<<<<< HEAD
 Globals.evaluateTagModels = async (testSetPostIdsFilename: string, outputFilename: string) => {
   const testSetPostIds = JSON.parse(fs.readFileSync(testSetPostIdsFilename, "utf-8"));
   const posts = await Posts.find({ _id: { $in: testSetPostIds } }).fetch();
   const tags = await getAutoAppliedTags();
+=======
+// Exported to allow running with "yarn repl"
+export const evaluateTagModels = async (testSetPostIdsFilename: string, outputFilename: string) => {
+  const context = createAnonymousContext();
+  const testSetPostIds = JSON.parse(fs.readFileSync(testSetPostIdsFilename, 'utf-8'));
+  const posts = await fetchFragment({
+    collectionName: "Posts",
+    fragmentDoc: PostsHTML,
+    selector: {_id: {$in: testSetPostIds}},
+    currentUser: null,
+    skipFiltering: true,
+  });
+  const tags = await getAutoAppliedTags(context);
+>>>>>>> base/master
   const openAIApi = await getOpenAI();
   if (!openAIApi) throw new Error("OpenAI API not configured");
   const sb: string[] = [];
@@ -231,6 +358,7 @@ Globals.evaluateTagModels = async (testSetPostIdsFilename: string, outputFilenam
     const tagsByHumans = filter(tags, (t) => post.tagRelevance?.[t._id] > 0).map((t) => t.name);
 
     try {
+<<<<<<< HEAD
       const tagsPredicted = await checkTags(post, tags, openAIApi);
 
       writeResult(
@@ -240,6 +368,14 @@ Globals.evaluateTagModels = async (testSetPostIdsFilename: string, outputFilenam
             .map((t) => t.name)
             .join(", ")}\n` +
           `    Human: ${tagsByHumans.join(", ")}\n`,
+=======
+      const tagsPredicted = await checkTags(post, tags, openAIApi, context);
+      
+      writeResult(`${post.title}\n`
+        + `    ${getSiteUrl()}/posts/${post._id}/${post.slug}\n`
+        + `    Language model: ${filter(tags, t=>!!tagsPredicted[t.slug]).map(t=>t.name).join(", ")}\n`
+        + `    Human: ${tagsByHumans.join(", ")}\n`
+>>>>>>> base/master
       );
     } catch (e) {
       writeResult(
@@ -251,11 +387,27 @@ Globals.evaluateTagModels = async (testSetPostIdsFilename: string, outputFilenam
   fs.writeFileSync(outputFilename, sb.join(""));
 };
 
+<<<<<<< HEAD
 Globals.evaluateFrontPageClassifier = async (testSetPostIdsFilename: string, outputFilename: string) => {
   const testSetPostIds = JSON.parse(fs.readFileSync(testSetPostIdsFilename, "utf-8"));
   const template = await wikiSlugToTemplate("lm-config-autotag");
   const posts = await Posts.find({ _id: { $in: testSetPostIds } }).fetch();
   const postsById = keyBy(posts, (post) => post._id);
+=======
+// Exported to allow running with "yarn repl"
+export const evaluateFrontPageClassifier = async (testSetPostIdsFilename: string, outputFilename: string) => {
+  const context = createAnonymousContext();
+  const testSetPostIds = JSON.parse(fs.readFileSync(testSetPostIdsFilename, 'utf-8'));
+  const template = await wikiSlugToTemplate("lm-config-autotag", context);
+  const posts = await fetchFragment({
+    collectionName: "Posts",
+    fragmentDoc: PostsHTML,
+    selector: {_id: {$in: testSetPostIds}},
+    currentUser: null,
+    skipFiltering: true,
+  });
+  const postsById = keyBy(posts, post=>post._id);
+>>>>>>> base/master
   const openAIApi = await getOpenAI();
   if (!openAIApi) throw new Error("OpenAI API not configured");
   let humanFrontpagedIt: Record<string, boolean> = {};
@@ -323,12 +475,11 @@ Globals.evaluateFrontPageClassifier = async (testSetPostIdsFilename: string, out
   fs.writeFileSync(outputFilename, sb.join(""));
 };
 
-async function printLanguageModelTemplate(templateName: string) {
-  const template = await wikiSlugToTemplate("lm-config-autotag");
+// Exported to allow running with "yarn repl"
+export async function printLanguageModelTemplate(templateName: string) {
+  const context = createAnonymousContext();
+  const template = await wikiSlugToTemplate("lm-config-autotag", context);
   //eslint-disable-next-line no-console
   console.log(JSON.stringify(template));
 }
-Globals.printLanguageModelTemplate = printLanguageModelTemplate;
 
-Globals.weightedPartition = weightedPartition;
-Globals.generateCandidateSetsForTagClassification = generateCandidateSetsForTagClassification;

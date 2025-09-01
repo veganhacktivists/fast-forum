@@ -24,8 +24,13 @@
  */
 export const acceptsSchemaHash = "922ce375a3ed4de843e0f4f9cc50dd08";
 
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { addField, dropField } from "./meta/utils";
+=======
+import Users from "../../server/collections/users/collection"
+import { addField, dropField } from "./meta/utils"
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   await addField(db, Users, "voteReceivedCount");

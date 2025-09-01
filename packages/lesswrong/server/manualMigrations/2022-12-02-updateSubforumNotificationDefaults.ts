@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
 import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
-import Users from "../../lib/collections/users/collection";
-import Tags from "../../lib/collections/tags/collection";
-import { Subscriptions } from "../../lib/collections/subscriptions";
+import Users from "../../server/collections/users/collection";
+import Tags from "../../server/collections/tags/collection";
+import { Subscriptions } from "../../server/collections/subscriptions/collection";
+import { randomId } from "../../lib/random";
 
-registerMigration({
+export default registerMigration({
   name: "updateSubforumNotificationDefaults",
   dateWritten: "2022-12-02",
   idempotent: true,
@@ -57,15 +58,25 @@ registerMigration({
       const newSubscriptions = unsubscribedSubforumMembers.map((u) => ({
         insertOne: {
           document: {
+            _id: randomId(),
             userId: u._id,
             collectionName: "Tags",
             documentId: tag._id,
             type: "newTagPosts",
             state: "subscribed",
             deleted: false,
+<<<<<<< HEAD
           },
         },
       }));
+=======
+            createdAt: new Date(),
+            schemaVersion: 1,
+            legacyData: null
+          } as const
+        }
+      }))
+>>>>>>> base/master
 
       console.log(`Creating ${newSubscriptions.length} new subscriptions`);
       if (newSubscriptions.length) {

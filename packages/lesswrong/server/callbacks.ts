@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Notifications from "../lib/collections/notifications/collection";
 import Conversations from "../lib/collections/conversations/collection";
 import Reports from "../lib/collections/reports/collection";
@@ -108,6 +109,13 @@ export const nullifyVotesForUser = async (user: DbUser) => {
     await nullifyVotesForUserAndCollection(user, collection);
   }
 };
+=======
+import { Votes } from '../server/collections/votes/collection';
+import { getVoteableCollections } from '@/server/collections/allCollections';
+import { capitalize } from '../lib/vulcan-lib/utils';
+import { silentlyReverseVote } from './voteServer';
+import { createAdminContext } from "./vulcan-lib/createContexts";
+>>>>>>> base/master
 
 interface DateRange {
   after?: Date;
@@ -115,11 +123,12 @@ interface DateRange {
 }
 
 export const nullifyVotesForUserByTarget = async (user: DbUser, targetUserId: string, dateRange: DateRange) => {
-  for (let collection of VoteableCollections) {
+  for (let collection of getVoteableCollections()) {
     await nullifyVotesForUserAndCollectionByTarget(user, collection, targetUserId, dateRange);
   }
 };
 
+<<<<<<< HEAD
 const nullifyVotesForUserAndCollection = async (user: DbUser, collection: CollectionBase<VoteableCollectionName>) => {
   const collectionName = capitalize(collection.collectionName);
   const context = createAdminContext();
@@ -137,6 +146,8 @@ const nullifyVotesForUserAndCollection = async (user: DbUser, collection: Collec
   console.info(`Nullified ${votes.length} votes for user ${user.username}`);
 };
 
+=======
+>>>>>>> base/master
 const nullifyVotesForUserAndCollectionByTarget = async (
   user: DbUser,
   collection: CollectionBase<VoteableCollectionName>,
@@ -170,6 +181,7 @@ const nullifyVotesForUserAndCollectionByTarget = async (
   }
   //eslint-disable-next-line no-console
   console.info(`Nullified ${votes.length} votes for user ${user.username} in collection ${collectionName}`);
+<<<<<<< HEAD
 };
 
 export async function userDeleteContent(user: DbUser, deletingUser: DbUser, deleteTags = true) {
@@ -383,3 +395,6 @@ getCollectionHooks("LWEvents").newSync.add(async function updateReadStatus(event
   }
   return event;
 });
+=======
+}
+>>>>>>> base/master

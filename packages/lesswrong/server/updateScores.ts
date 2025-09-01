@@ -1,9 +1,19 @@
+<<<<<<< HEAD
 import { getCollection, Vulcan } from "./vulcan-lib";
 import { TIME_DECAY_FACTOR, getSubforumScoreBoost, SCORE_BIAS } from "../lib/scoring";
 import { Posts } from "../lib/collections/posts";
 import { runSqlQuery } from "../lib/sql/sqlClient";
+=======
+import {
+  TIME_DECAY_FACTOR,
+  getSubforumScoreBoost,
+  SCORE_BIAS,
+} from '../lib/scoring';
+import { runSqlQuery } from "@/server/sql/sqlClient";
+>>>>>>> base/master
 import chunk from "lodash/chunk";
 import compact from "lodash/compact";
+import { getCollection } from "@/server/collections/allCollections";
 
 // INACTIVITY_THRESHOLD_DAYS =  number of days after which a single vote will not have a big enough effect to trigger a score update
 //      and posts can become inactive
@@ -14,7 +24,7 @@ interface BatchUpdateParams {
   forceUpdate?: boolean;
 }
 
-const getPgCollectionProjections = (collectionName: CollectionNameString) => {
+const getPgCollectionProjections = (collectionName: VoteableCollectionName) => {
   const proj = {
     _id: '"_id"',
     postedAt: '"postedAt"',
@@ -41,16 +51,23 @@ const getPgCollectionProjections = (collectionName: CollectionNameString) => {
         )
         ELSE 0 END)) as "baseScore"`;
       break;
+    default:
+      break;
   }
   return Object.values(proj);
 };
 
+<<<<<<< HEAD
 const getBatchItemsPg = async <N extends CollectionNameString>(
   collection: CollectionBase<N>,
   inactive: boolean,
   forceUpdate: boolean,
 ) => {
   const { collectionName } = collection;
+=======
+const getBatchItemsPg = async <N extends VoteableCollectionName>(collection: CollectionBase<N>, inactive: boolean, forceUpdate: boolean) => {
+  const {collectionName} = collection;
+>>>>>>> base/master
   if (!["Posts", "Comments"].includes(collectionName)) {
     return [];
   }
@@ -84,6 +101,7 @@ const getBatchItemsPg = async <N extends CollectionNameString>(
   );
 };
 
+<<<<<<< HEAD
 const getBatchItems = <N extends CollectionNameString>(
   collection: CollectionBase<N>,
   inactive: boolean,
@@ -97,6 +115,13 @@ export const batchUpdateScore = async ({
   inactive = false,
   forceUpdate = false,
 }: BatchUpdateParams & { collection: CollectionBase<CollectionNameString> }) => {
+=======
+const getBatchItems = <N extends VoteableCollectionName>(collection: CollectionBase<N>, inactive: boolean, forceUpdate: boolean) => {
+  return getBatchItemsPg(collection, inactive, forceUpdate)
+}
+
+export const batchUpdateScore = async ({collection, inactive = false, forceUpdate = false}: BatchUpdateParams & { collection: CollectionBase<VoteableCollectionName> }) => {
+>>>>>>> base/master
   const items = await getBatchItems(collection, inactive, forceUpdate);
   let updatedDocumentsCounter = 0;
 
@@ -134,6 +159,7 @@ export const batchUpdateScore = async ({
   return updatedDocumentsCounter;
 };
 
+<<<<<<< HEAD
 export const batchUpdateScoreByName = ({
   collectionName,
   inactive = false,
@@ -144,3 +170,10 @@ export const batchUpdateScoreByName = ({
 };
 
 Vulcan.batchUpdateScoreByName = batchUpdateScoreByName;
+=======
+// Exported to allow running manually with "yarn repl"
+export const batchUpdateScoreByName = ({collectionName, inactive = false, forceUpdate = false}: BatchUpdateParams & { collectionName: VoteableCollectionName }) => {
+  const collection = getCollection(collectionName);
+  return batchUpdateScore({collection, inactive, forceUpdate});
+}
+>>>>>>> base/master

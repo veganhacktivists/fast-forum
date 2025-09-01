@@ -1,11 +1,19 @@
 /* eslint-disable no-console */
 // Given all the console logs, this seemed more elegant than commenting on every one
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import { Votes } from "../../lib/collections/votes";
 import Users from "../../lib/vulcan-users";
 import { getCollection } from "../vulcan-lib";
+=======
+import { registerMigration } from './migrationUtils';
+import { Votes } from '../../server/collections/votes/collection';
+import Users from '../../server/collections/users/collection';
+import { getCollection } from '../collections/allCollections';
 
-registerMigration({
+>>>>>>> base/master
+
+export default registerMigration({
   name: "updateCollectionScores",
   dateWritten: "2020-09-19",
   idempotent: true,
@@ -143,6 +151,17 @@ const recomputeUserKarma = async () => {
   console.log(`Finished updating User karma. Updated ${newScores.length} users.`);
 };
 
+<<<<<<< HEAD
 const chunkArray = <T>(arr: T[], size: number): T[][] => {
   return Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
 };
+=======
+  console.log(`Finished updating User karma. Updated ${newScores.length} users.`)
+}
+
+const chunkArray = <T>(arr: T[], size: number): T[][] => {
+  return Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
+    arr.slice((i * size), (i * size) + size)
+  );
+}
+>>>>>>> base/master

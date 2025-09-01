@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   addGraphQLSchema,
   addGraphQLResolvers,
@@ -51,7 +52,50 @@ addGraphQLSchema(ElicitBlockDataType);
 const elicitAPIUrl = "https://forecast.elicit.org/api/v1";
 const elicitAPIKey = new DatabaseServerSetting("elicitAPIKey", null);
 // const elicitSourceName = new DatabaseServerSetting('elicitSourceName', 'LessWrong')
+=======
+import { generateIdResolverSingle } from '../../lib/utils/schemaUtils';
+import ElicitQuestions from '../../server/collections/elicitQuestions/collection';
+import ElicitQuestionPredictions from '../../server/collections/elicitQuestionPredictions/collection';
+import { randomId } from '@/lib/random';
+import gql from 'graphql-tag';
+import { createElicitQuestionPrediction } from '../collections/elicitQuestionPredictions/mutations';
+import { computeContextFromUser } from '../vulcan-lib/apollo-server/context';
+>>>>>>> base/master
 
+export const elicitPredictionsGraphQLTypeDefs = gql`
+  type ElicitUser {
+    isQuestionCreator: Boolean
+    displayName: String
+    _id: String
+    sourceUserId: String
+    lwUser: User
+  }
+  type ElicitPrediction {
+    _id: String
+    predictionId: String
+    prediction: Float
+    createdAt: Date
+    notes: String
+    creator: ElicitUser
+    sourceUrl: String
+    sourceId: String
+    binaryQuestionId: String
+  }
+  type ElicitBlockData {
+    _id: String
+    title: String
+    notes: String
+    resolvesBy: Date
+    resolution: Boolean
+    predictions: [ElicitPrediction!]
+  }
+  extend type Query {
+    ElicitBlockData(questionId: String): ElicitBlockData
+  }
+  extend type Mutation {
+    MakeElicitPrediction(questionId: String, prediction: Int): ElicitBlockData
+  }
+`
 export interface ElicitPredictionData {
   id: string;
   prediction: number;
@@ -68,6 +112,7 @@ export type ConvertedElicitPredictionData = Omit<ElicitPredictionData, "id" | "c
   createdAt: Date;
 };
 
+<<<<<<< HEAD
 export async function getPredictionsFromElicit(questionId: string): Promise<null | Array<ElicitPredictionData>> {
   const response = await fetch(
     `${elicitAPIUrl}/binary-questions/${questionId}/binary-predictions?${encode({
@@ -192,6 +237,25 @@ async function getLocalElicitQuestionWithPredictions(
   const [questionData, predictionData] = await Promise.all([
     ElicitQuestions.findOne(questionId),
     ElicitQuestionPredictions.find({ binaryQuestionId: questionId }).fetch(),
+=======
+interface ElicitQuestionWithPredictions {
+  _id: string,
+  title: string,
+  notes: string | null,
+  resolution: boolean,
+  resolvesBy: Date | null,
+  predictions: DbElicitQuestionPrediction[]
+}
+
+async function getLocalElicitQuestionWithPredictions(questionId: string): Promise<ElicitQuestionWithPredictions | Record<any, never>> {
+  const [questionData, predictionData] = await Promise.all([
+    ElicitQuestions.findOne(questionId),
+    ElicitQuestionPredictions.find({
+      binaryQuestionId: questionId,
+      isDeleted: false,
+      prediction: { $ne: null },
+    }).fetch()
+>>>>>>> base/master
   ]);
 
   if (!questionData) return {};
@@ -203,6 +267,7 @@ async function getLocalElicitQuestionWithPredictions(
   };
 }
 
+<<<<<<< HEAD
 onStartup(() => {
   if (elicitAPIKey.get()) {
     const elicitPredictionResolver = {
@@ -251,3 +316,56 @@ onStartup(() => {
     addGraphQLMutation("MakeElicitPrediction(questionId: String, prediction: Int): ElicitBlockData");
   }
 });
+=======
+export const elicitPredictionsGraphQLFieldResolvers = {
+  ElicitUser: {
+    lwUser: generateIdResolverSingle({
+      foreignCollectionName: "Users",
+      fieldName: "sourceUserId",
+      nullable: true 
+    })
+  }
+}
+
+export const elicitPredictionsGraphQLMutations = {
+  async MakeElicitPrediction(root: void, { questionId, prediction }: { questionId: string, prediction: number }, { currentUser }: ResolverContext) {
+    if (!currentUser) throw Error("Can only make elicit prediction when logged in")
+    const userContext = await computeContextFromUser({ user: currentUser, isSSR: false });
+    const predictionObj = (await createElicitQuestionPrediction({
+      data: {
+        prediction,
+        binaryQuestionId: questionId,
+        notes: "",
+        creator: {
+          _id: randomId(),
+          displayName: currentUser.displayName ?? currentUser._id,
+          sourceUserId: currentUser._id,
+          isQuestionCreator: false, //TODO
+        },
+        userId: currentUser._id,
+        sourceUrl: "",
+        sourceId: "",
+      },
+    }, userContext));
+
+    // Delete any predictions by this user other than this one
+    await ElicitQuestionPredictions.rawUpdateMany({
+      binaryQuestionId: questionId,
+      userId: currentUser._id,
+      _id: { $ne: predictionObj._id },
+    }, {
+      $set: { isDeleted: true }
+    });
+
+    // When not using their API, use the imported data
+    return await getLocalElicitQuestionWithPredictions(questionId)
+  },
+}
+
+
+export const elicitPredictionsGraphQLQueries = {
+  async ElicitBlockData(root: void, { questionId }: { questionId: string }, context: ResolverContext) {
+    return await getLocalElicitQuestionWithPredictions(questionId);
+  }
+}
+>>>>>>> base/master

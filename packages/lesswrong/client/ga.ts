@@ -1,7 +1,12 @@
 import { googleTagManagerIdSetting } from "../lib/publicSettings";
 
+<<<<<<< HEAD
 function googleTagManagerInit() {
   const googleTagManagerId = googleTagManagerIdSetting.get();
+=======
+export function googleTagManagerInit() {
+  const googleTagManagerId = googleTagManagerIdSetting.get()
+>>>>>>> base/master
   if (googleTagManagerId) {
     (function (w: any, d: any, s: any, l: any, i: any) {
       w[l] = w[l] || [];
@@ -24,4 +29,3 @@ function googleTagManagerInit() {
   }
 }
 
-googleTagManagerInit();

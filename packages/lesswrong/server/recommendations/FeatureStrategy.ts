@@ -1,7 +1,12 @@
 import RecommendationStrategy, { RecommendationResult } from "./RecommendationStrategy";
 import type { StrategySpecification } from "../../lib/collections/users/recommendationSettings";
-import { getSqlClientOrThrow } from "../../lib/sql/sqlClient";
+import { getSqlClientOrThrow } from "../sql/sqlClient";
 import { featureRegistry } from "./Feature";
+
+type FeatureStrategyOptions = {
+  publishedAfter: Date,
+  publishedBefore: Date,
+}
 
 /**
  * The feature strategy can be used to combine multiple composable "features" that
@@ -13,7 +18,12 @@ class FeatureStrategy extends RecommendationStrategy {
   async recommend(
     currentUser: DbUser | null,
     count: number,
+<<<<<<< HEAD
     { postId, features }: StrategySpecification,
+=======
+    {postId, features}: StrategySpecification,
+    options?: Partial<FeatureStrategyOptions>,
+>>>>>>> base/master
   ): Promise<RecommendationResult> {
     if (!features) {
       throw new Error("No features supplied to FeatureStrategy");
@@ -31,7 +41,18 @@ class FeatureStrategy extends RecommendationStrategy {
     let score = "";
     let args = {};
 
+<<<<<<< HEAD
     for (const { feature: featureName, weight } of features) {
+=======
+    if (options?.publishedAfter) {
+      filters += `p."createdAt" > $(publishedAfter) AND `;
+    }
+    if (options?.publishedBefore) {
+      filters += `p."createdAt" < $(publishedBefore) AND `;
+    }
+
+    for (const {feature: featureName, weight} of features) {
+>>>>>>> base/master
       if (weight === 0) {
         continue;
       }
@@ -43,8 +64,13 @@ class FeatureStrategy extends RecommendationStrategy {
       args = { ...args, ...feature.getArgs(), [weightName]: weight };
     }
 
+<<<<<<< HEAD
     const posts = await db.any(
       `
+=======
+    const posts = await db.any(`
+      -- FeatureStrategy
+>>>>>>> base/master
       SELECT p.*
       FROM (
         SELECT p.*
@@ -64,6 +90,7 @@ class FeatureStrategy extends RecommendationStrategy {
       ${recommendedFilter.join}
       WHERE ${recommendedFilter.filter} 1=1
       LIMIT $(count)
+<<<<<<< HEAD
     `,
       {
         ...readFilter.args,
@@ -75,6 +102,18 @@ class FeatureStrategy extends RecommendationStrategy {
         count,
       },
     );
+=======
+    `, {
+      ...readFilter.args,
+      ...recommendedFilter.args,
+      ...postFilter.args,
+      ...tagFilter.args,
+      ...args,
+      ...options,
+      postId,
+      count,
+    });
+>>>>>>> base/master
 
     return { posts, settings: { postId, features } };
   }

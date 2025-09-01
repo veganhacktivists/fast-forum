@@ -1,16 +1,20 @@
 /* eslint-disable no-console */
 
-import { getSqlClientOrThrow } from "../../lib/sql/sqlClient";
+import { getSqlClientOrThrow } from "../sql/sqlClient";
 import { pgPromiseLib } from "../sqlConnection";
-import { Globals } from "../vulcan-lib";
 
 type PostVotingSystem = Pick<DbPost, "_id" | "votingSystem">;
 type VoteType = Pick<DbVote, "documentId" | "extendedVoteType">;
 type VoteCounts = { agree: number; disagree: number };
 
+<<<<<<< HEAD
 const convertDefaultVotingSystemToEAEmojis = async (postId: string) => {
   await getSqlClientOrThrow().none(
     `
+=======
+export const convertDefaultVotingSystemToEAEmojis = async (postId: string) => {
+  await getSqlClientOrThrow().none(`
+>>>>>>> base/master
     UPDATE "Posts"
     SET "votingSystem" = 'eaEmojis'
     WHERE "_id" = $1
@@ -19,7 +23,7 @@ const convertDefaultVotingSystemToEAEmojis = async (postId: string) => {
   );
 };
 
-const convertTwoAxisVotingSystemToEAEmojis = async (postId: string) => {
+export const convertTwoAxisVotingSystemToEAEmojis = async (postId: string) => {
   await getSqlClientOrThrow().tx(async (db) => {
     const votes: VoteType[] = await db.any(
       `
@@ -86,7 +90,7 @@ const convertTwoAxisVotingSystemToEAEmojis = async (postId: string) => {
   });
 };
 
-const convertAllPostsToEAEmojis = async () => {
+export const convertAllPostsToEAEmojis = async () => {
   console.log("Converting voting systems to EA emojis...");
   const posts: PostVotingSystem[] = await getSqlClientOrThrow().any(`
     SELECT "_id", "votingSystem"
@@ -114,8 +118,12 @@ const convertAllPostsToEAEmojis = async () => {
       console.error(`Failed to convert post ${post._id}:`, e);
     }
   }
+<<<<<<< HEAD
 };
 
 Globals.convertDefaultVotingSystemToEAEmojis = convertDefaultVotingSystemToEAEmojis;
 Globals.convertTwoAxisVotingSystemToEAEmojis = convertTwoAxisVotingSystemToEAEmojis;
 Globals.convertAllPostsToEAEmojis = convertAllPostsToEAEmojis;
+=======
+}
+>>>>>>> base/master

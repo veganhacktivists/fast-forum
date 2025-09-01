@@ -1,9 +1,18 @@
+<<<<<<< HEAD
 import Migrations from "../../lib/collections/migrations/collection";
 import { Vulcan } from "../../lib/vulcan-lib";
 import * as _ from "underscore";
 import { getSchema } from "../../lib/utils/getSchema";
 import { sleep, timedFunc } from "../../lib/helpers";
 import { getSqlClient } from "../../lib/sql/sqlClient";
+=======
+import Migrations from '../../server/collections/migrations/collection';
+import * as _ from 'underscore';
+import { getSchema } from '@/lib/schema/allSchemas';
+import { sleep, timedFunc } from '../../lib/helpers';
+import { getSqlClient } from '../../server/sql/sqlClient';
+import { getCollection } from '@/server/collections/allCollections';
+>>>>>>> base/master
 
 // When running migrations with split batches, the fraction of time spent
 // running those batches (as opposed to sleeping). Used to limit database
@@ -13,11 +22,6 @@ const DEFAULT_LOAD_FACTOR = 0.5;
 
 export const availableMigrations: Record<string, any> = {};
 export const migrationRunners: Record<string, any> = {};
-
-// Put migration functions in a dictionary Vulcan.migrations to make it
-// accessible in meteor shell, working around awkward inability to import
-// things non-relatively there.
-Vulcan.migrations = migrationRunners;
 
 interface RegisterMigrationProps {
   name: string;
@@ -47,11 +51,18 @@ export function registerMigration({ name, dateWritten, idempotent, action }: Reg
   }
 
   availableMigrations[name] = { name, dateWritten, idempotent, action };
-  migrationRunners[name] = async () => await runMigration(name);
+  const runner = async () => await runMigration(name);
+  migrationRunners[name] = runner;
+  return runner;
 }
 
 export async function runMigration(name: string) {
+<<<<<<< HEAD
   if (!(name in availableMigrations)) throw new Error(`Unrecognized migration: ${name}`);
+=======
+  if (!(name in availableMigrations))
+    throw new Error(`Unrecognized migration: ${name}`);
+>>>>>>> base/master
   // eslint-disable-next-line no-unused-vars
   const { dateWritten, idempotent, action } = availableMigrations[name];
 
@@ -108,7 +119,12 @@ export async function runMigration(name: string) {
 // migration or similarly slow operation, which can be broken into smaller
 // steps, to keep the database load low enough for the site to keep running.
 export async function runThenSleep(loadFactor: number, func: () => Promise<void>) {
+<<<<<<< HEAD
   if (loadFactor <= 0 || loadFactor > 1) throw new Error(`Invalid loadFactor ${loadFactor}: must be in (0,1].`);
+=======
+  if (loadFactor <=0 || loadFactor > 1)
+    throw new Error(`Invalid loadFactor ${loadFactor}: must be in (0,1].`);
+>>>>>>> base/master
 
   const startTime = new Date();
   try {
@@ -128,6 +144,7 @@ export async function runThenSleep(loadFactor: number, func: () => Promise<void>
 // Given a collection which has a field that has a default value (specified
 // with ...schemaDefaultValue), fill in the default value for any rows where it
 // is missing.
+<<<<<<< HEAD
 export async function fillDefaultValues<N extends CollectionNameString>({
   collection,
   fieldName,
@@ -138,14 +155,21 @@ export async function fillDefaultValues<N extends CollectionNameString>({
   fieldName: string;
   batchSize?: number;
   loadFactor?: number;
+=======
+export async function fillDefaultValues<N extends CollectionNameString>({ collection, fieldName, batchSize, loadFactor=DEFAULT_LOAD_FACTOR }: {
+  collection: CollectionBase<N>,
+  fieldName: string,
+  batchSize?: number,
+  loadFactor?: number
+>>>>>>> base/master
 }) {
   if (!collection) throw new Error("Missing required argument: collection");
   if (!fieldName) throw new Error("Missing required argument: fieldName");
-  const schema = getSchema(collection);
+  const schema = getSchema(collection.collectionName);
   if (!schema) throw new Error(`Collection ${collection.collectionName} does not have a schema`);
-  const defaultValue = schema[fieldName].defaultValue;
+  const defaultValue = schema[fieldName].database?.defaultValue;
   if (defaultValue === undefined) throw new Error(`Field ${fieldName} does not have a default value`);
-  if (!schema[fieldName].canAutofillDefault) throw new Error(`Field ${fieldName} is not marked autofillable`);
+  if (!schema[fieldName].database?.canAutofillDefault) throw new Error(`Field ${fieldName} is not marked autofillable`);
 
   // eslint-disable-next-line no-console
   console.log(`Filling in default values of ${collection.collectionName}.${fieldName}`);
@@ -544,6 +568,7 @@ export async function forEachDocumentInCollection({
 // fn: (bucketSelector=>null) Callback function run for each bucket. Takes a
 //     selector, which includes both an _id range (either one- or two-sided)
 //     and also the selector from `filter`.
+<<<<<<< HEAD
 export async function forEachBucketRangeInCollection<N extends CollectionNameString>({
   collection,
   filter,
@@ -554,6 +579,13 @@ export async function forEachBucketRangeInCollection<N extends CollectionNameStr
   filter?: MongoSelector<ObjectsByCollectionName[N]>;
   bucketSize?: number;
   fn: (selector: MongoSelector<ObjectsByCollectionName[N]>) => Promise<void>;
+=======
+export async function forEachBucketRangeInCollection<N extends CollectionNameString>({collection, filter, bucketSize=1000, fn}: {
+  collection: CollectionBase<N>
+  filter?: MongoSelector<ObjectsByCollectionName[N]>
+  bucketSize?: number
+  fn: (selector: MongoSelector<ObjectsByCollectionName[N]>) => Promise<void>
+>>>>>>> base/master
 }) {
   // Get filtered collection size and use it to calculate a number of buckets
   const count = await collection.find(filter).count();
@@ -601,12 +633,19 @@ export async function forEachBucketRangeInCollection<N extends CollectionNameStr
   });
 }
 
+<<<<<<< HEAD
 Vulcan.dropUnusedField = dropUnusedField;
 
 // We can't assume that certain postgres functions exist because we may not have run the appropriate migration
 // This wraapper runs the function and ignores if it's not defined yet
 export async function safeRun(db: SqlClient | null, fn: string): Promise<void> {
   if (!db) return;
+=======
+  // We can't assume that certain postgres functions exist because we may not have run the appropriate migration
+  // This wraapper runs the function and ignores if it's not defined yet
+export async function safeRun(db: SqlClient | null, fn: string): Promise<void> {
+  if(!db) return;
+>>>>>>> base/master
 
   await db.any(`DO $$
     BEGIN
@@ -616,3 +655,18 @@ export async function safeRun(db: SqlClient | null, fn: string): Promise<void> {
     END;
   $$;`);
 }
+
+export async function bulkRawInsert<N extends CollectionNameString>(
+  collectionName: N,
+  objects: Array<ObjectsByCollectionName[N]>
+): Promise<void> {
+  const collection = getCollection(collectionName);
+  await collection.rawCollection().bulkWrite(
+    objects.map(obj => ({
+      insertOne: {
+        document: obj
+      }
+    }))
+  );
+}
+

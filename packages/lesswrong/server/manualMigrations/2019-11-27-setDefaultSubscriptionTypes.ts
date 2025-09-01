@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 import { registerMigration, fillDefaultValues } from "./migrationUtils";
 import Users from "../../lib/collections/users/collection";
+=======
+import { registerMigration, fillDefaultValues } from './migrationUtils';
+import Users from '../../server/collections/users/collection';
 
-registerMigration({
+>>>>>>> base/master
+
+export default registerMigration({
   name: "setDefaultSubscriptionTypes",
   dateWritten: "2019-11-27",
   idempotent: true,

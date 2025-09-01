@@ -1,22 +1,96 @@
 import type { Request } from "express";
-import Posts from "../../lib/collections/posts/collection";
-import Users from "../../lib/collections/users/collection";
-import { getGraphQLQueryFromOptions, getResolverNameFromOptions } from "../../lib/crud/withSingle";
-import { getCollection, Utils } from "../../lib/vulcan-lib";
-import { createClient } from "../vulcan-lib/apollo-ssr/apolloClient";
-import { createAnonymousContext } from "../vulcan-lib/query";
+import Posts from "../../server/collections/posts/collection";
+import Users from "../../server/collections/users/collection";
+import { createAnonymousContext } from "../vulcan-lib/createContexts";
 import { extractDenormalizedData } from "./denormalizedFields";
-import { InvalidUserError, UnauthorizedError } from "./errors";
-import { validateCrosspostingKarmaThreshold } from "./helpers";
+import { InvalidUserError, PostNotFoundError, UnauthorizedError } from "./errors";
+import { assertCrosspostingKarmaThreshold } from "./helpers";
 import type { GetRouteOf, PostRouteOf } from "./routes";
-import { signToken, verifyToken } from "./tokens";
+import { verifyToken } from "./tokens";
 import {
+<<<<<<< HEAD
   ConnectCrossposterPayload,
+=======
+>>>>>>> base/master
   ConnectCrossposterPayloadValidator,
   CrosspostPayloadValidator,
   UnlinkCrossposterPayloadValidator,
   UpdateCrosspostPayloadValidator,
 } from "./types";
+import { connectCrossposterToken } from "../crossposting/tokens";
+import { computeContextFromUser } from "../vulcan-lib/apollo-server/context";
+import { createPost } from '../collections/posts/mutations';
+import { gql } from "@/lib/generated/gql-codegen";
+import type { CrosspostFragments } from "@/components/hooks/useForeignCrosspost";
+
+const postsWithNavigationQuery = gql(`
+  query getCrosspostPostsWithNavigation($input: SinglePostInput, $sequenceId: String) {
+    post(input: $input) {
+      result {
+        ...PostsWithNavigation
+      }
+    }
+  }
+`);
+
+const postsWithNavigationAndRevisionQuery = gql(`
+  query getCrosspostPostsWithNavigationAndRevision($input: SinglePostInput, $version: String, $sequenceId: String) {
+    post(input: $input) {
+      result {
+        ...PostsWithNavigationAndRevision
+      }
+    }
+  }
+`);
+
+const postsListQuery = gql(`
+  query getCrosspostPostsList($input: SinglePostInput) {
+    post(input: $input) {
+      result {
+        ...PostsList
+      }
+    }
+  }
+`);
+
+const sunshinePostsListQuery = gql(`
+  query getCrosspostSunshinePostsList($input: SinglePostInput) {
+    post(input: $input) {
+      result {
+        ...SunshinePostsList
+      }
+    }
+  }
+`);
+
+const postsPageQuery = gql(`
+  query getCrosspostPostsPage($input: SinglePostInput) {
+    post(input: $input) {
+      result {
+        ...PostsPage
+      }
+    }
+  }
+`);
+
+const getCrosspostQueryDocument = (fragmentName: CrosspostFragments) => {
+  switch (fragmentName) {
+    case 'PostsWithNavigation':
+      return postsWithNavigationQuery;
+    
+    case 'PostsWithNavigationAndRevision':
+      return postsWithNavigationAndRevisionQuery;
+    
+    case 'PostsList':
+      return postsListQuery;
+    
+    case 'SunshinePostsList':
+      return sunshinePostsListQuery;
+    
+    case 'PostsPage':
+      return postsPageQuery;
+  }
+};
 
 export const onCrosspostTokenRequest: GetRouteOf<"crosspostToken"> = async (req: Request) => {
   const { user } = req;
@@ -25,10 +99,15 @@ export const onCrosspostTokenRequest: GetRouteOf<"crosspostToken"> = async (req:
   }
 
   // Throws an error if user doesn't have enough karma on the source forum (which is the current execution environment)
-  validateCrosspostingKarmaThreshold(user);
+  assertCrosspostingKarmaThreshold(user);
 
+<<<<<<< HEAD
   const token = await signToken<ConnectCrossposterPayload>({ userId: user._id });
   return { token };
+=======
+  const token = await connectCrossposterToken.create({userId: user._id});
+  return {token};
+>>>>>>> base/master
 };
 
 export const onConnectCrossposterRequest: PostRouteOf<"connectCrossposter"> = async (req) => {
@@ -76,7 +155,7 @@ export const onCrosspostRequest: PostRouteOf<"crosspost"> = async (req) => {
    * TODO: Null is made legal value for fields but database types are incorrectly generated without null.
    * Hacky fix for now. Search 84b2 to find all instances of this casting.
    */
-  const document: Partial<DbPost> = {
+  const document: CreatePostDataInput = {
     userId: user._id,
     fmCrosspost: {
       isCrosspost: true,
@@ -84,8 +163,9 @@ export const onCrosspostRequest: PostRouteOf<"crosspost"> = async (req) => {
       foreignPostId: postId,
     },
     ...denormalizedData,
-  } as Partial<DbPost>;
+  };
 
+<<<<<<< HEAD
   const { data: post } = await Utils.createMutator({
     document,
     collection: Posts,
@@ -99,6 +179,10 @@ export const onCrosspostRequest: PostRouteOf<"crosspost"> = async (req) => {
       Users,
     } as Partial<ResolverContext> as ResolverContext,
   });
+=======
+  const userContext = await computeContextFromUser({ user, isSSR: false })
+  const post = await createPost({ data: document }, { ...userContext, isFMCrosspostRequest: true });
+>>>>>>> base/master
 
   return {
     status: "posted",
@@ -115,17 +199,17 @@ export const onUpdateCrosspostRequest: PostRouteOf<"updateCrosspost"> = async (r
   return { status: "updated" };
 };
 
+<<<<<<< HEAD
 export const onGetCrosspostRequest: PostRouteOf<"getCrosspost"> = async (req) => {
   const { collectionName, extraVariables, extraVariablesValues, fragmentName, documentId } = req;
+=======
+export const onGetCrosspostRequest: PostRouteOf<'getCrosspost'> = async (req) => {
+  const { createClient }: typeof import('../vulcan-lib/apollo-ssr/apolloClient') = require('../vulcan-lib/apollo-ssr/apolloClient');
+  const { extraVariablesValues, fragmentName, documentId } = req;
+>>>>>>> base/master
   const apolloClient = await createClient(createAnonymousContext());
-  const collection = getCollection(collectionName);
-  const query = getGraphQLQueryFromOptions({
-    extraVariables,
-    collection,
-    fragmentName,
-    fragment: undefined,
-  });
-  const resolverName = getResolverNameFromOptions(collection);
+  
+  const query = getCrosspostQueryDocument(fragmentName);
 
   const { data } = await apolloClient.query({
     query,
@@ -137,7 +221,11 @@ export const onGetCrosspostRequest: PostRouteOf<"getCrosspost"> = async (req) =>
     },
   });
 
-  const document = data?.[resolverName]?.result;
+  const document = data?.post?.result;
+
+  if (!document) {
+    throw new PostNotFoundError(documentId);
+  }
 
   return { document };
 };

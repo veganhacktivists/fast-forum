@@ -4,7 +4,7 @@
  *
  * When adding a new component below, be sure to prepend it's name with 'Mui',
  * and import the _file_ where the component is defined, not just the directory
- * (ie; "@material-ui/core/Badge/Badge" instead of "@material-ui/core/Badge").
+ * (ie; "@/lib/vendor/@material-ui/core/src/Badge/Badge" instead of "@/lib/vendor/@material-ui/core/src/Badge").
  *
  * Some components also have a 'Base' variant that must be included here too
  * even if they're only used indirectly (eg; InputBase, ButtonBase). Failing to
@@ -15,6 +15,7 @@
  */
 const getUsedMuiStyles = () => {
   const components = {
+<<<<<<< HEAD
     MuiBadge: require("@material-ui/core/Badge/Badge").styles,
     MuiButtonBase: require("@material-ui/core/ButtonBase/ButtonBase").styles,
     MuiButton: require("@material-ui/core/Button/Button").styles,
@@ -69,6 +70,8 @@ const getUsedMuiStyles = () => {
     MuiTextField: require("@material-ui/core/TextField/TextField").styles,
     MuiToolbar: require("@material-ui/core/Toolbar/Toolbar").styles,
     MuiTooltip: require("@material-ui/core/Tooltip/Tooltip").styles,
+=======
+>>>>>>> base/master
   };
 
   // Filter out components that don't have any styles

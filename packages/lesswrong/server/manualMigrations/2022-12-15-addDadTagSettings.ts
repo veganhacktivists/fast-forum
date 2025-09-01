@@ -1,8 +1,14 @@
+<<<<<<< HEAD
 import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
 import Tags from "../../lib/collections/tags/collection";
 import Users from "../../lib/collections/users/collection";
+=======
+import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
+import Tags from '../../server/collections/tags/collection';
+import Users from '../../server/collections/users/collection';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "addDadTagSettings",
   dateWritten: "2022-12-15",
   idempotent: true,

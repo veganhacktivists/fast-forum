@@ -35,8 +35,13 @@
  */
 export const acceptsSchemaHash = "4a1a03e638557cba881d59cb63b0ed02";
 
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { addField, dropField } from "./meta/utils";
+=======
+import Users from "../../server/collections/users/collection"
+import { addField, dropField } from "./meta/utils"
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   await addField(db, Users, "notificationYourTurnMatchForm");

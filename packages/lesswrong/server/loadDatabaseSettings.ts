@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 import { setPublicSettings, setServerSettingsCache } from "../lib/settingsCache";
 import { DatabaseMetadataRepo } from "./repos";
 import { getSqlClient } from "../lib/sql/sqlClient";
 import { isAnyTest } from "../lib/executionEnvironment";
+=======
+import { setPublicSettings, setServerSettingsCache } from '../lib/settingsCache';
+import DatabaseMetadataRepo from "./repos/DatabaseMetadataRepo";
+import { getSqlClient } from './sql/sqlClient';
+import { isAnyTest } from '../lib/executionEnvironment';
+>>>>>>> base/master
 
 let databaseIdPreloaded = false;
 let preloadedDatabaseId: string | null = null;
@@ -26,12 +33,21 @@ const loadDatabaseSettingsPostgres = async (): Promise<DatabaseSettings> => {
 
   const repo = new DatabaseMetadataRepo();
 
+<<<<<<< HEAD
   const [serverSettingsObject, publicSettingsObject, loadedDatabaseId] = await Promise.all([
     repo.getServerSettings(),
     repo.getPublicSettings(),
     repo.getDatabaseId(),
   ]);
 
+=======
+  const [
+    serverSettingsObject,
+    publicSettingsObject,
+    loadedDatabaseId,
+  ] = await repo.getByNames(['serverSettings', 'publicSettings', 'databaseId']);
+  
+>>>>>>> base/master
   if (!isAnyTest && (!serverSettingsObject || !publicSettingsObject)) {
     // eslint-disable-next-line no-console
     console.error("Failed to load database settings from Postgres");
@@ -55,7 +71,7 @@ const loadDatabaseSettings = async (): Promise<DatabaseSettings> => {
       return await loadDatabaseSettingsPostgres();
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.error("Failed to load database settings from Postgres");
+      console.error("Failed to load database settings from Postgres", e);
     }
   }
   return {

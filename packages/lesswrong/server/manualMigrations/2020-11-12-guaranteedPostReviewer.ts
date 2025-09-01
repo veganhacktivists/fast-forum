@@ -10,10 +10,17 @@
  * | sidebar before you run this!
  * +---------------------------------------------------------------------------
  */
+<<<<<<< HEAD
 import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
 import Posts from "../../lib/collections/posts/collection";
 import { postStatuses } from "../../lib/collections/posts/constants";
 import { ForumOptions, forumSelect } from "../../lib/forumTypeUtils";
+=======
+import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
+import Posts from '../../server/collections/posts/collection';
+import { postStatuses } from '../../lib/collections/posts/constants';
+import { ForumOptions, forumSelect } from '../../lib/forumTypeUtils';
+>>>>>>> base/master
 
 // TODO: LessWrong, you'll want to set this
 // lw-look-here
@@ -25,7 +32,7 @@ const defaultReviewerByForum: ForumOptions<string | null> = {
 };
 const defaultReviewer = forumSelect(defaultReviewerByForum);
 
-registerMigration({
+export default registerMigration({
   name: "guaranteedPostReviewer",
   dateWritten: "2020-11-12",
   idempotent: true,

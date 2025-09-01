@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { asyncForeachSequential } from "../../lib/utils/asyncUtils";
+=======
+import Users from '../../server/collections/users/collection';
+import { asyncForeachSequential } from '../../lib/utils/asyncUtils';
+>>>>>>> base/master
 
-const fixKarma = false;
 const mainPostKarmaWeight = 10;
 const mainCommentKarmaWeight = 1;
 const discussionPostKarmaWeight = 1;
@@ -9,6 +13,7 @@ const discussionCommentKarmaWeight = 1;
 const upvoteWeight = 1;
 const downvoteWeight = 1;
 
+<<<<<<< HEAD
 if (fixKarma) {
   void (async () => {
     let usersCount = 0;
@@ -23,6 +28,17 @@ if (fixKarma) {
           // @ts-ignore for legacyData
           downvoteWeight * f(user.legacyData.karma_downs_link_lesswrong);
 
+=======
+export async function fixKarma() {
+  let usersCount = 0;
+  const allUsers = await Users.find().fetch();
+  await asyncForeachSequential(allUsers, async (user) => {
+    if (user.legacy) {
+      // Function to deal with fields sometimes being undefined. Casts undefined to 0;
+      const f = (n: number) => n || 0;
+      // @ts-ignore legacyData isn't handled right on the schema
+      const mainPostKarma = (upvoteWeight * f(user.legacyData.karma_ups_link_lesswrong))
+>>>>>>> base/master
         // @ts-ignore for legacyData
         const mainCommentKarma =
           upvoteWeight * f(user.legacyData.karma_ups_comment_lesswrong) -
@@ -55,6 +71,11 @@ if (fixKarma) {
           console.log("Updated karma of n users: ", usersCount);
         }
       }
+<<<<<<< HEAD
     });
   })();
+=======
+    }
+  })
+>>>>>>> base/master
 }

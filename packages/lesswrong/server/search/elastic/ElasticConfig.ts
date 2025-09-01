@@ -1,6 +1,8 @@
 import type { MappingProperty, QueryDslQueryContainer } from "@elastic/elasticsearch/lib/api/types";
 import { SearchIndexCollectionName } from "../../../lib/search/searchUtil";
 import { postStatuses } from "../../../lib/collections/posts/constants";
+import { isEAForum } from "../../../lib/instanceSettings";
+import { isFriendlyUI } from "@/themes/forumTheme";
 
 export type Ranking = {
   field: string;
@@ -68,7 +70,7 @@ export type IndexConfig = {
    * results when used on more structured strings like ids or slugs, which should
    * instead be given the "keyword" mapping.
    * Note that making a change here requires reindexing the data with
-   * `Globals.elasticConfigureIndex`.
+   * `configureIndex`.
    */
   mappings?: Mappings;
   /**
@@ -103,6 +105,11 @@ const fullTextMapping: MappingProperty = {
       type: "text",
       analyzer: "fm_exact_analyzer",
     },
+    sort: {
+      // A wildcard is similar to a keyword, but supports data larger than 32KB
+      type: "wildcard",
+      null_value: "",
+    },
   },
 };
 
@@ -119,6 +126,10 @@ const shingleTextMapping: MappingProperty = {
       type: "text",
       analyzer: "fm_exact_analyzer",
     },
+    sort: {
+      type: "keyword",
+      normalizer: "fm_sortable_keyword",
+    },
   },
 };
 
@@ -134,9 +145,20 @@ const keywordMapping: MappingProperty = {
   type: "keyword",
 };
 
+const objectMapping = (
+  properties: Record<string, MappingProperty>,
+): MappingProperty => ({properties});
+
 const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
   Comments: {
+<<<<<<< HEAD
     fields: ["body", "authorDisplayName"],
+=======
+    fields: [
+      "body",
+      "authorDisplayName^11",
+    ],
+>>>>>>> base/master
     snippet: "body",
     highlight: "authorDisplayName",
     ranking: [
@@ -146,14 +168,29 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
         weight: 0.5,
         scoring: { type: "numeric", pivot: 20 },
       },
+      {
+        field: "baseScore",
+        order: "desc",
+        weight: 1.5,
+        scoring: {type: "numeric", pivot: 50, min: 50},
+      },
     ],
     tiebreaker: "publicDateMs",
     filters: [
+<<<<<<< HEAD
       { term: { deleted: false } },
       { term: { rejected: false } },
       { term: { authorIsUnreviewed: false } },
       { term: { retracted: false } },
       { term: { spam: false } },
+=======
+      {term: {deleted: false}},
+      {term: {draft: false}},
+      {term: {rejected: false}},
+      {term: {authorIsUnreviewed: false}},
+      {term: {retracted: false}},
+      {term: {spam: false}},
+>>>>>>> base/master
     ],
     mappings: {
       body: fullTextMapping,
@@ -169,7 +206,19 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
       tagSlug: keywordMapping,
       tagCommentType: keywordMapping,
     },
+<<<<<<< HEAD
     privateFields: ["authorIsUnreviewed", "deleted", "legacy", "rejected", "retracted", "spam"],
+=======
+    privateFields: [
+      "authorIsUnreviewed",
+      "deleted",
+      "draft",
+      "legacy",
+      "rejected",
+      "retracted",
+      "spam",
+    ],
+>>>>>>> base/master
   },
   Posts: {
     fields: ["title^3", "authorDisplayName^4", "body"],
@@ -185,12 +234,22 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
     ],
     tiebreaker: "publicDateMs",
     filters: [
+<<<<<<< HEAD
       { term: { isFuture: false } },
       { term: { draft: false } },
       { term: { rejected: false } },
       { term: { authorIsUnreviewed: false } },
       { term: { status: postStatuses.STATUS_APPROVED } },
       { range: { baseScore: { gte: 0 } } },
+=======
+      {term: {isFuture: false}},
+      {term: {draft: false}},
+      {term: {rejected: false}},
+      {term: {authorIsUnreviewed: false}},
+      {term: {unlisted: false}},
+      {term: {status: postStatuses.STATUS_APPROVED}},
+      ...(isEAForum ? [] : [{range: {baseScore: {gte: 0}}}]),
+>>>>>>> base/master
     ],
     mappings: {
       title: fullTextMapping,
@@ -200,11 +259,28 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
       body: fullTextMapping,
       feedLink: keywordMapping,
       slug: keywordMapping,
-      tags: keywordMapping,
+      tags: objectMapping({
+        _id: keywordMapping,
+        slug: keywordMapping,
+        name: keywordMapping,
+      }),
       url: keywordMapping,
       userId: keywordMapping,
     },
+<<<<<<< HEAD
     privateFields: ["authorIsUnreviewed", "draft", "isFuture", "legacy", "rejected", "status", "viewCount"],
+=======
+    privateFields: [
+      "authorIsUnreviewed",
+      "unlisted",
+      "draft",
+      "isFuture",
+      "legacy",
+      "rejected",
+      "status",
+      "viewCount",
+    ],
+>>>>>>> base/master
   },
   Users: {
     fields: [
@@ -215,6 +291,12 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
       "organization",
       "howICanHelpOthers",
       "howOthersCanHelpMe",
+      ...(isFriendlyUI
+        ? [
+          "tags.name",
+          "posts.title",
+        ]
+        : []),
     ],
     snippet: "bio",
     ranking: [
@@ -244,7 +326,16 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
       },
     ],
     tiebreaker: "karma",
+<<<<<<< HEAD
     filters: [{ range: { karma: { gte: 0 } } }, { term: { deleted: false } }, { term: { deleteContent: false } }],
+=======
+    filters: [
+      {term: {deleted: false}},
+      {term: {deleteContent: false}},
+      //Removed because it turns out you do need to be able to find unreviewed users in search sometimes, in order to add coauthors
+      //{term: {isReviewed: true}},
+    ],
+>>>>>>> base/master
     mappings: {
       displayName: shingleTextMapping,
       bio: fullTextMapping,
@@ -258,10 +349,28 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
       slug: shingleTextMapping,
       website: keywordMapping,
       profileImageId: keywordMapping,
-      tags: keywordMapping,
+      tags: objectMapping({
+        _id: keywordMapping,
+        slug: keywordMapping,
+        name: keywordMapping,
+      }),
+      posts: objectMapping({
+        _id: keywordMapping,
+        slug: keywordMapping,
+        title: fullTextMapping,
+      }),
       _geoloc: geopointMapping,
     },
+<<<<<<< HEAD
     privateFields: ["deleteContent", "deleted", "isAdmin"],
+=======
+    privateFields: [
+      "deleteContent",
+      "deleted",
+      "isAdmin",
+      "hideFromPeopleDirectory",
+    ],
+>>>>>>> base/master
     karmaField: "karma",
     locationField: "_geoloc",
   },
@@ -281,7 +390,14 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
     privateFields: ["draft", "hidden", "isDeleted"],
   },
   Tags: {
+<<<<<<< HEAD
     fields: ["name^3", "description"],
+=======
+    fields: [
+      "name^30",
+      "description",
+    ],
+>>>>>>> base/master
     snippet: "description",
     ranking: [
       {
@@ -291,6 +407,12 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
         scoring: { type: "bool" },
       },
       {
+        field: "baseScore",
+        order: "desc",
+        weight: 0.5,
+        scoring: {type: "numeric", pivot: 20},
+      },
+      {
         field: "postCount",
         order: "desc",
         weight: 0.25,
@@ -298,7 +420,15 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
       },
     ],
     tiebreaker: "postCount",
+<<<<<<< HEAD
     filters: [{ term: { deleted: false } }, { term: { adminOnly: false } }],
+=======
+    filters: [
+      {term: {deleted: false}},
+      {term: {isPlaceholderPage: false}},
+      {term: {adminOnly: false}},
+    ],
+>>>>>>> base/master
     mappings: {
       name: fullTextMapping,
       description: fullTextMapping,
@@ -310,7 +440,7 @@ const elasticSearchConfig: Record<SearchIndexCollectionName, IndexConfig> = {
   },
 };
 
-const indexToCollectionName = (index: string): SearchIndexCollectionName => {
+export const indexToCollectionName = (index: string): SearchIndexCollectionName => {
   const data: Record<string, SearchIndexCollectionName> = {
     comments: "Comments",
     posts: "Posts",
@@ -335,4 +465,19 @@ export const collectionNameToConfig = (collectionName: SearchIndexCollectionName
 export const indexNameToConfig = (indexName: string): IndexConfig => {
   const collectionName = indexToCollectionName(indexName);
   return collectionNameToConfig(collectionName);
+<<<<<<< HEAD
 };
+=======
+}
+
+export const isFullTextField = <N extends SearchIndexCollectionName>(
+  collectionName: N,
+  fieldName: string,
+) => {
+  const config = elasticSearchConfig[collectionName];
+  if (!config) {
+    throw new Error(`Invalid elastic collection name: ${collectionName}`);
+  }
+  return config.mappings?.[fieldName] === fullTextMapping;
+}
+>>>>>>> base/master

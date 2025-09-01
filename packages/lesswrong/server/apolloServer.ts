@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { ApolloServer } from "apollo-server-express";
 import { GraphQLError, GraphQLFormattedError } from "graphql";
 
@@ -68,6 +69,58 @@ class ApolloServerLogging implements ApolloServerPlugin<ResolverContext> {
     context,
   }: GraphQLRequestContext<ResolverContext>): GraphQLRequestListener<ResolverContext> {
     const { operationName = "unknownGqlOperation", query, variables } = request;
+=======
+import { ApolloServer, ApolloServerPlugin, GraphQLRequestContext, GraphQLRequestListener } from '@apollo/server';
+import { expressMiddleware } from '@as-integrations/express5';
+import { GraphQLError, GraphQLFormattedError } from 'graphql';
+import { handleRequest } from './rendering/renderPage';
+import cors from 'cors';
+import { isDevelopment } from '../lib/executionEnvironment';
+import { pickerMiddleware, addStaticRoute } from './vulcan-lib/staticRoutes';
+import { graphiqlMiddleware } from './vulcan-lib/apollo-server/graphiql'; 
+import { getUserFromReq, configureSentryScope, getContextFromReqAndRes } from './vulcan-lib/apollo-server/context';
+import universalCookiesMiddleware from 'universal-cookie-express';
+import { formatError } from 'apollo-errors';
+import * as Sentry from '@sentry/node';
+import { app } from './expressServer';
+import path from 'path'
+import { addAuthMiddlewares, expressSessionSecretSetting } from './authenticationMiddlewares';
+import { addForumSpecificMiddleware } from './forumSpecificMiddleware';
+import { addSentryMiddlewares, logGraphqlQueryStarted, logGraphqlQueryFinished } from './logging';
+import expressSession from 'express-session';
+import MongoStore from './vendor/ConnectMongo/MongoStore';
+import { ckEditorTokenHandler } from './ckEditor/ckEditorToken';
+import { getEAGApplicationData } from './zohoUtils';
+import { addTestingRoutes } from './testingSqlClient';
+import { addCrosspostRoutes } from './fmCrosspost/routes';
+import { addV2CrosspostHandlers } from './crossposting/handlers';
+import { getUserEmail } from "../lib/collections/users/helpers";
+import { inspect } from "util";
+import { datadogMiddleware } from './datadog/datadogMiddleware';
+import { Sessions } from '../server/collections/sessions/collection';
+import { addServerSentEventsEndpoint } from "./serverSentEvents";
+import { botRedirectMiddleware } from './botRedirect';
+import { hstsMiddleware } from './hsts';
+import { getClientBundle } from './utils/bundleUtils';
+import ElasticController from './search/elastic/ElasticController';
+import { closePerfMetric, openPerfMetric, perfMetricMiddleware } from './perfMetrics';
+import { addAdminRoutesMiddleware } from './adminRoutesMiddleware'
+import { addCacheControlMiddleware } from './cacheControlMiddleware';
+import { addAutocompleteEndpoint } from './autocompleteEndpoint';
+import { getSqlClientOrThrow } from './sql/sqlClient';
+import { addLlmChatEndpoint } from './resolvers/anthropicResolvers';
+import { getCommandLineArguments } from './commandLine';
+import { isDatadogEnabled, isEAForum, isElasticEnabled, performanceMetricLoggingEnabled, testServerSetting } from "../lib/instanceSettings";
+import { getExecutableSchema } from './vulcan-lib/apollo-server/initGraphQL';
+import express from 'express';
+import { getSiteUrl } from '@/lib/vulcan-lib/utils';
+import { botProtectionCommentRedirectSetting } from './databaseSettings';
+
+
+class ApolloServerLogging implements ApolloServerPlugin<ResolverContext> {
+  async requestDidStart({ request, contextValue: context }: GraphQLRequestContext<ResolverContext>) {
+    const { operationName = 'unknownGqlOperation', query, variables } = request;
+>>>>>>> base/master
 
     //remove sensitive data from variables such as password
     let filteredVariables = variables;
@@ -93,8 +146,12 @@ class ApolloServerLogging implements ApolloServerPlugin<ResolverContext> {
     }
 
     return {
+<<<<<<< HEAD
       willSendResponse() {
         // hook for transaction finished
+=======
+      async willSendResponse() { // hook for transaction finished
+>>>>>>> base/master
         if (performanceMetricLoggingEnabled.get()) {
           closePerfMetric(startedRequestMetric);
         }
@@ -105,13 +162,24 @@ class ApolloServerLogging implements ApolloServerPlugin<ResolverContext> {
       },
     };
   }
+
+
 }
 
 export type AddMiddlewareType = typeof app.use;
 
-export function startWebserver() {
+export async function startWebserver() {
   const addMiddleware: AddMiddlewareType = (...args: any[]) => app.use(...args);
   const config = { path: "/graphql" };
+
+  if (enableVite) {
+    // When vite is running the backend is proxied which means we have to
+    // enable CORS for API routes to work
+    app.use((_req, res, next) => {
+      res.set("Access-Control-Allow-Origin", "*");
+      next();
+    });
+  }
 
   app.use(universalCookiesMiddleware());
 
@@ -147,12 +215,26 @@ export function startWebserver() {
   app.use("/analyticsEvent", express.json({ limit: "50mb" }));
   app.use("/ckeditor-webhook", express.json({ limit: "50mb" }));
 
-  addStripeMiddleware(addMiddleware);
+  if (isElasticEnabled) {
+    // We register this here (before the auth middleware) to avoid blocking
+    // search requests whilst waiting to fetch the current user from Postgres,
+    // which is never actually used.
+    ElasticController.addRoutes(app);
+  }
+
   // Most middleware need to run after those added by addAuthMiddlewares, so that they can access the user that passport puts on the request.  Be careful if moving it!
   addAuthMiddlewares(addMiddleware);
+  addAdminRoutesMiddleware(addMiddleware);
   addForumSpecificMiddleware(addMiddleware);
   addSentryMiddlewares(addMiddleware);
+<<<<<<< HEAD
   addClientIdMiddleware(addMiddleware);
+=======
+  addCacheControlMiddleware(addMiddleware);
+  if (isDatadogEnabled) {
+    app.use(datadogMiddleware);
+  }
+>>>>>>> base/master
   app.use(pickerMiddleware);
   app.use(botRedirectMiddleware);
   app.use(hstsMiddleware);
@@ -160,21 +242,30 @@ export function startWebserver() {
   // create server
   // given options contains the schema
   const apolloServer = new ApolloServer({
-    // graphql playground (replacement to graphiql), available on the app path
-    playground: getPlaygroundConfig(config.path),
+
     introspection: true,
+<<<<<<< HEAD
     debug: isDevelopment,
 
     schema: getExecutableSchema(),
     formatError: (e: GraphQLError): GraphQLFormattedError => {
       Sentry.captureException(e);
       const { message, ...properties } = e;
+=======
+    includeStacktraceInErrorResponses: isDevelopment,
+    
+    schema: getExecutableSchema(),
+    formatError: (e): GraphQLFormattedError => {
+      Sentry.captureException(new GraphQLError(e.message, e));
+      const {message, ...properties} = e;
+>>>>>>> base/master
       // eslint-disable-next-line no-console
       console.error(`[GraphQLError: ${message}]`, inspect(properties, { depth: null }));
       // TODO: Replace sketchy apollo-errors package with something first-party
       // and that doesn't require a cast here
       return formatError(e) as any;
     },
+<<<<<<< HEAD
     //tracing: isDevelopment,
     tracing: false,
     cacheControl: true,
@@ -184,9 +275,13 @@ export function startWebserver() {
       setAsyncStoreValue("resolverContext", context);
       return context;
     },
+=======
+>>>>>>> base/master
     plugins: [new ApolloServerLogging()],
+    allowBatchedHttpRequests: true,
   });
 
+<<<<<<< HEAD
   const storage = multer.memoryStorage();
 
   app.post("/api/upload", multer({ storage }).single("upload"), async (req, res) => {
@@ -219,6 +314,38 @@ export function startWebserver() {
     const { bundleHash, bundleBuffer, bundleBrotliBuffer } = getClientBundle();
     let headers: Record<string, string> = {};
     const acceptBrotli = req.headers["accept-encoding"] && req.headers["accept-encoding"].includes("br");
+=======
+  app.use('/graphql', express.json({ limit: '50mb' }));
+  app.use('/graphql', express.text({ type: 'application/graphql' }));
+  app.use('/graphql', perfMetricMiddleware);
+
+  await apolloServer.start();
+
+  // This sets Access-Control-Allow-Origin to *.
+  // As of v4, Apollo Server has a CSRF prevention feature enabled by default.
+  // It requires that clients either send a content-type header that indicates the request must have already been pre-flighted,
+  // or include one of the `x-apollo-operation-name` or `apollo-require-preflight` headers.
+  // Confusingly, I experienced the CSRF-prevention error in both the github action and locally when testing crossposting,
+  // in the _preflight_ OPTIONS request, which of course doesn't have any of those headers.
+  // I... don't really understand why setting the Access-Control-Allow-Origin header here prevents Apollo Server from
+  // rejecting the preflight request, but it does seem to do that.
+  // (Their docs say "You can also choose to omit CORS middleware entirely to disable cross-origin requests",
+  // but if the preflight request was getting rejected for that reason, then it seems like a bug that the server
+  // was returning the CSRF-prevention error in response, which contains instructions that wouldn't help at all.)
+  app.use('/graphql', cors());
+  app.use('/graphql', expressMiddleware(apolloServer, {
+    context: async ({ req, res }: { req: express.Request, res: express.Response }) => {
+      const context = await getContextFromReqAndRes({req, res, isSSR: false});
+      configureSentryScope(context);
+      return context;
+    },
+  }))
+
+  addStaticRoute("/js/bundle.js", ({query}, req, res, context) => {
+    const {hash: bundleHash, content: bundleBuffer, brotli: bundleBrotliBuffer} = getClientBundle().resource;
+    let headers: Record<string,string> = {}
+    const acceptBrotli = req.headers['accept-encoding'] && req.headers['accept-encoding'].includes('br')
+>>>>>>> base/master
 
     if ((query.hash && query.hash !== bundleHash) || (acceptBrotli && bundleBrotliBuffer === null)) {
       // If the query specifies a hash, but it's wrong, this probably means there's a
@@ -255,6 +382,7 @@ export function startWebserver() {
   app.use("/ckeditor-token", ckEditorTokenHandler);
 
   // Static files folder
+<<<<<<< HEAD
   app.use(express.static(path.join(__dirname, "../../client")));
   app.use(express.static(path.join(__dirname, "../../../public")));
 
@@ -265,6 +393,18 @@ export function startWebserver() {
       endpointUrl: config.path,
     }),
   );
+=======
+  app.use(express.static(path.join(__dirname, '../../client')))
+  app.use(express.static(path.join(__dirname, '../../../public'), {
+    setHeaders: (res, requestPath) => {
+      const relativePath = path.relative(__dirname, requestPath);
+      if (relativePath.startsWith("../../../public/reactionImages")) {
+        res.set("Cache-Control", "public, max-age=604800, immutable");
+      }
+    }
+  }))
+  
+>>>>>>> base/master
   // Setup GraphiQL
   app.use(
     "/graphiql",
@@ -276,8 +416,19 @@ export function startWebserver() {
 
   app.get("/api/eag-application-data", async function (req, res, next) {
     if (!isEAForum) {
+<<<<<<< HEAD
       next();
       return;
+=======
+      next()
+      return
+    }
+    
+    const currentUser = getUserFromReq(req)
+    if (!currentUser) {
+      res.status(403).send("Not logged in")
+      return
+>>>>>>> base/master
     }
 
     const currentUser = await getUserFromReq(req);
@@ -296,13 +447,12 @@ export function startWebserver() {
   });
 
   addCrosspostRoutes(app);
-  addCypressRoutes(app);
-
-  if (isElasticEnabled) {
-    ElasticController.addRoutes(app);
-  }
+  addV2CrosspostHandlers(app);
+  addTestingRoutes(app);
+  addLlmChatEndpoint(app);
 
   if (testServerSetting.get()) {
+<<<<<<< HEAD
     app.post("/api/quit", (_req, res) => {
       res.status(202).send("Quiting server");
       process.kill(process.pid, "SIGQUIT");
@@ -312,6 +462,18 @@ export function startWebserver() {
   addServerSentEventsEndpoint(app);
 
   app.get("/node_modules/*", (req, res) => {
+=======
+    app.post('/api/quit', (_req, res) => {
+      res.status(202).send('Quiting server');
+      process.kill(buildProcessPid, 'SIGQUIT');
+    })
+  }
+
+  addServerSentEventsEndpoint(app);
+  addAutocompleteEndpoint(app);
+  
+  app.get('/node_modules/*', (req, res) => {
+>>>>>>> base/master
     // Under some circumstances (I'm not sure exactly what the trigger is), the
     // Chrome JS debugger tries to load a bunch of /node_modules/... paths
     // (presumably for some sort of source mapping). If these were treated as
@@ -321,6 +483,7 @@ export function startWebserver() {
     res.end("");
   });
 
+<<<<<<< HEAD
   app.get("*", async (request, response) => {
     response.setHeader("Content-Type", "text/html; charset=utf-8"); // allows compression
 
@@ -363,9 +526,19 @@ export function startWebserver() {
 
     if (prefetchResources) {
       response.setHeader("X-Accel-Buffering", "no"); // force nginx to send start of response immediately
+=======
+  app.get('/api/health', async (request, response) => {
+    try {
+      const db = getSqlClientOrThrow();
+      await db.one('SELECT 1');
+>>>>>>> base/master
       response.status(200);
-      response.write(prefetchPrefix);
+      response.end("");
+    } catch (err) {
+      response.status(500);
+      response.end("");
     }
+<<<<<<< HEAD
 
     const renderResult = performanceMetricLoggingEnabled.get()
       ? await asyncLocalStorage.run({}, () => renderWithCache(request, response, user))
@@ -436,6 +609,19 @@ export function startWebserver() {
     // eslint-disable-next-line no-console
     return console.info(`Server running on http://localhost:${port} [${env}]`);
   });
+=======
+  });
+
+  app.get('*', async (request, response) => handleRequest(request, response));
+
+  // Start Server
+  const listenPort = getCommandLineArguments().listenPort;
+  const env = process.env.NODE_ENV || 'production'
+  const server = app.listen({ port: listenPort }, () => {
+    // eslint-disable-next-line no-console
+    return console.info(`Server running on http://localhost:${listenPort} [${env}]`)
+  })
+>>>>>>> base/master
   server.keepAliveTimeout = 120000;
 
   // Route used for checking whether the server is ready for an auto-refresh
@@ -444,4 +630,32 @@ export function startWebserver() {
   addStaticRoute("/api/ready", ({ query }, _req, res, next) => {
     res.end("true");
   });
+}
+
+/**
+ * Workaround to redirect `?commentId=...` links to `#...`, to prevent being DDoS-ed
+ */
+export function prefilterHandleRequest(req: express.Request, res: express.Response): boolean {
+  if (!botProtectionCommentRedirectSetting.get()) {
+    return false;
+  }
+
+  const url = req.url;
+  const baseUrl = getSiteUrl();
+  const parsedUrl = new URL(url, baseUrl);
+
+  // If the URL is of the form ...?commentId=id, serve a redirect to ...#commentId
+  const commentId = parsedUrl.searchParams.get('commentId');
+  if (commentId) {
+    // Side-effectfully transform parsedUrl
+    parsedUrl.searchParams.delete("commentId");
+    parsedUrl.hash = commentId;
+
+    res.status(302);
+    res.redirect(parsedUrl.toString());
+    res.end();
+    return true;
+  }
+
+  return false;
 }

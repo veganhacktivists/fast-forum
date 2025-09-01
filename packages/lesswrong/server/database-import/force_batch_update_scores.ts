@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Vulcan } from "../../lib/vulcan-lib";
 import { Comments } from "../../lib/collections/comments";
 import { Posts } from "../../lib/collections/posts";
@@ -5,6 +6,15 @@ import { wrapVulcanAsyncScript } from "../scripts/utils";
 import { batchUpdateScore } from "../updateScores";
 
 Vulcan.forceBatchUpdateScores = wrapVulcanAsyncScript("forceBatchUpdateScores", async () => {
+=======
+import { Comments } from '../../server/collections/comments/collection'
+import { Posts } from '../../server/collections/posts/collection'
+import { wrapVulcanAsyncScript } from '../scripts/utils'
+import { batchUpdateScore } from '../updateScores';
+
+// Exported to allow running manually with "yarn repl"
+export const forceBatchUpdateScores = wrapVulcanAsyncScript('forceBatchUpdateScores', async () => {
+>>>>>>> base/master
   // Posts
   const nActivePostsUpdated = await batchUpdateScore({
     collection: Posts,

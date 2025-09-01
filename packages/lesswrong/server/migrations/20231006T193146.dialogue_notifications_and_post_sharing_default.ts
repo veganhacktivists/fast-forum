@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import Posts from "../../lib/collections/posts/collection";
 import { addField, dropField, updateDefaultValue } from "./meta/utils";
+=======
+import Users from "../../server/collections/users/collection";
+import Posts from "../../server/collections/posts/collection";
+import {addField, dropField, updateDefaultValue} from "./meta/utils";
+>>>>>>> base/master
 
 /**
  * Generated on 2023-10-06T19:31:46.057Z by `yarn makemigrations`

@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 import { Comments } from "../../lib/collections/comments/collection";
 import * as _ from "underscore";
 import { Globals } from "../vulcan-lib";
+=======
+import { Comments } from '../../server/collections/comments/collection';
+import * as _ from 'underscore';
+>>>>>>> base/master
 
 // Return the IDs of all ancestors of the given comment (not including the provided
 // comment itself).
@@ -41,5 +46,9 @@ export const getCommentSubtree = async (rootComment: DbComment, projection?: any
   }
 
   return comments;
+<<<<<<< HEAD
 };
 Globals.getCommentSubtree = getCommentSubtree;
+=======
+}
+>>>>>>> base/master

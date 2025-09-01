@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import Users from "../../lib/collections/users/collection";
 import { mergeSingleUser, DuplicateUser, MergeAction } from "../scripts/fixDuplicateEmail";
 import { Vulcan } from "../../lib/vulcan-lib";
 import "../scripts/mergeAccounts";
+=======
+import { registerMigration } from './migrationUtils';
+import Users from '../../server/collections/users/collection';
+import { mergeSingleUser, DuplicateUser, MergeAction } from '../scripts/fixDuplicateEmail'
+import { mergeAccounts } from '../scripts/mergeAccounts';
+>>>>>>> base/master
 
 type MongoDuplicateUser = {
   _id: string;
@@ -14,7 +21,7 @@ type MergeResult = {
   action: MergeAction;
 };
 
-registerMigration({
+export default registerMigration({
   name: "fixDuplicateEmails",
   dateWritten: "2021-07-22",
   idempotent: true,
@@ -163,7 +170,12 @@ async function runSingleMerge(merge: MergeResult) {
   const action = merge.action;
   for (const sourceId of action.sourceIds) {
     //eslint-disable-next-line no-console
+<<<<<<< HEAD
     console.log("merging account ", sourceId, " into ", action.destinationId, " for email ", merge.email);
     await Vulcan.mergeAccounts(sourceId, action.destinationId);
+=======
+    console.log('merging account ', sourceId, ' into ', action.destinationId, ' for email ', merge.email)
+    await mergeAccounts({sourceUserId: sourceId, targetUserId: action.destinationId, dryRun: false})
+>>>>>>> base/master
   }
 }

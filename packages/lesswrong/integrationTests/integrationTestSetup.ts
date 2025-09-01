@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { runStartupFunctions } from "../lib/executionEnvironment";
@@ -8,11 +9,39 @@ import { initGraphQL } from "../server/vulcan-lib/apollo-server/initGraphQL";
 import { createVoteableUnionType } from "../server/votingGraphQL";
 import { setSqlClient, closeSqlClient, getSqlClientOrThrow } from "../lib/sql/sqlClient";
 import { preparePgTables, createTestingSqlClientFromTemplate, dropTestingDatabases } from "../server/testingSqlClient";
+=======
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import { setServerSettingsCache, setPublicSettings } from '../lib/settingsCache';
+import process from 'process';
+import { setSqlClient, closeSqlClient, getSqlClientOrThrow } from '../server/sql/sqlClient';
+import {
+  createTestingSqlClientFromTemplate,
+  dropTestingDatabases,
+} from '../server/testingSqlClient';
+import { getAllCollections } from '../server/collections/allCollections';
+import PgCollection from '../server/sql/PgCollection';
+import { waitUntilPgQueriesFinished } from './utils';
+import "@/lib"
+import { runServerOnStartupFunctions } from '@/server/serverMain';
+>>>>>>> base/master
 
 // Work around an incompatibility between Jest and iconv-lite (which is used
 // by mathjax).
 require("iconv-lite").encodingExists("UTF-8");
 require("encoding/node_modules/iconv-lite").encodingExists("UTF-8");
+
+const preparePgTables = () => {
+  for (let collection of getAllCollections()) {
+    if (collection instanceof PgCollection) {
+      if (!collection.getTable()) {
+        collection.buildPostgresTable();
+      }
+    } else {
+      throw new Error(`Invalid collection type: ${collection.constructor.name}`);
+    }
+  }
+}
 
 let pgConnected = false;
 const ensurePgConnection = async () => {
@@ -45,14 +74,10 @@ async function oneTimeSetup() {
 
   await ensurePgConnection();
 
-  await runStartupFunctions();
-
-  // define executableSchema
-  createVoteableUnionType();
-  initGraphQL();
+  await runServerOnStartupFunctions();
 }
 
-jest.setTimeout(20000);
+jest.setTimeout(50000);
 
 beforeAll(async () => {
   chai.should();
@@ -62,7 +87,7 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
-  await waitUntilCallbacksFinished();
+  await waitUntilPgQueriesFinished();
 });
 
 afterAll(async () => {
@@ -70,7 +95,7 @@ afterAll(async () => {
   // - There may be some dead time between callbacks where waitUntilCallbacksFinished resolves, but actually another callback is about to run
   // - Some async functions may not be caught by waitUntilCallbacksFinished at all
   for (let i = 0; i < 10; i++) {
-    await waitUntilCallbacksFinished();
+    await waitUntilPgQueriesFinished();
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import crypto from "crypto";
 import fs from "fs";
 import difference from "lodash/difference";
@@ -27,6 +28,27 @@ import {
 import { getCkEditorApiPrefix, getCkEditorApiSecretKey } from "./ckEditorServerConfig";
 import { getPostEditorConfig } from "./postEditorConfig";
 import CkEditorUserSessions from "../../lib/collections/ckEditorUserSessions/collection";
+=======
+import crypto from 'crypto';
+import fs from 'fs';
+import difference from 'lodash/difference';
+import moment from 'moment';
+import _ from 'underscore';
+import Posts from '../../server/collections/posts/collection';
+import Revisions from '../../server/collections/revisions/collection';
+import Users from '../../server/collections/users/collection';
+import { userGetDisplayName } from '../../lib/collections/users/helpers';
+import { filterNonnull } from '../../lib/utils/typeGuardUtils';
+import { ckEditorBundleVersion } from '../../lib/wrapCkEditor';
+import { buildRevision } from '../editor/conversionUtils';
+import { CkEditorUser, CreateDocumentPayload, DocumentResponse, DocumentResponseSchema, UserSchema } from './ckEditorApiValidators';
+import { getCkEditorApiPrefix, getCkEditorApiSecretKey } from './ckEditorServerConfig';
+import { getPostEditorConfig } from './postEditorConfig';
+import { getLatestRev, getNextVersion, getPrecedingRev, htmlToChangeMetrics } from '../editor/utils';
+import { createAdminContext } from "../vulcan-lib/createContexts";
+import { createRevision } from '../collections/revisions/mutations';
+import { updateCkEditorUserSession } from '../collections/ckEditorUserSessions/mutations';
+>>>>>>> base/master
 
 // TODO: actually implement these in Zod
 interface CkEditorComment {
@@ -76,7 +98,28 @@ function generateSignature(apiKey: string, method: string, uri: string, timestam
   return hmac.digest("hex");
 }
 
-async function fetchCkEditorRestAPI(method: string, uri: string, body?: any): Promise<string> {
+async function extractCkEditorResponseErrorInfo(response: Response) {
+  let reason;
+  try {
+    const responseBody = await response.json();
+    reason = responseBody.data?.reasons?.[0];
+    // eslint-disable-next-line no-console
+    console.log({ reason });
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log(`Failed to extract error info from non-ok ckEditor response`, { err });
+  }
+
+  return reason;
+}
+
+function logAndThrow(message: string) {
+  // eslint-disable-next-line no-console
+  console.log(message);
+  throw new Error(message);
+}
+
+async function fetchCkEditorRestAPI<T extends boolean = false>(method: string, uri: string, body?: any, returnRawResponse?: T): Promise<T extends true ? Response : string> {
   const apiPrefix = getCkEditorApiPrefix()!;
   // See: https://ckeditor.com/docs/cs/latest/guides/security/request-signature.html
   const timestamp = new Date().getTime();
@@ -90,7 +133,11 @@ async function fetchCkEditorRestAPI(method: string, uri: string, body?: any): Pr
       "X-CS-Timestamp": "" + timestamp,
     },
   });
+  if (returnRawResponse) {
+    return response as (T extends true ? Response : string);
+  }
   if (!response.ok) {
+<<<<<<< HEAD
     let explanation;
     try {
       const responseBody = await response.json();
@@ -102,9 +149,16 @@ async function fetchCkEditorRestAPI(method: string, uri: string, body?: any): Pr
     if (explanation)
       throw new Error(`CkEditor REST API call FAILED (${response.status}): ${method} ${fullURI}\n${explanation}`);
     throw new Error(`CkEditor REST API call FAILED (${response.status}): ${method} ${fullURI}`);
+=======
+    const errorReason = await extractCkEditorResponseErrorInfo(response);
+    if (errorReason) {
+      logAndThrow(`CkEditor REST API call FAILED (${response.status}): ${method} ${fullURI}\n${JSON.stringify(errorReason)}`);
+    }
+    logAndThrow(`CkEditor REST API call FAILED (${response.status}): ${method} ${fullURI}`);
+>>>>>>> base/master
   }
   const responseBody = await response.text();
-  return responseBody;
+  return responseBody as (T extends true ? Response : string);
 }
 
 const documentHelpers = {
@@ -121,10 +175,16 @@ const documentHelpers = {
   },
 
   async saveDocumentRevision(userId: string, documentId: string, html: string) {
+    const context = createAdminContext();
     const fieldName = "contents";
     const user = await Users.findOne(userId);
+<<<<<<< HEAD
     const previousRev = await getLatestRev(documentId, fieldName);
 
+=======
+    const previousRev = await getLatestRev(documentId, fieldName, context);
+    
+>>>>>>> base/master
     const newOriginalContents = {
       data: html,
       type: "ckEditorMarkup",
@@ -138,7 +198,12 @@ const documentHelpers = {
         ...(await buildRevision({
           originalContents: newOriginalContents,
           currentUser: user,
+<<<<<<< HEAD
         })),
+=======
+          context,
+        }),
+>>>>>>> base/master
         documentId,
         fieldName,
         collectionName: "Posts",
@@ -148,18 +213,21 @@ const documentHelpers = {
         commitMessage: cloudEditorAutosaveCommitMessage,
         changeMetrics: htmlToChangeMetrics(previousRev?.html || "", html),
       };
-      await createMutator({
-        collection: Revisions,
-        document: newRevision,
-        validate: false,
-      });
+      
+      await createRevision({ data: newRevision }, context);
     }
   },
 
   async saveOrUpdateDocumentRevision(postId: string, html: string) {
+    const context = createAdminContext();
     const fieldName = "contents";
+<<<<<<< HEAD
     const previousRev = await getLatestRev(postId, fieldName);
 
+=======
+    const previousRev = await getLatestRev(postId, fieldName, context);
+    
+>>>>>>> base/master
     // Time relative to which to compute the max autosave interval, in ms since
     // epoch.
     const lastEditedAt = previousRev
@@ -176,8 +244,13 @@ const documentHelpers = {
       previousRev.commitMessage === cloudEditorAutosaveCommitMessage
     ) {
       // Get the revision prior to the one being replaced, for computing change metrics
+<<<<<<< HEAD
       const precedingRev = await getPrecedingRev(previousRev);
 
+=======
+      const precedingRev = await getPrecedingRev(previousRev, context);
+      
+>>>>>>> base/master
       // eslint-disable-next-line no-console
       console.log("Updating rev " + previousRev._id);
       // Update the existing rev
@@ -203,6 +276,7 @@ const documentHelpers = {
   async endCkEditorUserSession(documentId: string, endedBy: string, endedAt: Date = new Date()) {
     const adminContext = createAdminContext();
 
+<<<<<<< HEAD
     return updateMutator({
       collection: CkEditorUserSessions,
       documentId,
@@ -211,10 +285,40 @@ const documentHelpers = {
       currentUser: adminContext.currentUser,
     });
   },
+=======
+    return updateCkEditorUserSession({
+      data: { endedAt, endedBy },
+      selector: { _id: documentId },
+    }, adminContext);
+  }
+>>>>>>> base/master
 };
 
 // See https://docs.cke-cs.com/api/v5/docs for documentation on ckEditor's api.
 const ckEditorApi = {
+  async getStorageDocument(ckEditorId: string) {
+    const rawResult = await fetchCkEditorRestAPI("GET", `/storage/${ckEditorId}`);
+    let parsedResult;
+    try {
+      parsedResult = JSON.parse(rawResult);
+    } catch (err) {
+      throw new Error(`Failure to parse response from ckEditor when fetching storage document. Returned data: ${rawResult}`);
+    }
+
+    return parsedResult;
+  },
+
+  async getAllStorageDocuments() {
+    const rawResult = await fetchCkEditorRestAPI("GET", `/storage?order=desc`);
+    let parsedResult;
+    try {
+      parsedResult = JSON.parse(rawResult);
+    } catch (err) {
+      throw new Error(`Failure to parse response from ckEditor when fetching all storage documents. Returned data: ${rawResult}`);
+    }
+
+    return parsedResult.data;
+  },
   async fetchCkEditorDocumentFromStorage(ckEditorId: string): Promise<DocumentResponse> {
     const rawResult = await fetchCkEditorRestAPI("GET", `/documents/${ckEditorId}`);
     let parsedResult;
@@ -240,12 +344,20 @@ const ckEditorApi = {
     return await fetchCkEditorRestAPI("GET", "/collaborations");
   },
 
+  async getCollaborationDetails(documentId: string) {
+    return await fetchCkEditorRestAPI("GET", `/collaborations/${documentId}/details`);
+  },
+
   async getAllConnectedUserIds(documentId: string) {
     return await fetchCkEditorRestAPI("GET", `/collaborations/${documentId}/users`);
   },
 
   async getAllDocuments() {
     return await fetchCkEditorRestAPI("GET", "/documents");
+  },
+
+  async getAllRevisionsForDocument(ckEditorId: string) {
+    return await fetchCkEditorRestAPI("GET", `/revisions?document_id=${ckEditorId}&order=desc`); 
   },
 
   async fetchCkEditorCommentThread(threadId: string): Promise<CkEditorComment[]> {
@@ -258,8 +370,13 @@ const ckEditorApi = {
     // a CkEditor thread somehow has more comments than that, then new commenters
     // won't subscribed after the 1000th comment, which is not a big problem.
     const limit = 1000;
+<<<<<<< HEAD
 
     const response = await fetchCkEditorRestAPI("GET", `/comments?thread_id=${threadId}&limit=${limit}`);
+=======
+    
+    const response = await fetchCkEditorRestAPI("GET", `/comments?thread_id=${threadId}&limit=${limit}&include_deleted=true`);
+>>>>>>> base/master
     const parsedResponse: CkEditorGetCommentsResponse = JSON.parse(response);
     return parsedResponse.data;
   },
@@ -289,6 +406,37 @@ const ckEditorApi = {
 
   async flushCkEditorCollaboration(ckEditorId: string) {
     return await fetchCkEditorRestAPI("DELETE", `/collaborations/${ckEditorId}?force=true&wait=true`);
+  },
+  
+  async flushAndUpgradeCkEditorCollaboration(ckEditorId: string) {
+    const html = await ckEditorApiHelpers.fetchCkEditorCloudStorageDocumentHtml(ckEditorId);
+    if (!html) {
+      throw new Error("Failed to get document HTML");
+    }
+    
+    const postId = documentHelpers.ckEditorDocumentIdToPostId(ckEditorId);
+    await ckEditorApiHelpers.pushRevisionToCkEditor(postId, html);
+  },
+  
+  async flushAndUpgradeAllCkEditorCollaborations() {
+    const collaborations = JSON.parse(await this.getAllCollaborations());
+    for (let ckEditorId of collaborations) {
+      try {
+        await this.flushAndUpgradeCkEditorCollaboration(ckEditorId);
+      } catch(e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+      }
+    }
+  },
+
+  /**
+   * Per docs, this attempts to restore a corrupted collaborative session.
+   * Since this requires deleting the invalid operation(s), it might involve a bit of data loss.
+   * https://docs.cke-cs.com/api/v5/docs#tag/Collaboration/paths/~1collaborations~1%7Bdocument_id%7D~1restore/put
+   */
+  async restoreCkEditorCollaboration(ckEditorId: string) {
+    return await fetchCkEditorRestAPI("PUT", `/collaborations/${ckEditorId}/restore`);
   },
 
   /**
@@ -323,11 +471,20 @@ const ckEditorApi = {
   },
 
   async uploadEditorBundle(bundleVersion: string): Promise<void> {
+<<<<<<< HEAD
     if (!bundleVersion) throw new Error("Missing argument: bundleVersion");
 
     const editorBundle = fs.readFileSync("public/lesswrong-editor/build/ckeditor-cloud.js", "utf8");
     const editorBundleHash = crypto.createHash("sha256").update(editorBundle, "utf8").digest("hex");
 
+=======
+    if (!bundleVersion)
+      throw new Error("Missing argument: bundleVersion");
+    
+    const editorBundle = fs.readFileSync("ckEditor/build/ckeditor-cloud.js", 'utf8');
+    const editorBundleHash = crypto.createHash('sha256').update(editorBundle, 'utf8').digest('hex');
+    
+>>>>>>> base/master
     // eslint-disable-next-line no-console
     console.log(`Uploading editor with SHA256sum ${editorBundleHash}`);
 
@@ -340,15 +497,36 @@ const ckEditorApi = {
         },
       },
       testData: "<p>Test</p>",
-    });
+    }, true);
+
+    if (result.status > 299 && result.status !== 409) {
+      logAndThrow(`Got a ${result.status} status code when uploading bundle version ${bundleVersion}`);
+    }
   },
 
+<<<<<<< HEAD
   async checkEditorBundle(bundleVersion: string): Promise<void> {
     if (!bundleVersion) throw new Error("Missing argument: bundleVersion");
 
+=======
+  async checkEditorBundle(bundleVersion: string): Promise<{ exists: boolean }> {
+    if (!bundleVersion)
+      throw new Error("Missing argument: bundleVersion");
+    
+>>>>>>> base/master
     const result = await fetchCkEditorRestAPI("GET", `/editors/${bundleVersion}/exists`);
-    // eslint-disable-next-line no-console
-    console.log(result);
+
+    let parsedResult;
+    try {
+      parsedResult = JSON.parse(result);
+      if (!('exists' in parsedResult)) {
+        logAndThrow('Missing "exists" field in response from ckEditor when checking if editor bundle exists');
+      }
+    } catch (err) {
+      logAndThrow(`Failure to parse response from ckEditor when checking if editor bundle ${bundleVersion} exists. Returned data: ${result}`);
+    }
+
+    return parsedResult;
   },
 
   async flushAllCkEditorCollaborations() {
@@ -411,7 +589,7 @@ const ckEditorApiHelpers = {
   // (This is used when reverting through the revision-history UI.)
   async pushRevisionToCkEditor(postId: string, html: string) {
     // eslint-disable-next-line no-console
-    console.log(`Pushing to CkEditor cloud: postId=${postId}, html=${html}`);
+    console.log(`Pushing to CkEditor cloud: postId=${postId}, html=${html.slice(0, 100)}`);
     const ckEditorId = documentHelpers.postIdToCkEditorDocumentId(postId);
 
     // Check for unsaved changes and save them first
@@ -455,12 +633,14 @@ const ckEditorApiHelpers = {
   },
 };
 
-Globals.cke = {
+// Exported to allow running manually with "yarn repl"
+export const cke = {
   ...ckEditorApi,
   ...ckEditorApiHelpers,
   ...documentHelpers,
 };
 
+<<<<<<< HEAD
 // Also generate serverShellCommands that log the output of every function here, rather than just running them.
 // In general this is only useful for GET calls, since ckEditor doesn't often return anything for POST/DELETE/etc operations.
 // This isn't guaranteed to produce sane results in every single case, but seems fine for the things I've tested.
@@ -480,5 +660,7 @@ Globals.cke.log = Object.fromEntries(
     return [key, withLoggedOutput];
   }),
 );
+=======
+>>>>>>> base/master
 
 export { ckEditorApi, ckEditorApiHelpers, documentHelpers };

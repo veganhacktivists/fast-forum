@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Comments } from "../../lib/collections/comments";
 import { commentGetPageUrlFromDB, commentGetRSSUrl } from "../../lib/collections/comments/helpers";
 import { Posts } from "../../lib/collections/posts/collection";
@@ -10,6 +11,19 @@ import { onStartup } from "../../lib/executionEnvironment";
 import { addStaticRoute } from "../vulcan-lib";
 import { createAnonymousContext } from "../vulcan-lib/query";
 import type { ServerResponse } from "http";
+=======
+import { Comments } from '../../server/collections/comments/collection';
+import { commentGetPageUrlFromDB, commentGetRSSUrl } from '../../lib/collections/comments/helpers';
+import { Posts } from '../../server/collections/posts/collection';
+import { postGetPageUrl } from '../../lib/collections/posts/helpers';
+import Users from '../../server/collections/users/collection';
+import { userGetProfileUrl } from '../../lib/collections/users/helpers';
+import { faviconUrlSetting, isAF } from '../../lib/instanceSettings';
+import { legacyRouteAcronymSetting } from '../../lib/publicSettings';
+import { addStaticRoute } from '../vulcan-lib/staticRoutes';
+import { createAnonymousContext } from '../vulcan-lib/createContexts';
+import type { ServerResponse } from 'http';
+>>>>>>> base/master
 
 // Some legacy routes have an optional subreddit prefix, which is either
 // omitted, is /r/all, /r/discussion, or /r/lesswrong. The is followed by
@@ -189,7 +203,7 @@ addStaticRoute("/static/imported/:year/:month/:day/:imageName", (params, req, re
 // Legacy RSS Routes
 
 // Route for old comment rss feeds
-onStartup(() => {
+export function addLegacyRssRoutes() {
   // Because the EA Forum was identical except for the change from /lw/ to /ea/
   const legacyRouteAcronym = legacyRouteAcronymSetting.get();
 
@@ -219,9 +233,18 @@ onStartup(() => {
         res.statusCode = 404;
         res.end(`No legacy post found with: id=${params.id} slug=${params.slug}`);
       }
+<<<<<<< HEAD
     },
   );
 });
+=======
+    } else {
+      res.statusCode = 404
+      res.end(`No legacy post found with: id=${params.id} slug=${params.slug}`);
+    }
+  });
+}
+>>>>>>> base/master
 
 // Route for old general RSS (all posts)
 addStaticRoute("/.rss", (params, req, res, next) => {
@@ -251,8 +274,13 @@ addStaticRoute("/promoted", (params, req, res, next) => {
 });
 
 // Route for old promoted RSS (promoted posts)
+<<<<<<< HEAD
 addStaticRoute("/promoted/.rss", (params, req, res, next) => {
   return makeRedirect(res, "/feed.xml?view=curated-rss");
+=======
+addStaticRoute('/promoted/.rss', (params, req, res, next) => {
+  return makeRedirect(res, '/feed.xml?view=curatedRss');
+>>>>>>> base/master
 });
 
 // Route for old agent-foundations post and commentlinks

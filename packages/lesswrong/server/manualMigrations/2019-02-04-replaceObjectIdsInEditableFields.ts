@@ -1,14 +1,25 @@
+<<<<<<< HEAD
 import { registerMigration, migrateDocuments } from "./migrationUtils";
 import { editableCollections } from "../../lib/editor/make_editable";
 import { getCollection } from "../../lib/vulcan-lib";
 import * as _ from "underscore";
+=======
+import { registerMigration, migrateDocuments } from './migrationUtils';
+import { getEditableCollectionNames } from '@/server/editor/editableSchemaFieldHelpers';
+import { getCollection } from '../collections/allCollections';
+import * as _ from 'underscore';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "replaceObjectIdsInEditableFieldsAndVotes",
   dateWritten: "2019-02-04",
   idempotent: true,
   action: async () => {
+<<<<<<< HEAD
     const collectionNames: Array<CollectionNameString> = [...editableCollections, "Revisions", "Votes"];
+=======
+    const collectionNames: Array<CollectionNameString> = [...getEditableCollectionNames(), "Revisions", "Votes"]
+>>>>>>> base/master
     for (let collectionName of collectionNames) {
       const collection = getCollection(collectionName);
       await migrateDocuments({

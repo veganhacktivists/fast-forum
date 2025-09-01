@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import merge from "lodash/merge";
 import { Posts } from "../../lib/collections/posts";
 import Revisions from "../../lib/collections/revisions/collection";
@@ -9,16 +10,34 @@ import { cheerioParse } from "../utils/htmlUtil";
 import { registerMigration } from "./migrationUtils";
 import { Globals } from "../vulcan-lib";
 import { sleep } from "../../lib/helpers";
+=======
+import merge from 'lodash/merge';
+import Revisions from '../../server/collections/revisions/collection';
+import { ckEditorBundleVersion } from '../../lib/wrapCkEditor';
+import { ckEditorApi, ckEditorApiHelpers, documentHelpers } from '../ckEditor/ckEditorApi';
+import { CreateDocumentPayload } from '../ckEditor/ckEditorApiValidators';
+import { cheerioWrapAll } from '../editor/conversionUtils';
+import { cheerioParse } from '../utils/htmlUtil';
+import { registerMigration } from './migrationUtils';
+import { sleep } from '../../lib/helpers';
+import { fetchFragment, fetchFragmentSingle } from '../fetchFragment';
+import { PostsOriginalContents } from '@/lib/collections/posts/fragments';
+>>>>>>> base/master
 
-const widgetizeDialogueMessages = (html: string, postId: string) => {
+const widgetizeDialogueMessages = (html: string, _postId: string) => {
   const $ = cheerioParse(html);
 
   let anyChanges = false;
 
   //for each dialogue message, we check if it's contents represented as paragraphs are already wrapped in a div or not,
   //if not we wrap them in a dialogue-message-content div
+<<<<<<< HEAD
   $(".dialogue-message").each((i, el) => {
     const existingContentWrapper = $(el).find(".dialogue-message-content");
+=======
+  $('.dialogue-message').each((_i, el) => {
+    const existingContentWrapper = $(el).find('.dialogue-message-content');
+>>>>>>> base/master
     if (existingContentWrapper.length === 0) {
       cheerioWrapAll($(el).find("p"), '<div class="dialogue-message-content"></div>', $);
       anyChanges = true;
@@ -28,7 +47,7 @@ const widgetizeDialogueMessages = (html: string, postId: string) => {
   return { anyChanges, migratedHtml: $.html() };
 };
 
-async function wrapMessageContents(dialogue: DbPost) {
+async function wrapMessageContents(dialogue: PostsOriginalContents) {
   const postId = dialogue._id;
   const latestRevisionPromise = Revisions.findOne(
     { documentId: postId, fieldName: "contents" },
@@ -47,7 +66,7 @@ async function wrapMessageContents(dialogue: DbPost) {
   }
 
   // If there's no remote session for a dialogue, fall back to migrating the latest revision, then fall back to migrating the post contents
-  html ??= (await latestRevisionPromise)?.originalContents?.data ?? dialogue.contents.originalContents?.data;
+  html ??= (await latestRevisionPromise)?.originalContents?.data ?? dialogue.contents?.originalContents?.data;
 
   const results = widgetizeDialogueMessages(html!, postId);
   return {
@@ -70,7 +89,7 @@ async function saveAndDeleteRemoteDocument(postId: string, migratedHtml: string,
   }
 }
 
-async function migrateDialogue(dialogue: DbPost) {
+async function _migrateDialogue(dialogue: PostsOriginalContents) {
   const postId = dialogue._id;
   const ckEditorId = documentHelpers.postIdToCkEditorDocumentId(postId);
   const { anyChanges, migratedHtml, remoteDocument } = await wrapMessageContents(dialogue);
@@ -102,18 +121,37 @@ async function migrateDialogue(dialogue: DbPost) {
   }
 }
 
+<<<<<<< HEAD
 Globals.migrateDialogue = async (postId: string) => {
   const dialogue = await Posts.findOne(postId);
   if (dialogue) await migrateDialogue(dialogue);
 };
+=======
+export const migrateDialogue = async (postId: string) => {
+  const dialogue = await fetchFragmentSingle({
+    collectionName: "Posts",
+    fragmentDoc: PostsOriginalContents,
+    selector: {_id: postId},
+    currentUser: null,
+    skipFiltering: true,
+  });
+  if (dialogue) await _migrateDialogue(dialogue)
+}
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "widgetizeDialogueMessages",
   dateWritten: "2023-10-25",
   idempotent: true,
   action: async () => {
-    const dialogues = await Posts.find({ collabEditorDialogue: true }).fetch();
-    const dialogueMigrations = dialogues.map(migrateDialogue);
+    const dialogues = await fetchFragment({
+      collectionName: "Posts",
+      fragmentDoc: PostsOriginalContents,
+      selector: {collabEditorDialogue: true},
+      currentUser: null,
+      skipFiltering: true,
+    });
+    const dialogueMigrations = dialogues.map(_migrateDialogue);
 
     await Promise.all(dialogueMigrations);
     await ckEditorApi.flushAllCkEditorCollaborations();

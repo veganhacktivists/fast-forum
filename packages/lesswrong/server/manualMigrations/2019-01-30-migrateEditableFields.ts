@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 import { registerMigration, migrateDocuments } from "./migrationUtils";
 import { editableCollections, editableCollectionsFields } from "../../lib/editor/make_editable";
 import { getCollection } from "../../lib/vulcan-lib";
 import { Revisions } from "../../lib/collections/revisions/collection";
+=======
+import { registerMigration, migrateDocuments } from './migrationUtils';
+import { getEditableCollectionNames, getEditableFieldNamesForCollection } from '@/server/editor/editableSchemaFieldHelpers';
+import { getCollection } from '../collections/allCollections';
+import { Revisions } from '../../server/collections/revisions/collection';
+>>>>>>> base/master
 
 function determineCanonicalContent({
   content: draftJS,
@@ -42,13 +49,18 @@ function determineSemVer({ draft }: { draft: boolean }) {
 
 const TARGET_SCHEMA_VERSION = 2;
 
-registerMigration({
+export default registerMigration({
   name: "migrateEditableFields",
   dateWritten: "2019-01-30",
   idempotent: true,
   action: async () => {
+<<<<<<< HEAD
     for (let collectionName of editableCollections) {
       const collection = getCollection(collectionName);
+=======
+    for (let collectionName of getEditableCollectionNames()) {
+      const collection = getCollection(collectionName)
+>>>>>>> base/master
       await migrateDocuments({
         description: `Migrate ${collectionName} to new content fields`,
         collection,
@@ -57,6 +69,7 @@ registerMigration({
           schemaVersion: { $lt: TARGET_SCHEMA_VERSION },
         },
         migrate: async (documents: Array<any>) => {
+<<<<<<< HEAD
           let collectionUpdates: Array<any> = [];
           let newRevisions: Array<any> = [];
           documents.forEach((doc) => {
@@ -65,6 +78,15 @@ registerMigration({
               let newFieldName;
               if (["Sequences", "Books", "Chapters", "Collections"].includes(collectionName)) {
                 // Special case for sequences, books, collections and chapters
+=======
+          let collectionUpdates: Array<any> = []
+          let newRevisions: Array<any> = []
+          documents.forEach(doc => {
+            getEditableFieldNamesForCollection(collectionName).forEach((fieldName) => {
+              let contentFields
+              let newFieldName
+              if (["Sequences", "Books", "Chapters", "Collections"].includes(collectionName)) { // Special case for sequences, books, collections and chapters
+>>>>>>> base/master
                 const canonicalContents = determineCanonicalContent({
                   content: doc.description,
                   body: doc.plaintextDescription,

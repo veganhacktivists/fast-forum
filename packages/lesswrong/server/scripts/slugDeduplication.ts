@@ -1,9 +1,12 @@
+<<<<<<< HEAD
 import { Posts } from "../../lib/collections/posts";
 import { asyncForeachSequential } from "../../lib/utils/asyncUtils";
+=======
+import { Posts } from '../../server/collections/posts/collection';
+import { asyncForeachSequential } from '../../lib/utils/asyncUtils';
+>>>>>>> base/master
 
-const runDeduplication = false;
-
-async function slugDeduplication() {
+export async function slugDeduplication() {
   try {
     //eslint-disable-next-line no-console
     console.log("Running slugDeduplication");
@@ -50,7 +53,10 @@ async function slugDeduplication() {
     console.error(e);
   }
 }
+<<<<<<< HEAD
 
 if (runDeduplication) {
   void slugDeduplication();
 }
+=======
+>>>>>>> base/master

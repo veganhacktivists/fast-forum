@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import "./client/apolloClient";
 import "./lib/vulcan-lib";
 import "./client/start";
@@ -23,3 +24,13 @@ import "./lib/index";
 
 // Polyfills:
 import "element-closest";
+=======
+import './client/apolloClient';
+import './client/start';
+
+import './client/autoRefresh';
+import './client/logging';
+import './lib/index';
+
+import './client/polyfills'
+>>>>>>> base/master

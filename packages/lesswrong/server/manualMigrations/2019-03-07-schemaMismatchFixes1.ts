@@ -1,8 +1,14 @@
+<<<<<<< HEAD
 import { registerMigration, migrateDocuments, dropUnusedField } from "./migrationUtils";
 import { Posts } from "../../lib/collections/posts";
 import * as _ from "underscore";
+=======
+import { registerMigration, migrateDocuments, dropUnusedField } from './migrationUtils';
+import { Posts } from '../../server/collections/posts/collection';
+import * as _ from 'underscore';
+>>>>>>> base/master
 
-registerMigration({
+export const scoreExceededDateFalseToNull = registerMigration({
   name: "scoreExceededDateFalseToNull",
   dateWritten: "2019-03-07",
   idempotent: true,
@@ -35,7 +41,7 @@ registerMigration({
   },
 });
 
-registerMigration({
+export const dropUnusedFields1 = registerMigration({
   name: "dropUnusedFields1",
   dateWritten: "2019-03-07",
   idempotent: true,

@@ -1,8 +1,12 @@
 import { registerMigration, fillDefaultValues } from "./migrationUtils";
 
+<<<<<<< HEAD
 import { Localgroups } from "../../lib/collections/localgroups/collection";
+=======
+import { Localgroups } from '../../server/collections/localgroups/collection';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "setDefaultGroupActiveStatus",
   dateWritten: "2019-09-05",
   idempotent: true,

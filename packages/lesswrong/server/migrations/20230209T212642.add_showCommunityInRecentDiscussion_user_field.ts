@@ -33,8 +33,13 @@
  */
 export const acceptsSchemaHash = "dbc3a1a821f459ad60e85420d4c287c0";
 
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { addField, dropField } from "./meta/utils";
+=======
+import Users from "../../server/collections/users/collection"
+import { addField, dropField } from "./meta/utils"
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   await addField(db, Users, "showCommunityInRecentDiscussion");

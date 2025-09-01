@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import RSS from "rss";
 import { Comments } from "../lib/collections/comments";
 import { commentGetPageUrlFromDB } from "../lib/collections/comments/helpers";
@@ -16,6 +17,29 @@ import { viewTermsToQuery } from "../lib/utils/viewUtils";
 
 Posts.addView("rss", Posts.views.new); // default to 'new' view for RSS feed
 Comments.addView("rss", Comments.views.recentComments); // default to 'recentComments' view for comments RSS feed
+=======
+import RSS from 'rss';
+import { Comments } from '../server/collections/comments/collection';
+import { commentGetPageUrlFromDB } from '../lib/collections/comments/helpers';
+import { Posts } from '../server/collections/posts/collection';
+import { postGetPageUrl } from '../lib/collections/posts/helpers';
+import { userGetDisplayNameById } from '../lib/vulcan-users/helpers';
+import { forumTitleSetting, siteUrlSetting, taglineSetting } from '../lib/instanceSettings';
+import moment from '../lib/moment-timezone';
+import { rssTermsToUrl, RSSTerms } from '../lib/rss_urls';
+import { accessFilterMultiple } from '../lib/utils/schemaUtils';
+import { getCommentParentTitle } from '../lib/notificationTypes';
+import { asyncForeachSequential } from '../lib/utils/asyncUtils';
+import { getContextFromReqAndRes } from './vulcan-lib/apollo-server/context';
+import { viewTermsToQuery } from '../lib/utils/viewUtils';
+import { fetchFragment } from './fetchFragment';
+import { addStaticRoute } from "./vulcan-lib/staticRoutes";
+import { createAnonymousContext } from "./vulcan-lib/createContexts";
+import { PostsViews } from '@/lib/collections/posts/views';
+import { CommentsViews } from '@/lib/collections/comments/views';
+import { PostsRSSFeed } from '@/lib/collections/posts/fragments';
+import { camelCaseify } from '@/lib/vulcan-lib/utils';
+>>>>>>> base/master
 
 export const getMeta = (url: string) => {
   const siteUrl = siteUrlSetting.get();
@@ -51,7 +75,14 @@ const servePostRSS = async (terms: RSSTerms, url?: string) => {
   const karmaThreshold = 0 as number;
   url = url || rssTermsToUrl(terms); // Default value is the custom rss feed computed from terms
   const feed = new RSS(getMeta(url));
+
+  // We renamed the rss views to no longer have dashes in them
+  if (terms.view?.includes('-')) {
+    terms.view = camelCaseify(terms.view);
+  }
+
   const context = createAnonymousContext();
+<<<<<<< HEAD
   const parameters = viewTermsToQuery("Posts", terms, undefined, context);
   delete parameters["options"]["sort"]["sticky"];
 
@@ -59,8 +90,22 @@ const servePostRSS = async (terms: RSSTerms, url?: string) => {
 
   const postsCursor = await Posts.find(parameters.selector, parameters.options).fetch();
   const restrictedPosts = (await accessFilterMultiple(null, Posts, postsCursor, null)) as DbPost[];
+=======
+  const parameters = viewTermsToQuery(PostsViews, terms, undefined, context);
+  delete parameters['options']['sort']['sticky'];
 
-  await asyncForeachSequential(restrictedPosts, async (post) => {
+  parameters.options.limit = 10;
+
+  const postsCursor = await fetchFragment({
+    collectionName: "Posts",
+    fragmentDoc: PostsRSSFeed,
+    currentUser: null,
+    selector: parameters.selector,
+    options: parameters.options,
+  });
+>>>>>>> base/master
+
+  await asyncForeachSequential(postsCursor, async (post) => {
     // LESSWRONG - this was added to handle karmaThresholds
     let thresholdDate =
       karmaThreshold === 2
@@ -77,6 +122,7 @@ const servePostRSS = async (terms: RSSTerms, url?: string) => {
                   ? post.scoreExceeded200Date
                   : null;
     thresholdDate = thresholdDate || post.postedAt;
+<<<<<<< HEAD
     let viewDate =
       terms.view === "frontpage-rss"
         ? post.frontpageDate
@@ -85,6 +131,12 @@ const servePostRSS = async (terms: RSSTerms, url?: string) => {
           : terms.view === "meta-rss"
             ? post.metaDate
             : null;
+=======
+    let viewDate = (terms.view === "frontpageRss") ? post.frontpageDate
+                 : (terms.view === "curatedRss")   ? post.curatedDate
+                 : (terms.view === "metaRss")      ? post.metaDate
+                 : null;
+>>>>>>> base/master
     viewDate = viewDate || post.postedAt;
 
     let date = viewDate > thresholdDate ? viewDate : thresholdDate;
@@ -97,7 +149,7 @@ const servePostRSS = async (terms: RSSTerms, url?: string) => {
       // LESSWRONG - changed how author is set for RSS because
       // LessWrong posts don't reliably have post.author defined.
       //author: post.author,
-      author: await userGetDisplayNameById(post.userId),
+      author: await userGetDisplayNameById(post.userId, context),
       // LESSWRONG - this was added to handle karmaThresholds
       // date: post.postedAt
       date: date,
@@ -114,16 +166,24 @@ const servePostRSS = async (terms: RSSTerms, url?: string) => {
 const serveCommentRSS = async (terms: RSSTerms, req: any, res: any, url?: string) => {
   url = url || rssTermsToUrl(terms); // Default value is the custom rss feed computed from terms
   const feed = new RSS(getMeta(url));
-  const context = await getContextFromReqAndRes(req, res);
+  const context = await getContextFromReqAndRes({req, res, isSSR: false});
 
-  let parameters = viewTermsToQuery("Comments", terms);
+  let parameters = viewTermsToQuery(CommentsViews, terms);
   parameters.options.limit = 50;
   const commentsCursor = await Comments.find(parameters.selector, parameters.options).fetch();
+<<<<<<< HEAD
   const restrictedComments = (await accessFilterMultiple(null, Comments, commentsCursor, null)) as DbComment[];
 
   await asyncForeachSequential(restrictedComments, async (comment) => {
     const url = await commentGetPageUrlFromDB(comment, context, true);
     const parentTitle = await getCommentParentTitle(comment);
+=======
+  const restrictedComments = await accessFilterMultiple(null, 'Comments', commentsCursor, context) as DbComment[];
+
+  await asyncForeachSequential(restrictedComments, async (comment) => {
+    const url = await commentGetPageUrlFromDB(comment, context, true);
+    const parentTitle = await getCommentParentTitle(comment, context)
+>>>>>>> base/master
     feed.item({
       title: "Comment on " + parentTitle,
       description: `${comment.contents && comment.contents.html}</br></br><a href='${url}'>Discuss</a>`,
@@ -137,10 +197,18 @@ const serveCommentRSS = async (terms: RSSTerms, req: any, res: any, url?: string
   return feed.xml();
 };
 
+<<<<<<< HEAD
 addStaticRoute("/feed.xml", async function (params, req, res, next) {
   res.setHeader("Content-Type", "application/rss+xml; charset=utf-8");
   if (typeof params.query.view === "undefined") {
     params.query.view = "rss";
+=======
+
+addStaticRoute('/feed.xml', async function(params, req, res, _next) {
+  res.setHeader('Content-Type', 'application/rss+xml; charset=utf-8')
+  if (typeof params.query.view === 'undefined') {
+    params.query.view = 'rss';
+>>>>>>> base/master
   }
   if (params.query.filterSettings) {
     params.query.filterSettings = JSON.parse(params.query.filterSettings);

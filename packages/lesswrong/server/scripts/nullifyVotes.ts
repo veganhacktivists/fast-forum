@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { Globals, createAdminContext } from "../vulcan-lib";
 import { nullifyVotesForUser, nullifyVotesForUserByTarget, silentlyReverseVote } from "../callbacks";
@@ -9,6 +10,23 @@ Globals.nullifyVotesForNullifiedUsers = async () => {
   users.forEach((user) => {
     void nullifyVotesForUser(user);
   });
+=======
+import Users from '../../server/collections/users/collection';
+import { nullifyVotesForUserByTarget } from '../callbacks';
+import VotesRepo from '../repos/VotesRepo';
+import { Votes } from '../../server/collections/votes/collection';
+import { createAdminContext } from "../vulcan-lib/createContexts";
+import { silentlyReverseVote } from '../voteServer';
+import { nullifyVotesForUser } from '../nullifyVotesForUser';
+import { backgroundTask } from '../utils/backgroundTask';
+
+// Exported to allow running manually with "yarn repl"
+export const nullifyVotesForNullifiedUsers = async () => {
+  const users = await Users.find({nullifyVotes: true}).fetch();
+  users.forEach((user) => {
+    backgroundTask(nullifyVotesForUser(user));
+  })
+>>>>>>> base/master
   //eslint-disable-next-line no-console
   console.warn(`Nullified votes for ${users.length} users`);
 };
@@ -18,11 +36,16 @@ interface DateRangeInput {
   before?: string;
 }
 
+<<<<<<< HEAD
 Globals.nullifyVotesForUserByTarget = async (
   sourceUserId: string,
   targetUserId: string,
   dateRange: DateRangeInput = {},
 ) => {
+=======
+// Exported to allow running manually with "yarn repl"
+export const wrappedNullifyVotesForUserByTarget = async (sourceUserId: string, targetUserId: string, dateRange: DateRangeInput = {}) => {
+>>>>>>> base/master
   let afterDate = undefined;
   let beforeDate = undefined;
 
@@ -44,9 +67,15 @@ Globals.nullifyVotesForUserByTarget = async (
 /**
  * Nullify votes where both user1 and user2 voted on the same document, this is intended for
  * nullifying duplicate votes from someone using an alt account.
+ * Exported to allow running manually with "yarn repl"
  */
+<<<<<<< HEAD
 Globals.nullifySharedVotesForUsers = async (user1Id: string, user2Id: string, dryRun = false) => {
   const voteIds = await new VotesRepo().getSharedVoteIds({ user1Id, user2Id });
+=======
+export const nullifySharedVotesForUsers = async (user1Id: string, user2Id: string, dryRun = false) => {
+  const voteIds = await(new VotesRepo()).getSharedVoteIds({ user1Id, user2Id });
+>>>>>>> base/master
   const votes = await Votes.find({ _id: { $in: voteIds } }, { sort: { votedAt: -1 } }).fetch();
 
   // eslint-disable-next-line no-console

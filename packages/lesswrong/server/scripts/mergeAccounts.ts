@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Users from "../../lib/collections/users/collection";
 import { Vulcan, updateMutator, getCollection, Utils } from "../vulcan-lib";
 import { Revisions } from "../../lib/collections/revisions/collection";
@@ -44,6 +45,54 @@ const transferCollection = async ({
   collectionName: CollectionNameString;
   fieldName?: string;
   dryRun: boolean;
+=======
+import Users from '../../server/collections/users/collection';
+import { Revisions } from '../../server/collections/revisions/collection';
+import { getEditableFieldNamesForCollection, editableFieldIsNormalized } from '@/server/editor/editableSchemaFieldHelpers';
+import ReadStatuses from '../../server/collections/readStatus/collection';
+import { Votes } from '../../server/collections/votes/collection';
+import { Conversations } from '../../server/collections/conversations/collection'
+import { asyncForeachSequential } from '../../lib/utils/asyncUtils';
+import sumBy from 'lodash/sumBy';
+import ConversationsRepo from '../repos/ConversationsRepo';
+import LocalgroupsRepo from '../repos/LocalgroupsRepo';
+import PostsRepo from '../repos/PostsRepo';
+import VotesRepo from '../repos/VotesRepo';
+import { collectionsThatAffectKarma } from '../callbacks/votingCallbacks';
+import { filterNonnull, filterWhereFieldsNotNull } from '../../lib/utils/typeGuardUtils';
+import { getUnusedSlugByCollectionName } from '@/server/utils/slugUtil';
+import { getCollection } from "../collections/allCollections";
+import { createAnonymousContext } from "@/server/vulcan-lib/createContexts";
+import { updateUser } from '../collections/users/mutations';
+
+type TransferableCollectionName = 
+ | 'Bans'
+ | 'Subscriptions'
+ | 'Posts'
+ | 'Comments'
+ | 'Tags'
+ | 'TagRels'
+ | 'RSSFeeds'
+ | 'PetrovDayLaunchs'
+ | 'Reports'
+ | 'ElectionVotes'
+ | 'ModeratorActions'
+ | 'UserRateLimits'
+ | 'Messages'
+ | 'Notifications'
+ | 'EmailTokens'
+ | 'Sequences'
+ | 'Collections'
+ | 'Localgroups'
+ | 'ReviewVotes';
+
+const transferCollection = async <N extends TransferableCollectionName>({sourceUserId, targetUserId, collectionName, fieldName = "userId", dryRun}: {
+  sourceUserId: string,
+  targetUserId: string,
+  collectionName: N,
+  fieldName?: string,
+  dryRun: boolean
+>>>>>>> base/master
 }) => {
   const collection = getCollection(collectionName);
 
@@ -67,8 +116,13 @@ const transferCollection = async ({
         try {
           await transferOwnership({ documentId: doc._id, targetUserId, collection, fieldName });
           // Transfer ownership of all revisions and denormalized references for editable fields
+<<<<<<< HEAD
           const editableFieldNames = editableCollectionsFields[collectionName];
           if (editableFieldNames?.length) {
+=======
+          const editableFieldNames = getEditableFieldNamesForCollection(collectionName)
+          if (editableFieldNames.length) {
+>>>>>>> base/master
             await asyncForeachSequential(editableFieldNames, async (editableFieldName) => {
               await transferEditableField({
                 documentId: doc._id,
@@ -104,6 +158,7 @@ const transferCollection = async ({
   }
 };
 
+<<<<<<< HEAD
 const transferEditableField = async ({
   documentId,
   sourceUserId,
@@ -125,6 +180,118 @@ const transferEditableField = async ({
     unset: {},
     validate: false,
   });
+=======
+const getUpdateMutator = ((collectionName: TransferableCollectionName) => {
+  switch (collectionName) {
+    case 'Posts': {
+      const { updatePost }: typeof import("../collections/posts/mutations") = require("../collections/posts/mutations");
+      return updatePost;
+    }
+    case 'Comments': {
+      const { updateComment }: typeof import("../collections/comments/mutations") = require("../collections/comments/mutations");
+      return updateComment;
+    }
+    case 'Tags': {
+      const { updateTag }: typeof import("../collections/tags/mutations") = require("../collections/tags/mutations");
+      return updateTag;
+    }
+    case 'Bans': {
+      const { updateBan }: typeof import("../collections/bans/mutations") = require("../collections/bans/mutations");
+      return updateBan;
+    }
+    case 'Subscriptions': {
+      const { updateSubscription }: typeof import("../collections/subscriptions/mutations") = require("../collections/subscriptions/mutations");
+      return updateSubscription;
+    }
+    case 'TagRels': {
+      const { updateTagRel }: typeof import("../collections/tagRels/mutations") = require("../collections/tagRels/mutations");
+      return updateTagRel;
+    }
+    case 'RSSFeeds': {
+      const { updateRSSFeed }: typeof import("../collections/rssfeeds/mutations") = require("../collections/rssfeeds/mutations");
+      return updateRSSFeed;
+    }
+    case 'PetrovDayLaunchs': {
+      const { updatePetrovDayLaunch }: typeof import("../collections/petrovDayLaunchs/mutations") = require("../collections/petrovDayLaunchs/mutations");
+      return updatePetrovDayLaunch;
+    }
+    case 'Reports': {
+      const { updateReport }: typeof import("../collections/reports/mutations") = require("../collections/reports/mutations");
+      return updateReport;
+    }
+    case 'ElectionVotes': {
+      const { updateElectionVote }: typeof import("../collections/electionVotes/mutations") = require("../collections/electionVotes/mutations");
+      return updateElectionVote;
+    }
+    case 'ModeratorActions': {
+      const { updateModeratorAction }: typeof import("../collections/moderatorActions/mutations") = require("../collections/moderatorActions/mutations");
+      return updateModeratorAction;
+    }
+    case 'UserRateLimits': {
+      const { updateUserRateLimit }: typeof import("../collections/userRateLimits/mutations") = require("../collections/userRateLimits/mutations");
+      return updateUserRateLimit;
+    }
+    case 'Messages': {
+      const { updateMessage }: typeof import("../collections/messages/mutations") = require("../collections/messages/mutations");
+      return updateMessage;
+    }
+    case 'Notifications': {
+      const { updateNotification }: typeof import("../collections/notifications/mutations") = require("../collections/notifications/mutations");
+      return updateNotification;
+    }
+    case 'EmailTokens': {
+      const { updateEmailToken }: typeof import("../collections/emailTokens/mutations") = require("../collections/emailTokens/mutations");
+      return updateEmailToken;
+    }
+    case 'Sequences': {
+      const { updateSequence }: typeof import("../collections/sequences/mutations") = require("../collections/sequences/mutations");
+      return updateSequence;
+    }
+    case 'Collections': {
+      const { updateCollection }: typeof import("../collections/collections/mutations") = require("../collections/collections/mutations");
+      return updateCollection;
+    }
+    case 'Localgroups': {
+      const { updateLocalgroup }: typeof import("../collections/localgroups/mutations") = require("../collections/localgroups/mutations");
+      return updateLocalgroup;
+    }
+    case 'ReviewVotes': {
+      const { updateReviewVote }: typeof import("../collections/reviewVotes/mutations") = require("../collections/reviewVotes/mutations");
+      return updateReviewVote;
+    }
+    
+  }
+}) satisfies ((collectionName: TransferableCollectionName) => Function);
+
+const transferOwnership = async ({documentId, targetUserId, collection, fieldName = "userId"}: {
+  documentId: string
+  targetUserId: string
+  collection: CollectionBase<any>
+  fieldName: string
+}) => {
+  const updateMutator = getUpdateMutator(collection.collectionName);
+  await updateMutator({
+    data: { [fieldName]: targetUserId },
+    selector: { _id: documentId },
+  }, createAnonymousContext());
+}
+
+const transferEditableField = async <N extends TransferableCollectionName>({documentId, sourceUserId, targetUserId, collection, fieldName = "contents"}: {
+  documentId: string,
+  sourceUserId: string,
+  targetUserId: string,
+  collection: CollectionBase<N>,
+  fieldName: string
+}) => {
+  if (!editableFieldIsNormalized(collection.collectionName, fieldName)) {
+    // Update the denormalized revision on the document
+    const updateMutator = getUpdateMutator(collection.collectionName)
+    await updateMutator({
+      data: { [`${fieldName}.userId`]: targetUserId },
+      selector: { _id: documentId },
+    }, createAnonymousContext());
+  }
+>>>>>>> base/master
   // Update the revisions themselves
   await Revisions.rawUpdateMany(
     { documentId, userId: sourceUserId, fieldName },
@@ -169,12 +336,17 @@ const transferServices = async (sourceUser: DbUser, targetUser: DbUser, dryRun: 
   const profilePaths = ["github", "facebook", "google"];
 
   for (const profilePath of profilePaths) {
+<<<<<<< HEAD
     const sourceProfile = sourceUser.services[profilePath];
+=======
+    const sourceProfile = sourceUser.services?.[profilePath]
+>>>>>>> base/master
     if (sourceProfile && !targetUser.services[profilePath]) {
       // eslint-disable-next-line no-console
       console.log(`  Copying ${profilePath} profile from ${sourceUser._id} to ${targetUser._id}`);
       if (!dryRun) {
         // if we don't remove the profile from the old account, we'll get a duplicate key error
+<<<<<<< HEAD
         await updateMutator({
           collection: Users,
           documentId: sourceUser._id,
@@ -190,6 +362,11 @@ const transferServices = async (sourceUser: DbUser, targetUser: DbUser, dryRun: 
           validate: false,
         });
       }
+=======
+        await updateUser({ data: { [`services.${profilePath}`]: null }, selector: { _id: sourceUser._id } }, createAnonymousContext())
+        await updateUser({ data: {[`services.${profilePath}`]: sourceProfile}, selector: { _id: targetUser._id } }, createAnonymousContext())
+      } 
+>>>>>>> base/master
     } else {
       // eslint-disable-next-line no-console
       console.log(`  Not copying ${profilePath}`);
@@ -197,6 +374,7 @@ const transferServices = async (sourceUser: DbUser, targetUser: DbUser, dryRun: 
   }
 };
 
+<<<<<<< HEAD
 Vulcan.mergeAccounts = async ({
   sourceUserId,
   targetUserId,
@@ -205,6 +383,13 @@ Vulcan.mergeAccounts = async ({
   sourceUserId: string;
   targetUserId: string;
   dryRun: boolean;
+=======
+// Exported to allow usage with "yarn repl". Also wrapped by scripts/mergeUsers.sh.
+export const mergeAccounts = async ({sourceUserId, targetUserId, dryRun}: {
+  sourceUserId: string, 
+  targetUserId: string, 
+  dryRun: boolean
+>>>>>>> base/master
 }) => {
   if (typeof dryRun !== "boolean") throw Error("dryRun value missing");
 
@@ -226,7 +411,15 @@ Vulcan.mergeAccounts = async ({
   await transferCollection({ sourceUserId, targetUserId, collectionName: "Subscriptions", dryRun });
 
   // Transfer posts
+<<<<<<< HEAD
   await transferCollection({ sourceUserId, targetUserId, collectionName: "Posts", dryRun });
+=======
+  await transferCollection({sourceUserId, targetUserId, collectionName: "Posts", dryRun})
+  // Transfer post co-authorship
+  if (!dryRun) {
+    await new PostsRepo().moveCoauthorshipToNewUser(sourceUserId, targetUserId)
+  }
+>>>>>>> base/master
 
   // Transfer comments
   await transferCollection({ sourceUserId, targetUserId, collectionName: "Comments", dryRun });
@@ -244,6 +437,7 @@ Vulcan.mergeAccounts = async ({
   await transferCollection({ sourceUserId, targetUserId, collectionName: "PetrovDayLaunchs", dryRun });
 
   // Transfer reports (i.e. user reporting a comment/tag/etc)
+<<<<<<< HEAD
   await transferCollection({ sourceUserId, targetUserId, collectionName: "Reports", dryRun });
 
   try {
@@ -251,6 +445,24 @@ Vulcan.mergeAccounts = async ({
       Conversations.find({ participantIds: sourceUserId }).count(),
       Conversations.find({ participantIds: sourceUserId }).count(),
     ]);
+=======
+  await transferCollection({sourceUserId, targetUserId, collectionName: "Reports", dryRun})
+  
+  // Transfer election votes
+  await transferCollection({sourceUserId, targetUserId, collectionName: "ElectionVotes", dryRun})
+  
+  // Transfer moderator actions
+  await transferCollection({sourceUserId, targetUserId, collectionName: "ModeratorActions", dryRun})
+  
+  // Transfer user rate limits
+  await transferCollection({sourceUserId, targetUserId, collectionName: "UserRateLimits", dryRun})
+
+  try {
+    const [sourceConversationsCount, targetConversationsCount] = await Promise.all([
+      Conversations.find({participantIds: sourceUserId}).count(),
+      Conversations.find({participantIds: targetUserId}).count()
+    ])
+>>>>>>> base/master
     // eslint-disable-next-line no-console
     console.log(`conversations from source user: ${sourceConversationsCount}`);
     // eslint-disable-next-line no-console
@@ -335,6 +547,7 @@ Vulcan.mergeAccounts = async ({
 
       // Transfer karma
       // eslint-disable-next-line no-console
+<<<<<<< HEAD
       console.log("Transferring karma");
       const newKarma = await recomputeKarma(targetUserId);
       await updateMutator({
@@ -348,6 +561,53 @@ Vulcan.mergeAccounts = async ({
         },
         validate: false,
       });
+=======
+      console.log("Transferring karma")
+      const newKarma = await recomputeKarma(targetUserId)
+      await updateUser({
+        data: {
+          karma: newKarma,
+          // We only recalculate the karma for non-af karma, because recalculating
+          // af karma is a lot more complicated
+          afKarma: (sourceUser.afKarma) + (targetUser.afKarma)
+        }, selector: { _id: targetUserId }
+      }, createAnonymousContext())
+    }    
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log()
+    // eslint-disable-next-line no-console
+    console.log("%c Error merging votes", "color: red")
+    // eslint-disable-next-line no-console
+    console.log(err)
+  }
+
+  await transferServices(sourceUser, targetUser, dryRun)
+  
+  // Change slug of source account by appending "old" and reset oldSlugs array
+  // eslint-disable-next-line no-console
+  console.log("Change slugs of source account")
+  try {
+
+    if (!dryRun) {
+      await Users.rawUpdateOne(
+        {_id: sourceUserId},
+        {$set: {
+          slug: await getUnusedSlugByCollectionName("Users", `${sourceUser.slug}-old`, true)
+        }}
+      );
+    
+      // Add slug to oldSlugs array of target account
+      const newOldSlugs = [
+        ...(targetUser.oldSlugs || []), 
+        ...(sourceUser.oldSlugs || []), 
+        sourceUser.slug
+      ]
+      // eslint-disable-next-line no-console
+      console.log("Changing slugs of target account", sourceUser.slug, newOldSlugs)
+      
+      await updateUser({ data: {oldSlugs: filterNonnull(newOldSlugs)}, selector: { _id: targetUserId } }, createAnonymousContext())
+>>>>>>> base/master
     }
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -454,6 +714,7 @@ Vulcan.mergeAccounts = async ({
   if (!dryRun) {
     // Mark old acccount as deleted
     // eslint-disable-next-line no-console
+<<<<<<< HEAD
     console.log("Marking old account as deleted");
     await updateMutator({
       collection: Users,
@@ -465,6 +726,15 @@ Vulcan.mergeAccounts = async ({
       unset: { "services.resume": 1 },
       validate: false,
     });
+=======
+    console.log("Marking old account as deleted")
+    await updateUser({
+      data: {
+          deleted: true,
+          'services.resume': null
+      } as UpdateUserDataInput, selector: { _id: sourceUserId }
+    }, createAnonymousContext())
+>>>>>>> base/master
   }
 };
 
@@ -486,4 +756,8 @@ async function recomputeKarma(userId: string) {
   return karma;
 }
 
+<<<<<<< HEAD
 Vulcan.getTotalKarmaForUser = recomputeKarma;
+=======
+export const getTotalKarmaForUser = recomputeKarma
+>>>>>>> base/master

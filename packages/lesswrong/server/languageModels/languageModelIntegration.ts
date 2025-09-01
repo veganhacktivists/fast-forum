@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Globals } from "../../lib/vulcan-lib/config";
 import OpenAI from "openai";
 import { Tags } from "../../lib/collections/tags/collection";
@@ -13,6 +14,17 @@ const openAIOrganizationId = new DatabaseServerSetting<string | null>("languageM
 let openAIApi: OpenAI | null = null;
 export async function getOpenAI(): Promise<OpenAI | null> {
   if (!openAIApi) {
+=======
+import OpenAI from "openai";
+import { dataToMarkdown } from '../editor/conversionUtils';
+import { openAIApiKey, openAIOrganizationId } from '../databaseSettings';
+import drop from 'lodash/drop';
+import take from 'lodash/take';
+
+let openAIApi: OpenAI|null = null;
+export async function getOpenAI(): Promise<OpenAI|null> {
+  if (!openAIApi){
+>>>>>>> base/master
     const apiKey = openAIApiKey.get();
     const organizationId = openAIOrganizationId.get();
 
@@ -26,10 +38,22 @@ export async function getOpenAI(): Promise<OpenAI | null> {
   return openAIApi;
 }
 
+<<<<<<< HEAD
 type LanguageModelAPI = "disabled" | "stub" | "openai";
 type LanguageModelClassificationTask = "isSpam" | "isFrontpage";
 type LanguageModelGenerationTask = "summarize" | "authorFeedback";
 type LanguageModelTask = LanguageModelClassificationTask | LanguageModelGenerationTask;
+=======
+export function isOpenAIAPIEnabled() {
+  const apiKey = openAIApiKey.get();
+  return !!apiKey;
+}
+
+type LanguageModelAPI = "disabled"|"stub"|"openai";
+type LanguageModelClassificationTask = "isSpam"|"isFrontpage";
+type LanguageModelGenerationTask = "summarize"|"authorFeedback";
+type LanguageModelTask = LanguageModelClassificationTask|LanguageModelGenerationTask;
+>>>>>>> base/master
 
 export type LanguageModelTemplate = {
   header: Record<string, string>;
@@ -71,6 +95,7 @@ function taskToWikiSlug(task: LanguageModelTask): string {
  * text of an admin-only wiki page, formatted as Markdown.
  */
 async function getLMConfigForTask(task: LanguageModelTask, context: ResolverContext): Promise<LanguageModelConfig> {
+  const { Tags } = context;
   const wikiPageSlug = taskToWikiSlug(task);
   const tag = await Tags.findOne({ slug: wikiPageSlug });
 
@@ -102,8 +127,14 @@ function tagToLMConfig(tag: DbTag, task: LanguageModelTask): LanguageModelConfig
   };
 }
 
+<<<<<<< HEAD
 export async function wikiSlugToTemplate(slug: string): Promise<LanguageModelTemplate> {
   const wikiConfig = await Tags.findOne({ slug });
+=======
+export async function wikiSlugToTemplate(slug: string, context: ResolverContext): Promise<LanguageModelTemplate> {
+  const { Tags } = context;
+  const wikiConfig = await Tags.findOne({slug});
+>>>>>>> base/master
   if (!wikiConfig) throw new Error(`No LM config page ${slug}`);
   return wikiPageToTemplate(wikiConfig);
 }
@@ -185,6 +216,7 @@ export function substituteIntoTemplate({
 function countGptTokens(str: string): number {
   if (!str) return 0;
   try {
+    const { encode: gpt3encode } = require("gpt-3-encoder");
     return gpt3encode(str).length;
   } catch (e) {
     return str.length;
@@ -204,6 +236,7 @@ function truncateByTokenCount(str: string, tokens: number): string {
 
   // First try an encode-then-decode roundtrip
   try {
+    const { encode: gpt3encode, decode: gpt3decode } = require("gpt-3-encoder");
     const encoded = gpt3encode(str);
 
     if (encoded.length <= tokens) return str;

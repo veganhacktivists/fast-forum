@@ -1,5 +1,6 @@
 import { PostAnalyticsResult } from "../../components/hooks/usePostAnalytics";
 import { isEAForum } from "../../lib/instanceSettings";
+<<<<<<< HEAD
 import { getAnalyticsConnection, getAnalyticsConnectionOrThrow } from "../analytics/postgresConnection";
 import { addGraphQLQuery, addGraphQLResolvers, addGraphQLSchema } from "../vulcan-lib";
 import camelCase from "lodash/camelCase";
@@ -14,24 +15,18 @@ import { getHybridView } from "../analytics/hybridViews";
 import { userIsAdminOrMod } from "../../lib/vulcan-users";
 import { POST_VIEWS_IDENTIFIER } from "../analytics/postViewsHybridView";
 import { POST_VIEW_TIMES_IDENTIFIER } from "../analytics/postViewTimesHybridView";
+=======
+import { getAnalyticsConnection } from "../analytics/postgresConnection";
+import  camelCase  from "lodash/camelCase";
+import { canUserEditPostMetadata } from "../../lib/collections/posts/helpers";
+import { AnalyticsSeriesValue, MultiPostAnalyticsResult, PostAnalytics2Result } from "../../components/hooks/useAnalytics";
+import Posts from "../../server/collections/posts/collection";
+import { userIsAdminOrMod } from "../../lib/vulcan-users/permissions";
+>>>>>>> base/master
 import moment from "moment";
 import groupBy from "lodash/groupBy";
-import { executeChunkedQueue } from "../../lib/utils/asyncUtils";
 import { generateDateSeries } from "../../lib/helpers";
-import { DatabasePublicSetting } from "../../lib/publicSettings";
-
-// Queries are executed in batches of post ids. This is mainly to coerce postgres into using
-// the index on post_id (via get_post_id_from_path(event ->> 'path'::text)). If you give it too
-// many ids at once it will try to filter by timestamp first and then sequentially scan to filter
-// by post_id, which is much (much!) slower.
-const MAX_CONCURRENT_QUERIES = 8;
-// Note: there is currently a bug/behaviour where, just after the materialized view is refreshed, postgres
-// is even more averse to using the index on post_id. This is because the amount of live data to check is smaller
-// so it thinks it's faster to just use the filter on timestamp and then scan through to filter by post_id, this is
-// in fact much slower. I'm trying ways to get around this, but for now I've just set the batch size to 1, which does
-// cause it to spam a lot of queries, but even so it's much faster than the alternative.
-const liveBatchSizeSetting = new DatabasePublicSetting<number>("analytics.liveBatchSize", 1);
-const materializedBatchSizeSetting = new DatabasePublicSetting<number>("analytics.materializedBatchSize", 50);
+import gql from "graphql-tag";
 
 /**
  * Based on an analytics query, returns a function that runs that query
@@ -90,6 +85,7 @@ function makePgAnalyticsQuerySeries({
   };
 }
 
+<<<<<<< HEAD
 /**
  * Generates an OR condition that is essentially equivalent to `columnName IN (ids)`.
  * This encourages postgres to use the index on `columnName` if one exists.
@@ -104,6 +100,8 @@ function generateOrConditionQuery(columnName: string, ids: string[]): string {
   }
 }
 
+=======
+>>>>>>> base/master
 type QueryFunc = (post: DbPost) => Promise<Partial<PostAnalyticsResult>>;
 
 const queries: QueryFunc[] = [
@@ -174,6 +172,7 @@ const queries: QueryFunc[] = [
   }),
 ];
 
+<<<<<<< HEAD
 addGraphQLResolvers({
   Query: {
     async PostAnalytics(
@@ -526,6 +525,9 @@ addGraphQLResolvers({
 });
 
 addGraphQLSchema(`
+=======
+export const analyticsGraphQLTypeDefs = gql`
+>>>>>>> base/master
   type UniqueClientViewsSeries {
     uniqueClientViews: Int
     date: Date
@@ -539,9 +541,6 @@ addGraphQLSchema(`
     uniqueClientViews5Min: Int
     uniqueClientViewsSeries: [UniqueClientViewsSeries]
   }
-`);
-
-addGraphQLSchema(`
   type PostAnalytics2Result {
     _id: String
     title: String
@@ -559,9 +558,6 @@ addGraphQLSchema(`
     posts: [PostAnalytics2Result]
     totalCount: Int!
   }
-`);
-
-addGraphQLSchema(`
   type AnalyticsSeriesValue {
     date: Date
     views: Int
@@ -569,8 +565,14 @@ addGraphQLSchema(`
     karma: Int
     comments: Int
   }
-`);
+  extend type Query {
+    PostAnalytics(postId: String!): PostAnalyticsResult!
+    MultiPostAnalytics(userId: String, postIds: [String], sortBy: String, desc: Boolean, limit: Int): MultiPostAnalyticsResult!
+    AnalyticsSeries(userId: String, postIds: [String], startDate: Date, endDate: Date): [AnalyticsSeriesValue]
+  }
+`
 
+<<<<<<< HEAD
 addGraphQLQuery("PostAnalytics(postId: String!): PostAnalyticsResult!");
 addGraphQLQuery(
   "MultiPostAnalytics(userId: String, postIds: [String], sortBy: String, desc: Boolean, limit: Int, cachedOnly: Boolean): MultiPostAnalyticsResult!",
@@ -578,3 +580,231 @@ addGraphQLQuery(
 addGraphQLQuery(
   "AnalyticsSeries(userId: String, postIds: [String], startDate: Date, endDate: Date, cachedOnly: Boolean): [AnalyticsSeriesValue]",
 );
+=======
+export const analyticsGraphQLQueries = {
+  async PostAnalytics(
+    root: void,
+    { postId }: { postId: string },
+    context: ResolverContext
+  ): Promise<PostAnalyticsResult> {
+    const { currentUser } = context;
+    if (!currentUser) throw new Error(`No user`);
+    const post = await context.loaders.Posts.load(postId);
+    // check that the current user has permission to view post metrics
+    // LW doesn't want to show this to authors, but we'll let admins see it
+    if (!isEAForum && !currentUser.isAdmin) {
+      throw new Error("Permission denied");
+    }
+    // Maybe check for karma level here?
+    if (
+      !canUserEditPostMetadata(currentUser, post) &&
+      !currentUser.groups?.includes("sunshineRegiment")
+    ) {
+      throw new Error("Permission denied");
+    }
+
+    // I really wanted to do this as a map, but I want to do this in serial,
+    // and couldn't get it to work the way I wanted
+    let postAnalytics: Partial<PostAnalyticsResult> = {};
+    for (const queryFunc of queries) {
+      const queryResult = await queryFunc(post);
+      postAnalytics = {...postAnalytics, ...queryResult}
+    }
+    
+    // There's no good way to tell TS that because we've iterated over all the
+    // keys, the partial is no longer partial
+    return postAnalytics as PostAnalyticsResult;
+  },
+  async MultiPostAnalytics(
+    root: void,
+    {
+      userId,
+      postIds: postIdsInput,
+      sortBy,
+      desc,
+      limit,
+    }: { userId: string; postIds: string[] | null; sortBy: string | null; desc: boolean | null; limit: number | null },
+    context: ResolverContext
+  ): Promise<MultiPostAnalyticsResult> {
+    // These are null (not undefined) if not provided, so we have to explicitly set them to the default
+    sortBy = sortBy ?? "postedAt";
+    desc = desc ?? true;
+    limit = limit ?? 10;
+
+    // Directly sortable fields can be sorted and filtered on before querying the analytics database,
+    // so we can avoid querying for most of the post ids. Indirectly sortable fields are calculated
+    // rely on the results from the analytics database, so we have to query for all the post ids and then
+    // sort and filter afterwards.
+    const DIRECTLY_SORTABLE_FIELDS = ["postedAt", "baseScore", "commentCount"];
+    const INDIRECTLY_SORTABLE_FIELDS = ["views", "reads"];
+
+    const { currentUser } = context;
+
+    const directlySortable = DIRECTLY_SORTABLE_FIELDS.includes(sortBy);
+
+    const postSelector = {
+      ...(userId && {$or: [{ userId: userId }, { "coauthorStatuses.userId": userId }]}),
+      ...(postIdsInput && { _id: { $in: postIdsInput } }),
+      rejected: { $ne: true },
+      draft: false,
+      isEvent: false,
+    };
+    const postCountPromise = Posts.find(postSelector).count();
+    const rawPosts = await Posts.find(postSelector, {
+      ...(directlySortable && { sort: { [sortBy]: desc ? -1 : 1 } }),
+      ...(directlySortable && { limit }),
+    }).fetch();
+
+    const filteredPosts = rawPosts.filter((post) =>
+      userIsAdminOrMod(currentUser) || canUserEditPostMetadata(currentUser, post)
+    );
+
+    const postsById = Object.fromEntries(filteredPosts.map((post) => [post._id, post]));
+    const postIds = filteredPosts.map((post) => post._id);
+
+    if (!postIds.length) {
+      return {
+        posts: [],
+        totalCount: 0,
+      };
+    }
+
+    const [viewsResults, readsResults] = await Promise.all([
+      context.repos.postViews.viewsByPost({postIds}),
+      context.repos.postViewTimes.readsByPost({postIds}),
+    ]);
+
+    // Flatten the results
+    const viewsById = Object.fromEntries(viewsResults.map((row) => [row.postId, row.totalViews]));
+    const uniqueViewsById = Object.fromEntries(viewsResults.map((row) => [row.postId, row.totalUniqueViews]));
+    const readsById = Object.fromEntries(readsResults.map((row) => [row.postId, row.totalReads]));
+    const meanReadingTimeById = Object.fromEntries(readsResults.map((row) => [row.postId, row.meanReadTime]));
+
+    let sortedAndLimitedPostIds: string[] = postIds;
+    if (INDIRECTLY_SORTABLE_FIELDS.includes(sortBy)) {
+      const sortMap = sortBy === "views" ? viewsById : readsById;
+      sortedAndLimitedPostIds = postIds.sort((a, b) => {
+        const aVal = sortMap[a] ?? 0;
+        const bVal = sortMap[b] ?? 0;
+        return desc ? bVal - aVal : aVal - bVal;
+      });
+    }
+    sortedAndLimitedPostIds = sortedAndLimitedPostIds.slice(0, limit);
+
+    const posts: PostAnalytics2Result[] = sortedAndLimitedPostIds.map((_id, idx) => {
+      return {
+        _id,
+        title: postsById[_id].title,
+        slug: postsById[_id].slug,
+        postedAt: postsById[_id].postedAt,
+        views: viewsById[_id] ?? 0,
+        uniqueViews: uniqueViewsById[_id] ?? 0,
+        reads: readsById[_id] ?? 0,
+        meanReadingTime: meanReadingTimeById[_id] ?? 0,
+        karma: postsById[_id].baseScore,
+        comments: postsById[_id].commentCount ?? 0,
+      };
+    });
+
+    return {
+      posts: posts,
+      totalCount: await postCountPromise,
+    };
+  },
+  async AnalyticsSeries(
+    root: void,
+    {
+      userId,
+      postIds,
+      startDate,
+      endDate,
+    }: {
+      userId: string | null;
+      postIds: string[] | null;
+      startDate: Date | null;
+      endDate: Date | null;
+    },
+    context: ResolverContext
+  ): Promise<AnalyticsSeriesValue[]> {
+    const { currentUser } = context;
+
+    if (!userId && (!postIds || !postIds.length)) {
+      throw new Error("Must provide either userId or postIds");
+    }
+    if (!endDate) {
+      throw new Error("Must provide endDate");
+    }
+  
+    // Round start date down to nearest day in UTC
+    const adjustedStartDate = startDate ? moment(new Date(startDate)).utc().startOf("day") : undefined;
+    const adjustedEndDate = moment(new Date(endDate)).utc().add(1, "days").startOf("day");
+
+    const postSelector = {
+      ...(userId && {$or: [{ userId: userId }, { "coauthorStatuses.userId": userId }]}),
+      ...(postIds && { _id: { $in: postIds } }),
+      rejected: { $ne: true },
+      draft: false,
+      isEvent: false,
+    }
+    const rawPosts = await Posts.find(postSelector).fetch();
+    const filteredPosts = rawPosts.filter(
+      (post) => userIsAdminOrMod(currentUser) || canUserEditPostMetadata(currentUser, post)
+    );
+    const queryPostIds = filteredPosts.map((post) => post._id);
+
+    if (!queryPostIds.length) {
+      return [];
+    }
+
+    const [viewRes, readRes, karmaRes, commentRes] = await Promise.all([
+      context.repos.postViews.viewsByDate({
+        postIds: queryPostIds,
+        startDate: adjustedStartDate?.toDate(),
+        endDate: adjustedEndDate.toDate(),
+      }),
+      context.repos.postViewTimes.readsByDate({
+        postIds: queryPostIds,
+        startDate: adjustedStartDate?.toDate(),
+        endDate: adjustedEndDate.toDate(),
+      }),
+      context.repos.votes.getDocumentKarmaChangePerDay({
+        documentIds: queryPostIds,
+        startDate: adjustedStartDate?.toDate(),
+        endDate: adjustedEndDate.toDate(),
+      }),
+      context.repos.comments.getCommentsPerDay({
+        postIds: queryPostIds,
+        startDate: adjustedStartDate?.toDate(),
+        endDate: adjustedEndDate.toDate(),
+      }),
+    ]);
+
+    const viewsByDate = groupBy(viewRes, "date");
+    const readsByDate = groupBy(readRes, "date");
+    const commentsByDate = groupBy(commentRes, "window_start_key");
+    const karmaByDate = groupBy(karmaRes, "window_start_key");
+
+    const lowestStartDate =
+      adjustedStartDate ??
+      moment.min(
+        moment.min(Object.keys(viewsByDate).map((date) => moment(date))),
+        moment.min(Object.keys(readsByDate).map((date) => moment(date))),
+        moment.min(Object.keys(commentsByDate).map((date) => moment(date))),
+        moment.min(Object.keys(karmaByDate).map((date) => moment(date)))
+      );
+
+    const result = generateDateSeries(lowestStartDate, adjustedEndDate).map((date) => ({
+      date: new Date(date),
+      views: viewsByDate[date]?.reduce((acc, curr) => acc + (curr.totalViews ?? 0), 0) ?? 0,
+      reads: readsByDate[date]?.reduce((acc, curr) => acc + (curr.totalReads ?? 0), 0) ?? 0,
+      karma: karmaByDate[date]?.reduce((acc, curr) => acc + parseInt(curr.karma_change ?? 0), 0) ?? 0,
+      comments: commentsByDate[date]?.reduce((acc, curr) => acc + parseInt(curr.comment_count ?? 0), 0) ?? 0
+    }));
+    // Remove leading values where all fields are 0
+    const truncatedResult = result.slice(result.findIndex((value) => (
+      value.views !== 0 || value.reads !== 0 || value.karma !== 0 || value.comments !== 0
+    )));
+    return truncatedResult;
+  },
+}
+>>>>>>> base/master

@@ -34,8 +34,13 @@
  */
 export const acceptsSchemaHash = "f167b9a94ae9eebe159267d6ca82d3a4";
 
+<<<<<<< HEAD
 import Spotlights from "../../lib/collections/spotlights/collection";
 import { addField, dropField } from "./meta/utils";
+=======
+import Spotlights from "../../server/collections/spotlights/collection"
+import { addField, dropField } from "./meta/utils"
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   await addField(db, Spotlights, "showAuthor");

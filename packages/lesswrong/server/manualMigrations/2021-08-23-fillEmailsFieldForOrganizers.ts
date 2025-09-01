@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import Users from "../../lib/collections/users/collection";
+=======
+import { registerMigration } from './migrationUtils';
+import Users from '../../server/collections/users/collection';
 
-registerMigration({
+>>>>>>> base/master
+
+export default registerMigration({
   name: "fillEmailsFieldForOrganizers",
   dateWritten: "2021-08-23",
   idempotent: true,

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { defineQuery, defineMutation } from "../utils/serverGraphqlUtil";
 import { LWEvents } from "../../lib/collections/lwevents/collection";
 import { userIsAdminOrMod } from "../../lib/vulcan-users/permissions";
@@ -43,6 +44,34 @@ defineMutation({
   argTypes: "(commentId: String!, until: String)",
   resultType: "Boolean!",
   fn: async (_root: void, args: { commentId: string; until?: string }, context: ResolverContext) => {
+=======
+import { LWEvents } from '../../server/collections/lwevents/collection';
+import { userIsAdminOrMod } from '../../lib/vulcan-users/permissions';
+import { getCommentSubtree } from '../utils/commentTreeUtils';
+import { Comments } from '../../server/collections/comments/collection';
+import moment from 'moment';
+import uniq from 'lodash/uniq';
+import gql from 'graphql-tag';
+import { updateComment } from '../collections/comments/mutations';
+
+export const moderationGqlTypeDefs = gql`
+  type ModeratorIPAddressInfo {
+    ip: String!
+    userIds: [String!]!
+  }
+  extend type Query {
+    moderatorViewIPAddress(ipAddress: String!): ModeratorIPAddressInfo
+  }
+
+  extend type Mutation {
+    lockThread(commentId: String!, until: String): Boolean!
+    unlockThread(commentId: String!): Boolean!
+  }
+`
+
+export const moderationGqlMutations = {
+  async lockThread (_root: void, args: {commentId: string, until?: string}, context: ResolverContext) {
+>>>>>>> base/master
     const { currentUser } = context;
     if (!userIsAdminOrMod(currentUser)) {
       throw new Error("Only admins and moderators can lock or unlock threads");
@@ -59,6 +88,7 @@ defineMutation({
     const expiryDate = args.until ? moment(args.until).toDate() : farFuture;
 
     // Mark them all as replies-locked
+<<<<<<< HEAD
     await Promise.all(
       commentsInThread.map(async (comment) => {
         await updateMutator({
@@ -81,6 +111,19 @@ defineMutation({
   argTypes: "(commentId: String!)",
   resultType: "Boolean!",
   fn: async (_root: void, args: { commentId: string }, context: ResolverContext) => {
+=======
+    await Promise.all(commentsInThread.map(async (comment) => {
+      await updateComment({
+        data: {
+          repliesBlockedUntil: expiryDate,
+        }, selector: { _id: comment._id }
+      }, context);
+    }));
+    
+    return true;
+  },
+  async unlockThread (_root: void, args: {commentId: string}, context: ResolverContext) {
+>>>>>>> base/master
     const { currentUser } = context;
     if (!userIsAdminOrMod(currentUser)) {
       throw new Error("Only admins and moderators can lock or unlock threads");
@@ -113,6 +156,7 @@ defineMutation({
     const commentsInThread: DbComment[] = await getCommentSubtree(rootOfLocking);
 
     // Unmark them all as replies-locked
+<<<<<<< HEAD
     await Promise.all(
       commentsInThread.map(async (comment) => {
         await updateMutator({
@@ -129,3 +173,32 @@ defineMutation({
     return true;
   },
 });
+=======
+    await Promise.all(commentsInThread.map(async (comment) => {
+      await updateComment({ data: { repliesBlockedUntil: null }, selector: { _id: comment._id } }, context);
+    }));
+
+    return true;
+  }
+}
+
+export const moderationGqlQueries = {
+  async moderatorViewIPAddress (_root: void, args: {ipAddress: string}, context: ResolverContext) {
+    const { currentUser } = context;
+    const { ipAddress } = args;
+    if (!currentUser || !currentUser.isAdmin)
+      throw new Error("Only admins can see IP address information");
+    
+    const loginEvents = await LWEvents.find({
+      name: "login",
+      "properties.ip": ipAddress,
+    }, {limit: 100}).fetch();
+    
+    const userIds = uniq(loginEvents.map(loginEvent => loginEvent.userId));
+    return {
+      ip: ipAddress,
+      userIds,
+    };
+  }
+}
+>>>>>>> base/master

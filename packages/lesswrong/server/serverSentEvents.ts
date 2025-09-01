@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import type { Express, Response } from "express";
 import { getUserFromReq } from "./vulcan-lib/apollo-server/context";
 import { Notifications } from "../lib/collections/notifications/collection";
@@ -15,6 +16,16 @@ import {
 import TypingIndicatorsRepo from "./repos/TypingIndicatorsRepo";
 import UsersRepo from "./repos/UsersRepo";
 import { isEAForum } from "../lib/instanceSettings";
+=======
+import type { Express, Response } from 'express';
+import { getUserFromReq } from './vulcan-lib/apollo-server/context';
+import { Notifications } from "../server/collections/notifications/collection";
+import { getSiteUrl } from "../lib/vulcan-lib/utils";
+import { DatabaseServerSetting } from './databaseSettings';
+import maxBy from 'lodash/maxBy';
+import moment from 'moment';
+import { ServerSentEventsMessage } from '../components/hooks/useUnreadNotifications';
+>>>>>>> base/master
 
 const disableServerSentEvents = new DatabaseServerSetting<boolean>("disableServerSentEvents", false);
 
@@ -30,7 +41,11 @@ export function addServerSentEventsEndpoint(app: Express) {
     const parsedUrl = new URL(req.url, getSiteUrl());
     const apiVersionStr = parsedUrl.searchParams.get("version") ?? "1";
     const apiVersion = parseInt(apiVersionStr);
+<<<<<<< HEAD
     const currentUser = await getUserFromReq(req);
+=======
+    const currentUser = getUserFromReq(req)
+>>>>>>> base/master
 
     // Can't subscribe to notifications if logged out
     if (!currentUser) {
@@ -80,9 +95,25 @@ export function addServerSentEventsEndpoint(app: Express) {
   });
 
   setInterval(checkForNotifications, 1000);
-  setInterval(checkForTypingIndicators, 1000);
-  if (!isEAForum) {
-    setInterval(checkForActiveDialoguePartners, 1000);
+}
+
+/*
+ * FIXME: This function can't be used in practice because it only works if the
+ * user is connected to the same server as this function is called on, but user
+ * server-sent event connections are sent by the load balancer to a randomly
+ * selected server.
+ */
+function sendSseMessageToUser(userId: string, message: ServerSentEventsMessage) {
+  const userConnections = openConnections[userId];
+  if (!userConnections) {
+    // TODO: do we want to log an error here?  Probably not, it'll be happening reasonably often for innocous reasons
+    // eslint-disable-next-line no-console
+    console.log(`No connections found for user id ${userId}`, message);
+    return;
+  }
+
+  for (let userConnection of userConnections) {
+    userConnection.res.write(`data: ${JSON.stringify(message)}\n\n`);
   }
 }
 
@@ -162,6 +193,7 @@ function dateMax(a: Date, b: Date) {
   else return b;
 }
 
+<<<<<<< HEAD
 async function checkForTypingIndicators() {
   const numOpenConnections = Object.keys(openConnections).length;
   if (!numOpenConnections) {
@@ -213,6 +245,8 @@ async function checkForTypingIndicators() {
   }
 }
 
+=======
+>>>>>>> base/master
 const isRecentlyActive = (editedAt: Date | undefined, minutes: number): boolean => {
   if (!editedAt) {
     return false;
@@ -221,6 +255,7 @@ const isRecentlyActive = (editedAt: Date | undefined, minutes: number): boolean 
   const currentTime = new Date().getTime();
   const editedTime = new Date(editedAt).getTime();
 
+<<<<<<< HEAD
   return currentTime - editedTime <= minutes * 60 * 1000;
 };
 
@@ -271,4 +306,7 @@ async function checkForActiveDialoguePartners() {
       }
     }
   }
+=======
+  return (currentTime - editedTime) <= minutes * 60 * 1000;
+>>>>>>> base/master
 }

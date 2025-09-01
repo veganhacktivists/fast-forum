@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import { UserInputError } from "apollo-server";
 import { Utils } from "../../lib/vulcan-lib";
+=======
+import { GraphQLError } from "graphql";
+>>>>>>> base/master
 
 /*
 
@@ -10,9 +14,14 @@ An error should have:
 - data: data/values to give more context to the error
 
 */
+<<<<<<< HEAD
 export const throwError = (error: { id: string; data: Record<string, any> }) => {
   const { id } = error;
   throw new UserInputError(id, error);
+=======
+export function throwError(error: { id: string; data?: Record<string, AnyBecauseTodo> }): never {
+  const { id } = error;
+  throw new GraphQLError(id)
+  // throw new Error(`${error.id}: ${error.data}`);
+>>>>>>> base/master
 };
-
-Utils.throwError = throwError;

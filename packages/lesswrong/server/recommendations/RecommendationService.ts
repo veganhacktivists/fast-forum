@@ -2,6 +2,7 @@ import { StrategySpecification, RecommendationStrategyName } from "../../lib/col
 import MoreFromAuthorStrategy from "./MoreFromAuthorStrategy";
 import MoreFromTagStrategy from "./MoreFromTagStrategy";
 import BestOfStrategy from "./BestOfStrategy";
+import WrappedStrategy from "./WrappedStrategy";
 import CollabFilterStrategy from "./CollabFilterStrategy";
 import TagWeightedCollabFilterStrategy from "./TagWeightedCollabFilter";
 import RecommendationStrategy, { RecommendationResult } from "./RecommendationStrategy";
@@ -9,6 +10,7 @@ import PostRecommendationsRepo from "../repos/PostRecommendationsRepo";
 import { loggerConstructor } from "../../lib/utils/logging";
 import FeatureStrategy from "./FeatureStrategy";
 import NewAndUpvotedInTagStrategy from "./NewAndUpvotedInTagStrategy";
+import { backgroundTask } from "../utils/backgroundTask";
 
 type ConstructableStrategy = {
   new (): RecommendationStrategy;
@@ -31,6 +33,7 @@ class RecommendationService {
     moreFromTag: MoreFromTagStrategy,
     moreFromAuthor: MoreFromAuthorStrategy,
     bestOf: BestOfStrategy,
+    wrapped: WrappedStrategy,
     tagWeightedCollabFilter: TagWeightedCollabFilterStrategy,
     collabFilter: CollabFilterStrategy,
     feature: FeatureStrategy,
@@ -58,13 +61,13 @@ class RecommendationService {
       const time = Date.now() - start;
       this.logger("...found", newPosts.length, "posts in", time, "milliseconds");
 
-      void this.repo.recordRecommendations(
+      backgroundTask(this.repo.recordRecommendations(
         currentUser,
         clientId,
         strategies[0],
         { ...result.settings, context: strategy.context },
         newPosts,
-      );
+      ));
 
       posts = posts.concat(newPosts);
       count -= newPosts.length;

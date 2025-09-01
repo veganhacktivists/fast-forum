@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import _ from "underscore";
 import { addGraphQLResolvers, addGraphQLQuery, addGraphQLSchema } from "../../lib/vulcan-lib/graphql";
 import { accessFilterMultiple } from "../../lib/utils/schemaUtils";
@@ -9,6 +10,23 @@ type FeedSubquery<ResultType extends DbObject, SortKeyType> = {
   isNumericallyPositioned?: boolean;
   doQuery: (limit: number, cutoff?: SortKeyType) => Promise<Partial<ResultType>[]>;
 };
+=======
+import _ from 'underscore';
+import { accessFilterMultiple } from '../../lib/utils/schemaUtils';
+import { getDefaultViewSelector, mergeSelectors, mergeWithDefaultViewSelector, replaceSpecialFieldSelectors } from '../../lib/utils/viewUtils';
+import { filterNonnull } from '@/lib/utils/typeGuardUtils';
+import { FieldChanges } from '@/server/collections/fieldChanges/collection';
+import gql from 'graphql-tag';
+import { allViews } from '@/lib/views/allViews';
+import { CollectionViewSet } from '@/lib/views/collectionViewSet';
+
+type FeedSubquery<ResultType extends {}, SortKeyType> = {
+  type: string,
+  getSortKey: (item: ResultType) => SortKeyType,
+  isNumericallyPositioned?: boolean,
+  doQuery: (limit: number, cutoff?: SortKeyType) => Promise<Partial<ResultType>[]>,
+}
+>>>>>>> base/master
 
 export type SortDirection = "asc" | "desc";
 
@@ -17,12 +35,27 @@ export type SubquerySortField<ResultType extends DbObject, SortFieldName extends
   sortDirection?: SortDirection;
 };
 
+<<<<<<< HEAD
 type ViewBasedSubqueryProps<N extends CollectionNameString, SortFieldName extends keyof ObjectsByCollectionName[N]> = {
   type: string;
   collection: CollectionBase<N>;
   context: ResolverContext;
   selector: MongoSelector<ObjectsByCollectionName[N]>;
   sticky?: boolean;
+=======
+type Sortable<SortKey extends number | Date> = { sortKey: SortKey };
+
+type ViewBasedSubqueryProps<
+  N extends CollectionNameString,
+  SortFieldName extends keyof ObjectsByCollectionName[N]
+> = {
+  type: string,
+  collection: CollectionBase<N>,
+  context: ResolverContext,
+  selector: MongoSelector<ObjectsByCollectionName[N]>,
+  includeDefaultSelector: boolean,
+  sticky?: boolean,
+>>>>>>> base/master
 } & SubquerySortField<ObjectsByCollectionName[N], SortFieldName>;
 
 export function viewBasedSubquery<
@@ -30,13 +63,18 @@ export function viewBasedSubquery<
   SortKeyType,
   SortFieldName extends keyof ObjectsByCollectionName[N],
 >(props: ViewBasedSubqueryProps<N, SortFieldName>): FeedSubquery<ObjectsByCollectionName[N], SortKeyType> {
+<<<<<<< HEAD
   props.sortDirection ??= "desc";
   const { type, collection, context, selector, sticky, sortField, sortDirection } = props;
+=======
+  const {type, collection, context, selector, includeDefaultSelector, sticky, sortField, sortDirection="desc"} = props;
+>>>>>>> base/master
   return {
     type,
     getSortKey: (item: ObjectsByCollectionName[N]) => item[props.sortField] as unknown as SortKeyType,
     isNumericallyPositioned: !!sticky,
     doQuery: async (limit: number, cutoff: SortKeyType): Promise<Partial<ObjectsByCollectionName[N]>[]> => {
+<<<<<<< HEAD
       return queryWithCutoff({ context, collection, selector, limit, cutoffField: sortField, cutoff, sortDirection });
     },
   };
@@ -50,6 +88,48 @@ export function fixedResultSubquery<ResultType extends DbObject, SortKeyType>({
   type: string;
   result: Partial<ResultType>;
   sortKey: SortKeyType;
+=======
+      const viewSet = allViews[collection.collectionName] as CollectionViewSet<N, Record<string, ViewFunction<N>>>;
+      const selectorWithDefaults = includeDefaultSelector
+        ? mergeWithDefaultViewSelector(viewSet, selector)
+        : selector;
+      const results = await queryWithCutoff({context, collection, selector, limit, cutoffField: sortField, cutoff, sortDirection});
+      return await accessFilterMultiple(context.currentUser, collection.collectionName, results, context);
+    }
+  };
+}
+
+export function fieldChangesSubquery<N extends CollectionNameString>({type, collection, context, documentIds, fieldNames}: {
+  type: string,
+  collection: CollectionBase<N>,
+  context: ResolverContext,
+  documentIds: string[],
+  fieldNames: Array<keyof ObjectsByCollectionName[N]>
+}) {
+  return {
+    type,
+    getSortKey: (item: DbFieldChange): Date => item.createdAt,
+    doQuery: async (limit: number, cutoff: Date|null): Promise<DbFieldChange[]> => {
+      return await queryWithCutoff({
+        context,
+        collection: FieldChanges,
+        selector: {
+          documentId: {$in: documentIds},
+          fieldName: {$in: fieldNames},
+        },
+        limit, cutoff,
+        cutoffField: "createdAt",
+        sortDirection: "desc",
+      });
+    },
+  };
+}
+
+export function fixedResultSubquery<ResultType extends DbObject, SortKeyType>({type, result, sortKey}: {
+  type: string,
+  result: Partial<ResultType>,
+  sortKey: SortKeyType,
+>>>>>>> base/master
 }): FeedSubquery<ResultType, SortKeyType> {
   return {
     type,
@@ -77,6 +157,7 @@ export function fixedIndexSubquery<ResultType extends DbObject>({
   };
 }
 
+<<<<<<< HEAD
 export function defineFeedResolver<CutoffType>({
   name,
   resolver,
@@ -165,13 +246,37 @@ export async function mergeFeedQueries<SortKeyType>({
   offset?: number;
   sortDirection?: SortDirection;
   subqueries: Array<any>;
+=======
+const applyCutoff = <T extends Sortable<SortKeyType>, SortKeyType extends number | Date>(
+  sortedResults: T[],
+  cutoff: SortKeyType,
+  sortDirection: SortDirection,
+) => {
+  const cutoffFilter = sortDirection === "asc"
+    ? ({sortKey}: { sortKey: SortKeyType }) => sortKey > cutoff
+    : ({sortKey}: { sortKey: SortKeyType }) => sortKey < cutoff;
+  return _.filter<T>(sortedResults, cutoffFilter);
+}
+
+export async function mergeFeedQueries<SortKeyType extends number | Date>({limit, cutoff, offset, sortDirection, subqueries}: {
+  limit: number
+  cutoff?: SortKeyType,
+  offset?: number,
+  sortDirection?: SortDirection,
+  subqueries: Array<FeedSubquery<{}, any>|null>,
+>>>>>>> base/master
 }) {
   sortDirection ??= "desc";
 
   // Perform the subqueries
   const unsortedSubqueryResults = await Promise.all(
+<<<<<<< HEAD
     subqueries.map(async (subquery) => {
       const subqueryResults = await subquery.doQuery(limit, cutoff);
+=======
+    filterNonnull(subqueries).map(async (subquery) => {
+      const subqueryResults = await subquery.doQuery(limit, cutoff)
+>>>>>>> base/master
       return subqueryResults.map((result: DbObject) => ({
         type: subquery.type,
         sortKey: subquery.getSortKey(result),
@@ -182,6 +287,7 @@ export async function mergeFeedQueries<SortKeyType>({
   );
 
   // Merge the result lists
+<<<<<<< HEAD
   const unsortedResults = _.flatten(unsortedSubqueryResults);
 
   // Split into results with numeric indexes and results with sort-key indexes
@@ -190,6 +296,16 @@ export async function mergeFeedQueries<SortKeyType>({
     ({ isNumericallyPositioned }) => isNumericallyPositioned,
   );
 
+=======
+  const unsortedResults = unsortedSubqueryResults.flat();
+  
+  // Split into results with numeric indexes and results with sort-key indexes
+  const [
+    numericallyPositionedResults,
+    orderedResults,
+  ] = _.partition(unsortedResults, ({isNumericallyPositioned}) => !!isNumericallyPositioned);
+  
+>>>>>>> base/master
   // Sort by shared sort key
   const sortedResults = _.sortBy(orderedResults, (r) => r.sortKey);
   if (sortDirection === "desc") {
@@ -211,6 +327,7 @@ export async function mergeFeedQueries<SortKeyType>({
 
   // Find the last result that wasn't numerically positioned (after the limit
   // is applied), and get its sortKey to use as the page cutoff
+<<<<<<< HEAD
   const nonNumericallyPositionedResults = _.filter(
     withLimitApplied,
     (r) => !_.some(numericallyPositionedResults, (r2) => r === r2),
@@ -220,6 +337,11 @@ export async function mergeFeedQueries<SortKeyType>({
       ? nonNumericallyPositionedResults[nonNumericallyPositionedResults.length - 1].sortKey
       : null;
 
+=======
+  const nonNumericallyPositionedResults = _.filter(withLimitApplied, r => !_.some(numericallyPositionedResults, r2=>r===r2)) as Sortable<SortKeyType>[];
+  const nextCutoff = (nonNumericallyPositionedResults.length>0) ? nonNumericallyPositionedResults[nonNumericallyPositionedResults.length-1].sortKey : null;
+  
+>>>>>>> base/master
   return {
     results: withLimitApplied,
     cutoff: nextCutoff,
@@ -231,6 +353,7 @@ export async function mergeFeedQueries<SortKeyType>({
 // of results that have numeric indexes instead, and merge them. Eg, Recent
 // Discussion contains posts sorted by date, but with some things mixed in
 // with their position defined as "index 5".
+<<<<<<< HEAD
 function mergeSortedAndNumericallyPositionedResults(
   sortedResults: Array<any>,
   numericallyPositionedResults: Array<any>,
@@ -242,6 +365,15 @@ function mergeSortedAndNumericallyPositionedResults(
 
   let mergedResults: Array<any> = [...sortedResults];
   for (let i = 0; i < sortedNumericallyPositionedResults.length; i++) {
+=======
+function mergeSortedAndNumericallyPositionedResults<D extends Sortable<Date>, N extends Sortable<number>>(sortedResults: Array<D>, numericallyPositionedResults: Array<N>, offset: number) {
+  // Take the numerically positioned results. Sort them by index, discard ones
+  // from below the offset, and resolve collisions.
+  const sortedNumericallyPositionedResults = _.sortBy(numericallyPositionedResults, r=>r.sortKey);
+  
+  let mergedResults: (D|N)[] = [...sortedResults];
+  for (let i=0; i<sortedNumericallyPositionedResults.length; i++) {
+>>>>>>> base/master
     const insertedResult = sortedNumericallyPositionedResults[i];
     const insertionPosition = insertedResult.sortKey - offset;
 
@@ -255,10 +387,6 @@ function mergeSortedAndNumericallyPositionedResults(
   }
 
   return mergedResults;
-}
-
-function isNonEmptyObject(obj: {}): boolean {
-  return Object.keys(obj).length > 0;
 }
 
 async function queryWithCutoff<N extends CollectionNameString>({
@@ -279,11 +407,27 @@ async function queryWithCutoff<N extends CollectionNameString>({
   sortDirection: SortDirection;
 }) {
   const collectionName = collection.collectionName;
+<<<<<<< HEAD
   const { currentUser } = context;
 
   const sort = { [cutoffField]: sortDirection === "asc" ? 1 : -1, _id: 1 };
   const cutoffSelector = cutoff ? { [cutoffField]: { [sortDirection === "asc" ? "$gt" : "$lt"]: cutoff } } : {};
   const mergedSelector = mergeSelectors(getDefaultViewSelector(collectionName), selector, cutoffSelector);
+=======
+
+  const sort = {[cutoffField]: sortDirection === "asc" ? 1 : -1, _id: 1};
+  const cutoffSelector = cutoff
+    ? {[cutoffField]: {[sortDirection === "asc" ? "$gt" : "$lt"]: cutoff}}
+    : {};
+
+  // TODO: figure out how to get the appropriate collection's default view piped through here without going through allViews, if possible
+  const viewSet: CollectionViewSet<CollectionNameString, any> = allViews[collectionName];
+  const mergedSelector = mergeSelectors(
+    getDefaultViewSelector(viewSet),
+    selector,
+    cutoffSelector
+  )
+>>>>>>> base/master
   const finalizedSelector = replaceSpecialFieldSelectors(mergedSelector);
   const resultsRaw = await collection
     .find(finalizedSelector, {
@@ -292,5 +436,5 @@ async function queryWithCutoff<N extends CollectionNameString>({
     })
     .fetch();
 
-  return await accessFilterMultiple(currentUser, collection, resultsRaw, context);
+  return resultsRaw;
 }

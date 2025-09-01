@@ -1,19 +1,47 @@
+<<<<<<< HEAD
 import { Comments } from "../../lib/collections/comments/collection";
 import { Tags } from "../../lib/collections/tags/collection";
 import { TagRels } from "../../lib/collections/tagRels/collection";
 import { Revisions } from "../../lib/collections/revisions/collection";
 import { accessFilterSingle } from "../../lib/utils/schemaUtils";
 import { defineFeedResolver, mergeFeedQueries, fixedResultSubquery, viewBasedSubquery } from "../utils/feedUtil";
+=======
+import { Comments } from '../../server/collections/comments/collection';
+import { Tags } from '../../server/collections/tags/collection';
+import { TagRels } from '../../server/collections/tagRels/collection';
+import { Revisions } from '../../server/collections/revisions/collection';
+import { accessFilterSingle } from '../../lib/utils/schemaUtils';
+import { mergeFeedQueries, fixedResultSubquery, viewBasedSubquery, fieldChangesSubquery } from '../utils/feedUtil';
+import { MultiDocuments } from '@/server/collections/multiDocuments/collection';
+import { defaultTagHistorySettings, TagHistorySettings } from '@/components/tagging/history/TagHistoryPage';
+import { MAIN_TAB_ID } from '@/lib/arbital/useTagLenses';
+import gql from 'graphql-tag';
+>>>>>>> base/master
 
-defineFeedResolver<Date>({
-  name: "TagHistoryFeed",
-  args: "tagId: String!",
-  cutoffTypeGraphQL: "Date",
-  resultTypesGraphQL: `
+
+export const tagHistoryFeedGraphQLTypeDefs = gql`
+  type TagHistoryFeedQueryResults {
+    cutoff: Date
+    endOffset: Int!
+    results: [TagHistoryFeedEntry!]
+  }
+  enum TagHistoryFeedEntryType {
+    tagCreated
+    tagApplied
+    tagRevision
+    tagDiscussionComment
+    lensRevision
+    summaryRevision
+    wikiMetadataChanged
+    lensOrSummaryMetadataChanged
+  }
+  type TagHistoryFeedEntry {
+    type: TagHistoryFeedEntryType!
     tagCreated: Tag
     tagApplied: TagRel
     tagRevision: Revision
     tagDiscussionComment: Comment
+<<<<<<< HEAD
   `,
   resolver: async ({
     limit = 50,
@@ -36,6 +64,54 @@ defineFeedResolver<Date>({
     if (!tag) throw new Error("Tag not found");
 
     type SortKeyType = Date;
+=======
+    lensRevision: Revision
+    summaryRevision: Revision
+    wikiMetadataChanged: FieldChange
+    lensOrSummaryMetadataChanged: FieldChange
+  }
+  extend type Query {
+    TagHistoryFeed(
+      limit: Int,
+      cutoff: Date,
+      offset: Int,
+      tagId: String!,
+      options: JSON
+    ): TagHistoryFeedQueryResults!
+  }
+`
+
+export const tagHistoryFeedGraphQLQueries = {
+  TagHistoryFeed: async (_root: void, args: any, context: ResolverContext) => {
+    const {limit, cutoff, offset, tagId, options} = args;
+    const {currentUser} = context;
+    type SortKeyType = Date;
+
+    const historyOptions: TagHistorySettings = {...defaultTagHistorySettings, ...options};
+    
+    const tagRaw = await Tags.findOne({_id: tagId});
+    if (!tagRaw) throw new Error("Tag not found");
+    const tag = await accessFilterSingle(currentUser, 'Tags', tagRaw, context);
+    if (!tag) throw new Error("Tag not found");
+    
+    const lensesAndSummaries = await MultiDocuments.find({
+      parentDocumentId: tagId,
+    }).fetch();
+    const lenses = lensesAndSummaries.filter(md => md.fieldName==="description");
+    const lensIds = (historyOptions.lensId && historyOptions.lensId !== "all")
+      ? [historyOptions.lensId]
+      : lenses.map(lens => lens._id);
+    const summariesOfTag = lensesAndSummaries.filter(md => md.fieldName==="summary");
+    
+    const summariesOfLenses = lenses.length>0
+      ? await MultiDocuments.find({
+          parentDocumentId: {$in: lensIds},
+          fieldName: "summary",
+        }).fetch()
+      : [];
+    const summaries = [...summariesOfTag, ...summariesOfLenses];
+    const summaryIds = summaries.map(summary => summary._id);
+>>>>>>> base/master
 
     const result = await mergeFeedQueries<SortKeyType>({
       limit,
@@ -49,19 +125,26 @@ defineFeedResolver<Date>({
           sortKey: tag.createdAt,
         }),
         // Tag applications
-        viewBasedSubquery({
+        (historyOptions.showTagging ? viewBasedSubquery({
           type: "tagApplied",
           collection: TagRels,
           sortField: "createdAt",
           context,
+<<<<<<< HEAD
           selector: { tagId },
         }),
+=======
+          includeDefaultSelector: false,
+          selector: {tagId},
+        }) : null),
+>>>>>>> base/master
         // Tag revisions
-        viewBasedSubquery({
+        (historyOptions.showEdits && (!historyOptions.lensId || historyOptions.lensId === "all" || historyOptions.lensId === MAIN_TAB_ID) ? viewBasedSubquery({
           type: "tagRevision",
           collection: Revisions,
           sortField: "editedAt",
           context,
+          includeDefaultSelector: false,
           selector: {
             documentId: tagId,
             collectionName: "Tags",
@@ -69,6 +152,7 @@ defineFeedResolver<Date>({
 
             // Exclude no-change revisions (sometimes produced as a byproduct of
             // imports, metadata changes, etc)
+<<<<<<< HEAD
             $or: [
               {
                 "changeMetrics.added": { $gt: 0 },
@@ -77,22 +161,87 @@ defineFeedResolver<Date>({
                 "changeMetrics.removed": { $gt: 0 },
               },
             ],
+=======
+            /*$or: [{
+              "changeMetrics.added": {$gt: 0},
+            }, {
+              "changeMetrics.removed": {$gt: 0},
+            }]*/
+>>>>>>> base/master
           },
-        }),
+        }) : null),
         // Tag discussion comments
-        viewBasedSubquery({
+        (historyOptions.showComments ? viewBasedSubquery({
           type: "tagDiscussionComment",
           collection: Comments,
           sortField: "postedAt",
           context,
+          includeDefaultSelector: true,
           selector: {
             parentCommentId: null,
             tagId,
             tagCommentType: "DISCUSSION",
           },
-        }),
+        }) : null),
+        // Lens edits
+        (historyOptions.showEdits ? {
+          type: "lensRevision",
+          getSortKey: (rev: DbRevision) => rev.editedAt,
+          doQuery: async (limit: number, cutoff: Date|null): Promise<DbRevision[]> => {
+            return await Revisions.find({
+              documentId: {$in: lensIds},
+              collectionName: "MultiDocuments",
+              fieldName: "contents",
+              ...(cutoff ? {editedAt: {$lt: cutoff}} : {}),
+            }, {
+              sort: {editedAt: -1},
+              limit,
+            }).fetch();
+          },
+        } : null),
+        // Summary edits
+        (historyOptions.showSummaryEdits ? {
+          type: "summaryRevision",
+          getSortKey: (rev: DbRevision) => rev.editedAt,
+          doQuery: async (limit: number, cutoff: Date|null): Promise<DbRevision[]> => {
+            return await Revisions.find({
+              documentId: {$in: summaryIds},
+              collectionName: "MultiDocuments",
+              fieldName: "contents",
+              ...(cutoff ? {editedAt: {$lt: cutoff}} : {}),
+            }, {
+              sort: {editedAt: -1},
+              limit,
+            }).fetch();
+          },
+        } : null),
+        // Tag metadata changes
+        (historyOptions.showMetadata ? fieldChangesSubquery({
+          type: "wikiMetadataChanged",
+          collection: Tags,
+          context,
+          documentIds: [tagRaw._id],
+          fieldNames: ["name", "shortName", "subtitle", "core", "deleted"],
+        }) : null),
+        // Lens and summary metadata changes
+        (historyOptions.showMetadata ? fieldChangesSubquery({
+          type: "lensOrSummaryMetadataChanged",
+          collection: MultiDocuments,
+          context,
+          documentIds: [...lensIds, ...summaryIds],
+          fieldNames: ["title", "tabTitle", "tabSubtitle", "deleted"],
+        }) : null),
       ],
     });
+<<<<<<< HEAD
     return result;
   },
 });
+=======
+    return {
+      __typename: "TagHistoryFeedQueryResults",
+      ...result
+    };
+  }
+}
+>>>>>>> base/master

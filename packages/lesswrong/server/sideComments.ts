@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import cheerio from "cheerio";
 import { cheerioParse, cheerioParseAndMarkOffsets, tokenizeHtml } from "./utils/htmlUtil";
 import { Comments } from "../lib/collections/comments/collection";
@@ -5,6 +6,11 @@ import type { SideCommentsResolverResult } from "../lib/collections/posts/schema
 import { getDefaultViewSelector } from "../lib/utils/viewUtils";
 import groupBy from "lodash/groupBy";
 import some from "lodash/some";
+=======
+import cheerio from 'cheerio';
+import { cheerioParse, cheerioParseAndMarkOffsets, tokenizeHtml } from './utils/htmlUtil';
+import groupBy from 'lodash/groupBy';
+>>>>>>> base/master
 
 export interface QuoteShardSettings {
   minLength: number;
@@ -100,8 +106,16 @@ interface MarkedInterval {
  *   <p>Lorem <span ...>ipsum <em>dolor</em> sit</span> amet adipiscing
  */
 export function annotateMatchedSpans(html: string, intervals: MarkedInterval[]): string {
+<<<<<<< HEAD
   let intervalsByStart = groupBy(intervals, (interval) => interval.start);
   let intervalsByEnd = groupBy(intervals, (interval) => interval.end);
+=======
+  if (!intervals.length) {
+    return html;
+  }
+  let intervalsByStart = groupBy(intervals, interval=>interval.start);
+  let intervalsByEnd = groupBy(intervals, interval=>interval.end);
+>>>>>>> base/master
   let sb: string[] = [];
   let pos = 0;
 
@@ -212,8 +226,13 @@ export function getCommentQuotedBlockID(
   if (!quoteShards?.length) return null;
 
   const parsedPost = cheerioParse(postHTML);
+<<<<<<< HEAD
 
   const match = findQuoteInPost(parsedPost, quoteShards);
+=======
+  
+  const match = findQuoteInPost(parsedPost)(quoteShards);
+>>>>>>> base/master
   return match?.firstMatchingBlockID ?? null;
 }
 
@@ -302,6 +321,7 @@ interface QuoteInPost {
  * quote shards, return the ID of the first block which matches a quote shard
  * (or null if no match is found).
  */
+<<<<<<< HEAD
 function findQuoteInPost(parsedPost: AnyBecauseTodo, quoteShards: QuoteShard[]): QuoteInPost | null {
   let markedElements = parsedPost(matchableBlockElementSelector);
   let firstMatchingBlockID: string | null = null;
@@ -318,31 +338,74 @@ function findQuoteInPost(parsedPost: AnyBecauseTodo, quoteShards: QuoteShard[]):
         if (quoteShardOffset >= 0) {
           if (!firstMatchingBlockID) {
             firstMatchingBlockID = blockID;
+=======
+const findQuoteInPost = (parsedPost: AnyBecauseTodo) => {
+  let markedElements = parsedPost(matchableBlockElementSelector);
+  const markedElementBlockHtml: (string|null)[] = [];
+  for (let i=0; i<markedElements.length; i++) {
+    // This is a for loop instead of a map because markedElmeents (the result of
+    // a cheerio selector) isn't actually an array
+    const markedElement = markedElements[i];
+    const blockID = cheerio(markedElement).attr("id");
+    if (blockID) {
+      markedElementBlockHtml.push(parsedPost.html(cheerio(markedElement))||"");
+    } else {
+      markedElementBlockHtml.push(null);
+    }
+  }
+
+  return (quoteShards: QuoteShard[]): QuoteInPost|null => {
+    let firstMatchingBlockID: string|null = null;
+    let matchingSpans: {start: number, end: number}[] = [];
+    
+    for (let i=0; i<markedElements.length; i++) {
+      const blockID = cheerio(markedElements[i]).attr("id");
+      if (blockID) {
+        const blockStartOffset = markedElements[i].offset;
+        const markedHtml = markedElementBlockHtml[i];
+        if (!markedHtml) continue;
+        
+        for (let quoteShard of quoteShards) {
+          const quoteShardOffset = markedHtml.indexOf(quoteShard.text);
+          if (quoteShardOffset >= 0) {
+            if (!firstMatchingBlockID) {
+              firstMatchingBlockID = blockID;
+            }
+            // FIXME: This assumes that a parse-and-serialize roundtrip through cheerio doesn't change any offsets, but this assumption is not valid.
+            matchingSpans.push({
+              start: blockStartOffset + quoteShardOffset,
+              end: blockStartOffset + quoteShardOffset + quoteShard.text.length,
+            });
+>>>>>>> base/master
           }
-          // FIXME: This assumes that a parse-and-serialize roundtrip through cheerio doesn't change any offsets, but this assumption is not valid.
-          matchingSpans.push({
-            start: blockStartOffset + quoteShardOffset,
-            end: blockStartOffset + quoteShardOffset + quoteShard.text.length,
-          });
         }
       }
     }
+<<<<<<< HEAD
   }
 
   if (firstMatchingBlockID) {
     return { firstMatchingBlockID, matchingSpans };
   } else {
     return null;
+=======
+    
+    if (firstMatchingBlockID) {
+      return { firstMatchingBlockID, matchingSpans };
+    } else {
+      return null;
+    }
+>>>>>>> base/master
   }
 }
 
 // A comment, reduced to only the fields that affect side-comment placement.
-// Used to split getSideComments from matchSideComments, for unit testability.
 interface CommentForSideComment {
   _id: string;
   html: string;
 }
 
+<<<<<<< HEAD
 /**
  * Given a post, fetch all the comments on that post, check them for blockquotes,
  * line those quotes up to sections of the post, and return a mapping from block
@@ -405,20 +468,43 @@ export function matchSideComments({
   html: string;
   comments: CommentForSideComment[];
   quoteShardSettings?: QuoteShardSettings;
+=======
+export function matchSideComments({html, comments, quoteShardSettings}: {
+  html: string,
+  comments: CommentForSideComment[]
+  quoteShardSettings?: QuoteShardSettings,
+>>>>>>> base/master
 }): {
   html: string;
   sideCommentsByBlock: Record<string, string[]>;
 } {
   const htmlWithBlockIDs = addBlockIDsToHTML(html);
+  if (!comments.length) {
+    return {
+      html: htmlWithBlockIDs,
+      sideCommentsByBlock: {},
+    };
+  }
+
   const parsedPost = cheerioParseAndMarkOffsets(htmlWithBlockIDs);
 
   let sideCommentsByBlock: Record<string, string[]> = {};
   let markedSpans: MarkedInterval[] = [];
+<<<<<<< HEAD
 
   for (let comment of comments) {
     const quoteShards = commentToQuoteShards(comment.html, quoteShardSettings);
     const match = findQuoteInPost(parsedPost, quoteShards);
 
+=======
+  const findQuoteInPostPartialApplication = findQuoteInPost(parsedPost);
+  
+  for (let comment of comments) {
+    const quoteShards = commentToQuoteShards(comment.html, quoteShardSettings);
+    if (!quoteShards.length) continue;
+    const match = findQuoteInPostPartialApplication(quoteShards);
+    
+>>>>>>> base/master
     if (match) {
       const blockID = match?.firstMatchingBlockID ?? null;
       // TODO: this isn't distinguishing between blockquotes within the comment

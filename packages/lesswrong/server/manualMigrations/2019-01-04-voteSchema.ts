@@ -1,9 +1,16 @@
+<<<<<<< HEAD
 import { Votes } from "../../lib/collections/votes";
 import { registerMigration, migrateDocuments, fillDefaultValues } from "./migrationUtils";
 import { getCollection } from "../../lib/vulcan-lib";
 import * as _ from "underscore";
+=======
+import { Votes } from '../../server/collections/votes/collection';
+import { registerMigration, migrateDocuments, fillDefaultValues } from './migrationUtils';
+import { getCollection } from '../collections/allCollections';
+import * as _ from 'underscore';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "migrateVotes",
   dateWritten: "2019-01-04",
   idempotent: true,

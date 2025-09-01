@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import Users from "../../lib/collections/users/collection";
 import { createMutator, Utils } from "../vulcan-lib";
@@ -6,6 +7,19 @@ import { mapsAPIKeySetting } from "../../components/form-components/LocationForm
 import { getLocalTime } from "../mapsUtils";
 import { userFindOneByEmail } from "../commonQueries";
 import { writeFile } from "fs/promises";
+=======
+import { registerMigration } from './migrationUtils';
+import { Posts } from '../../server/collections/posts/collection';
+import { mapsAPIKeySetting } from '@/lib/publicSettings';
+import { getLocalTime } from '../mapsUtils';
+import {userFindOneByEmail} from "../commonQueries";
+import { writeFile } from 'fs/promises';
+import { getUnusedSlugByCollectionName } from '../utils/slugUtil';
+import { createUser } from '../collections/users/mutations';
+import { createPost } from '../collections/posts/mutations';
+import { createAnonymousContext } from '../vulcan-lib/createContexts';
+import { computeContextFromUser } from '../vulcan-lib/apollo-server/context';
+>>>>>>> base/master
 
 async function coordinatesToGoogleLocation({ lat, lng }: { lat: string; lng: string }) {
   const requestOptions: any = {
@@ -22,12 +36,14 @@ async function coordinatesToGoogleLocation({ lat, lng }: { lat: string; lng: str
   return responseData.results[0];
 }
 
-registerMigration({
+export default registerMigration({
   name: "importACXMeetupsSpring23",
   dateWritten: "2023-04-10",
   idempotent: true,
   action: async () => {
     const eventCacheContents: { _id: string; lat: number; lng: number }[] = [];
+
+    const adminId = 'XtphY3uYHwruKqDyG'
 
     // eslint-disable-next-line no-console
     console.log("Begin importing ACX Meetups");
@@ -42,8 +58,9 @@ registerMigration({
       if (existingUser) {
         eventOrganizer = existingUser;
       } else {
-        const username = await Utils.getUnusedSlugByCollectionName("Users", row["Name"].toLowerCase());
+        const username = await getUnusedSlugByCollectionName("Users", row["Name"].toLowerCase());
         try {
+<<<<<<< HEAD
           const { data: newUser } = await createMutator({
             collection: Users,
             document: {
@@ -57,10 +74,22 @@ registerMigration({
             currentUser: null,
           });
           eventOrganizer = newUser;
+=======
+          const userDoc = {
+            username,
+            displayName: row["Name"],
+            email: email,
+            reviewedByUserId: adminId,
+            reviewedAt: new Date()
+          };
+          const newUser = await createUser({ data: userDoc }, createAnonymousContext());
+          eventOrganizer = newUser
+>>>>>>> base/master
         } catch (err) {
           // eslint-disable-next-line no-console
           console.log({ err, email, row }, "Error when creating a new user, using a different username");
 
+<<<<<<< HEAD
           const { data: newUser } = await createMutator({
             collection: Users,
             document: {
@@ -73,6 +102,17 @@ registerMigration({
             validate: false,
             currentUser: null,
           });
+=======
+          const userDoc = {
+            username: `${username}-acx-23`,
+            displayName: row["Name"],
+            email: email,
+            reviewedByUserId: adminId,
+            reviewedAt: new Date()
+          };
+
+          const newUser = await createUser({ data: userDoc }, createAnonymousContext());
+>>>>>>> base/master
 
           eventOrganizer = newUser;
         }
@@ -141,12 +181,16 @@ registerMigration({
           authorIsUnreviewed: false,
           types: ["SSC"],
         };
+<<<<<<< HEAD
         const { data: newPost } = await createMutator({
           collection: Posts,
           document: newPostData,
           currentUser: eventOrganizer,
           validate: false,
         });
+=======
+        const newPost = await createPost({ data: newPostData }, await computeContextFromUser({ user: eventOrganizer, isSSR: false }));
+>>>>>>> base/master
         // eslint-disable-next-line no-console
         console.log("Created new ACX Meetup: ", newPost.title);
         const googleLocationInfo = newPost.googleLocation?.geometry?.location;

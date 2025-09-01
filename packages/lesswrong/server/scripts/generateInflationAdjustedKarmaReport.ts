@@ -1,5 +1,4 @@
-import { Globals } from "../vulcan-lib";
-import { Posts } from "../../lib/collections/posts";
+import { Posts } from "../../server/collections/posts/collection";
 import { getKarmaInflationSeries } from "../../lib/collections/posts/karmaInflation";
 import { buildInflationAdjustedField } from "../../lib/collections/posts/views";
 import { postGetPageUrl } from "../../lib/collections/posts/helpers";
@@ -7,6 +6,7 @@ import fs from "fs";
 
 const RELATIVE_TO = "2023-07-01T00:00:00.000Z";
 
+<<<<<<< HEAD
 const generateInflationAdjustedKarmaReport = async ({
   threshold = 100,
   relativeTo = RELATIVE_TO,
@@ -14,6 +14,10 @@ const generateInflationAdjustedKarmaReport = async ({
   threshold?: number;
   relativeTo?: string;
 }) => {
+=======
+// Exported to allow running manually with "yarn repl"
+export const generateInflationAdjustedKarmaReport = async ({threshold = 100, relativeTo = RELATIVE_TO}: {threshold?: number, relativeTo?: string}) => {
+>>>>>>> base/master
   const karmaInflationSeries = getKarmaInflationSeries();
 
   // Get threshold in inflation adjusted karma
@@ -35,6 +39,9 @@ const generateInflationAdjustedKarmaReport = async ({
         slug: 1,
         baseScore: 1,
         postedAt: 1,
+        // TODO: This is probably broken after normalizing word count - seems not
+        // worth the effort to fix right now since this is a very rarely used
+        // script
         wordCount: "$contents.wordCount",
       },
     },
@@ -62,6 +69,10 @@ const generateInflationAdjustedKarmaReport = async ({
   // log the name of the CSV file
   // eslint-disable-next-line no-console
   console.log(`Inflation adjusted karma report saved to ${csvFileName}`);
+<<<<<<< HEAD
 };
 
 Globals.generateInflationAdjustedKarmaReport = generateInflationAdjustedKarmaReport;
+=======
+}
+>>>>>>> base/master

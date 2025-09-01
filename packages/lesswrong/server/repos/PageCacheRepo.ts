@@ -1,10 +1,14 @@
 import type { CompleteTestGroupAllocation, RelevantTestGroupAllocation } from "../../lib/abTestImpl";
-import PageCache from "../../lib/collections/pagecache/collection";
+import PageCache from "../../server/collections/pagecache/collection";
 import { randomId } from "../../lib/random";
 import { getServerBundleHash } from "../utils/bundleUtils";
 import AbstractRepo from "./AbstractRepo";
 import { recordPerfMetrics } from "./perfMetricWrapper";
+<<<<<<< HEAD
 import type { RenderResult } from "../vulcan-lib/apollo-ssr/renderPage";
+=======
+import type { RenderResult } from "@/server/rendering/renderPage"
+>>>>>>> base/master
 
 export type MeanPostKarma = {
   _id: number;
@@ -35,18 +39,35 @@ class PageCacheRepo extends AbstractRepo<"PageCache"> {
     // Note: we use db.any here rather than e.g. oneOrNone because there may (in principle) be multiple
     // abTestGroups in the db that are a subset of the completeAbTestGroups. In this case it shouldn't
     // matter which one we use, so we just take the first one.
+<<<<<<< HEAD
     const cacheResult = await this.getRawDb().any(
       `
+=======
+    const cacheResult = await this.getRawDb().any<DbPageCacheEntry>(`
+>>>>>>> base/master
       -- PageCacheRepo.lookupCacheEntry
       SELECT * FROM "PageCache"
       WHERE "path" = $1
       AND "bundleHash" = $2
       AND "expiresAt" > NOW()
       AND fm_jsonb_subset($3::jsonb, "abTestGroups")`,
+<<<<<<< HEAD
       [path, bundleHash, JSON.stringify(completeAbTestGroups)],
     );
 
     return cacheResult?.[0] ?? null;
+=======
+      [path, bundleHash, JSON.stringify(completeAbTestGroups)]);
+
+    const firstResult = cacheResult?.[0];
+    if (firstResult?.renderResult?.renderedAt) {
+      // We're inserting `renderResult` straight out of a JSON.stringify, which converts dates to strings.
+      // There's probably a more principled way to fix the round trip, but this is a quick patch which works.
+      firstResult.renderResult.renderedAt = new Date(firstResult.renderResult.renderedAt);
+    }
+  
+    return firstResult ?? null;
+>>>>>>> base/master
   }
 
   async clearExpiredEntries(): Promise<void> {
@@ -102,6 +123,7 @@ class PageCacheRepo extends AbstractRepo<"PageCache"> {
           "renderedAt" = $(renderedAt),
           "expiresAt" = $(expiresAt),
           "renderResult" = $(renderResult)
+<<<<<<< HEAD
         `,
         {
           _id: randomId(),
@@ -116,6 +138,25 @@ class PageCacheRepo extends AbstractRepo<"PageCache"> {
           createdAt: now,
         },
       );
+=======
+        `, {
+        _id: randomId(),
+        path,
+        abTestGroups,
+        bundleHash,
+        renderedAt: now,
+        expiresAt: new Date(now.getTime() + maxCacheAgeMs),
+        ttlMs: maxCacheAgeMs,
+        
+        // Stringify renderResult before handing it to the postgres library. We
+        // do this because the string can be large, and if we pass it as a JSON
+        // object, the postgres library will stringify it in a slower way that
+        // adds bignum support (which we don't use).
+        renderResult: JSON.stringify(renderResult),
+        schemaVersion: 1,
+        createdAt: now,
+      });
+>>>>>>> base/master
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);

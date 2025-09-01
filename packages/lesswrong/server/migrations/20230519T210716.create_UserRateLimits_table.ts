@@ -41,8 +41,13 @@
  */
 export const acceptsSchemaHash = "cc8bba3f53cc75cb4b3864c0426830a8";
 
+<<<<<<< HEAD
 import { UserRateLimits } from "../../lib/collections/userRateLimits";
 import { createTable, dropTable } from "./meta/utils";
+=======
+import { UserRateLimits } from "../../server/collections/userRateLimits/collection"
+import { createTable, dropTable } from "./meta/utils"
+>>>>>>> base/master
 
 export const up = async ({ db }: MigrationContext) => {
   await createTable(db, UserRateLimits);

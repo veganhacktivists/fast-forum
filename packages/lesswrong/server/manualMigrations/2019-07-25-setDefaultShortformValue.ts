@@ -1,8 +1,12 @@
 import { registerMigration, fillDefaultValues } from "./migrationUtils";
 
+<<<<<<< HEAD
 import { Posts } from "../../lib/collections/posts/collection";
+=======
+import { Posts } from '../../server/collections/posts/collection';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "setDefaultShortformValue",
   dateWritten: "2019-07-25",
   idempotent: true,

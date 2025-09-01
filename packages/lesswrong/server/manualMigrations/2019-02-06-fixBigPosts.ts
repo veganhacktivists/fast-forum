@@ -1,9 +1,17 @@
+<<<<<<< HEAD
 import { registerMigration, migrateDocuments } from "./migrationUtils";
 import { draftJSToHtmlWithLatex, markdownToHtml } from "../editor/conversionUtils";
 import { Posts } from "../../lib/collections/posts";
 import { updateMutator } from "../vulcan-lib";
+=======
+import { registerMigration, migrateDocuments } from './migrationUtils';
+import { draftJSToHtmlWithLatex, markdownToHtml} from '../editor/conversionUtils'
+import { Posts } from '../../server/collections/posts/collection'
+import { createAnonymousContext } from "@/server/vulcan-lib/createContexts";
+import { updatePost } from '../collections/posts/mutations';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "fixBigPosts",
   dateWritten: "2019-02-06",
   idempotent: true,
@@ -26,6 +34,7 @@ registerMigration({
           } else {
             newHtml = htmlBody;
           }
+<<<<<<< HEAD
 
           await updateMutator({
             collection: Posts,
@@ -35,6 +44,14 @@ registerMigration({
             } as any, // Suppress type error because old migration uses an old schema
             validate: false,
           });
+=======
+          
+          await updatePost({
+            // I don't think htmlBody exists on posts anymore, if it ever did.
+            data: { htmlBody: newHtml } as UpdatePostDataInput,
+            selector: { _id: doc._id }
+          }, createAnonymousContext());
+>>>>>>> base/master
         }
       },
     });

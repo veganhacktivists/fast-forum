@@ -170,6 +170,7 @@ function Match(this: any, startInBefore: number, startInAfter: number, length: n
  *
  * @return {Array.<string>} The list of tokens.
  */
+<<<<<<< HEAD
 function htmlToTokens(html: string) {
   var mode = "char";
   var currentWord = "";
@@ -198,6 +199,110 @@ function htmlToTokens(html: string) {
           }
         } else {
           currentWord += char;
+=======
+function htmlToTokens(html: string){
+    var mode = 'char';
+    var currentWord = '';
+    var currentAtomicTag = '';
+    var words: Array<any> = [];
+    var inQuotes = false;
+    for (var i = 0; i < html.length; i++){
+        var char = html[i];
+        switch (mode){
+            case 'tag':
+                if (!inQuotes && char === '"') {
+                    inQuotes = true;
+                    currentWord += char;
+                } else if (inQuotes && char === '"' && currentWord[currentWord.length-1] !== '\\') {
+                    inQuotes = false;
+                    currentWord += char;
+                } else {
+                    var atomicTag = isStartOfAtomicTag(currentWord);
+                    if (atomicTag){
+                        mode = 'atomic_tag';
+                        currentAtomicTag = atomicTag;
+                        currentWord += char;
+                    } else if (isStartofHTMLComment(currentWord)){
+                        mode = 'html_comment';
+                        currentWord += char;
+                    } else if (!inQuotes && isEndOfTag(char)){
+                        currentWord += '>';
+                        words.push(createToken(currentWord));
+                        currentWord = '';
+                        if (isWhitespace(char)){
+                            mode = 'whitespace';
+                        } else {
+                            mode = 'char';
+                        }
+                    } else {
+                        currentWord += char;
+                    }
+                }
+                break;
+            case 'atomic_tag':
+                if (isEndOfTag(char) && isEndOfAtomicTag(currentWord, currentAtomicTag)){
+                    currentWord += '>';
+                    words.push(createToken(currentWord));
+                    currentWord = '';
+                    currentAtomicTag = '';
+                    mode = 'char';
+                } else {
+                    currentWord += char;
+                }
+                break;
+            case 'html_comment':
+                currentWord += char;
+                if (isEndOfHTMLComment(currentWord)){
+                    currentWord = '';
+                    mode = 'char';
+                }
+                break;
+            case 'char':
+                if (isStartOfTag(char)){
+                    if (currentWord){
+                        words.push(createToken(currentWord));
+                    }
+                    currentWord = '<';
+                    mode = 'tag';
+                } else if (/\s/.test(char)){
+                    if (currentWord){
+                        words.push(createToken(currentWord));
+                    }
+                    currentWord = char;
+                    mode = 'whitespace';
+                } else if (/[\w\d#@]/.test(char)){
+                    currentWord += char;
+                } else if (/&/.test(char)){
+                    if (currentWord){
+                        words.push(createToken(currentWord));
+                    }
+                    currentWord = char;
+                } else {
+                    currentWord += char;
+                    words.push(createToken(currentWord));
+                    currentWord = '';
+                }
+                break;
+            case 'whitespace':
+                if (isStartOfTag(char)){
+                    if (currentWord){
+                        words.push(createToken(currentWord));
+                    }
+                    currentWord = '<';
+                    mode = 'tag';
+                } else if (isWhitespace(char)){
+                    currentWord += char;
+                } else {
+                    if (currentWord){
+                        words.push(createToken(currentWord));
+                    }
+                    currentWord = char;
+                    mode = 'char';
+                }
+                break;
+            default:
+                throw new Error('Unknown mode ' + mode);
+>>>>>>> base/master
         }
         break;
       case "atomic_tag":

@@ -1,11 +1,19 @@
 /* eslint-disable no-console */
 // Given all the console logs, this seemed more elegant than commenting on every one
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import { Votes } from "../../lib/collections/votes";
 import Users from "../../lib/vulcan-users";
 import { calculateVotePower } from "../../lib/voting/voteTypes";
+=======
+import { registerMigration } from './migrationUtils';
+import { Votes } from '../../server/collections/votes/collection';
+import Users from '../../server/collections/users/collection';
+import { calculateVotePower } from '../../lib/voting/voteTypes';
 
-registerMigration({
+>>>>>>> base/master
+
+export default registerMigration({
   name: "legacyKarmaMigration",
   dateWritten: "2020-09-19",
   idempotent: true,
@@ -13,6 +21,7 @@ registerMigration({
     // First we only get the relevant votes, which are all votes that are not self-votes
     // and are not cancelled. I should also do a sanity check to see how many votes there are that
     // are duplicated (i.e. have the same user-documentId pair but are not cancelled)
+<<<<<<< HEAD
     const voteFields = {
       _id: 1,
       documentId: 1,
@@ -27,6 +36,12 @@ registerMigration({
     console.log("Got all the votes");
     const duplicateVotes = findDuplicateVotes(allVotes);
     console.log("Number of duplicate votes", duplicateVotes.length);
+=======
+    const allVotes = await Votes.find({}, {sort: {votedAt: 1}}).fetch()
+    console.log("Got all the votes")
+    const duplicateVotes = findDuplicateVotes(allVotes)
+    console.log("Number of duplicate votes", duplicateVotes.length)
+>>>>>>> base/master
 
     if (duplicateVotes.length) {
       await Votes.rawCollection().bulkWrite(
@@ -77,7 +92,11 @@ registerMigration({
 
     console.log("Removed invalid votes");
 
+<<<<<<< HEAD
     const allUpdatedVotes = await Votes.find({}, { sort: { votedAt: 1 } }, voteFields).fetch();
+=======
+    const allUpdatedVotes = await Votes.find({}, {sort: {votedAt: 1}}).fetch()
+>>>>>>> base/master
 
     console.log("Got all the updated votes");
 
@@ -138,12 +157,25 @@ registerMigration({
   },
 });
 
+<<<<<<< HEAD
 const doesVoteIncreaseKarma = ({ userId, collectionName, cancelled }: DbVote, authorId: string) => {
   if (cancelled) return false;
   if (userId === authorId) return false;
   if (!["Posts", "Comments"].includes(collectionName)) return false;
   return true;
 };
+=======
+    console.log("Finished writing changes")
+  }
+})
+
+const doesVoteIncreaseKarma = ({userId, collectionName, cancelled}: DbVote, authorId: string) => {
+  if (cancelled) return false
+  if (userId === authorId) return false
+  if (!['Posts', 'Comments'].includes(collectionName)) return false
+  return true
+}
+>>>>>>> base/master
 
 const findDuplicateVotes = (allVotes: DbVote[]) => {
   const seen = new Set();

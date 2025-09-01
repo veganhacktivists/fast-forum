@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
 import { captureEvent, AnalyticsUtil } from "../lib/analyticsEvents";
@@ -7,6 +8,18 @@ import { getUserEmail } from "../lib/collections/users/helpers";
 import { devicePrefersDarkMode } from "../components/themes/usePrefersDarkMode";
 import { configureDatadogRum } from "./datadogRum";
 import { userChangedCallback } from "../lib/vulcan-lib/callbacks";
+=======
+import * as Sentry from '@sentry/browser';
+import * as SentryIntegrations from '@sentry/integrations';
+import { captureEvent } from '../lib/analyticsEvents';
+import { browserProperties } from '../lib/utils/browserProperties';
+import { sentryUrlSetting, sentryReleaseSetting, sentryEnvironmentSetting } from '../lib/instanceSettings';
+import { devicePrefersDarkMode } from '@/components/themes/ThemeContextProvider';
+import { getUserEmail } from "../lib/collections/users/helpers";
+import { configureDatadogRum } from './datadogRum';
+import type { UtmParam } from '@/server/analytics/utm-tracking';
+import { CamelCaseify } from '@/lib/vulcan-lib/utils';
+>>>>>>> base/master
 
 const sentryUrl = sentryUrlSetting.get();
 const sentryEnvironment = sentryEnvironmentSetting.get();
@@ -34,45 +47,72 @@ if (sentryUrl && sentryEnvironment && sentryRelease) {
 }
 
 // Initializing sentry on the client browser
-
-userChangedCallback.add(function identifyUserToSentry(user: UsersCurrent | null) {
+function identifyUserToSentry(user: UsersCurrent | null) {
   // Set user in sentry scope, or clear user if they have logged out
   Sentry.configureScope((scope) => {
+<<<<<<< HEAD
     scope.setUser(user ? { id: user._id, email: getUserEmail(user), username: user.username } : null);
+=======
+    scope.setUser(user ? {id: user._id, email: getUserEmail(user), username: user.username ?? undefined} : null);
+>>>>>>> base/master
   });
-});
+}
 
+<<<<<<< HEAD
 userChangedCallback.add(function addUserIdToGoogleAnalytics(user: UsersCurrent | null) {
   const dataLayer = (window as any).dataLayer;
+=======
+function addUserIdToGoogleAnalytics(user: UsersCurrent | null) {
+  const dataLayer = (window as any).dataLayer
+>>>>>>> base/master
   if (!dataLayer) {
     // eslint-disable-next-line no-console
     console.warn("Trying to call gtag before dataLayer has been initialized");
   } else {
     dataLayer.push({ userId: user ? user._id : null });
   }
-});
+}
 
-userChangedCallback.add(configureDatadogRum);
+
+export function onUserChanged(user: UsersCurrent | null) {
+  identifyUserToSentry(user);
+  addUserIdToGoogleAnalytics(user);
+  configureDatadogRum(user);
+}
 
 window.addEventListener("load", (ev) => {
   const urlParams = new URLSearchParams(document.location?.search);
 
-  captureEvent("pageLoadFinished", {
+  const eventPayload: Record<CamelCaseify<UtmParam, '_'>, string | null> & Record<string, AnyBecauseIsInput> = {
     url: document.location?.href,
     referrer: document.referrer,
+<<<<<<< HEAD
     utmSource: urlParams.get("utm_source"),
     utmMedium: urlParams.get("utm_medium"),
     utmCampaign: urlParams.get("utm_campaign"),
+=======
+    utmSource: urlParams.get('utm_source'),
+    utmMedium: urlParams.get('utm_medium'),
+    utmCampaign: urlParams.get('utm_campaign'),
+    utmContent: urlParams.get('utm_content'),
+    utmTerm: urlParams.get('utm_term'),
+    utmUserId: urlParams.get('utm_user_id'),
+>>>>>>> base/master
     browserProps: browserProperties(),
     prefersDarkMode: devicePrefersDarkMode(),
     performance: {
       memory: (window as any).performance?.memory?.usedJSHeapSize,
       timeOrigin: window.performance?.timeOrigin,
-      timing: window.performance?.timing,
+      timing: window.performance?.timing?.toJSON?.(),
     },
-  });
+  }
+
+  captureEvent("pageLoadFinished", eventPayload);
 });
+<<<<<<< HEAD
 
 // Put the tabId, which was injected into the page as a global variable, into
 // the analytics context vars. See apollo-ssr/renderPage.js
 AnalyticsUtil.clientContextVars.tabId = (window as any).tabId;
+=======
+>>>>>>> base/master

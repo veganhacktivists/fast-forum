@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 import { forEachDocumentBatchInCollection, registerMigration } from "./migrationUtils";
 import Users from "../../lib/collections/users/collection";
 import * as _ from "underscore";
+=======
+import { forEachDocumentBatchInCollection, registerMigration } from './migrationUtils';
+import Users from '../../server/collections/users/collection';
+import * as _ from 'underscore';
+import { backgroundTask } from '../utils/backgroundTask';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "confirmLegacyEmails",
   dateWritten: "2019-04-10",
   idempotent: true,
@@ -20,8 +27,14 @@ registerMigration({
           // Because all emails were verified on import, if the email address
           // is unverified, that means verification was cleared (eg by an email
           // address change) on import.
+<<<<<<< HEAD
           if (user.emails?.some((email: any) => !email.verified)) continue;
 
+=======
+          if (user.emails?.some((email: any) => !email.verified))
+            continue;
+          
+>>>>>>> base/master
           // If user.whenConfirmationEmailSent, either the email address was unnecessarily re-verified, or the email
           // was un-verified by changing email address and then re-verified. Or a verification email was sent but not
           // clicked; that case is hard to distinguish. In any case, leave things as-is.
@@ -50,9 +63,15 @@ registerMigration({
             }
           }
         }
+<<<<<<< HEAD
 
         Users.rawCollection().bulkWrite(updates, { ordered: false });
       },
+=======
+        
+        backgroundTask(Users.rawCollection().bulkWrite(updates, { ordered: false }));
+      }
+>>>>>>> base/master
     });
   },
 });

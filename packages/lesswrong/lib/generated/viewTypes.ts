@@ -1,67 +1,101 @@
 type AdvisorRequestsViewName = "requestsByUser";
+type ArbitalCachesViewName = never
+type ArbitalTagContentRelsViewName = never
+type AutomatedContentEvaluationsViewName = never
 type BansViewName = never
+type BookmarksViewName = "myBookmarkedPosts"|"myBookmarks"|"userDocumentBookmark";
 type BooksViewName = never
 type ChaptersViewName = "SequenceChapters";
 type CkEditorUserSessionsViewName = never
 type ClientIdsViewName = "getClientId";
 type CollectionsViewName = never
 type CommentModeratorActionsViewName = "activeCommentModeratorActions";
-type CommentsViewName = "commentReplies"|"postCommentsDeleted"|"allCommentsDeleted"|"checkedByModGPT"|"postCommentsTop"|"postCommentsRecentReplies"|"postCommentsMagic"|"afPostCommentsTop"|"postCommentsOld"|"postCommentsNew"|"postCommentsBest"|"postLWComments"|"profileRecentComments"|"allRecentComments"|"recentComments"|"afSubmissions"|"rejected"|"recentDiscussionThread"|"afRecentDiscussionThread"|"postsItemComments"|"sunshineNewCommentsList"|"questionAnswers"|"legacyIdComment"|"sunshineNewUsersComments"|"defaultModeratorResponses"|"repliesToAnswer"|"answersAndReplies"|"topShortform"|"shortform"|"shortformFrontpage"|"repliesToCommentThread"|"shortformLatestChildren"|"nominations2018"|"nominations2019"|"reviews2018"|"reviews2019"|"reviews"|"tagDiscussionComments"|"tagSubforumComments"|"latestSubforumDiscussion"|"moderatorComments"|"debateResponses"|"recentDebateResponses"|"alignmentSuggestedComments"|"rss";
+type CommentsViewName = "afPostCommentsTop"|"afRecentDiscussionThread"|"afSubmissions"|"alignmentSuggestedComments"|"allCommentsDeleted"|"allRecentComments"|"answersAndReplies"|"checkedByModGPT"|"commentReplies"|"debateResponses"|"defaultModeratorResponses"|"draftComments"|"forumEventComments"|"latestSubforumDiscussion"|"legacyIdComment"|"moderatorComments"|"nominations2018"|"nominations2019"|"postCommentsBest"|"postCommentsDeleted"|"postCommentsMagic"|"postCommentsNew"|"postCommentsOld"|"postCommentsRecentReplies"|"postCommentsTop"|"postLWComments"|"postsItemComments"|"profileComments"|"profileRecentComments"|"questionAnswers"|"recentComments"|"recentDebateResponses"|"recentDiscussionThread"|"rejected"|"repliesToAnswer"|"repliesToCommentThread"|"repliesToCommentThreadIncludingRoot"|"reviews"|"reviews2018"|"reviews2019"|"rss"|"shortform"|"shortformFrontpage"|"shortformLatestChildren"|"sunshineNewCommentsList"|"sunshineNewUsersComments"|"tagDiscussionComments"|"tagSubforumComments"|"topShortform";
 type ConversationsViewName = "moderatorConversations"|"userConversations"|"userConversationsAll"|"userGroupUntitledConversations";
 type CronHistoriesViewName = never
+type CurationEmailsViewName = never
+type CurationNoticesViewName = "curationNoticesPage";
 type DatabaseMetadataViewName = never
 type DebouncerEventsViewName = never
 type DialogueChecksViewName = "userDialogueChecks"|"userTargetDialogueChecks";
 type DialogueMatchPreferencesViewName = "dialogueMatchPreferences";
 type DigestPostsViewName = never
-type DigestsViewName = "findByNum"|"all";
+type DigestsViewName = "all"|"findByNum";
 type ElectionCandidatesViewName = never
 type ElectionVotesViewName = "allSubmittedVotes";
 type ElicitQuestionPredictionsViewName = never
 type ElicitQuestionsViewName = never
 type EmailTokensViewName = never
 type FeaturedResourcesViewName = "activeResources";
-type GardenCodesViewName = "usersPrivateGardenCodes"|"publicGardenCodes"|"gardenCodeByCode";
+type FieldChangesViewName = never
+type ForumEventsViewName = "currentAndRecentForumEvents"|"currentForumEvent"|"pastForumEvents"|"upcomingForumEvents";
+type GardenCodesViewName = "gardenCodeByCode"|"publicGardenCodes"|"usersPrivateGardenCodes";
+type GoogleServiceAccountSessionsViewName = never
 type ImagesViewName = never
-type LWEventsViewName = "adminView"|"postVisits"|"emailHistory"|"gatherTownUsers"|"postEverPublished";
+type JargonTermsViewName = "glossaryEditAll"|"postEditorJargonTerms"|"postsApprovedJargon";
+type LWEventsViewName = "adminView"|"emailHistory"|"gatherTownUsers"|"postVisits";
 type LegacyDataViewName = never
-type LocalgroupsViewName = "userOrganizesGroups"|"userActiveGroups"|"userInactiveGroups"|"all"|"nearby"|"single"|"local"|"online";
-type MessagesViewName = "messagesConversation"|"conversationPreview";
+type LlmConversationsViewName = "llmConversationsAll"|"llmConversationsWithUser";
+type LlmMessagesViewName = never
+type LocalgroupsViewName = "all"|"local"|"nearby"|"online"|"single"|"userActiveGroups"|"userInactiveGroups"|"userOrganizesGroups";
+type ManifoldProbabilitiesCachesViewName = never
+type MessagesViewName = "conversationPreview"|"messagesConversation";
 type MigrationsViewName = never
-type ModerationTemplatesViewName = "moderationTemplatesPage"|"moderationTemplatesList";
-type ModeratorActionsViewName = "userModeratorActions"|"restrictionModerationActions";
-type NotificationsViewName = "userNotifications"|"unreadUserNotifications"|"adminAlertNotifications";
+type ModerationTemplatesViewName = "moderationTemplatesList"|"moderationTemplatesPage";
+type ModeratorActionsViewName = "restrictionModerationActions"|"userModeratorActions";
+type MultiDocumentsViewName = "lensBySlug"|"pingbackLensPages"|"summariesByParentId";
+type NotificationsViewName = "adminAlertNotifications"|"unreadUserNotifications"|"userNotifications";
 type PageCacheViewName = never
+type PetrovDayActionsViewName = "adminConsole"|"getAction"|"launchDashboard"|"warningConsole";
 type PetrovDayLaunchsViewName = never
 type PodcastEpisodesViewName = "episodeByExternalId";
 type PodcastsViewName = never
 type PostEmbeddingsViewName = never
 type PostRecommendationsViewName = never
 type PostRelationsViewName = "allPostRelations";
-type PostsViewName = "userPosts"|"magic"|"top"|"new"|"recentComments"|"old"|"timeframe"|"daily"|"tagRelevance"|"frontpage"|"frontpage-rss"|"curated"|"curated-rss"|"community"|"community-rss"|"meta-rss"|"rss"|"topQuestions"|"recentQuestionActivity"|"scheduled"|"rejected"|"drafts"|"all_drafts"|"unlisted"|"userAFSubmissions"|"slugPost"|"legacyIdPost"|"recentDiscussionThreadsList"|"afRecentDiscussionThreadsList"|"2018reviewRecentDiscussionThreadsList"|"2019reviewRecentDiscussionThreadsList"|"globalEvents"|"nearbyEvents"|"events"|"eventsInTimeRange"|"upcomingEvents"|"pastEvents"|"tbdEvents"|"nonEventGroupPosts"|"postsWithBannedUsers"|"communityResourcePosts"|"sunshineNewPosts"|"sunshineNewUsersPosts"|"sunshineCuratedSuggestions"|"hasEverDialogued"|"pingbackPosts"|"nominations2018"|"nominations2019"|"reviews2018"|"reviews2019"|"voting2019"|"stickied"|"nominatablePostsByVote"|"reviewVoting"|"reviewQuickPage"|"reviewFinalVoting"|"myBookmarkedPosts"|"alignmentSuggestedPosts";
+type PostViewTimesViewName = never
+type PostViewsViewName = never
+type PostsViewName = "afRecentDiscussionThreadsList"|"alignmentSuggestedPosts"|"all_drafts"|"community"|"communityResourcePosts"|"communityRss"|"curated"|"curatedRss"|"currentOpenThread"|"daily"|"drafts"|"events"|"eventsInTimeRange"|"frontpage"|"frontpageReviewWidget"|"frontpageRss"|"globalEvents"|"hasEverDialogued"|"legacyIdPost"|"magic"|"metaRss"|"nearbyEvents"|"new"|"nominatablePostsByVote"|"nominations2018"|"nominations2019"|"nonEventGroupPosts"|"old"|"pastEvents"|"pingbackPosts"|"postsWithBannedUsers"|"recentComments"|"recentDiscussionThreadsList"|"recentQuestionActivity"|"rejected"|"reviewFinalVoting"|"reviewQuickPage"|"reviewRecentDiscussionThreadsList2018"|"reviewRecentDiscussionThreadsList2019"|"reviewVoting"|"reviews2018"|"reviews2019"|"rss"|"scheduled"|"slugPost"|"stickied"|"sunshineCuratedSuggestions"|"sunshineNewPosts"|"sunshineNewUsersPosts"|"tagRelevance"|"tbdEvents"|"timeframe"|"top"|"topQuestions"|"unlisted"|"upcomingEvents"|"userAFSubmissions"|"userPosts"|"voting2019";
 type RSSFeedsViewName = "usersFeed";
 type ReadStatusesViewName = never
-type ReportsViewName = "allReports"|"unclaimedReports"|"claimedReports"|"adminClaimedReports"|"sunshineSidebarReports"|"closedReports";
-type ReviewVotesViewName = "reviewVotesFromUser"|"reviewVotesForPost"|"reviewVotesForPostAndUser"|"reviewVotesAdminDashboard";
-type RevisionsViewName = "revisionsByUser"|"revisionsOnDocument";
-type SequencesViewName = "userProfile"|"userProfilePrivate"|"userProfileAll"|"curatedSequences"|"communitySequences";
+type RecommendationsCachesViewName = never
+type ReportsViewName = "adminClaimedReports"|"allReports"|"claimedReports"|"closedReports"|"sunshineSidebarReports"|"unclaimedReports";
+type ReviewVotesViewName = "reviewVotesAdminDashboard"|"reviewVotesForPost"|"reviewVotesForPostAndUser"|"reviewVotesFromUser";
+type ReviewWinnerArtsViewName = "allForYear"|"postArt";
+type ReviewWinnersViewName = "bestOfLessWrongAnnouncement"|"reviewWinnerSingle";
+type RevisionsViewName = "revisionByVersionNumber"|"revisionsByUser"|"revisionsOnDocument";
+type SequencesViewName = "communitySequences"|"curatedSequences"|"userProfile"|"userProfileAll"|"userProfilePrivate";
 type SessionsViewName = never
-type SpotlightsViewName = "mostRecentlyPromotedSpotlights"|"spotlightsPage"|"spotlightForSequence";
-type SubscriptionsViewName = "subscriptionState"|"subscriptionsOfType";
+type SideCommentCachesViewName = never
+type SplashArtCoordinatesViewName = never
+type SpotlightsViewName = "mostRecentlyPromotedSpotlights"|"spotlightsByDocumentIds"|"spotlightsById"|"spotlightsPage"|"spotlightsPageDraft";
+type SubscriptionsViewName = "membersOfGroup"|"subscriptionState"|"subscriptionsOfType";
+type SurveyQuestionsViewName = never
+type SurveyResponsesViewName = never
+type SurveySchedulesViewName = "surveySchedulesByCreatedAt";
+type SurveysViewName = "surveysByCreatedAt";
 type TagFlagsViewName = "allTagFlags";
 type TagRelsViewName = "postsWithTag"|"tagsOnPost";
-type TagsViewName = "allTagsAlphabetical"|"userTags"|"currentUserSubforums"|"allPagesByNewest"|"allTagsHierarchical"|"tagBySlug"|"coreTags"|"postTypeTags"|"coreAndSubforumTags"|"newTags"|"unreviewedTags"|"suggestedFilterTags"|"allLWWikiTags"|"unprocessedLWWikiTags"|"tagsByTagFlag"|"allPublicTags";
+type TagsViewName = "allArbitalTags"|"allLWWikiTags"|"allPagesByNewest"|"allPublicTags"|"allTagsAlphabetical"|"allTagsHierarchical"|"coreAndSubforumTags"|"coreTags"|"currentUserSubforums"|"newTags"|"pingbackWikiPages"|"postTypeTags"|"suggestedFilterTags"|"tagBySlug"|"tagsBySlugs"|"tagsByTagFlag"|"tagsByTagIds"|"unprocessedLWWikiTags"|"unreviewedTags"|"userTags";
+type TweetsViewName = never
 type TypingIndicatorsViewName = never
+type UltraFeedEventsViewName = never
 type UserActivitiesViewName = never
+type UserEAGDetailsViewName = "dataByUser";
+type UserJobAdsViewName = "adsByUser";
 type UserMostValuablePostsViewName = "currentUserMostValuablePosts"|"currentUserPost";
-type UserRateLimitsViewName = "userRateLimits"|"activeUserRateLimits";
+type UserRateLimitsViewName = "activeUserRateLimits"|"userRateLimits";
 type UserTagRelsViewName = "single";
-type UsersViewName = "usersByUserIds"|"usersProfile"|"LWSunshinesList"|"LWTrustLevel1List"|"LWUsersAdmin"|"usersWithBannedUsers"|"sunshineNewUsers"|"recentlyActive"|"allUsers"|"usersMapLocations"|"tagCommunityMembers"|"reviewAdminUsers"|"usersWithPaymentInfo"|"walledGardenInvitees"|"usersWithOptedInToDialogueFacilitation"|"alignmentSuggestedUsers";
+type UsersViewName = "LWSunshinesList"|"LWTrustLevel1List"|"LWUsersAdmin"|"alignmentSuggestedUsers"|"allUsers"|"recentlyActive"|"reviewAdminUsers"|"sunshineNewUsers"|"tagCommunityMembers"|"usersByUserIds"|"usersMapLocations"|"usersProfile"|"usersTopKarma"|"usersWithBannedUsers"|"usersWithOptedInToDialogueFacilitation"|"usersWithPaymentInfo";
 type VotesViewName = "tagVotes"|"userPostVotes"|"userVotes";
 
 interface ViewTermsByCollectionName {
   AdvisorRequests: AdvisorRequestsViewTerms
+  ArbitalCaches: ViewTermsBase
+  ArbitalTagContentRels: ViewTermsBase
+  AutomatedContentEvaluations: ViewTermsBase
   Bans: ViewTermsBase
+  Bookmarks: BookmarksViewTerms
   Books: ViewTermsBase
   Chapters: ChaptersViewTerms
   CkEditorUserSessions: ViewTermsBase
@@ -71,6 +105,8 @@ interface ViewTermsByCollectionName {
   Comments: CommentsViewTerms
   Conversations: ConversationsViewTerms
   CronHistories: ViewTermsBase
+  CurationEmails: ViewTermsBase
+  CurationNotices: CurationNoticesViewTerms
   DatabaseMetadata: ViewTermsBase
   DebouncerEvents: ViewTermsBase
   DialogueChecks: DialogueChecksViewTerms
@@ -83,38 +119,62 @@ interface ViewTermsByCollectionName {
   ElicitQuestions: ViewTermsBase
   EmailTokens: ViewTermsBase
   FeaturedResources: FeaturedResourcesViewTerms
+  FieldChanges: ViewTermsBase
+  ForumEvents: ForumEventsViewTerms
   GardenCodes: GardenCodesViewTerms
+  GoogleServiceAccountSessions: GoogleServiceAccountSessionsViewTerms
   Images: ViewTermsBase
+  JargonTerms: JargonTermsViewTerms
   LWEvents: LWEventsViewTerms
   LegacyData: ViewTermsBase
+  LlmConversations: LlmConversationsViewTerms
+  LlmMessages: ViewTermsBase
   Localgroups: LocalgroupsViewTerms
+  ManifoldProbabilitiesCaches: ViewTermsBase
   Messages: MessagesViewTerms
   Migrations: ViewTermsBase
   ModerationTemplates: ModerationTemplatesViewTerms
   ModeratorActions: ModeratorActionsViewTerms
+  MultiDocuments: MultiDocumentsViewTerms
   Notifications: NotificationsViewTerms
   PageCache: ViewTermsBase
+  PetrovDayActions: PetrovDayActionsViewTerms
   PetrovDayLaunchs: ViewTermsBase
   PodcastEpisodes: PodcastEpisodesViewTerms
   Podcasts: ViewTermsBase
   PostEmbeddings: ViewTermsBase
   PostRecommendations: ViewTermsBase
   PostRelations: PostRelationsViewTerms
+  PostViewTimes: ViewTermsBase
+  PostViews: ViewTermsBase
   Posts: PostsViewTerms
   RSSFeeds: RSSFeedsViewTerms
   ReadStatuses: ViewTermsBase
+  RecommendationsCaches: ViewTermsBase
   Reports: ReportsViewTerms
   ReviewVotes: ReviewVotesViewTerms
+  ReviewWinnerArts: ReviewWinnerArtsViewTerms
+  ReviewWinners: ReviewWinnersViewTerms
   Revisions: RevisionsViewTerms
   Sequences: SequencesViewTerms
   Sessions: ViewTermsBase
+  SideCommentCaches: ViewTermsBase
+  SplashArtCoordinates: ViewTermsBase
   Spotlights: SpotlightsViewTerms
   Subscriptions: SubscriptionsViewTerms
+  SurveyQuestions: ViewTermsBase
+  SurveyResponses: ViewTermsBase
+  SurveySchedules: SurveySchedulesViewTerms
+  Surveys: SurveysViewTerms
   TagFlags: TagFlagsViewTerms
   TagRels: TagRelsViewTerms
   Tags: TagsViewTerms
+  Tweets: ViewTermsBase
   TypingIndicators: ViewTermsBase
+  UltraFeedEvents: ViewTermsBase
   UserActivities: ViewTermsBase
+  UserEAGDetails: UserEAGDetailsViewTerms
+  UserJobAds: UserJobAdsViewTerms
   UserMostValuablePosts: UserMostValuablePostsViewTerms
   UserRateLimits: UserRateLimitsViewTerms
   UserTagRels: UserTagRelsViewTerms
@@ -123,4 +183,4 @@ interface ViewTermsByCollectionName {
 }
 
 
-type NameOfCollectionWithViews = "AdvisorRequests"|"Chapters"|"ClientIds"|"CommentModeratorActions"|"Comments"|"Conversations"|"DialogueChecks"|"DialogueMatchPreferences"|"Digests"|"ElectionVotes"|"FeaturedResources"|"GardenCodes"|"LWEvents"|"Localgroups"|"Messages"|"ModerationTemplates"|"ModeratorActions"|"Notifications"|"PodcastEpisodes"|"PostRelations"|"Posts"|"RSSFeeds"|"Reports"|"ReviewVotes"|"Revisions"|"Sequences"|"Spotlights"|"Subscriptions"|"TagFlags"|"TagRels"|"Tags"|"UserMostValuablePosts"|"UserRateLimits"|"UserTagRels"|"Users"|"Votes"
+type NameOfCollectionWithViews = "AdvisorRequests"|"Bookmarks"|"Chapters"|"ClientIds"|"CommentModeratorActions"|"Comments"|"Conversations"|"CurationNotices"|"DialogueChecks"|"DialogueMatchPreferences"|"Digests"|"ElectionVotes"|"FeaturedResources"|"ForumEvents"|"GardenCodes"|"JargonTerms"|"LWEvents"|"LlmConversations"|"Localgroups"|"Messages"|"ModerationTemplates"|"ModeratorActions"|"MultiDocuments"|"Notifications"|"PetrovDayActions"|"PodcastEpisodes"|"PostRelations"|"Posts"|"RSSFeeds"|"Reports"|"ReviewVotes"|"ReviewWinnerArts"|"ReviewWinners"|"Revisions"|"Sequences"|"Spotlights"|"Subscriptions"|"SurveySchedules"|"Surveys"|"TagFlags"|"TagRels"|"Tags"|"UserEAGDetails"|"UserJobAds"|"UserMostValuablePosts"|"UserRateLimits"|"UserTagRels"|"Users"|"Votes"

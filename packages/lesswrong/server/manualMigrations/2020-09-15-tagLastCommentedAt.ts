@@ -1,8 +1,14 @@
+<<<<<<< HEAD
 import { registerMigration, forEachDocumentBatchInCollection } from "./migrationUtils";
 import { Tags } from "../../lib/collections/tags/collection";
 import { Comments } from "../../lib/collections/comments/collection";
+=======
+import { registerMigration, forEachDocumentBatchInCollection } from './migrationUtils';
+import { Tags } from '../../server/collections/tags/collection';
+import { Comments } from '../../server/collections/comments/collection';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "tagLastCommentedAt",
   dateWritten: "2020-09-15",
   idempotent: true,

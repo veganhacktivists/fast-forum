@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 import { registerMigration } from "./migrationUtils";
 import Posts from "../../lib/collections/posts/collection";
+=======
+import { registerMigration } from './migrationUtils';
+import Posts from '../../server/collections/posts/collection';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "updateCoauthorsSchema",
   dateWritten: "2022-06-02",
   idempotent: true,

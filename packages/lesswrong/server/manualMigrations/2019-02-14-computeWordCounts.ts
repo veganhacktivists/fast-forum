@@ -1,14 +1,24 @@
+<<<<<<< HEAD
 import { registerMigration, migrateDocuments } from "./migrationUtils";
 import { editableCollections, editableCollectionsFields } from "../../lib/editor/make_editable";
 import { getCollection } from "../../lib/vulcan-lib";
 import { dataToWordCount } from "../editor/conversionUtils";
 import { Revisions } from "../../lib/collections/revisions/collection";
+=======
+import { registerMigration, migrateDocuments } from './migrationUtils';
+import { getEditableCollectionNames, getEditableFieldNamesForCollection } from '@/server/editor/editableSchemaFieldHelpers';
+import { getCollection } from '../collections/allCollections';
+import { dataToWordCount } from '../editor/conversionUtils';
+import { Revisions } from '../../server/collections/revisions/collection';
+import { createAnonymousContext } from '../vulcan-lib/createContexts';
+>>>>>>> base/master
 
-registerMigration({
+export default registerMigration({
   name: "computeWordCounts",
   dateWritten: "2019-02-14",
   idempotent: true,
   action: async () => {
+    const context = createAnonymousContext();
     // Fill in wordCount in the Revisions table
     await migrateDocuments({
       description: `Compute word counts in the Revisions table`,
@@ -24,8 +34,13 @@ registerMigration({
         for (let doc of documents) {
           if (!doc.originalContents) continue;
           const { data, type } = doc.originalContents;
+<<<<<<< HEAD
           const wordCount = await dataToWordCount(data, type);
 
+=======
+          const wordCount = await dataToWordCount(data, type, context);
+          
+>>>>>>> base/master
           updates.push({
             updateOne: {
               filter: { _id: doc._id },
@@ -43,9 +58,15 @@ registerMigration({
     });
 
     // Fill in wordCount in the denormalized latest revs on posts/comments/etc
+<<<<<<< HEAD
     for (let collectionName of editableCollections) {
       for (let fieldName of editableCollectionsFields[collectionName]!) {
         const collection: CollectionBase<any> = getCollection(collectionName);
+=======
+    for (let collectionName of getEditableCollectionNames()) {
+      for (let fieldName of getEditableFieldNamesForCollection(collectionName)) {
+        const collection: CollectionBase<any> = getCollection(collectionName)
+>>>>>>> base/master
         await migrateDocuments({
           description: `Compute word counts for ${collectionName}.${fieldName}`,
           collection,
@@ -60,7 +81,7 @@ registerMigration({
             for (let doc of documents) {
               if (doc[fieldName]) {
                 const { data, type } = doc[fieldName].originalContents;
-                const wordCount = await dataToWordCount(data, type);
+                const wordCount = await dataToWordCount(data, type, context);
                 updates.push({
                   updateOne: {
                     filter: { _id: doc._id },

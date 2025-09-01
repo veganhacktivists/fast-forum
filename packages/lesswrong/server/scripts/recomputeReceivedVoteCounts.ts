@@ -1,8 +1,12 @@
 import { migrateDocuments } from "../manualMigrations/migrationUtils";
+<<<<<<< HEAD
 import { Users } from "../../lib/collections/users/collection";
 import { Votes } from "../../lib/collections/votes";
+=======
+import { Users } from '../../server/collections/users/collection';
+import { Votes } from "../../server/collections/votes/collection";
+>>>>>>> base/master
 import { collectionsThatAffectKarma } from "../callbacks/votingCallbacks";
-import { Globals } from "../vulcan-lib";
 import { filterWhereFieldsNotNull } from "../../lib/utils/typeGuardUtils";
 
 type UserVoteFields = {
@@ -30,7 +34,7 @@ const DEFAULT_USER_VOTE_FIELDS: UserVoteFields = {
  * smallDownvoteReceivedCount
  * bigDownvoteReceivedCount
  */
-async function recalculateReceivedVoteCounts() {
+export async function recalculateReceivedVoteCounts() {
   await migrateDocuments({
     collection: Users,
     batchSize: 100,
@@ -55,6 +59,7 @@ async function recalculateReceivedVoteCounts() {
           // (ex. we ignore other post authors since we didn't get all their received votes above)
           const authorsInBatch = vote.authorIds?.filter((authorId) => userIdSet.has(authorId)) ?? [];
 
+<<<<<<< HEAD
           // update each vote author (i.e. the users who received the vote)
           authorsInBatch.forEach((authorId) => {
             const voteCounts = agg[authorId] ?? { ...DEFAULT_USER_VOTE_FIELDS };
@@ -73,6 +78,28 @@ async function recalculateReceivedVoteCounts() {
                 break;
             }
             voteCounts.voteReceivedCount++;
+=======
+        // update each vote author (i.e. the users who received the vote)
+        authorsInBatch.forEach(authorId => {
+          const voteCounts = agg[authorId] ?? { ...DEFAULT_USER_VOTE_FIELDS };
+          switch (vote.voteType) {
+            case 'smallUpvote':
+              voteCounts.smallUpvoteReceivedCount++;
+              break;
+            case 'smallDownvote':
+              voteCounts.smallDownvoteReceivedCount++;
+              break;
+            case 'bigUpvote':
+              voteCounts.bigUpvoteReceivedCount++;
+              break;
+            case 'bigDownvote':
+              voteCounts.bigDownvoteReceivedCount++;
+              break;
+            case 'neutral': // We weren't previously counting neutral votes when I added this to fix types. I don't think we need to start, but, flagging the inconsistency.
+              break;
+          }
+          voteCounts.voteReceivedCount++;
+>>>>>>> base/master
 
             agg[authorId] = voteCounts;
           });
@@ -103,5 +130,3 @@ async function recalculateReceivedVoteCounts() {
     },
   });
 }
-
-Globals.recalculateReceivedVoteCounts = recalculateReceivedVoteCounts;

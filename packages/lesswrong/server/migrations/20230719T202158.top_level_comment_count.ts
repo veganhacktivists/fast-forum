@@ -25,7 +25,12 @@
  */
 export const acceptsSchemaHash = "1f4a770fddeffde4615bb22682170332";
 
+<<<<<<< HEAD
 import Posts from "../../lib/collections/posts/collection";
+=======
+
+import Posts from "../../server/collections/posts/collection";
+>>>>>>> base/master
 import { addField, dropField } from "./meta/utils";
 
 export const up = async ({ db }: MigrationContext) => {

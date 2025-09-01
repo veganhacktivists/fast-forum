@@ -6,10 +6,18 @@
  * Released under the MIT License, see: https://github.com/jdesboeufs/connect-mongo/blob/master/LICENSE
  */
 
+<<<<<<< HEAD
 import * as session from "express-session";
 import { assert } from "console";
 import { loggerConstructor } from "../../../lib/utils/logging";
 import SessionsRepo, { UpsertSessionData } from "../../repos/SessionsRepo";
+=======
+import * as session from 'express-session';
+import { assert } from 'console';
+import { loggerConstructor } from '../../../lib/utils/logging';
+import SessionsRepo, { UpsertSessionData } from '../../repos/SessionsRepo';
+import { backgroundTask } from '@/server/utils/backgroundTask';
+>>>>>>> base/master
 
 const debug = loggerConstructor("connect-mongo");
 
@@ -66,7 +74,7 @@ export default class MongoStore extends session.Store {
     this.collection = options.collection;
     this.options = options;
     this.collection = options.collection;
-    void this.setAutoRemove(this.collection);
+    backgroundTask(this.setAutoRemove(this.collection));
   }
 
   getCollection(): ConnectMongoCollection {
@@ -87,15 +95,25 @@ export default class MongoStore extends session.Store {
       },
     });
     switch (this.options.autoRemove) {
+<<<<<<< HEAD
       case "native":
         debug("Creating MongoDB TTL index");
         await collection._ensureIndex({ expires: 1 });
+=======
+      case 'native':
+        debug('Creating MongoDB TTL index');
+>>>>>>> base/master
         break;
       case "interval":
         debug("create Timer to remove expired sessions");
         this.timer = setInterval(
+<<<<<<< HEAD
           () => void collection.rawRemove(removeQuery()),
           this.options.autoRemoveInterval * 1000 * 60,
+=======
+          () => backgroundTask(collection.rawRemove(removeQuery())),
+          this.options.autoRemoveInterval * 1000 * 60
+>>>>>>> base/master
         );
         this.timer.unref();
         break;
@@ -109,7 +127,15 @@ export default class MongoStore extends session.Store {
    * Get a session from the store given a session ID (sid)
    * @param sid session ID
    */
+<<<<<<< HEAD
   get(sid: string, callback: (err: any, session?: session.SessionData | null) => void): void {
+=======
+  get(
+    sid: string,
+    callback: (err: any, session?: session.SessionData | null) => void
+  ): void {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+>>>>>>> base/master
     void (async () => {
       try {
         debug(`MongoStore#get=${sid}`);

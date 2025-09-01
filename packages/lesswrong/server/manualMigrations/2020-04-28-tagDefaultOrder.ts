@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 import { registerMigration, fillDefaultValues } from "./migrationUtils";
 
 import { Tags } from "../../lib/collections/tags/collection";
 
 registerMigration({
+=======
+import { registerMigration, fillDefaultValues } from './migrationUtils';
+import { Tags } from '../../server/collections/tags/collection';
+
+export default registerMigration({
+>>>>>>> base/master
   name: "defaultOrderTags",
   dateWritten: "2020-04-28",
   idempotent: true,

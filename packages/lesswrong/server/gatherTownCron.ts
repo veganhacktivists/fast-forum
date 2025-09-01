@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { addCronJob, removeCronJob } from "./cronUtil";
 import { createMutator, Globals } from "./vulcan-lib";
 import { LWEvents } from "../lib/collections/lwevents/collection";
@@ -9,6 +10,19 @@ import { toDictionary } from "../lib/utils/toDictionary";
 import * as _ from "underscore";
 import { isLW } from "../lib/instanceSettings";
 import type { OpenEvent } from "ws";
+=======
+import { addCronJob, removeCronJob } from './cronUtil';
+import WebSocket from 'ws';
+import { DatabaseServerSetting } from './databaseSettings';
+import { gatherTownRoomId, gatherTownRoomName } from '../lib/publicSettings';
+import { isProduction } from '../lib/executionEnvironment';
+import { toDictionary } from '../lib/utils/toDictionary';
+import * as _ from 'underscore';
+import { isLW } from '../lib/instanceSettings';
+import { createLWEvent } from './collections/lwevents/mutations';
+import { createAdminContext } from './vulcan-lib/createContexts';
+import { backgroundTask } from './utils/backgroundTask';
+>>>>>>> base/master
 
 const gatherTownRoomPassword = new DatabaseServerSetting<string | null>("gatherTownRoomPassword", "the12thvirtue");
 
@@ -26,18 +40,23 @@ const minGatherTownTrackerVersion = new DatabaseServerSetting<number>(
   currentGatherTownTrackerVersion,
 );
 
-if (isProduction && isLW) {
-  onStartup(() => {
+export function initGatherTownCron() {
+  if (isProduction && isLW) {
     if (currentGatherTownTrackerVersion >= minGatherTownTrackerVersion.get()) {
       addCronJob({
         name: "gatherTownBot" + currentGatherTownTrackerVersion,
         interval: "every 3 minutes",
         job() {
+<<<<<<< HEAD
           void pollGatherTownUsers();
         },
+=======
+          backgroundTask(pollGatherTownUsers());
+        }
+>>>>>>> base/master
       });
     }
-  });
+  }
 }
 
 const pollGatherTownUsers = async () => {
@@ -52,14 +71,21 @@ const pollGatherTownUsers = async () => {
   const { gatherTownUsers, checkFailed, failureReason } = result;
   // eslint-disable-next-line no-console
   console.log(`GatherTown users: ${JSON.stringify(result)}`);
+<<<<<<< HEAD
   void createMutator({
     collection: LWEvents,
     document: {
       name: "gatherTownUsersCheck",
+=======
+  backgroundTask(createLWEvent({
+    data: {
+      name: 'gatherTownUsersCheck',
+>>>>>>> base/master
       important: false,
       properties: {
         time: new Date(),
         trackerVersion: currentGatherTownTrackerVersion,
+<<<<<<< HEAD
         gatherTownUsers,
         checkFailed,
         failureReason,
@@ -69,6 +95,13 @@ const pollGatherTownUsers = async () => {
   });
 };
 Globals.pollGatherTownUsers = pollGatherTownUsers;
+=======
+        gatherTownUsers, checkFailed, failureReason
+      }
+    }
+  }, createAdminContext()));
+}
+>>>>>>> base/master
 
 type GatherTownPlayerInfo = any;
 interface GatherTownCheckResult {
@@ -224,7 +257,11 @@ const getGatherTownUsers = async (
   // eslint-disable-next-line no-console
   console.log(`Connecting to websocket server ${websocketServerUrl}`);
   const socket = new WebSocket(websocketServerUrl);
+<<<<<<< HEAD
   socket.on("open", function (data: OpenEvent) {
+=======
+  socket.on('open', function () {
+>>>>>>> base/master
     socketConnectedSuccessfully = true;
     sendMessageOnSocket(socket, {
       event: "init",
