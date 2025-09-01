@@ -29,6 +29,8 @@ import { TagRels } from "../tagRels/collection";
 import { loadByIds, getWithLoader, getWithCustomLoader } from "../../loaders";
 import { formGroups } from "./formGroups";
 import SimpleSchema from "simpl-schema";
+
+const URL_REGEX = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
 import { DEFAULT_QUALITATIVE_VOTE } from "../reviewVotes/schema";
 import { getCollaborativeEditorAccess } from "./collabEditingPermissions";
 import { getVotingSystems } from "../../voting/votingSystems";
@@ -2109,7 +2111,7 @@ const schema: SchemaType<"Posts"> = {
     control: "MuiTextField",
     optional: true,
     group: formGroups.event,
-    regEx: SimpleSchema.RegEx.Url,
+    regEx: URL_REGEX,
     tooltip: "https://...",
   },
 
@@ -2123,7 +2125,7 @@ const schema: SchemaType<"Posts"> = {
     control: "MuiTextField",
     optional: true,
     group: formGroups.event,
-    regEx: SimpleSchema.RegEx.Url,
+    regEx: URL_REGEX,
     tooltip: "https://...",
   },
 
@@ -2215,7 +2217,7 @@ const schema: SchemaType<"Posts"> = {
     control: "MuiTextField",
     optional: true,
     group: formGroups.event,
-    regEx: SimpleSchema.RegEx.Url,
+    regEx: URL_REGEX,
     tooltip: "https://www.facebook.com/events/...",
   },
 
@@ -2229,7 +2231,7 @@ const schema: SchemaType<"Posts"> = {
     control: "MuiTextField",
     optional: true,
     group: formGroups.event,
-    regEx: SimpleSchema.RegEx.Url,
+    regEx: URL_REGEX,
     tooltip: "https://www.meetup.com/...",
   },
 
@@ -2242,7 +2244,7 @@ const schema: SchemaType<"Posts"> = {
     control: "MuiTextField",
     optional: true,
     group: formGroups.event,
-    regEx: SimpleSchema.RegEx.Url,
+    regEx: URL_REGEX,
     tooltip: "https://...",
   },
 

@@ -29,9 +29,9 @@ const dbPageCacheEnabledSetting = new DatabaseServerSetting<boolean>("dbPageCach
 const maxPageCacheSizeBytes = 32 * 1024 * 1024; //32MB
 
 const pageCache = new LRU<string, RenderResult>({
-  max: maxPageCacheSizeBytes,
-  length: (page, key) => JSON.stringify(page).length + JSON.stringify(key).length,
-  maxAge: maxCacheAgeMs,
+  maxSize: maxPageCacheSizeBytes,
+  sizeCalculation: (page, key) => JSON.stringify(page).length + JSON.stringify(key).length,
+  ttl: maxCacheAgeMs,
   updateAgeOnGet: false,
   dispose: (key: string, page) => {
     const parsedKey: { cacheKey: string; abTestGroups: RelevantTestGroupAllocation } = JSON.parse(key);

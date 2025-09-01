@@ -21,16 +21,18 @@ type PostAndDigestPost = DbPost & {
 type PostEmojiReactors = Record<string, string[]>;
 
 const postEmojiReactorCache = new LRU<string, Promise<PostEmojiReactors>>({
-  maxAge: 30 * 1000, // 30 second TTL
+  ttl: 30 * 1000, // 30 second TTL
   updateAgeOnGet: false,
+  max: 500, // Maximum number of items
 });
 
 // Map from comment ids to maps from emoji names to an array of user display names
 type CommentEmojiReactors = Record<string, Record<string, string[]>>;
 
 const commentEmojiReactorCache = new LRU<string, Promise<CommentEmojiReactors>>({
-  maxAge: 30 * 1000, // 30 second TTL
+  ttl: 30 * 1000, // 30 second TTL
   updateAgeOnGet: false,
+  max: 500, // Maximum number of items
 });
 
 class PostsRepo extends AbstractRepo<"Posts"> {

@@ -1,4 +1,6 @@
 import SimpleSchema from "simpl-schema";
+
+const URL_REGEX = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
 import {
   schemaDefaultValue,
   arrayOfForeignKeysField,
@@ -193,7 +195,7 @@ const schema: SchemaType<"Localgroups"> = {
     label: isFriendlyUI ? "Facebook group" : "Facebook Group",
     control: "MuiTextField",
     optional: true,
-    regEx: SimpleSchema.RegEx.Url,
+    regEx: URL_REGEX,
     tooltip: "https://www.facebook.com/groups/...",
   },
 
@@ -205,7 +207,7 @@ const schema: SchemaType<"Localgroups"> = {
     label: isFriendlyUI ? "Facebook page" : "Facebook Page",
     control: "MuiTextField",
     optional: true,
-    regEx: SimpleSchema.RegEx.Url,
+    regEx: URL_REGEX,
     tooltip: "https://www.facebook.com/...",
   },
 
@@ -217,7 +219,7 @@ const schema: SchemaType<"Localgroups"> = {
     label: isFriendlyUI ? "Meetup.com group" : "Meetup.com Group",
     control: "MuiTextField",
     optional: true,
-    regEx: SimpleSchema.RegEx.Url,
+    regEx: URL_REGEX,
     tooltip: "https://www.meetup.com/...",
   },
 
@@ -229,7 +231,7 @@ const schema: SchemaType<"Localgroups"> = {
     label: isFriendlyUI ? "Slack workspace" : "Slack Workspace",
     control: "MuiTextField",
     optional: true,
-    regEx: SimpleSchema.RegEx.Url,
+    regEx: URL_REGEX,
     tooltip: "https://...",
   },
 
@@ -240,7 +242,7 @@ const schema: SchemaType<"Localgroups"> = {
     canUpdate: ["members"],
     control: "MuiTextField",
     optional: true,
-    regEx: SimpleSchema.RegEx.Url,
+    regEx: URL_REGEX,
     tooltip: "https://...",
   },
 

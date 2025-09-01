@@ -1,4 +1,6 @@
 import SimpleSchema from "simpl-schema";
+
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 import { Utils, slugify, getNestedProperty } from "../../vulcan-lib";
 import { userGetProfileUrl, getAuth0Id, getUserEmail, userOwnsAndInGroup } from "./helpers";
 import { userGetEditUrl } from "../../vulcan-users/helpers";
@@ -340,7 +342,7 @@ const schema: SchemaType<"Users"> = {
   },
   "emails.$.address": {
     type: String,
-    regEx: SimpleSchema.RegEx.Email,
+    regEx: EMAIL_REGEX,
     optional: true,
   },
   // NB: Not used on the EA Forum
@@ -424,7 +426,7 @@ const schema: SchemaType<"Users"> = {
   email: {
     type: String,
     optional: true,
-    regEx: SimpleSchema.RegEx.Email,
+    regEx: EMAIL_REGEX,
     input: "text",
     canCreate: ["members"],
     canUpdate: [userOwns, "sunshineRegiment", "admins"],

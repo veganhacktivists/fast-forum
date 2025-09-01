@@ -12,6 +12,8 @@ import {
 } from "../vulcan-lib";
 import pick from "lodash/pick";
 import SimpleSchema from "simpl-schema";
+
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 import { getUserEmail, userCanEditUser, userGetDisplayName } from "../../lib/collections/users/helpers";
 import { userFindOneByEmail } from "../commonQueries";
 import { isEAForum } from "../../lib/instanceSettings";
@@ -290,7 +292,7 @@ addGraphQLResolvers({
         throw new Error("Email already taken");
       }
       // Check for valid email
-      if (email && !SimpleSchema.RegEx.Email.test(email)) {
+      if (email && !EMAIL_REGEX.test(email)) {
         throw new Error("Invalid email");
       }
       const updatedUser = (
