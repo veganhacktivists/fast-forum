@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Components, registerComponent } from "../../../lib/vulcan-lib";
 import { EditorContents } from "../../editor/Editor";
-import { useQuery, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useQuery } from "@apollo/client";
 import { ToCData } from "../../../lib/tableOfContents";
 
 export interface DynamicTableOfContentsContextType {

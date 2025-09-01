@@ -1,6 +1,6 @@
 import React, { ErrorInfo } from "react";
 import { registerComponent, Components } from "../../lib/vulcan-lib";
-import { configureScope, captureException } from "@sentry/core";
+import { withScope, captureException } from "@sentry/core";
 import { withLocation } from "../../lib/routeUtil";
 
 interface ErrorBoundaryExternalProps {
@@ -32,7 +32,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       error: error.toString(),
       errorLocation: this.props.location.url,
     });
-    configureScope((scope) => {
+    withScope((scope) => {
       Object.keys(info).forEach((key: keyof ErrorInfo) => {
         scope.setExtra(key, info[key]);
       });

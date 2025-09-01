@@ -4,7 +4,7 @@ import { useLocation } from "../../../lib/routeUtil";
 import { Components, registerComponent } from "../../../lib/vulcan-lib";
 import { AnalyticsContext, useTracking } from "../../../lib/analyticsEvents";
 import { EditTagForm } from "../EditTagPage";
-import { useApolloClient } from "@apollo/client/react";
+import { useApolloClient } from "@apollo/client";
 import truncateTagDescription from "../../../lib/utils/truncateTagDescription";
 import { taggingNamePluralSetting } from "../../../lib/instanceSettings";
 import { truncate } from "../../../lib/editor/ellipsize";

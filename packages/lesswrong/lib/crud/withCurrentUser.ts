@@ -1,5 +1,5 @@
 import { fragmentTextForQuery } from "../vulcan-lib/fragments";
-import { useQuery, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useQuery } from "@apollo/client";
 import { hookToHoc } from "../hocUtils";
 
 /**

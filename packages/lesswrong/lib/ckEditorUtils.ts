@@ -1,4 +1,4 @@
-import LRU from "lru-cache";
+import { LRUCache as LRU } from "lru-cache";
 
 // This cache helps avoid multiple network load times when requesting
 // tokens in quick succession. We use the default TTL which is only

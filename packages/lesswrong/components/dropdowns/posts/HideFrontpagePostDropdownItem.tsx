@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { registerComponent, Components, fragmentTextForQuery } from "../../../lib/vulcan-lib";
 import { useCurrentUser } from "../../common/withUser";
 import { useTracking } from "../../../lib/analyticsEvents";
-import { useMutation, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import { AllowHidingFrontPagePostsContext } from "./PostActions";
 import withErrorBoundary from "../../common/withErrorBoundary";
 import map from "lodash/map";

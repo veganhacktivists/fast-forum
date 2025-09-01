@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Components, registerComponent, getFragment } from "../../../lib/vulcan-lib";
 import DialogContent from "@material-ui/core/DialogContent";
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import Input from "@material-ui/core/Input";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Select from "@material-ui/core/Select";

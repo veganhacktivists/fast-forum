@@ -8,7 +8,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import Button from "@material-ui/core/Button";
 import LoginIcon from "@material-ui/icons/LockOpen";
 import UnlinkIcon from "@material-ui/icons/RemoveCircle";
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import { useOnFocusTab } from "../hooks/useOnFocusTab";
 
 const styles = (theme: ThemeType): JssStyles => ({

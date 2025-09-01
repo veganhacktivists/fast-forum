@@ -20,7 +20,7 @@ import { getConfirmedCoauthorIds } from "../../lib/collections/posts/helpers";
 import sortBy from "lodash/sortBy";
 import uniqBy from "lodash/uniqBy";
 import { filterNonnull } from "../../lib/utils/typeGuardUtils";
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import type {
   Node,

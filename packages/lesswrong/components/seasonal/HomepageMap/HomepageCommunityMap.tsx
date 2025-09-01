@@ -3,7 +3,7 @@ import { useUserLocation } from "../../../lib/collections/users/helpers";
 import { registerComponent, Components } from "../../../lib/vulcan-lib";
 import { useCurrentUser } from "../../common/withUser";
 import { Helmet } from "react-helmet";
-import ReactMapGL, { Marker } from "react-map-gl";
+import ReactMapGL, { Marker } from "react-map-gl/mapbox-legacy";
 import { defaultCenter } from "../../localGroups/CommunityMap";
 import { mapboxAPIKeySetting } from "../../../lib/publicSettings";
 import { ArrowSVG } from "../../localGroups/Icons";

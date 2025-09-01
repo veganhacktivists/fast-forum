@@ -4,7 +4,9 @@ import { DatabasePublicSetting, localeSetting } from "../../lib/publicSettings";
 import { Components, registerComponent, userChangedCallback } from "../../lib/vulcan-lib";
 import { TimeOverride, TimeContext } from "../../lib/utils/timeUtil";
 // eslint-disable-next-line no-restricted-imports
-import { useLocation, withRouter } from "react-router";
+import { useLocation } from "react-router";
+// eslint-disable-next-line no-restricted-imports
+import { useNavigate } from "react-router-dom";
 import { useQueryCurrentUser } from "../../lib/crud/withCurrentUser";
 import {
   LocationContext,
@@ -32,12 +34,10 @@ interface ExternalProps {
 const App = ({
   serverRequestStatus,
   timeOverride,
-  history,
-}: ExternalProps & {
-  history: History;
-}) => {
+}: ExternalProps) => {
   const { currentUser, currentUserLoading } = useQueryCurrentUser();
   const reactDomLocation = useLocation();
+  const navigate = useNavigate();
   const locationContext = useRef<RouterLocation | null>(null);
   const subscribeLocationContext = useRef<RouterLocation | null>(null);
   const navigationContext = useRef<any>();
@@ -73,6 +73,16 @@ const App = ({
   } else {
     Object.assign(locationContext.current, location);
   }
+
+  // Create history-compatible object for navigation context
+  const history = {
+    push: navigate,
+    replace: (to: string) => navigate(to, { replace: true }),
+    go: (delta: number) => navigate(delta),
+    goBack: () => navigate(-1),
+    goForward: () => navigate(1),
+    location: reactDomLocation,
+  };
 
   if (!navigationContext.current) {
     navigationContext.current = { history };
@@ -123,9 +133,7 @@ const App = ({
   );
 };
 
-const AppComponent = registerComponent<ExternalProps>("App", App, {
-  hocs: [withRouter],
-});
+const AppComponent = registerComponent<ExternalProps>("App", App);
 
 declare global {
   interface ComponentTypes {

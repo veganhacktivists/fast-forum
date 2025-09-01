@@ -2,7 +2,7 @@ import { Vulcan } from "../../lib/vulcan-lib";
 import { Posts } from "../../lib/collections/posts";
 import Users from "../../lib/collections/users/collection";
 import { urlIsBroken } from "./utils";
-import htmlparser2 from "htmlparser2";
+import * as htmlparser2 from "htmlparser2";
 import { URL } from "url";
 import fs from "fs";
 import * as _ from "underscore";

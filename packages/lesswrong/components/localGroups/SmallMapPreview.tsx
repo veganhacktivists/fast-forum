@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Components, registerComponent } from "../../lib/vulcan-lib";
 import { createStyles } from "@material-ui/core/styles";
-import ReactMapGL from "react-map-gl";
+import ReactMapGL from "react-map-gl/mapbox-legacy";
 import { Helmet } from "react-helmet";
 import * as _ from "underscore";
 import { mapboxAPIKeySetting } from "../../lib/publicSettings";

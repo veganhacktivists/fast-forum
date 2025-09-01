@@ -9,7 +9,7 @@ import { responseToText, RsvpResponse } from "./RSVPForm";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import { isFriendlyUI } from "../../../themes/forumTheme";
 import groupBy from "lodash/groupBy";
 import mapValues from "lodash/mapValues";

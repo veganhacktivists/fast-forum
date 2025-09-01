@@ -1,6 +1,6 @@
 import React from "react";
 import { registerComponent, Components } from "../../lib/vulcan-lib";
-import { useQuery, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useQuery } from "@apollo/client";
 
 const styles = (theme: ThemeType): JssStyles => ({
   indexesTable: {

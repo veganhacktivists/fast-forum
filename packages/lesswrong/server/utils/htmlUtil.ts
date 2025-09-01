@@ -1,5 +1,5 @@
-import cheerio from "cheerio";
-import HtmlLexer from "html-lexer";
+import { load as cheerio } from "cheerio";
+import { Lexer as HtmlLexer } from "html-lexer";
 
 /**
  * Parse an HTML string with cheerio. Server-side only. Provides some cheerio

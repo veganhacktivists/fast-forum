@@ -1,4 +1,4 @@
-import cheerio from "cheerio";
+import { load as cheerio } from "cheerio";
 import { cheerioParse, cheerioParseAndMarkOffsets, tokenizeHtml } from "./utils/htmlUtil";
 import { Comments } from "../lib/collections/comments/collection";
 import type { SideCommentsResolverResult } from "../lib/collections/posts/schema";

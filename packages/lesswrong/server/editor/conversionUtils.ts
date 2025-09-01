@@ -14,7 +14,7 @@ import markdownItSup from "markdown-it-sup";
 import { mjpage } from "mathjax-node-page";
 import { isAnyTest } from "../../lib/executionEnvironment";
 import { cheerioParse } from "../utils/htmlUtil";
-import cheerio from "cheerio";
+import { load as cheerio } from "cheerio";
 import { sanitize } from "../../lib/vulcan-lib/utils";
 import Users from "../../lib/vulcan-users";
 import { filterWhereFieldsNotNull } from "../../lib/utils/typeGuardUtils";

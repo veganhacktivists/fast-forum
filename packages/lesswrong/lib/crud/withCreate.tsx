@@ -1,5 +1,5 @@
 import { ApolloError, gql } from "@apollo/client";
-import { useApolloClient, useMutation } from "@apollo/client/react/hooks";
+import { useApolloClient, useMutation } from "@apollo/client";
 import { extractFragmentInfo, getCollection } from "../vulcan-lib";
 import { updateCacheAfterCreate } from "./cacheUpdates";
 import { loggerConstructor } from "../utils/logging";

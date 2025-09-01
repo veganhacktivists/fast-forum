@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useCurrentUser } from "../common/withUser";
 import { useTracking } from "../../lib/analyticsEvents";
 import { useCookiesWithConsent } from "./useCookiesWithConsent";
-import { useMutation, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import moment from "moment";
 
 export type ExpandedFrontpageSections = NonNullable<DbUser["expandedFrontpageSections"]>;

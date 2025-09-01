@@ -1,7 +1,7 @@
 import React from "react";
 import { registerComponent, Components } from "../../lib/vulcan-lib";
 import { postGetPageUrl } from "../../lib/collections/posts/helpers";
-import { Marker } from "react-map-gl";
+import { Marker } from "react-map-gl/mapbox-legacy";
 import { createStyles } from "@material-ui/core/styles";
 import { ArrowSVG } from "./Icons";
 import RoomIcon from "@material-ui/icons/Room";

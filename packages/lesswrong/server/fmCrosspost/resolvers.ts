@@ -17,7 +17,7 @@ import { signToken } from "./tokens";
 import { ConnectCrossposterArgs, GetCrosspostRequest, UnlinkCrossposterPayload } from "./types";
 import { DatabaseServerSetting } from "../databaseSettings";
 import stringify from "json-stringify-deterministic";
-import LRU from "lru-cache";
+import { LRUCache as LRU } from "lru-cache";
 
 const fmCrosspostTimeoutMsSetting = new DatabaseServerSetting<number>("fmCrosspostTimeoutMs", 15000);
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Components, registerComponent } from "../../../lib/vulcan-lib";
 import { createStyles } from "@material-ui/core/styles";
-import ReactMapGL, { Marker } from "react-map-gl";
+import ReactMapGL, { Marker } from "react-map-gl/mapbox-legacy";
 import { Helmet } from "react-helmet";
 import { mapboxAPIKeySetting } from "../../../lib/publicSettings";
 import { connectHits } from "react-instantsearch-dom";

@@ -1,7 +1,7 @@
 import { diff } from "./vendor/node-htmldiff/htmldiff";
 import { Revisions } from "../lib/collections/revisions/collection";
 import { compareVersionNumbers } from "../lib/editor/utils";
-import cheerio from "cheerio";
+import { load as cheerio } from "cheerio";
 import { cheerioParse } from "./utils/htmlUtil";
 import orderBy from "lodash/orderBy";
 import times from "lodash/times";

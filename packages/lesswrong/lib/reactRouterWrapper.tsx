@@ -77,5 +77,6 @@ function isOffsiteLink(url: string): boolean {
   }
 }
 
-export const Redirect = reactRouter.Redirect;
+// React Router v6+ replaced Redirect with Navigate
+export const Redirect = reactRouterDom.Navigate;
 export { useNavigate, NavigateFunction } from "./routeUtil";

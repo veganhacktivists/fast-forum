@@ -1,4 +1,4 @@
-import cheerio from "cheerio";
+import { load as cheerio } from "cheerio";
 import * as _ from "underscore";
 import { cheerioParse } from "./utils/htmlUtil";
 import { Comments } from "../lib/collections/comments/collection";

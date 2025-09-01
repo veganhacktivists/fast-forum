@@ -8,7 +8,7 @@ import { registerMigration, forEachDocumentBatchInCollection } from "./migration
 import { urlIsBroken } from "../scripts/utils";
 import { Posts } from "../../lib/collections/posts/collection";
 import { postStatuses } from "../../lib/collections/posts/constants";
-import cheerio from "cheerio";
+import { load as cheerio } from "cheerio";
 
 function findInsecureImages($: any): Array<string> {
   let insecureImageSources: Array<string> = [];

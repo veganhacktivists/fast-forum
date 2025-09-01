@@ -1,5 +1,5 @@
 import React from "react";
-import JssProvider from "react-jss/lib/JssProvider";
+import { JssProvider } from "react-jss";
 import { createGenerateClassName, jssPreset } from "@material-ui/core/styles";
 import { create } from "jss";
 import type { AbstractThemeOptions } from "../themes/themeNames";

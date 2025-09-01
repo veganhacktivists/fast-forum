@@ -35,7 +35,7 @@ const getUsedMuiStyles = () => {
     MuiFormLabel: require("@material-ui/core/FormLabel/FormLabel").styles,
     MuiIconButton: require("@material-ui/core/IconButton/IconButton").styles,
     MuiInputBase: require("@material-ui/core/InputBase/InputBase").styles,
-    Textarea2: require("@material-ui/core/InputBase/Textarea").styles,
+    // Textarea2: require("@material-ui/core/InputBase/Textarea").styles, // Removed in Material-UI v4
     MuiInput: require("@material-ui/core/Input/Input").styles,
     MuiInputAdornment: require("@material-ui/core/InputAdornment/InputAdornment").styles,
     MuiInputLabel: require("@material-ui/core/InputLabel/InputLabel").styles,

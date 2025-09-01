@@ -1,7 +1,7 @@
 import React from "react";
 import { registerComponent, Components } from "../../lib/vulcan-lib";
 import { GroupIconSVG } from "./Icons";
-import { Marker } from "react-map-gl";
+import { Marker } from "react-map-gl/mapbox-legacy";
 import { createStyles } from "@material-ui/core/styles";
 import { forumTypeSetting } from "../../lib/instanceSettings";
 

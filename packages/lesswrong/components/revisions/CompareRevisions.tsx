@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Components, registerComponent } from "../../lib/vulcan-lib";
-import { useQuery, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useQuery } from "@apollo/client";
 
 const styles = (theme: ThemeType): JssStyles => ({
   differences: {

@@ -3,7 +3,7 @@ import { Components, registerComponent } from "../../lib/vulcan-lib";
 import Button from "@material-ui/core/Button";
 import { useCurrentUser } from "../common/withUser";
 import { forumHeaderTitleSetting } from "../common/Header";
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import { hasProminentLogoSetting } from "../../lib/publicSettings";
 
 const styles = (theme: ThemeType): JssStyles => ({

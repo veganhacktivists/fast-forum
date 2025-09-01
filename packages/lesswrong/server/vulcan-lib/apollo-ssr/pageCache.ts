@@ -1,4 +1,4 @@
-import LRU from "lru-cache";
+import { LRUCache as LRU } from "lru-cache";
 import type { RenderResult } from "./renderPage";
 import { CompleteTestGroupAllocation, RelevantTestGroupAllocation, getABTestsMetadata } from "../../../lib/abTestImpl";
 import { Globals } from "../../../lib/vulcan-lib";

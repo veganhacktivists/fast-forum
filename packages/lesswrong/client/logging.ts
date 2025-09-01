@@ -37,9 +37,7 @@ if (sentryUrl && sentryEnvironment && sentryRelease) {
 
 userChangedCallback.add(function identifyUserToSentry(user: UsersCurrent | null) {
   // Set user in sentry scope, or clear user if they have logged out
-  Sentry.configureScope((scope) => {
-    scope.setUser(user ? { id: user._id, email: getUserEmail(user), username: user.username } : null);
-  });
+  Sentry.setUser(user ? { id: user._id, email: getUserEmail(user), username: user.username } : null);
 });
 
 userChangedCallback.add(function addUserIdToGoogleAnalytics(user: UsersCurrent | null) {

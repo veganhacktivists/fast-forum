@@ -1,6 +1,5 @@
 import React from "react";
-import JssProvider from "react-jss/lib/JssProvider";
-import { SheetsRegistry } from "react-jss/lib/jss";
+import { JssProvider, SheetsRegistry } from "react-jss";
 import { ThemeContextProvider } from "../../components/themes/useTheme";
 import { AbstractThemeOptions } from "../../themes/themeNames";
 import { createGenerateClassName } from "@material-ui/core/styles";

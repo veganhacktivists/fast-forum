@@ -6,7 +6,7 @@ import { DatabaseServerSetting } from "../databaseSettings";
 import { ckEditorUploadUrlSetting, cloudinaryCloudNameSetting } from "../../lib/publicSettings";
 import { randomId } from "../../lib/random";
 import cloudinary from "cloudinary";
-import cheerio from "cheerio";
+import { load as cheerio } from "cheerio";
 import { cheerioParse } from "../utils/htmlUtil";
 import { URL } from "url";
 import { ckEditorUploadUrlOverrideSetting } from "../../lib/instanceSettings";

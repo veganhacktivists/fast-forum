@@ -1,4 +1,4 @@
-import { useMutation, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import { getFragment } from "../../../lib/vulcan-lib";
 
 export const useModerateComment = ({ fragmentName }: { fragmentName: FragmentName }) => {

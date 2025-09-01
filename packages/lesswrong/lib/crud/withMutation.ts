@@ -1,4 +1,4 @@
-import { graphql } from "@apollo/client/react/hoc";
+// import { graphql } from "@apollo/client/react/hoc"; // Removed in Apollo Client v4
 import { useMutation, gql, OperationVariables } from "@apollo/client";
 import { getFragment } from "../vulcan-lib";
 import * as _ from "underscore";
@@ -6,8 +6,9 @@ import * as _ from "underscore";
 /**
  * HoC for an arbitrary GraphQL mutation, which assembles a graphql query string
  * from parts. DEPRECATED: you probably want to use Apollo's useMutation instead.
+ * DISABLED: Apollo Client v4 removed HOCs
  */
-export function withMutation({ name, args, fragmentName }: { name: string; args: any; fragmentName?: FragmentName }) {
+/* export function withMutation({ name, args, fragmentName }: { name: string; args: any; fragmentName?: FragmentName }) {
   let mutation,
     fragment,
     fragmentBlock = "";
@@ -35,23 +36,8 @@ export function withMutation({ name, args, fragmentName }: { name: string; args:
     `;
   }
 
-  return graphql(
-    gql`
-      ${mutation}
-      ${fragmentName ? fragment : ""}
-    `,
-    {
-      alias: "withMutation",
-      props: ({ ownProps, mutate }: any) => ({
-        [name]: (vars: any) => {
-          return mutate({
-            variables: vars,
-          });
-        },
-      }),
-    },
-  );
-}
+  return null; // HOC removed in Apollo Client v4
+} */
 
 /**
  * Wrapper around Apollo's useMutation which assembles a GraphQL query from

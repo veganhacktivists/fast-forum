@@ -4,7 +4,7 @@ import { useMulti } from "../../lib/crud/withMulti";
 import { createStyles } from "@material-ui/core/styles";
 import { userGetDisplayName, userGetProfileUrl } from "../../lib/collections/users/helpers";
 import { useLocation } from "../../lib/routeUtil";
-import ReactMapGL, { Marker } from "react-map-gl";
+import ReactMapGL, { Marker } from "react-map-gl/mapbox-legacy";
 import { Helmet } from "react-helmet";
 import * as _ from "underscore";
 import { mapboxAPIKeySetting } from "../../lib/publicSettings";

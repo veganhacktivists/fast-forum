@@ -1,4 +1,4 @@
-import { useQuery, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useQuery } from "@apollo/client";
 import { fragmentTextForQuery } from "../../lib/vulcan-lib/fragments";
 import { defaultAlgorithmSettings } from "../../lib/collections/users/recommendationSettings";
 import type { RecommendationsAlgorithm } from "../../lib/collections/users/recommendationSettings";

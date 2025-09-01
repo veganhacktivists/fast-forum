@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useMutation, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import type { ApolloError } from "@apollo/client";
 import { getCollection, extractFragmentInfo } from "../vulcan-lib";
 import { updateCacheAfterUpdate } from "./cacheUpdates";

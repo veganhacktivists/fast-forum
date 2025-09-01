@@ -6,7 +6,7 @@ import { useDialog } from "../../common/withDialog";
 import Button from "@material-ui/core/Button";
 import classNames from "classnames";
 import { useTracking } from "../../../lib/analyticsEvents";
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 
 const styles = (theme: ThemeType): JssStyles => ({
   root: {

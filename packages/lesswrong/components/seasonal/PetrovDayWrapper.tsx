@@ -1,6 +1,6 @@
 import { registerComponent, Components } from "../../lib/vulcan-lib";
 import React, { useEffect, useState } from "react";
-import { useQuery, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useQuery } from "@apollo/client";
 import moment from "../../lib/moment-timezone";
 
 // This component is (most likely) going to be used once-a-year on Petrov Day (sept 26th)

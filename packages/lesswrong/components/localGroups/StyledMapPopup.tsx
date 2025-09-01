@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import { createStyles } from "@material-ui/core/styles";
 import { Link } from "../../lib/reactRouterWrapper";
 import { registerComponent } from "../../lib/vulcan-lib";
-import { Popup } from "react-map-gl";
+import { Popup } from "react-map-gl/mapbox-legacy";
 import { isEAForum } from "../../lib/instanceSettings";
 
 // Shared with LocalEventMarker

@@ -14,7 +14,7 @@ import SelectQuery from "../lib/sql/SelectQuery";
 import uniq from "lodash/uniq";
 import md5 from "md5";
 import { performanceMetricLoggingBatchSize } from "../lib/publicSettings";
-import LRU from "lru-cache";
+import { LRUCache as LRU } from "lru-cache";
 
 // Since different environments are connected to the same DB, this setting cannot be moved to the database
 export const environmentDescriptionSetting = new PublicInstanceSetting<string>(

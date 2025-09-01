@@ -5,10 +5,10 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { Link } from "../../lib/reactRouterWrapper";
 import { useCurrentUser } from "../common/withUser";
-import ReactMapGL from "react-map-gl";
+import ReactMapGL from "react-map-gl/mapbox-legacy";
 import { Helmet } from "react-helmet";
 import { DatabasePublicSetting, mapboxAPIKeySetting } from "../../lib/publicSettings";
-import { useMutation, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import { useMessages } from "../common/withMessages";
 import {
   getPetrovDayKarmaThreshold,

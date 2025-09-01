@@ -3,7 +3,7 @@ import { useDialog } from "../common/withDialog";
 import { useCurrentUser } from "../common/withUser";
 import { pluck } from "underscore";
 import { useTracking } from "../../lib/analyticsEvents";
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import { fragmentTextForQuery } from "../../lib/vulcan-lib";
 import type { ForumIconName } from "../common/ForumIcon";
 import { isFriendlyUI } from "../../themes/forumTheme";

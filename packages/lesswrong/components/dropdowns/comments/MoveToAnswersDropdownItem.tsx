@@ -4,7 +4,7 @@ import { useUpdate } from "../../../lib/crud/withUpdate";
 import { useMessages } from "../../common/withMessages";
 import { userCanDo, userOwns } from "../../../lib/vulcan-users/permissions";
 import { useCurrentUser } from "../../common/withUser";
-import { useApolloClient } from "@apollo/client/react/hooks";
+import { useApolloClient } from "@apollo/client";
 import { preferredHeadingCase } from "../../../themes/forumTheme";
 
 const MoveToAnswersDropdownItem = ({ comment, post }: { comment: CommentsList; post?: PostsBase }) => {

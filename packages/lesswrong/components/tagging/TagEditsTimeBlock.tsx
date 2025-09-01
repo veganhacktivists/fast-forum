@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Components, registerComponent } from "../../lib/vulcan-lib";
-import { useQuery, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useQuery } from "@apollo/client";
 import { fragmentTextForQuery } from "../../lib/vulcan-lib/fragments";
 import withErrorBoundary from "../common/withErrorBoundary";
 import { taggingNameCapitalSetting, taggingNameIsSet } from "../../lib/instanceSettings";

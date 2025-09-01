@@ -2,7 +2,7 @@ import React from "react";
 import { registerComponent } from "../../lib/vulcan-lib";
 import { InstantSearch, Configure } from "react-instantsearch-dom";
 import { getSearchClient, isSearchEnabled } from "../../lib/search/searchUtil";
-import { connectAutoComplete } from "react-instantsearch/connectors";
+import { connectAutoComplete } from "react-instantsearch-dom";
 import Autosuggest, { OnSuggestionSelected } from "react-autosuggest";
 
 const styles = (theme: ThemeType): JssStyles => ({

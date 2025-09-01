@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { CENTRAL_COLUMN_WIDTH } from "../posts/PostsPage/PostsPage";
 import { commentBodyStyles, postBodyStyles } from "../../themes/stylePiping";
 import { useMessages } from "../common/withMessages";
-import { useMutation, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import { useTracking } from "../../lib/analyticsEvents";
 import { useCurrentUser } from "../common/withUser";
 import { canUserEditPostMetadata } from "../../lib/collections/posts/helpers";

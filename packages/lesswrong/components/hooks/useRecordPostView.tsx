@@ -1,5 +1,5 @@
 import React, { useContext, useCallback, useState, useMemo } from "react";
-import { useMutation, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import { useCurrentUser } from "../common/withUser";
 import { useNewEvents } from "../../lib/events/withNewEvents";
 import { hookToHoc } from "../../lib/hocUtils";

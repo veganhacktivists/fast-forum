@@ -2,7 +2,7 @@ import React from "react";
 import { registerComponent, Components } from "../../../lib/vulcan-lib";
 import { useUpdate } from "../../../lib/crud/withUpdate";
 import { useMessages } from "../../common/withMessages";
-import { useApolloClient } from "@apollo/client/react/hooks";
+import { useApolloClient } from "@apollo/client";
 import { useCurrentUser } from "../../common/withUser";
 import { userCanDo } from "../../../lib/vulcan-users/permissions";
 import ListItemIcon from "@material-ui/core/ListItemIcon";

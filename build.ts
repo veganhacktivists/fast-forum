@@ -34,7 +34,7 @@ void (async () => {
   const clientBuild = build({
     ...commonOpts,
     entryPoints: ["./packages/lesswrong/client/clientStartup.ts"],
-    target: "es6",
+    target: "es2020",
     outfile: clientOutPath,
     platform: "browser",
     treeShaking: "ignore-annotations",

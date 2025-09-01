@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { registerComponent, Components, getFragment } from "../../lib/vulcan-lib";
 import { useMulti } from "../../lib/crud/withMulti";
-import { useMutation, gql } from "@apollo/client";
+import { gql } from "@apollo/client"; import { useMutation } from "@apollo/client";
 import { useCurrentUser } from "../common/withUser";
 import classNames from "classnames";
 import * as _ from "underscore";

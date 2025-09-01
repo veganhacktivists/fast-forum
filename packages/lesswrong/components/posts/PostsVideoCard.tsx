@@ -2,7 +2,7 @@ import React, { useMemo, useRef } from "react";
 import { Components, registerComponent } from "../../lib/vulcan-lib";
 import { useHover } from "../common/withHover";
 import { AnalyticsContext } from "../../lib/analyticsEvents";
-import cheerio from "cheerio";
+import { load as cheerio } from "cheerio";
 
 const styles = (theme: ThemeType) => ({
   root: {
