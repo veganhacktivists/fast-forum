@@ -263,7 +263,7 @@ class PgCollection<N extends CollectionNameString = CollectionNameString> implem
             ObjectsByCollectionName[N]
           >)
         : fieldOrSpec;
-    const index = this.table.getIndex(Object.keys(key), options) ?? this.getTable().addIndex(key, options);
+    const index = this.table?.getIndex(Object.keys(key), options) ?? this.getTable().addIndex(key, options);
     const query = new CreateIndexQuery(this.getTable(), index, true);
     await this.executeWriteQuery(query, { fieldOrSpec, options });
   }
