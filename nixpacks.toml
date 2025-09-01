@@ -1,5 +1,8 @@
 providers = ['node']
 
+[variables]
+NODE_VERSION = '24'
+
 [phases.build]
 dependsOn = ['install']
 cmds = [
