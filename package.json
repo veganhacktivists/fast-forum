@@ -359,7 +359,7 @@
     "graphql-tools": "^4.0.7"
   },
   "engines": {
-    "node": "20.x",
+    "node": "18.x",
     "pnpm": "9.1.2"
   },
   "optionalDependencies": {
