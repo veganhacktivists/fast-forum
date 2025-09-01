@@ -85,6 +85,7 @@ void (async () => {
       "@elastic/elasticsearch",
       "zod",
       "node-abort-controller",
+      "@dqbd/tiktoken",
     ],
   });
 

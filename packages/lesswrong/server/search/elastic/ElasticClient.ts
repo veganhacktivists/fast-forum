@@ -26,7 +26,7 @@ class ElasticClient {
     if (!host || !username || !password) {
       // eslint-disable-next-line no-console
       console.warn("Elastic is enabled, but credentials are missing");
-      return;
+      throw new Error("Elastic credentials are missing");
     }
 
     if (!globalClient) {
