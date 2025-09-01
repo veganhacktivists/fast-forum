@@ -96,7 +96,7 @@ export const PostSubmit = ({
   const onSubmitClick = requireConfirmation ? submitWithConfirmation : submitWithoutConfirmation;
   const requestFeedbackKarmaLevel = requestFeedbackKarmaLevelSetting.get()
   // EA Forum title is Effective Altruism Forum, which is unecessarily long
-  const eaOrOtherFeedbackTitle = isEAForum ? 'the EA Forum team' : `the ${forumTitleSetting.get()} team`
+  const eaOrOtherFeedbackTitle = isEAForum ? 'the FAST Forum team' : `the ${forumTitleSetting.get()} team`
   const feedbackTitle = `Request feedback from ${isLWorAF ? 'our editor' : eaOrOtherFeedbackTitle}`
 
   return (

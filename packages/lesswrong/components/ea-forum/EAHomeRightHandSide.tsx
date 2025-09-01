@@ -199,7 +199,7 @@ const UpcomingEventsSection = ({classes}: {
 }
 
 /**
- * This is the primary EA Forum home page right-hand side component.
+ * This is the primary FAST Forum home page right-hand side component.
  */
 export const EAHomeRightHandSide = ({classes}: {
   classes: ClassesType<typeof styles>,
@@ -311,7 +311,7 @@ export const EAHomeRightHandSide = ({classes}: {
               className={classes.courseLink}
             >
               <ForumIcon icon="ComputerDesktop" className={classes.courseIcon} />
-              The Introductory EA Program
+              The Introductory FAST Program
             </Link>
             <div className={classes.postMetadata}>
               Apply by <FormatDate date={vpDates.deadline.toISOString()} format={"MMM D"} tooltip={false} />,

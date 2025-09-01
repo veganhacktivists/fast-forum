@@ -2,15 +2,15 @@
   "public": {
     "forumType": "EAForum",
     "hasEvents": true,
-    "title": "EAForum Test",
-    "tagline": "Effective Altruism research, discussion and community updates",
-    "faviconUrl": "https://www.effectivealtruism.org/favicon-16x16.png",
+    "title": "FAST Forum Test",
+    "tagline": "Animal Advocacy Forum",
+    "faviconUrl": "https://i.imgur.com/EsjRMTB.png",
     "forumSettings": {
-      "tabTitle": "EA Forum Test",
-      "headerTitle": "EA Forum Test",
-      "shortForumTitle": "EA Forum"
+      "tabTitle": "FAST Forum Test",
+      "headerTitle": "FAST Forum Test",
+      "shortForumTitle": "FAST Forum"
     },
-    "siteNameWithArticle": "the EA Forum",
+    "siteNameWithArticle": "the FAST Forum",
     "siteUrl": "http://localhost:3456",
     
     "debug": false,

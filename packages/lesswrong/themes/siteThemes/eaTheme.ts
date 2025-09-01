@@ -32,18 +32,18 @@ export const eaForumTheme: SiteThemeSpecification = {
   },
   componentPalette: (shadePalette: ThemeShadePalette) => ({
     primary: {
-      main: '#0c869b',
-      light: '#00b2be',
-      dark: '#085d6c' 
+      main: '#1C563E',
+      light: '#AAB138',
+      dark: '#1C563E'
     },
     secondary: {
-      main: '#0c869b',
-      light: '#3c9eaf',
-      dark: '#085d6c'
+      main: '#1C563E',
+      light: '#67A453',
+      dark: '#1C563E'
     },
     lwTertiary: {
-      main: "#137283",
-      dark: "#137283",
+      main: "#1C563E",
+      dark: "#1C563E",
     },
     error: {
       main: "#bf360c",
@@ -52,7 +52,7 @@ export const eaForumTheme: SiteThemeSpecification = {
       main: "#ffad08"
     },
     text: {
-      primaryAlert: "#137283",
+      primaryAlert: "#1C563E",
       contentHeader: shadePalette.grey[1000],
       debateComment: {
         [1]: "#66C9F3",
@@ -64,7 +64,7 @@ export const eaForumTheme: SiteThemeSpecification = {
       },
     },
     link: {
-      visited: "#7130a6",
+      visited: "#458E2E",
     },
     background: {
       default: shadePalette.type === 'light' ? '#f6f8f9' : shadePalette.grey[60],
@@ -73,10 +73,10 @@ export const eaForumTheme: SiteThemeSpecification = {
       warningTranslucent: "rgba(255, 173, 8, 0.1)",
     },
     header: {
-      text: shadePalette.type === 'light' ? "rgba(0,0,0,.87)" : shadePalette.greyAlpha(.87),
-      background: shadePalette.type === 'light' ? '#ffffff' : shadePalette.grey[30],
+      text: shadePalette.type === 'light' ? "#fff" : shadePalette.greyAlpha(.87),
+      background: shadePalette.type === 'light' ? '#1C563E' : shadePalette.grey[30],
     },
-    event: '#0C869B',
+    event: '#1C563E',
     group: '#538747',
     individual: '#BF577D',
     icon: {
@@ -95,7 +95,7 @@ export const eaForumTheme: SiteThemeSpecification = {
       addedBlockquoteHighlightStyles: `padding-top: 4px; padding-bottom: 6px;`
     },
     buttons: {
-      alwaysPrimary: '#0c869b',
+      alwaysPrimary: '#1C563E',
     },
     tag: {
       text: shadePalette.grey[1000],

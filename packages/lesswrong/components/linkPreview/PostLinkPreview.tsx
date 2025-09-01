@@ -514,13 +514,14 @@ const defaultPreviewStyles = defineStyles('DefaultPreview', (theme: ThemeType) =
   },
 }));
 
-export const DefaultPreview = ({href, onsite=false, id, rel, className, children}: {
+export const DefaultPreview = ({href, onsite=false, id, rel, className, children, target}: {
   href: string,
   onsite?: boolean,
   id?: string,
   rel?: string,
   className?: string,
   children: ReactNode,
+  target?: "_blank",
 }) => {
   const classes = useStyles(defaultPreviewStyles);
 
@@ -545,7 +546,7 @@ export const DefaultPreview = ({href, onsite=false, id, rel, className, children
       {onsite
         ? <Link to={href} id={id} rel={rel} className={className}>{children}</Link>
         : <AnalyticsTracker eventType="link" eventProps={{to: href}}>
-            <a href={href} id={id} rel={rel} className={className}>
+            <a href={href} id={id} rel={rel} className={className} target={target}>
               {children}
             </a>
           </AnalyticsTracker>}

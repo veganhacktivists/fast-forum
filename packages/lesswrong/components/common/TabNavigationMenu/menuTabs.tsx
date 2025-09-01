@@ -301,8 +301,8 @@ export const menuTabs: ForumOptions<Array<MenuTab>> = {
       link: getAllTagsPath(),
       iconComponent: TopicsIcon,
       selectedIconComponent: TopicsSelectedIcon,
-      tooltip: `A sorted list of pages — “${taggingNamePluralCapitalSetting.get()}” — in the EA Forum Wiki, which explains 
-      ${taggingNamePluralSetting.get()} in EA and collects posts tagged with those ${taggingNamePluralSetting.get()}.`,
+      tooltip: `A sorted list of pages — "${taggingNamePluralCapitalSetting.get()}" — in the FAST Forum Wiki, which explains 
+      ${taggingNamePluralSetting.get()} in FAST and collects posts tagged with those ${taggingNamePluralSetting.get()}.`,
       showOnMobileStandalone: true,
       showOnCompressed: true,
     }, {
@@ -353,13 +353,13 @@ export const menuTabs: ForumOptions<Array<MenuTab>> = {
       showOnCompressed: true,
     }, {
       id: 'handbook',
-      title: 'EA Handbook',
+      title: 'FAST Handbook',
       link: '/handbook',
       subItem: true,
       showOnCompressed: true,
     }, {
       id: 'podcasts',
-      title: 'EA Forum Podcast',
+      title: 'FAST Forum Podcast',
       link: podcastPost,
       subItem: true,
       showOnCompressed: true,

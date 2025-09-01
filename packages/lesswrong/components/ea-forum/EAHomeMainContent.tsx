@@ -54,7 +54,7 @@ const sortTopics = (topics: Array<TopicsBarTab>) =>
 const frontpageTab = {_id: '0', name: FRONTPAGE_TAB_NAME}
 
 /**
- * This handles displaying the main content on the EA Forum home page,
+ * This handles displaying the main content on the FAST Forum home page,
  * which includes the topics bar and the topic-specific tabs.
  * The "Frontpage" tab content comes from EAHome.
  */

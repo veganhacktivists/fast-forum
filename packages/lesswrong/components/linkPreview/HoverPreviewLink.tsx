@@ -86,7 +86,7 @@ const HoverPreviewLink = ({ href, contentSourceDescription, id, rel, noPrefetch,
     const linkTargetAbsolute = new URLClass(href, currentURL);
 
     const onsiteUrl = linkTargetAbsolute.pathname + linkTargetAbsolute.search + linkTargetAbsolute.hash;
-    const hostType = classifyHost(linkTargetAbsolute.host)
+    const hostType = classifyHost(linkTargetAbsolute)
     if (!linkIsExcludedFromPreview(onsiteUrl) && (hostType==="onsite" || hostType==="mirrorOfUs")) {
       const parsedUrl = parseRouteWithErrors(onsiteUrl, contentSourceDescription)
       const destinationUrl = hostType==="onsite" ? parsedUrl.url : href;
@@ -104,7 +104,7 @@ const HoverPreviewLink = ({ href, contentSourceDescription, id, rel, noPrefetch,
             </NoSideItems>
           </AnalyticsContext>
         } else {
-          return <DefaultPreview href={href} id={id} rel={rel} className={className}>
+          return <DefaultPreview target="_blank" href={href} id={id} rel={rel} className={className}>
             {children}
           </DefaultPreview>
         }
@@ -156,7 +156,7 @@ const HoverPreviewLink = ({ href, contentSourceDescription, id, rel, noPrefetch,
           {children}
         </ViewpointsPreview>
       }
-      return <DefaultPreview href={href} id={id} rel={rel} className={className}>
+      return <DefaultPreview target="_blank" href={href} id={id} rel={rel} className={className}>
         {children}
       </DefaultPreview>
     }

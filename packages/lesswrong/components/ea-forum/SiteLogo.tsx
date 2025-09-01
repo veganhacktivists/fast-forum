@@ -3,16 +3,15 @@
  *
  * Could easily be adapted for other Forums
  */
-import React from 'react';
-import { registerComponent } from '../../lib/vulcan-lib/components';
-import { getLogoUrl } from '../../lib/vulcan-lib/utils';
-import { forumTitleSetting, isEAForum } from '../../lib/instanceSettings';
-import { lightbulbIcon } from '../icons/lightbulbIcon';
+import React from "react";
+import { registerComponent } from "../../lib/vulcan-lib/components";
+import { getLogoUrl, getSmallLogoUrl } from "../../lib/vulcan-lib/utils";
+import { forumTitleSetting, isEAForum } from "../../lib/instanceSettings";
 
-const styles = (theme: ThemeType) => ({
+const styles = (theme: ThemeType): JssStyles => ({
   root: {
     height: isEAForum ? 34 : 48,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       height: isEAForum ? 30 : 48,
     },
   },
@@ -21,31 +20,48 @@ const styles = (theme: ThemeType) => ({
     [theme.breakpoints.down("sm")]: {
       width: 30,
     },
-  }
-})
+  },
+});
 
-const SiteLogo = ({eaContrast, classes}: {
-  eaContrast?: boolean,
-  classes: ClassesType<typeof styles>;
-}) => {
-  // Use this icon when we want version of the EAF logo with an editable (usually white) color
-  if (isEAForum && eaContrast) {
-    return <div className={classes.icon}>{lightbulbIcon}</div>
-  }
+const SiteLogo = ({ eaWhite, classes }: { eaWhite?: boolean; classes: ClassesType; width?: number }) => {
+  const logoUrl = getLogoUrl();
+  if (!logoUrl) return null;
 
-  if (!getLogoUrl()) return null
+  return (
+    <img
+      className={classes.root}
+      src={logoUrl}
+      title={forumTitleSetting.get()}
+      alt={`${forumTitleSetting.get()} Logo`}
+      style={{ width: "250px", height: "45px" }}
+    />
+  );
+};
 
-  return <img
-    className={classes.root}
-    src={getLogoUrl()}
-    title={forumTitleSetting.get()}
-    alt={`${forumTitleSetting.get()} Logo`}
-  />
-}
+const SiteLogoSmall = ({ eaWhite, classes }: { eaWhite?: boolean; classes: ClassesType }) => {
+  const smallUrl = getSmallLogoUrl();
+
+  return (
+    <img
+      className={classes.root}
+      src={smallUrl}
+      title={forumTitleSetting.get()}
+      alt={`${forumTitleSetting.get()} Logo`}
+      style={{ width: "150px", height: "46px" }}
+    />
+  );
+};
 
 SiteLogo.displayName = "SiteLogo";
-export default registerComponent(
-  'SiteLogo', SiteLogo, {styles}
-);
+
+const SiteLogoComponent = registerComponent("SiteLogo", SiteLogo, { styles });
+const SiteLogoSmallComponent = registerComponent("SiteLogoSmall", SiteLogoSmall, { styles });
+
+declare global {
+  interface ComponentTypes {
+    SiteLogo: typeof SiteLogoComponent;
+    SiteLogoSmall: typeof SiteLogoSmallComponent;
+  }
+}
 
 

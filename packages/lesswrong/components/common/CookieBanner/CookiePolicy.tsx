@@ -116,7 +116,7 @@ const CookiePolicy = ({ classes }: { classes: ClassesType<typeof styles> }) => {
       </Typography>
       <Typography variant="body1">
         {/* TODO possibly make this generic for all CEA websites once all the cookie banners are done */}
-        We use cookies on the EA Forum. This cookie notice applies only to the EA Forum. You may access and change your
+        We use cookies on the FAST Forum. This cookie notice applies only to the FAST Forum. You may access and change your
         cookie preferences at any time by clicking{" "}
         <a onClick={() => openDialog({
           name: "CookieDialog",
