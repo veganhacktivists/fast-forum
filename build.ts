@@ -20,6 +20,7 @@ const bundleDefinitions = envToDefinition({
 });
 
 const commonOpts: Partial<BuildConfig> = {
+  cwd: process.cwd(),
   clear: false,
   sourcemap: !isProd,
   sourcesContent: !isProd,

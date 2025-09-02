@@ -14,7 +14,7 @@ cmds = [
 ]
 
 [phases.setup]
-nixPkgs = ['...', 'python3Minimal']
+nixPkgs = ['nodejs_20', 'pnpm-9_x', 'openssl', 'python3Minimal']
 
 [start]
 cmd = 'pnpm run migrate up && exec node ./build/server/js/serverBundle.js'
