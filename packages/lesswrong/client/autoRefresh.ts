@@ -1,5 +1,4 @@
 import { onStartup, getWebsocketPort, isProduction } from "../lib/executionEnvironment";
-import type { MessageEvent, OpenEvent, CloseEvent } from "ws";
 
 // In development, make a websocket connection (on a different port) to get
 // notified when the server has restarted with a new version.
@@ -32,8 +31,8 @@ function connectWebsocket() {
       console.log(e);
     }
   });
-  connectedWebsocket.addEventListener("open", (event: OpenEvent) => {});
-  connectedWebsocket.addEventListener("error", (event: CloseEvent) => {
+  connectedWebsocket.addEventListener("open", (event: Event) => {});
+  connectedWebsocket.addEventListener("error", (event: Event) => {
     disconnectWebsocket();
   });
   connectedWebsocket.addEventListener("close", (event: CloseEvent) => {

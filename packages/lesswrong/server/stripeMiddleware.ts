@@ -1,6 +1,6 @@
 import { DatabaseServerSetting } from "./databaseSettings";
 import Stripe from "stripe";
-import type { Request, Response } from "express-serve-static-core";
+import type { Request, Response, NextFunction } from "express-serve-static-core";
 import type { AddMiddlewareType } from "./apolloServer";
 
 const stripePrivateKeySetting = new DatabaseServerSetting<null | string>("stripe.privateKey", null);
@@ -10,8 +10,9 @@ export const addStripeMiddleware = (addMiddleware: AddMiddlewareType) => {
   const stripePrivateKey = stripePrivateKeySetting.get();
   const stripe = stripePrivateKey && new Stripe(stripePrivateKey, { apiVersion: "2020-08-27" });
 
-  const stripeMiddleware = async (req: Request, res: Response) => {
-    if (req.method === "POST" && stripe) {
+  const stripeMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (req.method === "POST" && stripe) {
       const redirectTarget = stripeURLRedirect.get();
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
@@ -84,9 +85,14 @@ export const addStripeMiddleware = (addMiddleware: AddMiddlewareType) => {
       });
       res.setHeader("Content-Type", "application/json");
       res.end(JSON.stringify({ id: session.id }));
+      } else {
+        next();
+      }
+    } catch (error) {
+      next(error);
     }
   };
   if (stripePrivateKey && stripe) {
-    addMiddleware("/create-session", stripeMiddleware);
+    addMiddleware("/create-session", stripeMiddleware as any);
   }
 };

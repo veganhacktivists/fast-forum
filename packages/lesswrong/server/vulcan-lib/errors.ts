@@ -22,7 +22,7 @@ An error should have:
 */
 export const throwError = (error: { id: string; data: Record<string, any> }) => {
   const { id } = error;
-  throw new UserInputError(id, error);
+  throw new UserInputError(id, { extensions: error });
 };
 
 Utils.throwError = throwError;

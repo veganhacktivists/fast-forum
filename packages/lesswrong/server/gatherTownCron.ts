@@ -8,7 +8,6 @@ import { isProduction, onStartup } from "../lib/executionEnvironment";
 import { toDictionary } from "../lib/utils/toDictionary";
 import * as _ from "underscore";
 import { isLW } from "../lib/instanceSettings";
-import type { OpenEvent } from "ws";
 
 const gatherTownRoomPassword = new DatabaseServerSetting<string | null>("gatherTownRoomPassword", "the12thvirtue");
 
@@ -224,7 +223,7 @@ const getGatherTownUsers = async (
   // eslint-disable-next-line no-console
   console.log(`Connecting to websocket server ${websocketServerUrl}`);
   const socket = new WebSocket(websocketServerUrl);
-  socket.on("open", function (data: OpenEvent) {
+  socket.on("open", function (data: any) {
     socketConnectedSuccessfully = true;
     sendMessageOnSocket(socket, {
       event: "init",

@@ -31,7 +31,7 @@ import type { IncomingMessage, ServerResponse } from "http";
 const urlParse = URL.parse;
 
 type Req = Parameters<RequestHandler>[0];
-type Res = Response<any, Record<string, any>, number>;
+type Res = Parameters<RequestHandler>[1];
 type FilterFunction = (req: Req, res: Res) => any;
 type RouteCallback = (
   props: any,
