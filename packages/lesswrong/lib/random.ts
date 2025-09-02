@@ -5,7 +5,7 @@ const getCrypto = () => {
     return null;
   }
   try {
-    return require("crypto");
+    return require("node:crypto");
   } catch {
     return null;
   }

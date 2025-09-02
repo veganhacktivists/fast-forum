@@ -1,10 +1,9 @@
 // @ts-check
 const WebSocket = require("ws");
-const crypto = require("crypto");
+const { randomBytes } = require("node:crypto");
 const fs = require("fs");
 const { getOutputDir } = require("./buildUtil");
 const childProcess = require("child_process");
-const { promisify } = require("util");
 
 const openWebsocketConnections = [];
 let clientRebuildInProgress = false;
@@ -59,7 +58,7 @@ function getEitherBundleTimestamp() {
 }
 
 function generateBuildId() {
-  return crypto.randomBytes(12).toString("base64");
+  return randomBytes(12).toString("base64");
 }
 
 let refreshIsPending = false;

@@ -6,7 +6,7 @@ import {
   addGraphQLQuery,
 } from "../../lib/vulcan-lib/graphql";
 import { createMutator, updateMutator } from "../vulcan-lib/mutators";
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 import { petrovDayLaunchCode } from "../../components/seasonal/PetrovDayButton";
 import { userCanLaunchPetrovMissile } from "../../lib/petrovHelpers";
 

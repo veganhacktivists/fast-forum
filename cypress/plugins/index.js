@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 const pgp = require("pg-promise");
-const { createHash } = require("crypto");
+const { createHash } = require("node:crypto");
 
 const pgDbTemplate = "unittest_cypress_template";
 let pgDbName;
