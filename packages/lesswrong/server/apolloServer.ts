@@ -1,4 +1,5 @@
-import { ApolloServer } from "apollo-server-express";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@as-integrations/express5";
 import { GraphQLError, GraphQLFormattedError } from "graphql";
 
 import { isDevelopment, getInstanceSettings, getServerPort } from "../lib/executionEnvironment";
@@ -51,7 +52,7 @@ import { hstsMiddleware } from "./hsts";
 import { getClientBundle } from "./utils/bundleUtils";
 import { isElasticEnabled } from "./search/elastic/elasticSettings";
 import ElasticController from "./search/elastic/ElasticController";
-import type { ApolloServerPlugin, GraphQLRequestContext, GraphQLRequestListener } from "apollo-server-plugin-base";
+import type { ApolloServerPlugin, GraphQLRequestContext, GraphQLRequestListener } from "@apollo/server";
 import {
   asyncLocalStorage,
   closePerfMetric,
@@ -63,10 +64,8 @@ import { performanceMetricLoggingEnabled } from "../lib/publicSettings";
 import { Readable } from "stream";
 
 class ApolloServerLogging implements ApolloServerPlugin<ResolverContext> {
-  requestDidStart({
-    request,
-    context,
-  }: GraphQLRequestContext<ResolverContext>): GraphQLRequestListener<ResolverContext> {
+  async requestDidStart(requestContext: GraphQLRequestContext<ResolverContext>): Promise<GraphQLRequestListener<ResolverContext>> {
+    const { request } = requestContext;
     const { operationName = "unknownGqlOperation", query, variables } = request;
 
     //remove sensitive data from variables such as password
@@ -82,7 +81,7 @@ class ApolloServerLogging implements ApolloServerPlugin<ResolverContext> {
       startedRequestMetric = openPerfMetric({
         op_type: "query",
         op_name: operationName,
-        parent_trace_id: context.perfMetric?.trace_id,
+        parent_trace_id: requestContext.contextValue?.perfMetric?.trace_id,
         extra_data: filteredVariables,
         gql_string: query,
       });
@@ -93,7 +92,7 @@ class ApolloServerLogging implements ApolloServerPlugin<ResolverContext> {
     }
 
     return {
-      willSendResponse() {
+      async willSendResponse() {
         // hook for transaction finished
         if (performanceMetricLoggingEnabled.get()) {
           closePerfMetric(startedRequestMetric);
@@ -109,7 +108,7 @@ class ApolloServerLogging implements ApolloServerPlugin<ResolverContext> {
 
 export type AddMiddlewareType = typeof app.use;
 
-export function startWebserver() {
+export async function startWebserver() {
   const addMiddleware: AddMiddlewareType = (...args: any[]) => app.use(...args);
   const config = { path: "/graphql" };
 
@@ -160,10 +159,7 @@ export function startWebserver() {
   // create server
   // given options contains the schema
   const apolloServer = new ApolloServer({
-    // graphql playground (replacement to graphiql), available on the app path
-    playground: getPlaygroundConfig(config.path),
     introspection: true,
-    debug: isDevelopment,
 
     schema: getExecutableSchema(),
     formatError: (e: GraphQLError): GraphQLFormattedError => {
@@ -175,17 +171,10 @@ export function startWebserver() {
       // and that doesn't require a cast here
       return formatError(e) as any;
     },
-    //tracing: isDevelopment,
-    tracing: false,
-    cacheControl: true,
-    context: async ({ req, res }: { req: express.Request; res: express.Response }) => {
-      const context = await getContextFromReqAndRes(req, res);
-      configureSentryScope(context);
-      setAsyncStoreValue("resolverContext", context);
-      return context;
-    },
     plugins: [new ApolloServerLogging()],
   });
+
+  await apolloServer.start();
 
   const storage = multer.memoryStorage();
 
@@ -210,10 +199,18 @@ export function startWebserver() {
     }
   });
 
-  app.use("/graphql", express.json({ limit: "50mb" }));
-  app.use("/graphql", express.text({ type: "application/graphql" }));
-  app.use("/graphql", perfMetricMiddleware);
-  apolloServer.applyMiddleware({ app });
+  app.use(
+    "/graphql",
+    express.json({ limit: "50mb" }),
+    expressMiddleware(apolloServer, {
+      context: async ({ req, res }: { req: express.Request; res: express.Response }) => {
+        const context = await getContextFromReqAndRes(req, res);
+        configureSentryScope(context);
+        setAsyncStoreValue("resolverContext", context);
+        return context;
+      },
+    })
+  );
 
   addStaticRoute("/js/bundle.js", ({ query }, req, res, context) => {
     const { bundleHash, bundleBuffer, bundleBrotliBuffer } = getClientBundle();

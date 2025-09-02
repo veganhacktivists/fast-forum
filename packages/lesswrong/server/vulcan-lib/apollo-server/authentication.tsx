@@ -11,8 +11,18 @@ import { LWEvents } from "../../../lib/collections/lwevents";
 import Users from "../../../lib/vulcan-users";
 import { hashLoginToken, userIsBanned } from "../../loginTokens";
 import { LegacyData } from "../../../lib/collections/legacyData/collection";
-import { AuthenticationError } from "apollo-server";
+import { GraphQLError } from "graphql";
 import { EmailTokenType } from "../../emails/emailTokens";
+
+// AuthenticationError replacement for Apollo Server v4
+export class AuthenticationError extends GraphQLError {
+  constructor(message: string, options?: { extensions?: Record<string, any> }) {
+    super(message, undefined, undefined, undefined, undefined, undefined, {
+      code: 'UNAUTHENTICATED',
+      ...options?.extensions,
+    });
+  }
+}
 import { wrapAndSendEmail } from "../../emails/renderEmail";
 import SimpleSchema from "simpl-schema";
 import { userEmailAddressIsVerified } from "../../../lib/collections/users/helpers";

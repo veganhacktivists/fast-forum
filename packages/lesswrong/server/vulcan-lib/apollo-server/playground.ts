@@ -1,5 +1,6 @@
 import { isDevelopment } from "../../../lib/executionEnvironment";
-import type { PlaygroundConfig } from "apollo-server";
+// Apollo Server v4 doesn't have built-in playground
+type PlaygroundConfig = boolean | { settings?: any };
 
 // GraphQL Playground setup
 export const getPlaygroundConfig = (path: string): PlaygroundConfig | undefined => {

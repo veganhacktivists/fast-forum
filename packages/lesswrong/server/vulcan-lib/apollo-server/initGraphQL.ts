@@ -1,7 +1,7 @@
 // Generate GraphQL-syntax schemas from resolvers &c that were set up with
 // addGraphQLResolvers &c.
 
-import { makeExecutableSchema } from "apollo-server";
+import { makeExecutableSchema } from "@graphql-tools/schema";
 import {
   getAdditionalSchemas,
   queries,

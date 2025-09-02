@@ -1,4 +1,14 @@
-import { UserInputError } from "apollo-server";
+import { GraphQLError } from "graphql";
+
+// UserInputError replacement for Apollo Server v4
+export class UserInputError extends GraphQLError {
+  constructor(message: string, options?: { extensions?: Record<string, any> }) {
+    super(message, undefined, undefined, undefined, undefined, undefined, {
+      code: 'BAD_USER_INPUT',
+      ...options?.extensions,
+    });
+  }
+}
 import { Utils } from "../../lib/vulcan-lib";
 
 /*
