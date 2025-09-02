@@ -44,7 +44,6 @@ void (async () => {
     tslint: false,
     define: { ...bundleDefinitions, global: "window" },
     plugins: [
-      // @ts-ignore
       nodeModulesPolyfillPlugin({
         modules: ["crypto"],
       }),
