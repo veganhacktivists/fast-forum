@@ -64,4 +64,6 @@ declare global {
   }
 }
 
+export default SiteLogoComponent;
+
 

@@ -181,6 +181,15 @@ export const getLogoUrl = (): string|undefined => {
   }
 };
 
+export const getSmallLogoUrl = (): string|undefined => {
+  const logoUrl = logoUrlSetting.get()
+  if (logoUrl) {
+    const prefix = getSiteUrl().slice(0,-1);
+    // the logo may be hosted on another website
+    return logoUrl.indexOf('://') > -1 ? logoUrl : prefix + logoUrl;
+  }
+};
+
 export const encodeIntlError = (error: AnyBecauseTodo) => typeof error !== 'object' ? error : JSON.stringify(error);
 
 export const decodeIntlError = (error: AnyBecauseTodo, options = {stripped: false}) => {
