@@ -14,6 +14,7 @@ cmds = [
 ]
 
 [phases.setup]
+nixpkgsArchive = '58dcbf1ec551914c3756c267b8b9c8c86baa1b2f'
 nixPkgs = ['nodejs_20', 'pnpm-9_x', 'openssl', 'python3Minimal']
 
 [start]
