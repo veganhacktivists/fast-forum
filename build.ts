@@ -2,6 +2,7 @@
 
 import { BuildConfig, build, cliopts } from "estrella";
 import process from "process";
+import { nodeModulesPolyfillPlugin } from "esbuild-plugins-node-modules-polyfill";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -33,8 +34,8 @@ const serverOutPath = "./build/server/js/serverBundle.js";
 
 void (async () => {
   const clientBuild = build({
-    ...commonOpts,
     entryPoints: ["./packages/lesswrong/client/clientStartup.ts"],
+    ...commonOpts,
     target: "es6",
     outfile: clientOutPath,
     platform: "browser",
@@ -42,6 +43,11 @@ void (async () => {
     run: false,
     tslint: false,
     define: { ...bundleDefinitions, global: "window" },
+    plugins: [
+      nodeModulesPolyfillPlugin({
+        modules: ["crypto"],
+      }),
+    ],
   });
 
   const serverBuild = build({
